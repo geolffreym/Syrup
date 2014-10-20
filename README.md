@@ -1586,7 +1586,7 @@ Using modules
 -------------
 
 _$ ( function () {
-    var libraryStore = _.App.container ( 'libraryStore' );
+    var libraryStore = Module.blend ( 'libraryStore', [] );
     libraryStore.recipe ( 'bookList', function ( _, _$, scope ) {
         return {
             
@@ -1603,8 +1603,6 @@ _$ ( function () {
         };
     } );
 
-    libraryStore.taste ( 'bookList', true ); // Init
-    libraryStore.stop ( 'bookList' );//Stop
 } );
 
 ```  
@@ -1683,7 +1681,7 @@ Using modules
 -------------
 //The Controller /controller/libraryStore/init.js
  _$ ( function () {
-    var libraryStore = _.App.container ( 'libraryStore' );
+    var libraryStore = Module.blend ( 'libraryStore', [] );
     libraryStore.recipe ( 'bookList', function ( _, _$, scope ) {
         return {
             init:    function () {
@@ -1700,8 +1698,6 @@ Using modules
         };
     } );
 
-    libraryStore.taste ( 'bookList', true ); // Init
-    libraryStore.stop ( 'bookList' );//Stop
 } );
 
 
