@@ -65,7 +65,7 @@ Concepts
 *@param _$ {$ object}
 *@param scope {object}
 */
-var my_module = _.App.container('my_module');
+var my_module = Module.blend('my_module', []); 
 my_module.recipe('my_module', function( _, _$, scope ){
     return {
             //Constructor needed
@@ -80,16 +80,6 @@ my_module.recipe('my_module', function( _, _$, scope ){
     })
 })
 
-//Start Module
-my_module.taste('my_module', bool); //bool True if view need be loaded
-    or
-_.App.tasteAll();
-
-//Destroy Module
-my_module.drop('my_module');
-    or
-_.App.dropAll();
-
 ```
 
 
@@ -98,24 +88,24 @@ _.App.dropAll();
 ```js
 
 //Defining lib my_lib
-function my_lib(){
-    //Code
-}
 
 //Register Lib
-Syrup.blend(my_lib)
+var my_lib = Lib.blend('my_lib', [])
+my_lib.make(function(){
+    return {
+        //Attributes
+    }
+
+}) //Constructor
 
 
-//Controller
-// Include using method or with autoload (Just Instance)
-_.include('my_lib', function(){
-    //Making the Job ...
-    //The lib is now ready for global use.
-    var my_lib = new _.my_lib
+my_lib.supply(function(){
+    return {
+        //methods
+    }
 })
 
-//Destroy lib
-Syrup.drop(my_lib)
+
 ```
 
 **Binding random**
@@ -124,7 +114,7 @@ Syrup.drop(my_lib)
 function myClass(){
     //code
 }
-myClass.blend(my_lib);
+Syrup.blend(myClass);
 ```
 
 Compatibility with browsers
@@ -1495,12 +1485,18 @@ Using modules
 ```js
  _$ ( function () {
 
-    var libraryStore = _.App.container ( 'libraryStore' );
+    var libraryStore = Module.blend ( 'libraryStore', ['Ajax'] );
+    
+    //General service for modules
+    libraryStore.service('console', function(){
+        console.log("Here is the service");
+    })
 
     libraryStore.recipe ( 'bookList', function ( _, _$, scope ) {
         return {
-            init:    function () {
-
+            init:    function (tools) {
+                //Tools object with dependencies
+                
                 var _self = this;
 
                 scope.bookList = {info: [
@@ -1511,6 +1507,8 @@ Using modules
                 //When bookList change
                 _self.on ( 'change', function ( changes ) {
                     _self.serve (); // Getting view
+                    
+                    tools.console();
                 } );
 
             },
@@ -1523,7 +1521,7 @@ Using modules
 
     libraryStore.recipe ( 'bookUsers', function ( _, _$, scope ) {
         return {
-            init:    function () {
+            init:    function (tools) {
 
                 //Changing bookList. This notify to booklist for a new change
                 scope.bookList = {info: [
@@ -1544,7 +1542,7 @@ Using modules
     } ).addEvent('click', {function || null}); 
     
     //Bind listener for syrup-event="bookUsers"
-    //If function is passed it executes, else if not, init is executed
+    //If function is passed it executes, else if not, init is executed, else if string name of function is passed, its executed
     
     libraryStore.taste ( 'bookList' );
 });

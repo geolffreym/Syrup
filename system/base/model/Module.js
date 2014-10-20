@@ -185,12 +185,6 @@ Module.add ( '_taste', function ( moduleId, event ) {
 			_self.modules[moduleId].instance.serve = function ( _template ) {
 				_self._serve ( moduleId, _template );
 			};
-			_self.modules[moduleId].instance.listen = function ( callback ) {
-				return _self.listen ( callback );
-			};
-			_self.modules[moduleId].instance.source = function ( data, callback ) {
-				return _self.source ( data, callback );
-			};
 			_self._watch ( moduleId );
 			_self._serve ( moduleId, _self.modules[moduleId].instance.template );
 
