@@ -1,0 +1,35 @@
+{
+
+	"name": "Syrup",
+	"description": "Give your JS App MVC | MTV pattern with Models, Views, Controllers, Templates, Events, Connections, Real Time Communications, etc...",
+	"keywords": [
+		"model",
+		"view",
+		"controller",
+		"router",
+		"server",
+		"client",
+		"browser"
+	],
+	"author": "Geolffrey Mena <gmjun2000@gmail.com>",
+	"devDependencies": {
+		"b_combiner-js": "*"
+	},
+	"main": "Syrup.js",
+	"version": "0.1.0",
+	"license": "GNU GPL",
+	"scripts": {
+		"start": "node node_modules/b_combiner-js/index.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/geolffreym/_b_JS"
+	},
+	"bugs": {
+		"url": "https://github.com/geolffreym/_b_JS/issues"
+	},
+	"homepage": "https://github.com/geolffreym/_b_JS",
+	"directories": {
+		"test": "test"
+	}
+}

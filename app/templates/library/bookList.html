@@ -1,0 +1,19 @@
+<div class="library_info">
+    <table>
+        <tr>
+            <th>Library Info</th>
+        </tr>
+        <% (for |data| in |info|) %>
+            <tr>
+                <td>
+                    <div><strong>Unit:</strong> <span>{data.unit}</span></div>
+                    <div><strong>Departure/Date:</strong>
+                        <span id="{data.pickup}">{data.date}</span>
+                        <span>&nbsp; / &nbsp;{data.trip_date}</span>
+                    </div>
+                    <div><strong>Cost/Person:</strong> <span class="money">{data.money}</span></div>
+                </td>
+            </tr>
+        <% endfor %>
+    </table>
+</div>

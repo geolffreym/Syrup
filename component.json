@@ -1,0 +1,26 @@
+{
+<<<<<<< HEAD
+	"name": "Syrup",
+	"version": "0.1.",
+	"description": "Give your JS App MVC | MTV pattern with Models, Views, Controllers, Templates, Events and Connections.",
+	"keywords": ["model", "view", "controller", "router", "server", "client", "browser"],
+	"repo": "https://github.com/geolffreym/Syrup",
+	"dependencies": {
+		"jashkenas/underscore": "*"
+	},
+	"main": "Syrup.js",
+	"scripts": ["Syrup.js"],
+=======
+	"name": "__b__",
+	"version": "0.1.",
+	"description": "Give your JS App MVC | MTV pattern with Models, Views, Controllers, Templates, Events and Connections.",
+	"keywords": ["model", "view", "controller", "router", "server", "client", "browser"],
+	"repo": "https://github.com/geolffreym/__b__",
+	"dependencies": {
+		"jashkenas/underscore": "*"
+	},
+	"main": "__b__.js",
+	"scripts": ["__b__.js"],
+>>>>>>> 9060c5b2bfd16e0ad30a332636bf01df9234fa00
+	"license": "GNU GPL"
+}
