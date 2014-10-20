@@ -1544,7 +1544,6 @@ Using modules
     //Bind listener for syrup-event="bookUsers"
     //If function is passed it executes, else if not, init is executed, else if string name of function is passed, its executed
     
-    libraryStore.taste ( 'bookList' );
 });
 
 ```
