@@ -1337,9 +1337,9 @@ Syrup.add ( 'objectWatch', function ( obj, callback, conf ) {
  * @param orientation
  */
 Syrup.add ( 'interval', function ( callback, conf ) {
-	var _worker = new Workers;
+	var _worker = _.Workers.clone();
 
-	_worker.set ( 'system/workers/setting/Interval', function () {
+	_worker.set ( 'interval', 'system/workers/setting/Interval', function () {
 		_worker.send ( conf );
 	} );
 

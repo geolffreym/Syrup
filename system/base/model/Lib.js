@@ -29,6 +29,7 @@ Lib.add ( 'blend', function ( name, dependencies ) {
 		_self.object = _[name];
 		_self.breadcrumb[name] = _self.object;
 		_self.cook ( 'add', _self._mix );
+		_self.cook ( 'clone', function () {return _self.object;} );
 		_self._dependencies ( dependencies );
 	}
 	else {
@@ -94,5 +95,6 @@ Lib.add ( '_mix', function ( name, callback ) {
 	return this;
 
 } );
+
 
 window.Lib = new Lib;
