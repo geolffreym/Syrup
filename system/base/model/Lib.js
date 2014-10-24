@@ -13,7 +13,7 @@ function Lib () {
 
 Lib.add ( 'blend', function ( name, dependencies ) {
 	var _split = _.splitString ( name, '.' );
-	if ( _.isArray(_split) ) {
+	if ( _.isArray ( _split ) ) {
 		name = _split[0];
 	}
 
@@ -28,6 +28,7 @@ Lib.add ( 'blend', function ( name, dependencies ) {
 		_self.name = name;
 		_self.object = _[name];
 		_self.breadcrumb[name] = _self.object;
+		_self.cook ( 'add', _self._mix );
 		_self._dependencies ( dependencies );
 	}
 	else {
@@ -83,9 +84,15 @@ Lib.add ( 'supply', function ( supplier ) {
 
 
 Lib.add ( 'cook', function ( name, callback ) {
-    this.object.__proto__[name] = callback;
-    //this.object[name] = callback;
+	this.object.__proto__[name] = callback;
+	//this.object[name] = callback;
 	return this;
+} );
+
+Lib.add ( '_mix', function ( name, callback ) {
+	this.__proto__[name] = callback;
+	return this;
+
 } );
 
 window.Lib = new Lib;

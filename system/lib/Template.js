@@ -15,7 +15,7 @@ Lib.blend ( 'Template', ['Repository', 'Ajax', 'Workers'] ).make ( function () {
 	return {
 		lookup: function ( template, callback ) {
 			var _conf = {
-				url:       setting.app_path + 'app/templates/' + template,
+				url:       setting.app_path + 'templates/' + template,
 				dataType:  'text/plain',
 				processor: '.html'
 			};
