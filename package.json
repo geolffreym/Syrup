@@ -23,12 +23,12 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/geolffreym/_b_JS"
+		"url": "https://github.com/geolffreym/Syrup"
 	},
 	"bugs": {
-		"url": "https://github.com/geolffreym/_b_JS/issues"
+		"url": "https://github.com/geolffreym/Syrup/issues"
 	},
-	"homepage": "https://github.com/geolffreym/_b_JS",
+	"homepage": "https://github.com/geolffreym/Syrup",
 	"directories": {
 		"test": "test"
 	}
