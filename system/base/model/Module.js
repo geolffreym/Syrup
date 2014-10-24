@@ -160,7 +160,7 @@ Module.add ( 'factory', function ( name, callback ) {
 } );
 
 Module.add ( 'service', function ( name, callback ) {
-    Lib.cook(name, callback);
+	Lib.cook ( name, callback );
 } );
 
 Module.add ( 'services', function ( callback ) {
@@ -180,6 +180,14 @@ Module.add ( '_taste', function ( moduleId, event ) {
 			_self.modules[moduleId].instance = _self._trigger ( moduleId );
 			_self.modules[moduleId].instance.name = moduleId;
 			_self.modules[moduleId].instance.template = _.isSet ( _self.modules[moduleId].instance.template );
+			_self.modules[moduleId].instance.set = function ( object ) {
+				_self.set ( moduleId, object );
+			};
+
+			_self.modules[moduleId].instance.get = function () {
+				_self.get ( moduleId );
+			};
+
 			_self.modules[moduleId].instance.on = function ( event, callback ) {
 				_self.on ( event, moduleId, callback );
 			};
@@ -216,7 +224,7 @@ Module.add ( 'drop', function ( moduleId ) {
 	if ( _.isSet ( this.modules[moduleId] ) ) {
 		if ( this.modules[moduleId].instance ) {
 			if ( this.modules[moduleId].instance.destroy )
-				this.modules[moduleId].instance.destroy (moduleId);
+				this.modules[moduleId].instance.destroy ( moduleId );
 
 			if ( this.ondrop[moduleId] )
 				this.ondrop[moduleId] ( moduleId );
