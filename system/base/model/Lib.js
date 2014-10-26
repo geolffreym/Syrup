@@ -27,9 +27,12 @@ Lib.add ( 'blend', function ( name, dependencies ) {
 		Syrup.blend ( _anonymous () );
 		_self.name = name;
 		_self.object = _[name];
+		_self.object.name = name;
 		_self.breadcrumb[name] = _self.object;
 		_self.cook ( 'add', _self._mix );
-		_self.cook ( 'clone', function () {return _self.object;} );
+		_self.cook ( 'clone', function () {
+			return _[this.name];
+		} );
 		_self._dependencies ( dependencies );
 	}
 	else {
