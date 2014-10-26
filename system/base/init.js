@@ -110,6 +110,7 @@ _$_.add ( '$', function ( dom ) {
 	 }*/
 
 	_self.exist = _.isSet ( _self.collection );
+    _self.selector = dom;
 	return _self;
 } );
 

@@ -55,16 +55,16 @@ Module.add ( '_watch', function ( moduleId ) {
 } );
 
 Module.add ( '_add', function ( moduleId ) {
-    var _self = this,
-        _name = moduleId;
+	var _self = this,
+	    _name = moduleId;
 
-    if (moduleId.indexOf('.') > -1) {
-        _name = moduleId.split('.').pop();
-    }
+	if ( moduleId.indexOf ( '.' ) > -1 ) {
+		_name = moduleId.split ( '.' ).pop ();
+	}
 
-    if (!_.isObject(_self.scope[_self.modules[moduleId].parent][moduleId]))
-        _self.scope[_self.modules[moduleId].parent][_name] = {};
-        //_self.scope[_self.modules[moduleId].parent][moduleId] = {};
+	if ( !_.isObject ( _self.scope[_self.modules[moduleId].parent][moduleId] ) )
+		_self.scope[_self.modules[moduleId].parent][_name] = {};
+	//_self.scope[_self.modules[moduleId].parent][moduleId] = {};
 
 } );
 
@@ -104,7 +104,6 @@ Module.add ( 'addEvent', function ( event, callback ) {
 	    _callback,
 	    _dom = _$ ( '[syrup-event="' + _self.temp + '"]' );
 
-
 	_callback = _.isSet ( callback ) && _.isFunction ( callback )
 		? callback : function ( e ) {
 		e.dance = _.isString ( callback )
@@ -114,7 +113,7 @@ Module.add ( 'addEvent', function ( event, callback ) {
 
 	if ( _dom.exist ) {
 		_dom.data ( 'shooter', _self.temp );
-		_dom.addListener ( event, _callback );
+		_$ ( 'body' ).addListener ( event, _dom.selector, _callback );
 	}
 	return this;
 } );
@@ -195,10 +194,10 @@ Module.add ( '_taste', function ( moduleId, event ) {
 			};
 
 			_self.modules[moduleId].instance.on = function ( event, callback ) {
-                _self.on(event, this.name, callback);
+				_self.on ( event, this.name, callback );
 			};
 			_self.modules[moduleId].instance.serve = function ( _template ) {
-                _self._serve(this.name, _template);
+				_self._serve ( this.name, _template );
 			};
 			_self._watch ( moduleId );
 			_self._serve ( moduleId, _self.modules[moduleId].instance.template );
