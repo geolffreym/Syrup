@@ -55,10 +55,16 @@ Module.add ( '_watch', function ( moduleId ) {
 } );
 
 Module.add ( '_add', function ( moduleId ) {
-	var _self = this;
+    var _self = this,
+        _name = moduleId;
 
-	if ( !_.isObject ( _self.scope[_self.modules[moduleId].parent][moduleId] ) )
-		_self.scope[_self.modules[moduleId].parent][moduleId] = {};
+    if (moduleId.indexOf('.') > -1) {
+        _name = moduleId.split('.').pop();
+    }
+
+    if (!_.isObject(_self.scope[_self.modules[moduleId].parent][moduleId]))
+        _self.scope[_self.modules[moduleId].parent][_name] = {};
+        //_self.scope[_self.modules[moduleId].parent][moduleId] = {};
 
 } );
 
