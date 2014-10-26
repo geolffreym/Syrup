@@ -189,10 +189,10 @@ Module.add ( '_taste', function ( moduleId, event ) {
 			};
 
 			_self.modules[moduleId].instance.on = function ( event, callback ) {
-				_self.on ( event, moduleId, callback );
+                _self.on(event, this.name, callback);
 			};
 			_self.modules[moduleId].instance.serve = function ( _template ) {
-				_self._serve ( moduleId, _template );
+                _self._serve(this.name, _template);
 			};
 			_self._watch ( moduleId );
 			_self._serve ( moduleId, _self.modules[moduleId].instance.template );
