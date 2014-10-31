@@ -334,23 +334,24 @@ _$_.add ( 'removeAttr', function ( attr ) {
  * @param _css
  * @returns {_$_}
  */
-_$_.add ( 'css', function ( css ) {
-	var _css = [];
-	this.each ( function ( dom ) {
-		if ( _.isString ( css ) ) {
-			var _style = window.getComputedStyle ( dom, null );
-			_css.push ( _style.getPropertyValue ( css ) );
+_$_.add('css', function (css) {
+	var _css = [],
+	    _self = this;
+	_self.each(function (dom) {
+		if (_.isString(css)) {
+			var _style = window.getComputedStyle(dom, null);
+			_css.push(_style.getPropertyValue(css));
 		} else {
-			_.each ( css, function ( value, index ) {
+			_.each(css, function (value, index) {
 				dom.style[index] = value;
-			} );
+			});
 
-			return this;
+			return _self;
 		}
-	} );
+	});
 
-	return _.specArray ( _css );
-} );
+	return _.specArray(_css);
+});
 
 /***Insert After
  * @param elem
