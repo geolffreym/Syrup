@@ -345,8 +345,6 @@ _$_.add('css', function (css) {
 			_.each(css, function (value, index) {
 				dom.style[index] = value;
 			});
-
-			return _self;
 		}
 	});
 
