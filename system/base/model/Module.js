@@ -97,8 +97,7 @@ Module.add ( 'get', function ( moduleId ) {
 Module.add ( 'addEvent', function ( event, callback ) {
 	var _self = this,
 	    _callback,
-	    _dom = _$ ( '[syrup-event="' + _self.temp + '"]' );
-
+	    _dom = _self.modules[_self.temp].instance.dom;
 
 	_callback = _.isSet ( callback ) && _.isFunction ( callback )
 		? callback : function ( e ) {
@@ -180,6 +179,7 @@ Module.add ( '_taste', function ( moduleId, event ) {
 		if ( !_.isSet ( event ) ) {
 			_self._add ( moduleId );
 			_self.modules[moduleId].instance = _self._trigger ( moduleId );
+			_self.modules[moduleId].instance.dom = _$ ( '[syrup-event="' + moduleId + '"]' );
 			_self.modules[moduleId].instance.template = _.isSet ( _self.modules[moduleId].instance.template );
 			_self.modules[moduleId].instance.on = function ( event, callback ) {
 				_self.on ( event, moduleId, callback );
@@ -187,6 +187,7 @@ Module.add ( '_taste', function ( moduleId, event ) {
 			_self.modules[moduleId].instance.serve = function ( _template ) {
 				_self._serve ( moduleId, _template );
 			};
+
 
 			_self._watch ( moduleId );
 			_self._serve ( moduleId, _self.modules[moduleId].instance.template );
