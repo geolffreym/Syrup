@@ -110,7 +110,7 @@ _$_.add ( '$', function ( dom ) {
 	 }*/
 
 	_self.exist = _.isSet ( _self.collection );
-    _self.selector = dom;
+	_self.selector = dom;
 	return _self;
 } );
 
@@ -344,6 +344,8 @@ _$_.add ( 'css', function ( css ) {
 			_.each ( css, function ( value, index ) {
 				dom.style[index] = value;
 			} );
+
+			return this;
 		}
 	} );
 
@@ -1338,7 +1340,7 @@ Syrup.add ( 'objectWatch', function ( obj, callback, conf ) {
  * @param orientation
  */
 Syrup.add ( 'interval', function ( callback, conf ) {
-	var _worker = _.Workers.clone();
+	var _worker = _.Workers.clone ();
 
 	_worker.set ( 'interval', 'system/workers/setting/Interval', function () {
 		_worker.send ( conf );
