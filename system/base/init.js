@@ -334,22 +334,22 @@ _$_.add ( 'removeAttr', function ( attr ) {
  * @param _css
  * @returns {_$_}
  */
-_$_.add('css', function (css) {
+_$_.add ( 'css', function ( css ) {
 	var _css = [],
 	    _self = this;
-	_self.each(function (dom) {
-		if (_.isString(css)) {
-			var _style = window.getComputedStyle(dom, null);
-			_css.push(_style.getPropertyValue(css));
+	_self.each ( function ( dom ) {
+		if ( _.isString ( css ) ) {
+			var _style = window.getComputedStyle ( dom, null );
+			_css.push ( _style.getPropertyValue ( css ) );
 		} else {
-			_.each(css, function (value, index) {
+			_.each ( css, function ( value, index ) {
 				dom.style[index] = value;
-			});
+			} );
 		}
-	});
+	} );
 
-	return _.specArray(_css);
-});
+	return _.specArray ( _css );
+} );
 
 /***Insert After
  * @param elem
@@ -1339,7 +1339,7 @@ Syrup.add ( 'objectWatch', function ( obj, callback, conf ) {
  * @param orientation
  */
 Syrup.add ( 'interval', function ( callback, conf ) {
-	var _worker = _.Workers.clone ();
+	var _worker = _.Workers;
 
 	_worker.set ( 'interval', 'system/workers/setting/Interval', function () {
 		_worker.send ( conf );
