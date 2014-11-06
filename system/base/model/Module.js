@@ -136,14 +136,14 @@ Module.add ( '_serve', function ( moduleId, template ) {
 
 	if ( _dom.exist && _.getObjectSize ( _scope ) > 0 ) {
 		if ( _.isSet ( template ) ) {
-			_.include ( 'app/view/' + _self.modules[moduleId].parent + '/init', function () {
+			_.include ( 'app/view/' + _self.modules[moduleId].parent + '/' + moduleId, function () {
 				_template[moduleId] ( _scope, function ( my_html ) {
 					_dom.html ( my_html );
 				} )
 			} )
 		} else {
-			//if (!_.isSet(_self.modules[moduleId]['parse']))
-			_self.modules[moduleId]['parse'] = _dom.text ();
+			if ( !_.isSet ( _self.modules[moduleId]['parse'] ) )
+				_self.modules[moduleId]['parse'] = _dom.text ();
 
 			_template.parse ( _self.modules[moduleId]['parse'], _scope, function ( result ) {
 				_dom.html ( result );
