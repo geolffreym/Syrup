@@ -19,7 +19,7 @@ exports.files = {
 			'system/lib/Template', //Dependencies Workers and Repository
 			'system/lib/Socket',
 			'system/lib/Shortcuts',
-		    'app/modules/happyFire'
+		    'app/modules/happyFire' // Module example
 			// Add all the necessary modules
 		]
 
