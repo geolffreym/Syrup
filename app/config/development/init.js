@@ -16,7 +16,7 @@ exports.files = {
 			'system/lib/Ajax',
 			'system/lib/Workers',
 			'system/lib/Repository',
-			'system/lib/Template',
+			'system/lib/Template', //Dependencies Workers and Repository
 			'system/lib/Socket',
 			'system/lib/Shortcuts',
 		    'app/modules/happyFire'
