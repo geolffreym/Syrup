@@ -55,7 +55,7 @@ Lib.blend ( 'Template', ['Repository', 'Ajax', 'Workers'] ).make ( function () {
 				_self.Workers.send ( {template: _template, fields: _fields} );
 			} );
 
-			_self.Workers.on ( 'template', 'message', function ( e ) {
+			_self.Workers.on ( 'message', function ( e ) {
 				_.callbackAudit ( callback, e.data )
 			} )
 		}
