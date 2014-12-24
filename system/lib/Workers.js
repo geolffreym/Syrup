@@ -4,9 +4,10 @@
 
 
 Lib.blend ( 'Workers', [] ).make ( function () {
-	return{
-		Worker:    null,
-		onsuccess: null
+	return {
+		Worker:    {},
+		name:      null,
+		onsuccess: {}
 	}
 } ).supply ( function () {
 	return {
@@ -14,29 +15,30 @@ Lib.blend ( 'Workers', [] ).make ( function () {
 			var self = this;
 			return [{
 				message: function () {
-					self.onsuccess = callback;
+					self.onsuccess[self.name] = callback;
 				}
 			}[event] ()]
 		},
-		set:  function ( url, callback ) {
+		set:  function ( name, url, callback ) {
 			var self = this;
-			self.Worker = (new Worker ( setting.app_path + url + '.min.js' ));
-			self.Worker.addEventListener ( 'message', function ( e ) {
-				_.callbackAudit ( self.onsuccess, e );
+			self.name = name;
+			self.Worker[name] = (new Worker ( setting.app_path + url + '.min.js' ));
+			self.Worker[name].addEventListener ( 'message', function ( e ) {
+				_.callbackAudit ( self.onsuccess[name], e );
 			}, false );
-			_.callbackAudit ( callback );
+			_.callbackAudit ( callback, self.Worker[name] );
 
 		},
-		get:  function () {
-			return  this.Worker;
+		get:  function ( name ) {
+			return  this.Worker[name];
 		},
 		send: function ( message ) {
-			this.Worker.postMessage ( !!message ? message : '' );
+			self.Worker[self.name].postMessage ( !!message ? message : '' );
 		},
-		kill: function ( callback ) {
-			if ( this.Worker ) {
-				this.Worker.terminate ();
-				this.Worker = null;
+		kill: function ( name, callback ) {
+			if ( _.isSet ( this.Worker[name] ) ) {
+				this.Worker[name].terminate ();
+				this.Worker[name] = null;
 				_.callbackAudit ( callback );
 			}
 		}
