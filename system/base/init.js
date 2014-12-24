@@ -776,7 +776,7 @@ _$_.add ( 'get', function ( find ) {
 				_return.push ( node );
 			} );
 		} else {
-			_return.push ( _$ ( v.querySelector ( find ) ) );
+			_return.push ( _$ ( v.querySelectorAll ( find ) ) );
 		}
 	} );
 
