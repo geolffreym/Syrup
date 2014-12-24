@@ -763,7 +763,7 @@ _$_.add ( 'is', function ( context ) {
 	return _return;
 } );
 
-/***Get Childs Element
+/***Get Child Element
  * @param find
  * */
 _$_.add ( 'get', function ( find ) {
@@ -776,7 +776,7 @@ _$_.add ( 'get', function ( find ) {
 				_return.push ( node );
 			} );
 		} else {
-			_return.push ( _$ ( v.querySelectorAll ( find ) ) );
+			_return.push ( _$ ( v.querySelector ( find ) ) );
 		}
 	} );
 
