@@ -37,6 +37,7 @@ Lib.blend ( 'Shortcuts', ['Ajax', 'Socket'] ).supply ( function () {
 			if ( !!send ) {
 				_self.Socket.on ( 'open', function () {
 					_self.Socket.send ( send );
+					_self.Socket.stop ( _conf.protocol );
 				} )
 			}
 
