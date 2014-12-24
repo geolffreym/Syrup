@@ -28,9 +28,11 @@ WARNING_SYRUP = {
 		NOPROTOCOL: 'No protocol specified in the configuration.',
 		NOURL:      'URL is required for the request.',
 		NOHTML:     'Html string is required',
-		NOPOPUP:    'There are no popup created.'
+		NOPOPUP:    'There are no popup created.',
+		NOPACK:     'Error pack form'
 	}
-};
+}
+	;
 
 nativeFunction.blend = function ( child ) {
 	var name = child.prototype.constructor.name || (child.toString ().match ( regexConstructor )[0]).trim ();

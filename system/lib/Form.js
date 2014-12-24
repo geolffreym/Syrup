@@ -32,7 +32,7 @@ Lib.blend ( 'Form', ['Ajax'] ).make ( function () {
 
 		attach: function ( name, attach ) {
 			var self = this;
-			_.assert ( self.formData, WARNING_FORM.ERROR.NOPACK );
+			_.assert ( self.formData, WARNING_SYRUP.ERROR.NOPACK );
 			self.formData.append ( name, attach );
 		},
 
@@ -155,7 +155,7 @@ Lib.blend ( 'Form', ['Ajax'] ).make ( function () {
 			if ( event ) {
 				event.preventDefault ();
 			}
-			_.assert ( self.formData, WARNING_FORM.ERROR.NOPACK );
+			_.assert ( self.formData, WARNING_SYRUP.ERROR.NOPACK );
 
 			if ( self.failed ) {
 				return false;
