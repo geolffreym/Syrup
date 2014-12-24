@@ -173,8 +173,8 @@ Lib.blend('Form', ['Ajax']).make(function () {
 			};
 
 			self.Ajax.kill();
-			self.Ajax.on('before', self.onbefore);
 			self.Ajax.on('error', self.onerror);
+			self.Ajax.on('before', self.onbefore);
 			self.Ajax.request(Ajax, function (response) {
 				if (self.oncomplete) {
 					self.oncomplete(response);

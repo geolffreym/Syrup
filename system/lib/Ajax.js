@@ -24,7 +24,7 @@ Lib.blend ( 'Ajax', [] ).make ( function () {
 	}
 } ).supply ( function () {
 	return {
-		event:         function ( event, callback ) {
+		on:         function ( event, callback ) {
 			var self = this;
 			return [{
 				before:   function () {
