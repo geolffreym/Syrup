@@ -81,13 +81,13 @@ Module.add ( 'value', function () {
 
 } );
 
-Module.add ( 'set', function ( moduleId, object ) {
+Module.add ( 'setScope', function ( moduleId, object ) {
 	if ( _.isSet ( this.scope[this.modules[moduleId].parent][moduleId] ) ) {
 		this.scope[this.modules[moduleId].parent][moduleId] = object;
 	}
 } );
 
-Module.add ( 'get', function ( moduleId ) {
+Module.add ( 'getScope', function ( moduleId ) {
 	if ( _.isSet ( this.scope[this.modules[moduleId].parent][moduleId] ) ) {
 		return this.scope[this.modules[moduleId].parent][moduleId];
 	}
@@ -180,15 +180,16 @@ Module.add ( '_taste', function ( moduleId, event ) {
 			_self._add ( moduleId );
 			_self.modules[moduleId].instance = _self._trigger ( moduleId );
 			_self.modules[moduleId].instance.name = moduleId;
-			_self.modules[moduleId].instance.scope = _self.scope[_parent][moduleId];
+			_self.modules[moduleId].instance.parent = _parent;
 			_self.modules[moduleId].instance.dom = _$ ( '[syrup-event="' + moduleId + '"]+' );
 			_self.modules[moduleId].instance.template = _.isSet ( _self.modules[moduleId].instance.template );
+
 			_self.modules[moduleId].instance.setScope = function ( object ) {
-				_self.set ( moduleId, object );
+				_self.setScope ( moduleId, object );
 			};
 
 			_self.modules[moduleId].instance.getScope = function () {
-				return _self.get ( moduleId );
+				return _self.getScope ( moduleId );
 			};
 
 			_self.modules[moduleId].instance.on = function ( event, callback ) {
