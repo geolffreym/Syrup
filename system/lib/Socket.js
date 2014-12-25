@@ -5,7 +5,7 @@
 
 Lib.blend ( 'Socket', [] ).make ( function () {
 	return {
-		socket:   {},
+		socket:   null,
 		open:     null,
 		close:    null,
 		message:  null,
@@ -36,28 +36,28 @@ Lib.blend ( 'Socket', [] ).make ( function () {
 
 			if ( !!protocol && !!user ) {
 				var _query = '?protocol=' + protocol + '&user=' + user + '&admin=' + admin;
-				self.socket[protocol] = new WebSocket ( 'ws://' + self.host + ':' + port + _query );
-				self.socket[protocol].addEventListener ( 'open', function ( e ) {
-					if ( self.open[protocol] ) {
-						self.open[protocol] ( e )
+				self.socket = new WebSocket ( 'ws://' + self.host + ':' + port + _query );
+				self.socket.addEventListener ( 'open', function ( e ) {
+					if ( self.open ) {
+						self.open ( e )
 					}
 				} );
-				self.socket[protocol].addEventListener ( 'error', function ( e ) {
-					if ( self.error[protocol] ) {
-						self.error[protocol] ( e )
+				self.socket.addEventListener ( 'error', function ( e ) {
+					if ( self.error ) {
+						self.error ( e )
 					}
 				} );
-				self.socket[protocol].addEventListener ( 'close', function ( e ) {
-					if ( self.close[protocol] ) {
-						self.close[protocol] ( e )
+				self.socket.addEventListener ( 'close', function ( e ) {
+					if ( self.close ) {
+						self.close ( e )
 					}
 				} );
-				self.socket[protocol].addEventListener ( 'message', function ( e ) {
-					if ( self.message[protocol] ) {
-						self.message[protocol] ( e );
+				self.socket.addEventListener ( 'message', function ( e ) {
+					if ( self.message ) {
+						self.message ( e );
 					}
 				} );
-				return self.socket[protocol];
+				return self.socket;
 			} else {
 				return false;
 			}
@@ -67,16 +67,16 @@ Lib.blend ( 'Socket', [] ).make ( function () {
 			var self = this;
 			return [{
 				message: function () {
-					self.message[self.protocol] = callback;
+					self.message = callback;
 				},
 				open:    function () {
-					self.open[self.protocol] = callback;
+					self.open = callback;
 				},
 				close:   function () {
-					self.close[self.protocol] = callback;
+					self.close = callback;
 				},
 				error:   function () {
-					self.error[self.protocol] = callback;
+					self.error = callback;
 				}
 			}[event] ()]
 		},
@@ -95,20 +95,20 @@ Lib.blend ( 'Socket', [] ).make ( function () {
 				throw (WARNING_SYRUP.ERROR.NOPROTOCOL);
 			}
 
-			if ( this.socket[self.protocol] ) {
-				this.socket[self.protocol].send ( JSON.stringify ( config ) );
+			if ( this.socket ) {
+				this.socket.send ( JSON.stringify ( config ) );
 			}
 		},
-		clear: function ( name ) {
-			this.socket[name] = null;
+		clear: function () {
+			this.socket = null;
 
 		},
 		get:   function ( name ) {
-			return this.socket[name];
+			return this.socket;
 
 		},
-		stop:  function ( name ) {
-			this.socket[name].close ();
+		stop:  function () {
+			this.socket.close ();
 
 		}
 	}

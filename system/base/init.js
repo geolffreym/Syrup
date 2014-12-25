@@ -1343,7 +1343,7 @@ Syrup.add ( 'objectWatch', function ( obj, callback, conf ) {
 Syrup.add ( 'interval', function ( callback, conf ) {
 	var _worker = _.Workers;
 
-	_worker.set ( 'interval', 'system/workers/setting/Interval', function () {
+	_worker.set ( 'system/workers/setting/Interval', function () {
 		_worker.send ( conf );
 	} );
 

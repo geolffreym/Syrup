@@ -51,7 +51,7 @@ Lib.blend ( 'Template', ['Repository', 'Ajax', 'Workers'] ).make ( function () {
 		},
 		parse:  function ( _template, _fields, callback ) {
 			var _self = this;
-			_self.Workers.set ( 'template', 'system/workers/setting/Parser', function ( worker ) {
+			_self.Workers.set ( 'system/workers/setting/Parser', function ( worker ) {
 				_self.Workers.send ( {template: _template, fields: _fields} );
 			} );
 
