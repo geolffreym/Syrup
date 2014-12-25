@@ -134,7 +134,7 @@ Module.add ( '_serve', function ( moduleId, template ) {
 	    _template = _.Template,
 	    _dom = _$ ( '[syrup-controller="' + moduleId + '"]' );
 
-	if ( _dom.exist && _.getObjectSize ( _scope ) > 0 ) {
+	if ( _dom.exist /*&& _.getObjectSize ( _scope ) > 0 */) {
 		if ( _.isSet ( template ) ) {
 			_.include ( 'app/view/' + _self.modules[moduleId].parent + '/' + moduleId, function () {
 				_template[moduleId] ( _scope, function ( my_html ) {
