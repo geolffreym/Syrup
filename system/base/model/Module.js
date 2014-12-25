@@ -183,6 +183,14 @@ Module.add ( '_taste', function ( moduleId, event ) {
 			_self.modules[moduleId].instance.scope = _self.scope[_parent][moduleId];
 			_self.modules[moduleId].instance.dom = _$ ( '[syrup-event="' + moduleId + '"]+' );
 			_self.modules[moduleId].instance.template = _.isSet ( _self.modules[moduleId].instance.template );
+			_self.modules[moduleId].instance.setScope = function ( object ) {
+				_self.set ( moduleId, object );
+			};
+
+			_self.modules[moduleId].instance.getScope = function () {
+				return _self.get ( moduleId );
+			};
+
 			_self.modules[moduleId].instance.on = function ( event, callback ) {
 				_self.on ( event, moduleId, callback );
 			};
