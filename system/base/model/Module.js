@@ -134,7 +134,7 @@ Module.add ( '_serve', function ( moduleId, template ) {
 	    _template = _.Template,
 	    _dom = _$ ( '[syrup-controller="' + moduleId + '"]' );
 
-	if ( _dom.exist /*&& _.getObjectSize ( _scope ) > 0 */) {
+	if ( _dom.exist && _.getObjectSize ( _scope ) > 0 ) {
 		if ( _.isSet ( template ) ) {
 			_.include ( 'app/view/' + _self.modules[moduleId].parent + '/' + moduleId, function () {
 				_template[moduleId] ( _scope, function ( my_html ) {
@@ -191,7 +191,6 @@ Module.add ( '_taste', function ( moduleId, event ) {
 
 
 			_self._watch ( moduleId );
-			_self._serve ( moduleId, _self.modules[moduleId].instance.template );
 
 		} else {
 			if ( _.isSet ( event.dance ) ) {
@@ -210,6 +209,7 @@ Module.add ( '_taste', function ( moduleId, event ) {
 			 * @param event
 			 * */
 			_self.modules[moduleId].instance.init ( Lib.get ( _parent ), event );
+			_self._serve ( moduleId, _self.modules[moduleId].instance.template );
 		}
 
 	}
