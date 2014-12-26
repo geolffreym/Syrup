@@ -135,15 +135,14 @@ Module.add ( '_serve', function ( moduleId, template ) {
 	    _dom = _$ ( '[syrup-controller="' + moduleId + '"]' );
 
 	if ( _dom.exist && _.getObjectSize ( _scope ) > 0 ) {
-		if ( _.isSet ( template ) ) {
-			console.log ( 'template' );
+		if ( _.isSet ( template ) && _.isBoolean ( template ) ) {
 			_.include ( 'app/view/' + _self.modules[moduleId].parent + '/' + moduleId.replace ( /\./g, '_' ), function () {
 				_template[moduleId] ( _scope, function ( my_html ) {
 					_dom.html ( my_html );
 				} )
 			} )
 		} else {
-			var _dom_template = _$ ( '[syrup-template="' + moduleId + '"]' ),
+			var _dom_template = _$ ( '[syrup-template="' + (_.isString ( template ) ? template : moduleId) + '"]' ),
 			    _parse = _dom_template.exist ? _dom_template.html () : _dom.html ();
 
 			_parse = _parse.replace ( /(&lt;)/g, '<' );
