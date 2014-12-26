@@ -145,6 +145,7 @@ Module.add ( '_serve', function ( moduleId, template ) {
 			var _dom_template = _$ ( '[syrup-template="' + (_.isString ( template ) ? template : moduleId) + '"]' ),
 			    _parse = _dom_template.exist ? _dom_template.html () : _dom.html ();
 
+			console.log ( template );
 			if ( _.isSet ( _parse ) ) {
 				_parse = _parse.replace ( /(&lt;)/g, '<' );
 				_parse = _parse.replace ( /(&gt;)/g, '>' );
@@ -200,7 +201,7 @@ Module.add ( '_taste', function ( moduleId, event ) {
 				_self.on ( event, moduleId, callback );
 			};
 			_self.modules[moduleId].instance.serve = function ( _template ) {
-				_self._serve ( moduleId, _template );
+				_self._serve ( moduleId, _.isSet ( _template ) ? _template : this.template );
 			};
 
 
