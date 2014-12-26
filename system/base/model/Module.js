@@ -142,12 +142,17 @@ Module.add ( '_serve', function ( moduleId, template ) {
 				} )
 			} )
 		} else {
-			if ( !_.isSet ( _self.modules[moduleId]['parse'] ) )
-				_self.modules[moduleId]['parse'] = _dom.text ();
+			var _dom_copy = _dom.object ();
 
-			_template.parse ( _self.modules[moduleId]['parse'], _scope, function ( result ) {
-				_dom.html ( result );
-			} );
+			if ( !_.isSet ( _self.modules[moduleId]['parse'] ) )
+				_self.modules[moduleId]['parse'] = _.isSet ( _dom_copy.content )
+					? _dom_copy.content.textContent : _dom_copy.textContent;
+
+			if ( _.isSet ( _self.modules[moduleId]['parse'] ) ) {
+				_template.parse ( _self.modules[moduleId]['parse'], _scope, function ( result ) {
+					_dom.html ( result );
+				} );
+			}
 		}
 	}
 } );

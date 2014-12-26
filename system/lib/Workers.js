@@ -5,8 +5,8 @@
 
 Lib.blend ( 'Workers', [] ).make ( function () {
 	return {
-		Worker:    {},
-		onsuccess: {}
+		Worker:    null,
+		onsuccess: null
 	}
 } ).supply ( function () {
 	return {
@@ -22,7 +22,7 @@ Lib.blend ( 'Workers', [] ).make ( function () {
 			var self = this;
 			self.Worker = (new Worker ( setting.app_path + url + '.min.js' ));
 			self.Worker.addEventListener ( 'message', function ( e ) {
-				_.callbackAudit ( self.onsuccess[name], e );
+				_.callbackAudit ( self.onsuccess, e );
 			}, false );
 			_.callbackAudit ( callback, self.Worker );
 
@@ -31,10 +31,10 @@ Lib.blend ( 'Workers', [] ).make ( function () {
 			return  this.Worker;
 		},
 		send: function ( message ) {
-			self.Worker.postMessage ( !!message ? message : '' );
+			this.Worker.postMessage ( !!message ? message : '' );
 		},
-		kill: function ( name, callback ) {
-			if ( _.isSet ( this.Worker[name] ) ) {
+		kill: function ( callback ) {
+			if ( _.isSet ( this.Worker ) ) {
 				this.Worker.terminate ();
 				this.Worker = null;
 				_.callbackAudit ( callback );
