@@ -823,14 +823,24 @@ _$_.add ( 'offset', function ( _object ) {
 		var _cartesian = _.cartesianPlane ( elem );
 		if ( _.isObject ( _object ) ) {
 			//elem.style.position = 'absolute';
-			if ( _.isSet ( _object.x ) ) {
-				elem.style.left = _.isNumber ( _object.x )
-					? _object.x + 'px' : _object.x;
+			if ( _.isSet ( _object.top ) ) {
+				elem.style.left = _.isNumber ( _object.top )
+					? _object.top + 'px' : _object.top;
 			}
 
-			if ( _.isSet ( _object.y ) ) {
-				elem.style.top = _.isNumber ( _object.y )
-					? _object.y + 'px' : _object.y;
+			if ( _.isSet ( _object.left ) ) {
+				elem.style.top = _.isNumber ( _object.left )
+					? _object.left + 'px' : _object.left;
+			}
+
+			if ( _.isSet ( _object.bottom ) ) {
+				elem.style.bottom = _.isNumber ( _object.bottom )
+					? _object.bottom + 'px' : _object.bottom;
+			}
+
+			if ( _.isSet ( _object.right ) ) {
+				elem.style.right = _.isNumber ( _object.right )
+					? _object.right + 'px' : _object.right;
 			}
 		}
 
