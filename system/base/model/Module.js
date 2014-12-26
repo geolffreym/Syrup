@@ -142,14 +142,12 @@ Module.add ( '_serve', function ( moduleId, template ) {
 				} )
 			} )
 		} else {
-			var _dom_copy = _dom.object ();
+			var _parse = _dom.html ();
+			_parse = _parse.replace ( /(&lt;)/g, '<' );
+			_parse = _parse.replace ( /(&gt;)/g, '>' );
 
-			if ( !_.isSet ( _self.modules[moduleId]['parse'] ) )
-				_self.modules[moduleId]['parse'] = _.isSet ( _dom_copy.content )
-					? _dom_copy.content.textContent : _dom_copy.textContent;
-
-			if ( _.isSet ( _self.modules[moduleId]['parse'] ) ) {
-				_template.parse ( _self.modules[moduleId]['parse'], _scope, function ( result ) {
+			if ( _.isSet ( _parse ) ) {
+				_template.parse ( _parse, _scope, function ( result ) {
 					_dom.html ( result );
 				} );
 			}
