@@ -683,7 +683,7 @@ _$_.add ( 'fadeOut', function ( delay ) {
 			                       {opacity: '1'},
 			                       {opacity: '0'}
 		                       ], {
-			                       duration: _.isSet ( delay ) ? delay : 50
+			                       duration: _.isNumber ( delay ) ? delay : 50
 		                       } )
 	} );
 
@@ -699,7 +699,7 @@ _$_.add ( 'fadeIn', function ( delay ) {
 		               {opacity: '0'},
 		               {opacity: '1'}
 	               ], {
-		               duration: _.isSet ( delay ) ? delay : 50
+		               duration: _.isNumber ( delay ) ? delay : 50
 	               } );
 	return this;
 } );
@@ -895,7 +895,8 @@ _$_.add ( 'animate', function ( prop, conf ) {
 	this.each ( function ( elem ) {
 		if ( _.isSet ( elem.animate ) ) {
 
-			conf = ((_.isObject ( conf ) && !_.isNumber ( conf )) || !_.isSet ( conf )) ? {} : conf;
+			conf = ((!_.isObject ( conf ) && !_.isNumber ( conf )) ) ? {} : conf;
+
 			conf.iterations = _.isSet ( conf.iterations )
 				? conf.iterations : 1;
 
@@ -904,7 +905,6 @@ _$_.add ( 'animate', function ( prop, conf ) {
 
 			conf.delay = _.isSet ( conf.delay )
 				? conf.delay : 300;
-
 
 			elem.animate ( prop, conf );
 		}
