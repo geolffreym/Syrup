@@ -906,7 +906,13 @@ _$_.add ( 'animate', function ( prop, conf ) {
 			conf.delay = _.isSet ( conf.delay )
 				? conf.delay : 300;
 
-			elem.animate ( prop, conf );
+			var _animation = elem.animate ( prop, conf );
+
+//            _animation.addEventListener('finish', function () {
+//                if (conf.iterations <= 1) {
+//                    _animation.cancel();
+//                }
+//            })
 		}
 	} );
 	return this;
