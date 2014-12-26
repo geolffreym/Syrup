@@ -43,10 +43,9 @@ Module.add ( '_watch', function ( moduleId ) {
 
 	_self.observer[moduleId] = Object.observe ( _self.scope[_self.modules[moduleId].parent], function ( change ) {
 		_.each ( change, function ( v ) {
-
 			if ( _.isSet ( _self.onchange[v.name] )
 				&& _.getObjectSize ( v.object ) > 0
-				&& !_.isSet ( v.object[v.name]['watch'] )
+				&& !_.isSet ( v.object[v.name]['unattended'] )
 				&& moduleId === v.name
 				) {
 				_self.onchange[v.name] ( {name: v.name, old: v.oldValue, type: v.type, object: v.object[v.name]} );
