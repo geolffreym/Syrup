@@ -898,6 +898,17 @@ _$_.add ( 'sort', function ( _prop, _desc, _object ) {
 _$_.add ( 'animate', function ( prop, conf ) {
 	this.each ( function ( elem ) {
 		if ( _.isSet ( elem.animate ) ) {
+			conf = (_.isObject ( conf ) && !_.isNumeric ( conf )) || !_.isSet ( conf ) ? {} : conf;
+			conf.iterations = _.isSet ( conf.iterations )
+				? conf.iterations : 1;
+
+			conf.duration = _.isSet ( conf.duration )
+				? conf.duration : 1000;
+
+			conf.delay = _.isSet ( conf.delay )
+				? conf.delay : 300;
+
+
 			elem.animate ( prop, conf );
 		}
 	} );
