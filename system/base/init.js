@@ -112,7 +112,7 @@ _$_.add ( '$', function ( dom ) {
 	 }*/
 
 	_self.exist = _.isSet ( _self.collection );
-	_self.selector = dom;
+	_self.name = dom;
 	return _self;
 } );
 
@@ -822,7 +822,7 @@ _$_.add ( 'offset', function ( _object ) {
 	this.each ( function ( elem ) {
 		var _cartesian = _.cartesianPlane ( elem );
 		if ( _.isObject ( _object ) ) {
-			elem.style.position = 'absolute';
+			//elem.style.position = 'absolute';
 			if ( _.isSet ( _object.x ) ) {
 				elem.style.left = _.isNumber ( _object.x )
 					? _object.x + 'px' : _object.x;
