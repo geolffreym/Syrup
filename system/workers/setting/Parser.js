@@ -124,7 +124,7 @@ addEventListener('message', function (e) {
 	}).replace(/((<%)(.*)(for)(.*)(%>)(.*)(<%(\s)+(endfor)(\s)+%>))/g, function (match) {
 		var loop_replace = Template.for_loop(Template.split_sentence(match), fields),
 		    regex = new RegExp('(' + Object.keys(loop_replace.replace).join('|') + ')', "g");
-		console.log(loop_replace);
+
 		return loop_replace.template.replace(regex, function (matches) {
 			if (loop_replace.replace[matches]) {
 				return loop_replace.replace[matches].pop();
