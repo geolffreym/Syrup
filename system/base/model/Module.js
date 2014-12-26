@@ -176,16 +176,17 @@ Module.add ( 'services', function ( callback ) {
 Module.add ( '_taste', function ( moduleId, event ) {
 	var _self = this,
 	    _dance = false,
-	    _parent;
+	    _parent, _dom;
 
 	if ( _.isSet ( _self.modules[moduleId] ) && _.isSet ( _self.modules[moduleId].parent ) ) {
 		_parent = _self.modules[moduleId].parent.split ( '.' ).pop ();
+		_dom = _$ ( '[rel="' + moduleId + '"]+' )
 		if ( !_.isSet ( event ) ) {
 			_self._add ( moduleId );
 			_self.modules[moduleId].instance = _self._trigger ( moduleId );
 			_self.modules[moduleId].instance.name = moduleId;
 			_self.modules[moduleId].instance.parent = _parent;
-			_self.modules[moduleId].instance.dom = _$ ( '[rel="' + moduleId + '"]+' );
+			_self.modules[moduleId].instance.dom = _dom.exist ? _dom : false;
 			_self.modules[moduleId].instance.template = _.isSet ( _self.modules[moduleId].instance.template );
 
 			_self.modules[moduleId].instance.setScope = function ( object ) {
