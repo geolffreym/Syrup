@@ -97,7 +97,7 @@ Module.add ( 'getScope', function ( moduleId ) {
 Module.add ( 'addEvent', function ( event, callback ) {
 	var _self = this,
 	    _callback,
-	    _dom = _self.modules[_self.temp].instance.dom;
+	    _dom = _$ ( '[syrup-event="' + _self.modules[_self.temp].instance.name + '"]' );
 
 	_callback = _.isSet ( callback ) && _.isFunction ( callback )
 		? callback : function ( e ) {
