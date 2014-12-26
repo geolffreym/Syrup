@@ -679,12 +679,12 @@ _$_.add ( 'removeClass', function ( cls ) {
  */
 _$_.add ( 'fadeOut', function ( delay ) {
 	this.each ( function ( _elem ) {
-		_.interval ( function ( x ) {
-			_elem.style.opacity = (x - 1) / 0xA;
-		}, {
-			             delay: delay || 0x32,
-			             limit: 0xA
-		             } );
+		_$ ( _elem ).animate ( [
+			                       {opacity: '1'},
+			                       {opacity: '0'}
+		                       ], {
+			                       duration: _.isSet ( delay ) ? delay : 50
+		                       } )
 	} );
 
 	return this;
@@ -695,16 +695,12 @@ _$_.add ( 'fadeOut', function ( delay ) {
  * @returns {_$_}
  */
 _$_.add ( 'fadeIn', function ( delay ) {
-	this.each ( function ( _elem ) {
-		_elem.style.opacity = 0;
-		_.interval ( function ( x ) {
-			_elem.style.opacity = x / 0xA;
-		}, {
-			             delay: delay || 0x32,
-			             limit: -0xA
-		             } );
-	} );
-
+	this.animate ( [
+		               {opacity: '0'},
+		               {opacity: '1'}
+	               ], {
+		               duration: _.isSet ( delay ) ? delay : 50
+	               } );
 	return this;
 } );
 
@@ -898,7 +894,8 @@ _$_.add ( 'sort', function ( _prop, _desc, _object ) {
 _$_.add ( 'animate', function ( prop, conf ) {
 	this.each ( function ( elem ) {
 		if ( _.isSet ( elem.animate ) ) {
-			conf = (_.isObject ( conf ) && !_.isNumeric ( conf )) || !_.isSet ( conf ) ? {} : conf;
+
+			conf = ((_.isObject ( conf ) && !_.isNumber ( conf )) || !_.isSet ( conf )) ? {} : conf;
 			conf.iterations = _.isSet ( conf.iterations )
 				? conf.iterations : 1;
 
