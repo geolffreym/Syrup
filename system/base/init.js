@@ -678,14 +678,13 @@ _$_.add ( 'removeClass', function ( cls ) {
  * @returns {_$_}
  */
 _$_.add ( 'fadeOut', function ( delay ) {
-	this.each ( function ( _elem ) {
-		_$ ( _elem ).animate ( [
-			                       {opacity: '1'},
-			                       {opacity: '0'}
-		                       ], {
-			                       duration: _.isNumber ( delay ) ? delay : 50
-		                       } )
-	} );
+	this.animate ( [
+		               {opacity: '1'},
+		               {opacity: '0'}
+	               ], {
+		               delay: 0,
+		               duration: _.isNumber ( delay ) ? delay : 50
+	               } );
 
 	return this;
 } );
@@ -699,6 +698,7 @@ _$_.add ( 'fadeIn', function ( delay ) {
 		               {opacity: '0'},
 		               {opacity: '1'}
 	               ], {
+		               delay: 0,
 		               duration: _.isNumber ( delay ) ? delay : 50
 	               } );
 	return this;
