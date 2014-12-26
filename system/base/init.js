@@ -17,32 +17,32 @@ nativeFunction = Function.prototype,
 regexConstructor = /(([^function])([a-zA-z])+(?=\())/g,
 WARNING_SYRUP = {
 	ERROR: {
-		NOPARAM: 'Param needed',
-		NOOBJECT: 'An object necessary.',
-		NOARRAY: 'An array necessary.',
+		NOPARAM:    'Param needed',
+		NOOBJECT:   'An object necessary.',
+		NOARRAY:    'An array necessary.',
 		NOFUNCTION: 'An function necessary.',
-		NODATE: 'Invalid Date',
-		NOSTRING: 'String is required',
-		NODOM: ' not exist in the DOM document',
+		NODATE:     'Invalid Date',
+		NOSTRING:   'String is required',
+		NODOM:      ' not exist in the DOM document',
 		NOCALLBACK: 'Callback error on execution time.',
 		NOPROTOCOL: 'No protocol specified in the configuration.',
-		NOURL: 'URL is required for the request.',
-		NOHTML: 'Html string is required',
-		NOPOPUP: 'There are no popup created.',
-		NOPACK: 'Error pack form'
+		NOURL:      'URL is required for the request.',
+		NOHTML:     'Html string is required',
+		NOPOPUP:    'There are no popup created.',
+		NOPACK:     'Error pack form'
 	}
 }
 	;
 
-nativeFunction.blend = function (child) {
-	var name = child.prototype.constructor.name || (child.toString().match(regexConstructor)[0]).trim();
+nativeFunction.blend = function ( child ) {
+	var name = child.prototype.constructor.name || (child.toString ().match ( regexConstructor )[0]).trim ();
 	this.prototype[name] = child;
 	_.__proto__[name] = new child;
 };
 
-nativeFunction.drop = function (child) {
-	var name = child.prototype.constructor.name || (child.toString().match(regexConstructor)[0]).trim();
-	if (_[name]) {
+nativeFunction.drop = function ( child ) {
+	var name = child.prototype.constructor.name || (child.toString ().match ( regexConstructor )[0]).trim ();
+	if ( _[name] ) {
 		_[name] = null;
 		return true;
 	}
@@ -53,8 +53,8 @@ nativeFunction.drop = function (child) {
  * @param name
  * @param fn
  */
-nativeFunction.add = function (name, fn) {
-	name = name.trim();
+nativeFunction.add = function ( name, fn ) {
+	name = name.trim ();
 	this.prototype[name] = fn;
 };
 
@@ -63,7 +63,7 @@ nativeFunction.add = function (name, fn) {
  * @constructor
  */
 
-function Syrup() {
+function Syrup () {
 	this.recursiveStr = false;
 	this.scriptCalls = {};
 	this.waitingCalls = {};
@@ -72,7 +72,7 @@ function Syrup() {
 /**_$_
  * @constructor
  */
-function _$_() {
+function _$_ () {
 	this.collection = null;
 	this.exist = null;
 	this.state = null;
@@ -82,27 +82,27 @@ function _$_() {
  * @param dom
  * @returns {_$_}
  */
-_$_.add('$', function (dom) {
+_$_.add ( '$', function ( dom ) {
 	var _tmp,
 	    _self = new _$_;
 
-	if (_.isFunction(dom)) {
-		_$(document).ready(dom);
+	if ( _.isFunction ( dom ) ) {
+		_$ ( document ).ready ( dom );
 		return;
 	}
 
-	if (_.isHtml(dom)) {
-		_tmp = document.createElement('div');
+	if ( _.isHtml ( dom ) ) {
+		_tmp = document.createElement ( 'div' );
 		_tmp.innerHTML = dom;
 		_self.collection = _tmp.children.length > 1
 			? _tmp.children
 			: _tmp.firstChild;
 
 	} else {
-		_self.collection = !_.isObject(dom) && _.isString(dom)
-			? dom.indexOf('+') > -1
-			                   ? document.querySelectorAll(_.replace(dom, '+', ''))
-			                   : document.querySelector(dom)
+		_self.collection = !_.isObject ( dom ) && _.isString ( dom )
+			? dom.indexOf ( '+' ) > -1
+			                   ? document.querySelectorAll ( _.replace ( dom, '+', '' ) )
+			                   : document.querySelector ( dom )
 			: dom;
 
 	}
@@ -111,137 +111,137 @@ _$_.add('$', function (dom) {
 	 _.error(dom + WARNING_SYRUP.ERROR.NODOM);
 	 }*/
 
-	_self.exist = _.isSet(_self.collection);
+	_self.exist = _.isSet ( _self.collection );
 	_self.name = dom;
 	return _self;
-});
+} );
 
 //Avoid Conflict Libraries
-_$_.add('noConflict', function () {
+_$_.add ( 'noConflict', function () {
 	return _$;
-});
+} );
 
 /***Add fn to object
  * @param callback
  */
-_$_.add('fn', function (name, fn) {
+_$_.add ( 'fn', function ( name, fn ) {
 	return _$.__proto__[name] = fn;
-});
+} );
 
 /***Event Handler
  * @param callback
  */
-_$_.add('ready', function (callback) {
+_$_.add ( 'ready', function ( callback ) {
 	var _self = this;
-	if (_.isGlobal(_self.collection)) {
-		_self.collection.addEventListener("DOMContentLoaded", callback);
+	if ( _.isGlobal ( _self.collection ) ) {
+		_self.collection.addEventListener ( "DOMContentLoaded", callback );
 	}
-});
+} );
 
 /***Event Load
  * @param callback
  */
-_$_.add('load', function (callback) {
+_$_.add ( 'load', function ( callback ) {
 	var _self = this;
-	if (_.isGlobal(_self.collection)) {
+	if ( _.isGlobal ( _self.collection ) ) {
 		_self.collection.onload = callback;
 	}
-});
+} );
 
 
 /**Event Listener
  */
-_$_.add('addListener', function (event, delegate, callback) {
-	if (_.isFunction(delegate)) {
+_$_.add ( 'addListener', function ( event, delegate, callback ) {
+	if ( _.isFunction ( delegate ) ) {
 		callback = delegate;
 	}
 
 	var _self = this,
-	    _event = function (e) {
+	    _event = function ( e ) {
 		    e = e || window.event;
 		    var _target = event.srcElement || e.target;
-		    if (_.isSet(delegate) && !_.isFunction(delegate)) {
-			    if (_.isSet(_target.className.baseVal)) {
-				    if (_target.className.baseval === delegate) {
-					    _.callbackAudit(callback, e);
+		    if ( _.isSet ( delegate ) && !_.isFunction ( delegate ) ) {
+			    if ( _.isSet ( _target.className.baseVal ) ) {
+				    if ( _target.className.baseval === delegate ) {
+					    _.callbackAudit ( callback, e );
 				    }
 			    } else {
-				    _$(_target).filter(delegate, function () {
-					    _.callbackAudit(callback, e);
-				    });
+				    _$ ( _target ).filter ( delegate, function () {
+					    _.callbackAudit ( callback, e );
+				    } );
 			    }
 
 		    } else {
-			    _.callbackAudit(callback, e);
+			    _.callbackAudit ( callback, e );
 		    }
 
 	    };
 
-	_self.each(function (elem) {
-		if (elem.addEventListener) {
-			elem.addEventListener(event, _event, true)
+	_self.each ( function ( elem ) {
+		if ( elem.addEventListener ) {
+			elem.addEventListener ( event, _event, true )
 		} else {
-			if (elem.attachEvent) {
-				elem.attachEvent('on' + event, _event);
+			if ( elem.attachEvent ) {
+				elem.attachEvent ( 'on' + event, _event );
 			} else {
 				elem['on' + event] = _event;
 			}
 		}
-	});
+	} );
 
 	return this;
-});
+} );
 
 //TODO
-_$_.add('removeListener', function () {
+_$_.add ( 'removeListener', function () {
 
-});
+} );
 
 /**Filter Pattern match
  *@param filter
  *@param callback
  *@return Object
  */
-_$_.add('filter', function (filter, callback, e_handler) {
-	this.each(function (elem) {
+_$_.add ( 'filter', function ( filter, callback, e_handler ) {
+	this.each ( function ( elem ) {
 		var match = elem.matchesSelector ||
 			elem.webkitMatchesSelector ||
 			elem.mozMatchesSelector ||
 			elem.oMatchesSelector ||
 			elem.msMatchesSelector;
 
-		if (match.call(elem, filter)) {
-			_.callbackAudit(callback, _$(elem));
+		if ( match.call ( elem, filter ) ) {
+			_.callbackAudit ( callback, _$ ( elem ) );
 		} else {
-			if (_.isFunction(e_handler))
-				_.callbackAudit(e_handler, elem);
+			if ( _.isFunction ( e_handler ) )
+				_.callbackAudit ( e_handler, elem );
 		}
-	});
+	} );
 
 	return this;
-});
+} );
 
 /**Empty Dom*/
 
-_$_.add('empty', function () {
-	this.each(function (v) {
+_$_.add ( 'empty', function () {
+	this.each ( function ( v ) {
 		v.innerHTML = '';
-	});
-});
+	} );
+} );
 
 /**Clone Objects
  * @param childs
  * @returns {Array}
  */
-_$_.add('clone', function (childs) {
-	childs = _.isSet(childs);
+_$_.add ( 'clone', function ( childs ) {
+	childs = _.isSet ( childs );
 	var _clones = [];
-	this.each(function (v) {
-		_clones.push(_$(v.cloneNode(childs)));
-	});
-	return _.specArray(_clones);
+	this.each ( function ( v ) {
+		_clones.push ( _$ ( v.cloneNode ( childs ) ) );
+	} );
+	return _.specArray ( _clones );
 
-});
+} );
 
 
 /***Data set
@@ -249,382 +249,382 @@ _$_.add('clone', function (childs) {
  * @param value
  * @returns {Array}
  */
-_$_.add('data', function (name, value) {
+_$_.add ( 'data', function ( name, value ) {
 	var _self = this,
 	    _data_set,
 	    _values = [];
-	_self.each(function (dom, i) {
-		if (!_.isSet(dom.dataset)) {
+	_self.each ( function ( dom, i ) {
+		if ( !_.isSet ( dom.dataset ) ) {
 			_data_set = 'data-' + name;
-			if (_.isSet(value)) {
+			if ( _.isSet ( value ) ) {
 				var _set = {};
 				_set[_data_set] = value;
-				_self.attr(_set);
+				_self.attr ( _set );
 			} else {
-				var _attr = _self.attr(_data_set);
-				_values = _.isArray(_attr)
+				var _attr = _self.attr ( _data_set );
+				_values = _.isArray ( _attr )
 					? _attr : [_attr];
 			}
 		} else {
 			_data_set = dom.dataset;
-			if (_.isSet(value) || _.isNumber(value)) {
-				_data_set[name] = _.isArray(value) ? value[i] : value;
+			if ( _.isSet ( value ) || _.isNumber ( value ) ) {
+				_data_set[name] = _.isArray ( value ) ? value[i] : value;
 			} else {
-				if (_.isSet(_data_set[name])) {
-					_values.push(_data_set[name])
+				if ( _.isSet ( _data_set[name] ) ) {
+					_values.push ( _data_set[name] )
 				}
 			}
 		}
-	});
+	} );
 
-	return _.specArray(_values);
-});
+	return _.specArray ( _values );
+} );
 
 /***Assign Properties
  * @param _prop
  * @returns {Array}
  */
-_$_.add('prop', function (_prop) {
+_$_.add ( 'prop', function ( _prop ) {
 	var _props = [];
-	this.each(function (v) {
-		if (_.isString(_prop)) {
-			_props.push(v[_prop]);
+	this.each ( function ( v ) {
+		if ( _.isString ( _prop ) ) {
+			_props.push ( v[_prop] );
 		} else {
-			_.each(_prop, function (value, index) {
+			_.each ( _prop, function ( value, index ) {
 				v[index] = value;
-			});
+			} );
 		}
-	});
+	} );
 
-	return _.specArray(_props);
-});
+	return _.specArray ( _props );
+} );
 
 /***Assign Atributes
  * @param _attr
  * @returns {Array}
  */
-_$_.add('attr', function (attr) {
+_$_.add ( 'attr', function ( attr ) {
 	var _attr = [];
-	this.each(function (v) {
-		if (_.isString(attr)) {
-			_attr.push(v.getAttribute(attr));
+	this.each ( function ( v ) {
+		if ( _.isString ( attr ) ) {
+			_attr.push ( v.getAttribute ( attr ) );
 		} else {
-			_.each(attr, function (value, index) {
-				v.setAttribute(index, value);
-			});
+			_.each ( attr, function ( value, index ) {
+				v.setAttribute ( index, value );
+			} );
 		}
-	});
-	return _.specArray(_attr);
-});
+	} );
+	return _.specArray ( _attr );
+} );
 
 /***Remove Atributes
  * @param _attr
  * @returns {Array}
  */
-_$_.add('removeAttr', function (attr) {
-	this.each(function (v) {
-		if (v[attr]) {
+_$_.add ( 'removeAttr', function ( attr ) {
+	this.each ( function ( v ) {
+		if ( v[attr] ) {
 			v[attr] = false;
 		} else {
-			v.removeAttr(attr);
+			v.removeAttr ( attr );
 		}
-	});
+	} );
 	return this;
-});
+} );
 
 /**CSS
  * @param _css
  * @returns {_$_}
  */
-_$_.add('css', function (css) {
+_$_.add ( 'css', function ( css ) {
 	var _css = [],
 	    _self = this;
-	_self.each(function (dom) {
-		if (_.isString(css)) {
-			var _style = window.getComputedStyle(dom, null);
-			_css.push(_style.getPropertyValue(css));
+	_self.each ( function ( dom ) {
+		if ( _.isString ( css ) ) {
+			var _style = window.getComputedStyle ( dom, null );
+			_css.push ( _style.getPropertyValue ( css ) );
 		} else {
-			_.each(css, function (value, index) {
+			_.each ( css, function ( value, index ) {
 				dom.style[index] = value;
-			});
+			} );
 		}
-	});
+	} );
 
-	return _.specArray(_css);
-});
+	return _.specArray ( _css );
+} );
 
 /***Insert After
  * @param elem
  */
 
-_$_.add('after', function (elem) {
-	if (_.isHtml(elem) || !_.is$(elem)) {
-		elem = _$(elem);
+_$_.add ( 'after', function ( elem ) {
+	if ( _.isHtml ( elem ) || !_.is$ ( elem ) ) {
+		elem = _$ ( elem );
 	}
-	this.each(function (obj) {
+	this.each ( function ( obj ) {
 		var _parent = obj.parentNode;
-		elem.each(function (v) {
-			_parent.insertBefore(v, obj.nextSibling)
-		})
-	});
+		elem.each ( function ( v ) {
+			_parent.insertBefore ( v, obj.nextSibling )
+		} )
+	} );
 	return this;
-});
+} );
 
 /***Insert Before
  * @param elem
  */
 
-_$_.add('before', function (elem) {
-	if (_.isHtml(elem) || !_.is$(elem)) {
-		elem = _$(elem);
+_$_.add ( 'before', function ( elem ) {
+	if ( _.isHtml ( elem ) || !_.is$ ( elem ) ) {
+		elem = _$ ( elem );
 	}
-	this.each(function (obj) {
+	this.each ( function ( obj ) {
 		var _parent = obj.parentNode;
-		elem.each(function (v) {
-			_parent.insertBefore(v, obj)
-		})
-	});
+		elem.each ( function ( v ) {
+			_parent.insertBefore ( v, obj )
+		} )
+	} );
 
 	return this;
-});
+} );
 /**Append Element or Html
  * @param childs
  * @returns {_$_}
  */
-_$_.add('append', function (childs) {
+_$_.add ( 'append', function ( childs ) {
 	var parent = this;
-	if (_.isHtml(childs) || !_.is$(childs)) {
-		childs = _$(childs);
+	if ( _.isHtml ( childs ) || !_.is$ ( childs ) ) {
+		childs = _$ ( childs );
 	}
 
-	parent.each(function (p) {
-		childs.each(function (elm) {
-			p.appendChild(elm)
-		});
-	});
+	parent.each ( function ( p ) {
+		childs.each ( function ( elm ) {
+			p.appendChild ( elm )
+		} );
+	} );
 
 	return this;
-});
+} );
 
 /**Prepend Element or Html
  * @param childs
  * @returns {_$_}
  */
-_$_.add('prepend', function (childs) {
+_$_.add ( 'prepend', function ( childs ) {
 	var parent = this;
-	if (_.isHtml(childs) || !_.is$(childs)) {
-		childs = _$(childs);
+	if ( _.isHtml ( childs ) || !_.is$ ( childs ) ) {
+		childs = _$ ( childs );
 	}
 
-	parent.each(function (p) {
-		childs.each(function (elm) {
-			p.insertBefore(elm, p.firstChild)
-		});
-	});
+	parent.each ( function ( p ) {
+		childs.each ( function ( elm ) {
+			p.insertBefore ( elm, p.firstChild )
+		} );
+	} );
 
 	return this;
-});
+} );
 
 /**Inner HTML
  * @param html
  * @returns {_$_}
  */
-_$_.add('html', function (html) {
-	if (_.isHtml(html) || _.isString(html)) {
-		this.prop({'innerHTML': html});
+_$_.add ( 'html', function ( html ) {
+	if ( _.isHtml ( html ) || _.isString ( html ) ) {
+		this.prop ( {'innerHTML': html} );
 	} else {
-		return this.prop('innerHTML');
+		return this.prop ( 'innerHTML' );
 	}
 	return this;
-});
+} );
 
 /**Inner Text
  * @param html
  * @returns {_$_}
  */
-_$_.add('text', function (text) {
-	if (_.isString(text)) {
-		this.prop({'textContent': text});
+_$_.add ( 'text', function ( text ) {
+	if ( _.isString ( text ) ) {
+		this.prop ( {'textContent': text} );
 	} else {
-		return this.prop('textContent');
+		return this.prop ( 'textContent' );
 	}
 	return this;
-});
+} );
 
 /**Set value
  * @param html
  * @returns {_$_}
  */
-_$_.add('val', function (text) {
-	if (_.isString(text)) {
-		this.prop({'value': text});
+_$_.add ( 'val', function ( text ) {
+	if ( _.isString ( text ) ) {
+		this.prop ( {'value': text} );
 		return this;
 	} else {
-		return this.prop('value');
+		return this.prop ( 'value' );
 	}
-});
+} );
 
 //Hide Element
-_$_.add('hide', function () {
-	this.each(function (_elem) {
+_$_.add ( 'hide', function () {
+	this.each ( function ( _elem ) {
 		_elem.style.display = 'none';
-	});
+	} );
 	return this;
-});
+} );
 
 //Show Element
-_$_.add('show', function () {
-	this.each(function (_elem) {
+_$_.add ( 'show', function () {
+	this.each ( function ( _elem ) {
 		_elem.style.display = 'block';
-	});
+	} );
 	return this;
-});
+} );
 
 /**Parent Node
  * @param callback
  */
-_$_.add('parent', function (callback) {
-	this.each(function (_elem) {
-		_.callbackAudit(callback, _$(_elem.parentNode))
-	});
+_$_.add ( 'parent', function ( callback ) {
+	this.each ( function ( _elem ) {
+		_.callbackAudit ( callback, _$ ( _elem.parentNode ) )
+	} );
 	return this;
-});
+} );
 
 /**Childs Nodes
  * @param callback
  */
-_$_.add('children', function (callback) {
+_$_.add ( 'children', function ( callback ) {
 	var _self = this;
-	_self.each(function (_elem) {
-		if (_elem.children.length > 0) {
-			_.each(_elem.children, function (v, i) {
-				if (_.isObject(v)
-					&& !_.isFunction(v)
-					&& _.isSet(_elem.children[i])) {
-					_.callbackAudit(callback, _$(v))
+	_self.each ( function ( _elem ) {
+		if ( _elem.children.length > 0 ) {
+			_.each ( _elem.children, function ( v, i ) {
+				if ( _.isObject ( v )
+					&& !_.isFunction ( v )
+					&& _.isSet ( _elem.children[i] ) ) {
+					_.callbackAudit ( callback, _$ ( v ) )
 				}
-			})
+			} )
 		}
-	});
+	} );
 	return this;
-});
+} );
 
 /**Next Node
  * @param callback
  */
-_$_.add('next', function (callback) {
+_$_.add ( 'next', function ( callback ) {
 	var _self = this;
-	_self.each(function (_elem) {
-		_.callbackAudit(callback, _$(_elem.nextElementSibling));
-	});
+	_self.each ( function ( _elem ) {
+		_.callbackAudit ( callback, _$ ( _elem.nextElementSibling ) );
+	} );
 
 	return this;
-});
+} );
 
 /**Nexts Node
  * @param callback
  */
-_$_.add('nexts', function (filter, callback) {
-	callback = _.isFunction(filter) ? filter : callback;
+_$_.add ( 'nexts', function ( filter, callback ) {
+	callback = _.isFunction ( filter ) ? filter : callback;
 	var _self = this;
-	_self.next(function (elem) {
+	_self.next ( function ( elem ) {
 		var _sibling = elem;
 		do {
-			if (_.isSet(filter) && !_.isFunction(filter)) {
-				_sibling.filter(filter, function (elem) {
-					_.callbackAudit(callback, elem);
-				})
+			if ( _.isSet ( filter ) && !_.isFunction ( filter ) ) {
+				_sibling.filter ( filter, function ( elem ) {
+					_.callbackAudit ( callback, elem );
+				} )
 			} else {
-				_.callbackAudit(callback, _sibling);
+				_.callbackAudit ( callback, _sibling );
 			}
 			elem = _sibling;
-		} while ((_sibling = _$(elem.collection.nextElementSibling)).exist)
-	});
+		} while ( (_sibling = _$ ( elem.collection.nextElementSibling )).exist )
+	} );
 
 	return this;
-});
+} );
 
 /**Trigger
  * @param event
  */
-_$_.add('trigger', function (event, callback) {
-	var _event = new CustomEvent(event, {
-		bubbles: true,
+_$_.add ( 'trigger', function ( event, callback ) {
+	var _event = new CustomEvent ( event, {
+		bubbles:    true,
 		cancelable: true
-	});
+	} );
 
-	if (document.createEvent) {
-		_event = document.createEvent('Event');
-		_event.initEvent(event, true, false);
+	if ( document.createEvent ) {
+		_event = document.createEvent ( 'Event' );
+		_event.initEvent ( event, true, false );
 		//_event.eventType = event;
 	}
 
-	this.each(function (v) {
-		v.dispatchEvent(_event);
-	});
+	this.each ( function ( v ) {
+		v.dispatchEvent ( _event );
+	} );
 
-	_.callbackAudit(callback, _event);
+	_.callbackAudit ( callback, _event );
 
 	return this;
-});
+} );
 
 /**Find Elements
  * @param filter
  * @param callback
  */
-_$_.add('find', function (filter, callback) {
+_$_.add ( 'find', function ( filter, callback ) {
 	var _self = this;
-	_self.children(function (elem) {
-		elem.filter(filter, function (e) {
-			_.callbackAudit(callback, e);
+	_self.children ( function ( elem ) {
+		elem.filter ( filter, function ( e ) {
+			_.callbackAudit ( callback, e );
 		}, function () {
-			elem.find(filter, callback);
-		})
-	});
+			elem.find ( filter, callback );
+		} )
+	} );
 
 	return this;
-});
+} );
 
 /**Full Parent
  * @param parent_class
  * @param callback
  * @returns {_$_}
  */
-_$_.add('parents', function (parent_class, callback) {
+_$_.add ( 'parents', function ( parent_class, callback ) {
 	var _self = this;
-	_self.each(function (_elem) {
-		var _parent = _$(_elem.parentNode);
-		_parent.filter(parent_class, function (parent) {
-			_.callbackAudit(callback, parent);
+	_self.each ( function ( _elem ) {
+		var _parent = _$ ( _elem.parentNode );
+		_parent.filter ( parent_class, function ( parent ) {
+			_.callbackAudit ( callback, parent );
 		}, function () {
-			_parent.parents(parent_class, callback);
-		});
-	});
+			_parent.parents ( parent_class, callback );
+		} );
+	} );
 	return _self;
-});
+} );
 
 /***Veriy Class
  * @param elem
  * @param cls
  */
-_$_.add('hasClass', function (elem, cls) {
-	return (new RegExp('(\\s|^)' + cls + '(\\s|$)')).test(
-		_.isSet(elem.className.baseVal)
-			? elem.className.baseVal : elem.className);
-});
+_$_.add ( 'hasClass', function ( elem, cls ) {
+	return (new RegExp ( '(\\s|^)' + cls + '(\\s|$)' )).test (
+		_.isSet ( elem.className.baseVal )
+			? elem.className.baseVal : elem.className );
+} );
 
 /**AddClass Element
  * @param elem
  * @param cls
  */
-_$_.add('addClass', function (cls) {
+_$_.add ( 'addClass', function ( cls ) {
 	var _self = this;
-	_self.each(function (elem) {
-		if (!_self.hasClass(elem, cls)) {
-			if (elem.classList) {
-				elem.classList.add(cls)
+	_self.each ( function ( elem ) {
+		if ( !_self.hasClass ( elem, cls ) ) {
+			if ( elem.classList ) {
+				elem.classList.add ( cls )
 			} else {
-				if (_.isSet(elem.className.baseVal)) {
+				if ( _.isSet ( elem.className.baseVal ) ) {
 					elem.className.baseVal += ' ' + cls
 				} else {
 					elem.className += ' ' + cls;
@@ -632,228 +632,228 @@ _$_.add('addClass', function (cls) {
 
 			}
 		}
-	});
+	} );
 	return this;
-});
+} );
 
 /**ToggleClass Element
  * @param elem
  * @param cls
  */
-_$_.add('toggleClass', function (cls) {
+_$_.add ( 'toggleClass', function ( cls ) {
 	var _self = this;
-	_self.each(function (elem) {
-		if (_self.hasClass(elem, cls)) {
-			elem.classList.toggle(cls)
+	_self.each ( function ( elem ) {
+		if ( _self.hasClass ( elem, cls ) ) {
+			elem.classList.toggle ( cls )
 		}
-	});
+	} );
 	return this;
-});
+} );
 
 /**Remove Class
  * @param cls
  */
-_$_.add('removeClass', function (cls) {
+_$_.add ( 'removeClass', function ( cls ) {
 	var _self = this;
-	_self.each(function (elem) {
-		if (_self.hasClass(elem, cls)) {
-			if (elem.classList) {
-				elem.classList.remove(cls)
+	_self.each ( function ( elem ) {
+		if ( _self.hasClass ( elem, cls ) ) {
+			if ( elem.classList ) {
+				elem.classList.remove ( cls )
 			} else {
-				var _regex = new RegExp(cls, 'g');
-				if (_.isSet(elem.className.baseVal)) {
-					elem.className.baseVal = elem.className.baseVal.replace(_regex, '')
+				var _regex = new RegExp ( cls, 'g' );
+				if ( _.isSet ( elem.className.baseVal ) ) {
+					elem.className.baseVal = elem.className.baseVal.replace ( _regex, '' )
 				} else {
-					elem.className = elem.className.replace(_regex, '')
+					elem.className = elem.className.replace ( _regex, '' )
 				}
 
 			}
 		}
-	});
+	} );
 	return this;
-});
+} );
 
 /**Fade Out
  * @param delay
  * @returns {_$_}
  */
-_$_.add('fadeOut', function (delay) {
-	this.each(function (_elem) {
-		_.interval(function (x) {
+_$_.add ( 'fadeOut', function ( delay ) {
+	this.each ( function ( _elem ) {
+		_.interval ( function ( x ) {
 			_elem.style.opacity = (x - 1) / 0xA;
 		}, {
-			           delay: delay || 0x32,
-			           limit: 0xA
-		           });
-	});
+			             delay: delay || 0x32,
+			             limit: 0xA
+		             } );
+	} );
 
 	return this;
-});
+} );
 
 /**Fade In
  * @param delay
  * @returns {_$_}
  */
-_$_.add('fadeIn', function (delay) {
-	this.each(function (_elem) {
+_$_.add ( 'fadeIn', function ( delay ) {
+	this.each ( function ( _elem ) {
 		_elem.style.opacity = 0;
-		_.interval(function (x) {
+		_.interval ( function ( x ) {
 			_elem.style.opacity = x / 0xA;
 		}, {
-			           delay: delay || 0x32,
-			           limit: -0xA
-		           });
-	});
+			             delay: delay || 0x32,
+			             limit: -0xA
+		             } );
+	} );
 
 	return this;
-});
+} );
 
 /**Return and set Heigth of DOM
  * @param height
  * @returns {Object}
  */
-_$_.add('height', function (height) {
-	if (_.isSet(height)) {
-		this.css({'height': _.isNumber(height)
-			? height + 'px' : height});
+_$_.add ( 'height', function ( height ) {
+	if ( _.isSet ( height ) ) {
+		this.css ( {'height': _.isNumber ( height )
+			? height + 'px' : height} );
 	}
 
 	var _height = [];
-	this.each(function (elem) {
-		_height.push((_.cartesianPlane(elem)).height);
-	});
-	return _.specArray(_height);
-});
+	this.each ( function ( elem ) {
+		_height.push ( (_.cartesianPlane ( elem )).height );
+	} );
+	return _.specArray ( _height );
+} );
 
 /**Return and set width of DOM
  * @param width
  * @returns {Object}
  */
-_$_.add('width', function (width) {
-	if (_.isSet(width)) {
-		this.css({'width': _.isNumber(width)
-			? width + 'px' : width});
+_$_.add ( 'width', function ( width ) {
+	if ( _.isSet ( width ) ) {
+		this.css ( {'width': _.isNumber ( width )
+			? width + 'px' : width} );
 	}
 	var _width = [];
-	this.each(function (elem) {
-		_width.push((_.cartesianPlane(elem)).width);
-	});
+	this.each ( function ( elem ) {
+		_width.push ( (_.cartesianPlane ( elem )).width );
+	} );
 
-	return _.specArray(_width);
-});
+	return _.specArray ( _width );
+} );
 
 /**Validate is
  * @param context
  * @return Object
  * */
-_$_.add('is', function (context) {
-	_.assert(context, WARNING_SYRUP.ERROR.NOPARAM);
+_$_.add ( 'is', function ( context ) {
+	_.assert ( context, WARNING_SYRUP.ERROR.NOPARAM );
 	var _return = false;
-	this.each(function (v) {
-		_$(v).filter(context, function () {
+	this.each ( function ( v ) {
+		_$ ( v ).filter ( context, function () {
 			_return = true;
 		}, function () {
 			_return = v[context] || v['type'] === context;
-		});
+		} );
 
-		if (_return)
+		if ( _return )
 			return false;
-	});
+	} );
 
 	return _return;
-});
+} );
 
 /***Get Child Element
  * @param find
  * */
-_$_.add('get', function (find) {
+_$_.add ( 'get', function ( find ) {
 	var _return = [],
 	    _self = this;
 
-	_self.each(function (v) {
-		if (find.indexOf(':') > -1) {
-			_$(v).find(find, function (node) {
-				_return.push(node);
-			});
+	_self.each ( function ( v ) {
+		if ( find.indexOf ( ':' ) > -1 ) {
+			_$ ( v ).find ( find, function ( node ) {
+				_return.push ( node );
+			} );
 		} else {
-			_return.push(_$(v.querySelector(find)));
+			_return.push ( _$ ( v.querySelector ( find ) ) );
 		}
-	});
+	} );
 
-	return _.specArray(_return);
-});
+	return _.specArray ( _return );
+} );
 
 /***Remove Element*/
-_$_.add('remove', function () {
-	this.each(function (v) {
-		if (v.remove) {
-			v.remove();
+_$_.add ( 'remove', function () {
+	this.each ( function ( v ) {
+		if ( v.remove ) {
+			v.remove ();
 		} else {
-			v.parentNode.removeChild(v);
+			v.parentNode.removeChild ( v );
 		}
-	});
-});
+	} );
+} );
 
 /***Each Element
  * @param callback
  * @returns {_$_}
  */
-_$_.add('each', function (callback) {
+_$_.add ( 'each', function ( callback ) {
 	var _element = this.collection;
-	if (_.isSet(_element.childNodes)
-		|| _.isGlobal(_element)) {
-		_.callbackAudit(callback, _element, 0);
+	if ( _.isSet ( _element.childNodes )
+		|| _.isGlobal ( _element ) ) {
+		_.callbackAudit ( callback, _element, 0 );
 	} else {
-		_.each(_element, function (v, i, p) {
-			if (_.isObject(v) && _.isSet(v)) {
-				_.callbackAudit(callback, v, i, p);
+		_.each ( _element, function ( v, i, p ) {
+			if ( _.isObject ( v ) && _.isSet ( v ) ) {
+				_.callbackAudit ( callback, v, i, p );
 			}
-		});
+		} );
 	}
 	return this;
-});
+} );
 
 /**Return and set offset of DOM
  * @param _object
  * @returns {Object}
  * */
-_$_.add('offset', function (_object) {
+_$_.add ( 'offset', function ( _object ) {
 	var _offset = [];
-	this.each(function (elem) {
-		var _cartesian = _.cartesianPlane(elem);
-		if (_.isObject(_object)) {
+	this.each ( function ( elem ) {
+		var _cartesian = _.cartesianPlane ( elem );
+		if ( _.isObject ( _object ) ) {
 			//elem.style.position = 'absolute';
-			if (_.isSet(_object.top)) {
-				elem.style.left = _.isNumber(_object.top)
+			if ( _.isSet ( _object.top ) ) {
+				elem.style.left = _.isNumber ( _object.top )
 					? _object.top + 'px' : _object.top;
 			}
 
-			if (_.isSet(_object.left)) {
-				elem.style.top = _.isNumber(_object.left)
+			if ( _.isSet ( _object.left ) ) {
+				elem.style.top = _.isNumber ( _object.left )
 					? _object.left + 'px' : _object.left;
 			}
 
-			if (_.isSet(_object.bottom)) {
-				elem.style.bottom = _.isNumber(_object.bottom)
+			if ( _.isSet ( _object.bottom ) ) {
+				elem.style.bottom = _.isNumber ( _object.bottom )
 					? _object.bottom + 'px' : _object.bottom;
 			}
 
-			if (_.isSet(_object.right)) {
-				elem.style.right = _.isNumber(_object.right)
+			if ( _.isSet ( _object.right ) ) {
+				elem.style.right = _.isNumber ( _object.right )
 					? _object.right + 'px' : _object.right;
 			}
 		}
 
-		_offset.push({
-			             top: _cartesian.top,
-			             left: _cartesian.left,
-			             bottom: _cartesian.bottom,
-			             right: _cartesian.right
-		             })
-	});
+		_offset.push ( {
+			               top:    _cartesian.top,
+			               left:   _cartesian.left,
+			               bottom: _cartesian.bottom,
+			               right:  _cartesian.right
+		               } )
+	} );
 
-	return _.specArray(_offset);
-});
+	return _.specArray ( _offset );
+} );
 
 
 /**Ordena Elementos
@@ -862,32 +862,32 @@ _$_.add('offset', function (_object) {
  * @param _object
  * @returns {*|Array}
  */
-_$_.add('sort', function (_prop, _desc, _object) {
-	if (_.isBoolean(_prop)) {
+_$_.add ( 'sort', function ( _prop, _desc, _object ) {
+	if ( _.isBoolean ( _prop ) ) {
 		_desc = arguments[0];
 		_prop = false;
 	}
 
 	_desc = !_desc ? 1 : -1;
 	_prop = _prop ? _prop : 'innerHTML';
-	_object = _.isObject(_object) ? _object : this.collection;
-	_object = _.toArray(_object);
+	_object = _.isObject ( _object ) ? _object : this.collection;
+	_object = _.toArray ( _object );
 
-	return _object.sort(function (a, b) {
+	return _object.sort ( function ( a, b ) {
 
 		var _a = a[_prop],
 		    _b = b[_prop];
 
-		if (_.isSet(_a) && _.isSet(_b)) {
-			a = !isNaN(+_a) ? +_a : _a.toLowerCase();
-			b = !isNaN(+_b) ? +_b : _b.toLowerCase();
+		if ( _.isSet ( _a ) && _.isSet ( _b ) ) {
+			a = !isNaN ( +_a ) ? +_a : _a.toLowerCase ();
+			b = !isNaN ( +_b ) ? +_b : _b.toLowerCase ();
 		}
 
 		return (a > b)
 			? _desc : (_desc * -1);
-	});
+	} );
 
-});
+} );
 
 
 /**Animate element
@@ -895,21 +895,21 @@ _$_.add('sort', function (_prop, _desc, _object) {
  * @param conf
  * @return Object
  */
-_$_.add('animate', function (prop, conf) {
-	this.each(function (elem) {
-		if (_.isSet(elem.animate)) {
-			elem.animate(prop, conf);
+_$_.add ( 'animate', function ( prop, conf ) {
+	this.each ( function ( elem ) {
+		if ( _.isSet ( elem.animate ) ) {
+			elem.animate ( prop, conf );
 		}
-	});
+	} );
 	return this;
-});
+} );
 
 /**Return object
  * @returns {Object|Array}
  */
-_$_.add('object', function () {
+_$_.add ( 'object', function () {
 	return this.collection;
-});
+} );
 
 
 /**Valida si esta seteado un elemento y envia un mensaje
@@ -917,199 +917,199 @@ _$_.add('object', function () {
  * @param msg
  * @returns {object}
  */
-Syrup.add('assert', function (obj, msg) {
-	if (!_.isSet(obj)) {
-		_.error(_.isSet(msg) ? msg : 'Param needed');
+Syrup.add ( 'assert', function ( obj, msg ) {
+	if ( !_.isSet ( obj ) ) {
+		_.error ( _.isSet ( msg ) ? msg : 'Param needed' );
 	}
 	return this;
-});
+} );
 
 
 /**Valida si un elemento es un arreglo
  * @param obj
  * @returns {boolean}
  */
-Syrup.add('isArray', function (obj) {
-	return  _.objectAsString(obj) === '[object Array]';
-});
+Syrup.add ( 'isArray', function ( obj ) {
+	return  _.objectAsString ( obj ) === '[object Array]';
+} );
 
 /**Valida si un elemento es un object
  * @param obj
  * @returns {boolean}
  */
-Syrup.add('isObject', function (obj) {
-	return (_.objectAsString(obj) === '[object Object]' || (typeof obj === 'object' && _.objectAsString(obj) !== '[object Null]'));
-});
+Syrup.add ( 'isObject', function ( obj ) {
+	return (_.objectAsString ( obj ) === '[object Object]' || (typeof obj === 'object' && _.objectAsString ( obj ) !== '[object Null]'));
+} );
 
 /**Valida si un elemento es un object
  * @param obj
  * @returns {boolean}
  */
-Syrup.add('isGlobal', function (obj) {
-	return (_.objectAsString(obj) === "[object global]"
-		|| _.objectAsString(obj) === "[object Window]"
-		|| _.objectAsString(obj) === "[object HTMLDocument]"
-		|| _.objectAsString(obj) === "[object Document]");
-});
+Syrup.add ( 'isGlobal', function ( obj ) {
+	return (_.objectAsString ( obj ) === "[object global]"
+		|| _.objectAsString ( obj ) === "[object Window]"
+		|| _.objectAsString ( obj ) === "[object HTMLDocument]"
+		|| _.objectAsString ( obj ) === "[object Document]");
+} );
 /**Valida si un elemento es un object _$_
  * @param obj
  * @returns {boolean}
  */
-Syrup.add('is$', function (obj) {
+Syrup.add ( 'is$', function ( obj ) {
 	return (obj instanceof _$_);
-});
+} );
 
 /**Valida si es un FormData
  * @param obj
  * @returns {boolean}
  */
-Syrup.add('isFormData', function (obj) {
-	return _.objectAsString(obj) === "[object FormData]";
-});
+Syrup.add ( 'isFormData', function ( obj ) {
+	return _.objectAsString ( obj ) === "[object FormData]";
+} );
 
 /**Valida si es un String
  * @param obj
  * @returns {boolean}
  */
-Syrup.add('isString', function (obj) {
-	return _.objectAsString(obj) === '[object String]';
-});
+Syrup.add ( 'isString', function ( obj ) {
+	return _.objectAsString ( obj ) === '[object String]';
+} );
 
 /**Valida si un elemento es ua funcion
  * @param obj
  * @returns {boolean}
  */
-Syrup.add('isFunction', function (obj) {
-	return _.objectAsString(obj) === '[object Function]';
-});
+Syrup.add ( 'isFunction', function ( obj ) {
+	return _.objectAsString ( obj ) === '[object Function]';
+} );
 
 /**Comprueba si la estring es un html
  * @param html
  * @returns {boolean}
  */
-Syrup.add('isHtml', function (html) {
-	return /(<([^>]+)>)/ig.test(html);
-});
+Syrup.add ( 'isHtml', function ( html ) {
+	return /(<([^>]+)>)/ig.test ( html );
+} );
 
 /**Comprueba si es booleano
  * @param bool
  * @returns {boolean}
  */
-Syrup.add('isBoolean', function (bool) {
-	return this.objectAsString(bool) === '[object Boolean]';
-});
+Syrup.add ( 'isBoolean', function ( bool ) {
+	return this.objectAsString ( bool ) === '[object Boolean]';
+} );
 
 /**Comprueba si es una expresion regular
  * @param regex
  * @returns {boolean}
  */
-Syrup.add('isRegexp', function (regex) {
-	return this.objectAsString(regex) === '[object RegExp]';
-});
+Syrup.add ( 'isRegexp', function ( regex ) {
+	return this.objectAsString ( regex ) === '[object RegExp]';
+} );
 
 /**Verifica si un elemento esta seteado
  * @param elm
  * @return Boolean
  */
-Syrup.add('isSet', function (elm) {
+Syrup.add ( 'isSet', function ( elm ) {
 	return typeof elm !== 'undefined' && elm !== null && !!elm;
-});
+} );
 
 /**Valida Input
  * @param input
  * @returns {boolean}
  */
-Syrup.add('isEmpty', function (input) {
-	if (_.isArray(input)) {
+Syrup.add ( 'isEmpty', function ( input ) {
+	if ( _.isArray ( input ) ) {
 		return input.length === 0;
 	}
 
-	var value = _.isString(input)
+	var value = _.isString ( input )
 		? input
 		: input.value;
-	return (!value || value === '' || /^\s+$/.test(value))
-});
+	return (!value || value === '' || /^\s+$/.test ( value ))
+} );
 
 /**Validar Url
  * @param url
  * @returns {boolean}
  */
-Syrup.add('isUrl', function (url) {
-	return /(http:\/\/|https:\/\/|\/\/)[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:/~\+#]*[\w\-\@?^=%&amp;/~\+#])?/g.test(url);
-});
+Syrup.add ( 'isUrl', function ( url ) {
+	return /(http:\/\/|https:\/\/|\/\/)[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:/~\+#]*[\w\-\@?^=%&amp;/~\+#])?/g.test ( url );
+} );
 
 /**Valida Correo
  * @param mail
  * @returns {boolean}
  */
-Syrup.add('isMail', function (mail) {
-	return /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/.test(mail);
-});
+Syrup.add ( 'isMail', function ( mail ) {
+	return /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/.test ( mail );
+} );
 
 /**Valida JSON
  * @param str
  * @returns {boolean}
  */
-Syrup.add('isJson', function (str) {
+Syrup.add ( 'isJson', function ( str ) {
 	try {
-		JSON.parse(str);
+		JSON.parse ( str );
 	}
-	catch (e) {
+	catch ( e ) {
 		return false;
 	}
 	return true;
-});
+} );
 
 /**Valida Numero
  * @param number
  * @returns {boolean}
  */
-Syrup.add('isNumber', function (number) {
-	return !isNaN(number);
-});
+Syrup.add ( 'isNumber', function ( number ) {
+	return !isNaN ( number );
+} );
 
 /**Console Log con tiempo de ejecucion
  * @param msg
  */
-Syrup.add('warning', function (msg) {
-	var date = _.getDate(false);
-	console.log(date.hour + ':' + date.minutes + ':' + date.seconds + ' ' + date.meridian + ' -> ' + msg);
-});
+Syrup.add ( 'warning', function ( msg ) {
+	var date = _.getDate ( false );
+	console.log ( date.hour + ':' + date.minutes + ':' + date.seconds + ' ' + date.meridian + ' -> ' + msg );
+} );
 
 /**Console Log error con tiempo de ejecucion
  * @param msg
  */
-Syrup.add('error', function (msg) {
-	var date = _.getDate(false);
+Syrup.add ( 'error', function ( msg ) {
+	var date = _.getDate ( false );
 	throw (date.hour + ':' + date.minutes + ':' + date.seconds + ' ' + date.meridian + ' -> ' + msg);
-});
+} );
 
 
 /**Html entities
  * @param str
  * @returns {String}
  */
-Syrup.add('htmlEntities', function (str) {
+Syrup.add ( 'htmlEntities', function ( str ) {
 	var match = {
-		'<': '&lt',
-		'>': '&gt;',
-		'"': '&quot;',
+		'<':  '&lt',
+		'>':  '&gt;',
+		'"':  '&quot;',
 		'\'': '&#39;',
-		'&': '&amp;'
+		'&':  '&amp;'
 	};
-	return _.replace(str, /<|>|&|"|'/g, match);
-});
+	return _.replace ( str, /<|>|&|"|'/g, match );
+} );
 
 /**Split String
  * @param str
  * @returns {String}
  */
-Syrup.add('splitString', function (str, match) {
-	if (str.indexOf(match) > -1) {
-		return str.split(match)
+Syrup.add ( 'splitString', function ( str, match ) {
+	if ( str.indexOf ( match ) > -1 ) {
+		return str.split ( match )
 	}
 	return str;
-});
+} );
 
 
 /**Truncate String
@@ -1117,9 +1117,9 @@ Syrup.add('splitString', function (str, match) {
  * @param limit
  * @returns {String}
  */
-Syrup.add('truncateString', function (string, limit) {
-	return string.split(' ').slice(0, limit).join(' ');
-});
+Syrup.add ( 'truncateString', function ( string, limit ) {
+	return string.split ( ' ' ).slice ( 0, limit ).join ( ' ' );
+} );
 
 /**Replace String
  * @param _string
@@ -1128,45 +1128,45 @@ Syrup.add('truncateString', function (string, limit) {
  * @para _case
  * @return String
  */
-Syrup.add('replace', function (_string, _find, _replace) {
-	var o = _string.toString(),
-	    s = o.toLowerCase(),
+Syrup.add ( 'replace', function ( _string, _find, _replace ) {
+	var o = _string.toString (),
+	    s = o.toLowerCase (),
 	    r = '',
 	    b = 0,
 	    i = -1,
 	    e = -1;
 
 
-	if (!_.isRegexp(_find)) {
-		_find = _find.toLowerCase();
+	if ( !_.isRegexp ( _find ) ) {
+		_find = _find.toLowerCase ();
 	} else {
-		_find = o.match(_find);
+		_find = o.match ( _find );
 		i = _find.length;
 		this.recursiveStr = s;
 	}
 
 //TODO pasarlo a worker
-	while (i > 0 ? i-- : ((e = s.indexOf(_find)) > -1)) {
-		if (_.isObject(_find)) {
-			this.recursiveStr = _.replace(this.recursiveStr, _find[i], _replace[_find[i]]);
+	while ( i > 0 ? i-- : ((e = s.indexOf ( _find )) > -1) ) {
+		if ( _.isObject ( _find ) ) {
+			this.recursiveStr = _.replace ( this.recursiveStr, _find[i], _replace[_find[i]] );
 		} else {
-			r += o.substring(b, b + e) + _replace;
-			s = s.substring(e + _find.length, s.length);
+			r += o.substring ( b, b + e ) + _replace;
+			s = s.substring ( e + _find.length, s.length );
 			b += e + _find.length;
 		}
 
 	}
 
-	if (!_.isEmpty(s) > 0 && i == -1) {
-		r += o.substring(o.length - s.length, o.length);
+	if ( !_.isEmpty ( s ) > 0 && i == -1 ) {
+		r += o.substring ( o.length - s.length, o.length );
 	}
 
-	if (!_.isEmpty(r)) {
+	if ( !_.isEmpty ( r ) ) {
 		this.recursiveStr = r;
 	}
 
 	return this.recursiveStr;
-});
+} );
 
 //Optional
 
@@ -1178,20 +1178,20 @@ Syrup.add('replace', function (_string, _find, _replace) {
  * @param fecha
  * @returns {*}
  */
-Syrup.add('getDate', function (fecha) {
-	var _fecha = new Date(),
+Syrup.add ( 'getDate', function ( fecha ) {
+	var _fecha = new Date (),
 	    meridiano_,
 	    mes_ = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-	    minutos_ = _fecha.getMinutes(),
-	    hora_ = _fecha.getHours(),
-	    segundos_ = _fecha.getSeconds(),
-	    dia_ = _fecha.getDate();
+	    minutos_ = _fecha.getMinutes (),
+	    hora_ = _fecha.getHours (),
+	    segundos_ = _fecha.getSeconds (),
+	    dia_ = _fecha.getDate ();
 
-	_fecha = _.isSet(fecha)
-		? new Date(fecha) : _fecha;
+	_fecha = _.isSet ( fecha )
+		? new Date ( fecha ) : _fecha;
 
-	if (_fecha === 'Invalid Date') {
-		_.error(_fecha);
+	if ( _fecha === 'Invalid Date' ) {
+		_.error ( _fecha );
 	}
 
 	dia_ = dia_ < 0xA
@@ -1212,30 +1212,30 @@ Syrup.add('getDate', function (fecha) {
 		? '0' + segundos_ : segundos_;
 
 	return {
-		day: dia_,
-		month: mes_[_fecha.getMonth()],
-		year: _fecha.getFullYear(),
-		hour: hora_,
-		minutes: minutos_,
-		seconds: segundos_,
+		day:      dia_,
+		month:    mes_[_fecha.getMonth ()],
+		year:     _fecha.getFullYear (),
+		hour:     hora_,
+		minutes:  minutos_,
+		seconds:  segundos_,
 		meridian: meridiano_
 	}
-});
+} );
 
 /**Retorna informacion del navegador
  * @returns (Object|null)
  */
-Syrup.add('getNav', function () {
+Syrup.add ( 'getNav', function () {
 	var _regex = /(?:trident\/(?=\w.+rv:)|(?:chrome\/|firefox\/|opera\/|msie\s|safari\/))[\w.]{1,4}/,
-	    _matches = _.nav.local.match(_regex),
-	    _split = _.isSet(_matches) ? _matches[0].split('/') : false;
+	    _matches = _.nav.local.match ( _regex ),
+	    _split = _.isSet ( _matches ) ? _matches[0].split ( '/' ) : false;
 
 	return _split ? {
-		nav: !!_split[0] ? _.replace(_split[0], 'trident', 'msie') : false,
+		nav: !!_split[0] ? _.replace ( _split[0], 'trident', 'msie' ) : false,
 		version: !!_split[1] ? _split[1] : false,
-		platform: navigator.platform.toLocaleLowerCase()
+		platform: navigator.platform.toLocaleLowerCase ()
 	} : false;
-});
+} );
 
 
 ///**Set var by reference
@@ -1251,81 +1251,81 @@ Syrup.add('getNav', function () {
  * @param longitud
  * @returns {string}
  */
-Syrup.add('getEncodedId', function (longitud) {
+Syrup.add ( 'getEncodedId', function ( longitud ) {
 	var _text = "",
 	    _longitud = !!longitud ? longitud : 5,
 	    _possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789=_";
 
-	for (var i = 0; i < _longitud; i++)
-		_text += _possible.charAt(Math.floor(Math.random() * _possible.length));
+	for ( var i = 0; i < _longitud; i++ )
+		_text += _possible.charAt ( Math.floor ( Math.random () * _possible.length ) );
 
 	return _text;
-});
+} );
 
 /**Devuelve las llaves de un objeto
  * @param obj
  * return {Boolean|Array}
  */
-Syrup.add('getObjectKeys', function (obj) {
-	if (_.isObject(obj)) {
-		return Object.keys(obj);
+Syrup.add ( 'getObjectKeys', function ( obj ) {
+	if ( _.isObject ( obj ) ) {
+		return Object.keys ( obj );
 	}
 	return [];
 
-});
+} );
 
 /**Devuelve el tamano de un objeto
  * @param obj
  * @returns (Number|null|Boolean)
  */
-Syrup.add('getObjectSize', function (obj) {
-	if (_.isObject(obj)) {
-		return _.getObjectKeys(obj).length;
+Syrup.add ( 'getObjectSize', function ( obj ) {
+	if ( _.isObject ( obj ) ) {
+		return _.getObjectKeys ( obj ).length;
 	}
 	return 0;
-});
+} );
 
 /**Devuelve el los valores del objeto
  * @param obj
  * @returns (Number|null|Boolean)
  */
-Syrup.add('getObjectValues', function (obj) {
+Syrup.add ( 'getObjectValues', function ( obj ) {
 	var _values = [];
-	if (_.isObject(obj)) {
-		_.each(obj, function (v) {
-			_values.push(v);
-		});
+	if ( _.isObject ( obj ) ) {
+		_.each ( obj, function ( v ) {
+			_values.push ( v );
+		} );
 	}
 	return _values;
-});
+} );
 
 /**Retorna un objeto en String
  * @param obj
  * @returns {string}
  */
-Syrup.add('objectAsString', function (obj) {
-	return Object.prototype.toString.call(obj);
-});
+Syrup.add ( 'objectAsString', function ( obj ) {
+	return Object.prototype.toString.call ( obj );
+} );
 
 /**Immutable Object
  * @param obj
  */
-Syrup.add('objectImmutable', function (obj) {
-	if (_.isObject(obj))
-		return Object.freeze(obj);
+Syrup.add ( 'objectImmutable', function ( obj ) {
+	if ( _.isObject ( obj ) )
+		return Object.freeze ( obj );
 
 	return obj;
-});
+} );
 
 /**Watch Object
  * @param obj
  */
-Syrup.add('objectWatch', function (obj, callback, conf) {
-	if (_.isObject(obj) && _.isSet(callback))
-		Object.observe(obj, callback, conf ? conf : []);
+Syrup.add ( 'objectWatch', function ( obj, callback, conf ) {
+	if ( _.isObject ( obj ) && _.isSet ( callback ) )
+		Object.observe ( obj, callback, conf ? conf : [] );
 
 	return obj;
-});
+} );
 
 /** Interval Manager
  * @param callback
@@ -1333,63 +1333,63 @@ Syrup.add('objectWatch', function (obj, callback, conf) {
  * @param max
  * @param orientation
  */
-Syrup.add('interval', function (callback, conf) {
+Syrup.add ( 'interval', function ( callback, conf ) {
 	var _worker = _.Workers;
 
-	_worker.set('system/workers/setting/Interval', function () {
-		_worker.send(conf);
-	});
+	_worker.set ( 'system/workers/setting/Interval', function () {
+		_worker.send ( conf );
+	} );
 
-	_worker.on('message', function (e) {
-		_.callbackAudit(callback, e.data);
-	})
-});
+	_worker.on ( 'message', function ( e ) {
+		_.callbackAudit ( callback, e.data );
+	} )
+} );
 
 /**Devuelve la cookie segun el nombre
  * @param name
  * @returns {*}
  */
-Syrup.add('getCookie', function (name) {
+Syrup.add ( 'getCookie', function ( name ) {
 	var _mcookie = document.cookie,
 	    _cookie = null;
-	if (!!_mcookie && _mcookie !== '') {
-		var cookies = _mcookie.split(';');
-		_.each(cookies, function (cookie) {
-			cookie = cookie.split('=');
-			var _pre = cookie[0].trim(),
-			    _pos = cookie[1].trim();
-			if (_pre === name) {
+	if ( !!_mcookie && _mcookie !== '' ) {
+		var cookies = _mcookie.split ( ';' );
+		_.each ( cookies, function ( cookie ) {
+			cookie = cookie.split ( '=' );
+			var _pre = cookie[0].trim (),
+			    _pos = cookie[1].trim ();
+			if ( _pre === name ) {
 				_cookie = _pos;
 				return false;
 			}
-		})
+		} )
 	}
 	return _cookie;
-});
+} );
 
 
-Syrup.add('simplifyDirectory', function (slashDir) {
-	if (_.isString(slashDir)) {
-		return slashDir.split('/').join('.')
+Syrup.add ( 'simplifyDirectory', function ( slashDir ) {
+	if ( _.isString ( slashDir ) ) {
+		return slashDir.split ( '/' ).join ( '.' )
 	}
 	return slashDir;
-});
+} );
 
-Syrup.add('dotDirectory', function (dotDir) {
-	if (_.isString(dotDir)) {
-		return dotDir.split('.').join('/')
+Syrup.add ( 'dotDirectory', function ( dotDir ) {
+	if ( _.isString ( dotDir ) ) {
+		return dotDir.split ( '.' ).join ( '/' )
 	}
 	return dotDir;
-});
+} );
 
 /**Limita la cantidad de elementos ingresados en un input
  * @param _event
  * @param _max_value
  * @returns {*}
  */
-Syrup.add('limitBoxInput', function (_event, _max_value) {
-	if (!_.isObject(_event) && !_event.target) {
-		_.error('Event Object Needed');
+Syrup.add ( 'limitBoxInput', function ( _event, _max_value ) {
+	if ( !_.isObject ( _event ) && !_event.target ) {
+		_.error ( 'Event Object Needed' );
 	}
 	var _obj = _event.target,
 	    _value = _obj.value.length,
@@ -1400,86 +1400,86 @@ Syrup.add('limitBoxInput', function (_event, _max_value) {
 		|| (_value === 0 && _event.keyCode === 8)
 		|| _event.type == 'paste'
 		) {
-		_event.preventDefault();
+		_event.preventDefault ();
 	}
 
 	return _out;
-});
+} );
 
 /**Pasa Json a format URL
  * @param _object
  * @returns {string}
  */
-Syrup.add('parseJsonUrl', function (_object) {
+Syrup.add ( 'parseJsonUrl', function ( _object ) {
 	var _return = '',
-	    _size = _.isObject(_object)
-		    ? _.getObjectSize(_object)
+	    _size = _.isObject ( _object )
+		    ? _.getObjectSize ( _object )
 		    : 0;
 
-	_.each(_object, function (value, key) {
+	_.each ( _object, function ( value, key ) {
 		_return += key + '=' + value;
-		if (_size > 1) {
+		if ( _size > 1 ) {
 			_return += '&';
 		}
-	});
+	} );
 
-	return _return.lastIndexOf('&') > -1
-		? _return.slice(0, -1) : _return;
-});
+	return _return.lastIndexOf ( '&' ) > -1
+		? _return.slice ( 0, -1 ) : _return;
+} );
 
 
 /**Get Script
  * @param url
  * @param callback
  */
-Syrup.add('getScript', function (url, callback) {
-	var _script = document.createElement('script'),
+Syrup.add ( 'getScript', function ( url, callback ) {
+	var _script = document.createElement ( 'script' ),
 	    _body = document.body,
 	    _loaded = function () {
-		    _$(_script).remove();
-		    _.callbackAudit(callback);
+		    _$ ( _script ).remove ();
+		    _.callbackAudit ( callback );
 	    };
 
-	if (_.isSet(_script.readyState)) {
-		_script.addEventListener('readystatechange', function () {
-			if (_script.readyState == 'loaded'
-				|| _script.readyState == 'complete') {
-				_loaded();
+	if ( _.isSet ( _script.readyState ) ) {
+		_script.addEventListener ( 'readystatechange', function () {
+			if ( _script.readyState == 'loaded'
+				|| _script.readyState == 'complete' ) {
+				_loaded ();
 			}
-		}, false);
+		}, false );
 	} else {
-		_script.addEventListener('load', _loaded, false);
+		_script.addEventListener ( 'load', _loaded, false );
 	}
 
 	_script.src = url;
 	_script.async = true;
-	_body.appendChild(_script);
-});
+	_body.appendChild ( _script );
+} );
 
 /**Simple Each
  * @param _object
  * @param callback
  * @returns {boolean}
  */
-Syrup.add('each', function (_object, callback) {
+Syrup.add ( 'each', function ( _object, callback ) {
 	var _p = {first: false, last: false};
-	if (_.isArray(_object)) {
+	if ( _.isArray ( _object ) ) {
 		var i = 0,
 		    max = _object.length;
-		for (; i < max; i++) {
+		for ( ; i < max; i++ ) {
 			_p.first = i === 0;
 			_p.last = (i + 1) === max;
-			_.callbackAudit(callback, _object[i], i, _p);
+			_.callbackAudit ( callback, _object[i], i, _p );
 		}
 	} else {
-		if (_.isObject(_object)) {
-			var _keys = Object.keys(_object),
+		if ( _.isObject ( _object ) ) {
+			var _keys = Object.keys ( _object ),
 			    _tmp, _i = _tmp = _keys.length;
 
-			while (_i--) {
+			while ( _i-- ) {
 				_p.first = (_i + 1) === _tmp;
 				_p.last = _i === 0;
-				_.callbackAudit(callback, _object[_keys[_i]], _keys[_i], _p);
+				_.callbackAudit ( callback, _object[_keys[_i]], _keys[_i], _p );
 
 
 			}
@@ -1487,179 +1487,179 @@ Syrup.add('each', function (_object, callback) {
 	}
 
 	return this;
-});
+} );
 
 /**Retorna la pocision exacta de un elemento y sus caracteristicas
  * @param _dom
  * @param all
  * @returns {*}
  */
-Syrup.add('cartesianPlane', function (_dom, all) {
-	_dom = _.is$(_dom)
-		? _$(_dom).object()
+Syrup.add ( 'cartesianPlane', function ( _dom, all ) {
+	_dom = _.is$ ( _dom )
+		? _$ ( _dom ).object ()
 		: _dom;
 
-	if (_.isGlobal(_dom)) {
+	if ( _.isGlobal ( _dom ) ) {
 		return {
-			top: _dom.pageYOffset,
-			left: _dom.pageXOffset,
-			width: _dom.outerWidth,
+			top:    _dom.pageYOffset,
+			left:   _dom.pageXOffset,
+			width:  _dom.outerWidth,
 			height: _dom.outerHeight
 		}
 	}
 
 	return !!all
-		? _dom.getClientRects()
-		: _dom.getBoundingClientRect();
+		? _dom.getClientRects ()
+		: _dom.getBoundingClientRect ();
 
-});
+} );
 
 /**Verifica el callback y sirve de auditor
  * @param callback
  * @returns {boolean}
  */
-Syrup.add('callbackAudit', function (callback) {
+Syrup.add ( 'callbackAudit', function ( callback ) {
 	try {
-		if (!_.isSet(callback)) {
+		if ( !_.isSet ( callback ) ) {
 			return false;
 		}
 
-		var _args = _.toArray(arguments);
-		_args = _.filterArray(_args, function (v, i) {
-			return !_.isFunction(v);
-		});
+		var _args = _.toArray ( arguments );
+		_args = _.filterArray ( _args, function ( v, i ) {
+			return !_.isFunction ( v );
+		} );
 
-		callback.apply(null, _args.length > 0
-			? _args : null);
+		callback.apply ( null, _args.length > 0
+			? _args : null );
 
 	}
-	catch (e) {
-		_.error(WARNING_SYRUP.ERROR.NOCALLBACK);
+	catch ( e ) {
+		_.error ( WARNING_SYRUP.ERROR.NOCALLBACK );
 	}
 	return true;
-});
+} );
 
 /**Elimina elementos falsos de un Array
  * @param arr
 
  */
-Syrup.add('compactArray', function (arr) {
-	return _.filterArray(arr, function (i) {
+Syrup.add ( 'compactArray', function ( arr ) {
+	return _.filterArray ( arr, function ( i ) {
 		return !!i ? i : false;
-	});
-});
+	} );
+} );
 
 /**Elimina elementos falsos de un Array
  * @param arr
  * @param callback
  */
-Syrup.add('specArray', function (arr) {
-	if (!_.isArray(arr)) {
-		_.error(WARNING_SYRUP.ERROR.NOARRAY);
+Syrup.add ( 'specArray', function ( arr ) {
+	if ( !_.isArray ( arr ) ) {
+		_.error ( WARNING_SYRUP.ERROR.NOARRAY );
 	}
 
 	return arr.length > 1
-		? arr : _.isSet(arr[0])
+		? arr : _.isSet ( arr[0] )
 		       ? arr[0] : null;
-});
+} );
 
 
-Syrup.add('repeatString', function (str, times) {
-	return Array(times + 1).join(str);
-});
+Syrup.add ( 'repeatString', function ( str, times ) {
+	return Array ( times + 1 ).join ( str );
+} );
 
 /**Filtra Arreglos
  * @param array
  * @param filter
  * @returns {Array}
  */
-Syrup.add('filterArray', function (array, filter) {
-	return array.filter(filter);
-});
+Syrup.add ( 'filterArray', function ( array, filter ) {
+	return array.filter ( filter );
+} );
 
 /**Busca un elemento en un arreglo
  * @param needle
  * @param haystack
  * @returns {boolean}
  */
-Syrup.add('inObject', function (needle, haystack) {
+Syrup.add ( 'inObject', function ( needle, haystack ) {
 	var _exist = false;
-	_.each(haystack, function (v, i) {
-		if (_.isObject(v)) {
-			_exist = _.inObject(needle, v);
-			if (_exist) {
+	_.each ( haystack, function ( v, i ) {
+		if ( _.isObject ( v ) ) {
+			_exist = _.inObject ( needle, v );
+			if ( _exist ) {
 				return false;
 			}
 		} else {
-			if (v === needle) {
+			if ( v === needle ) {
 				_exist = i;
 				return false;
 			}
 		}
-	});
+	} );
 	return _exist === 0 ? true : _exist;
-});
+} );
 
 /**Busca un elemento en un arreglo por RegExp
  * @param find
  * @param haystack
  * @returns {boolean}
  */
-Syrup.add('matchInArray', function (find, haystack) {
-	var needle = new RegExp(haystack.join('|'), 'g');
-	return needle.test(find);
-});
+Syrup.add ( 'matchInArray', function ( find, haystack ) {
+	var needle = new RegExp ( haystack.join ( '|' ), 'g' );
+	return needle.test ( find );
+} );
 
 /**Crea un arreglo unico de valores
  * @param object
  * @returns Array
  */
-Syrup.add('uniqueArray', function (array) {
+Syrup.add ( 'uniqueArray', function ( array ) {
 	var _new = [];
-	_.each(array, function (v) {
-		if (!_.inObject(v, _new)) {
-			_new.push(v);
+	_.each ( array, function ( v ) {
+		if ( !_.inObject ( v, _new ) ) {
+			_new.push ( v );
 		}
-	});
+	} );
 
 	return _new;
-});
+} );
 
 /**Parse to Array
  * @param element
  * @returns {Array}
  */
-Syrup.add('toArray', function (element) {
+Syrup.add ( 'toArray', function ( element ) {
 
-	if (_.isObject(element)) {
-		return [].slice.apply(element);
+	if ( _.isObject ( element ) ) {
+		return [].slice.apply ( element );
 	} else {
-		if (_.isString(element)) {
-			return element.split('');
+		if ( _.isString ( element ) ) {
+			return element.split ( '' );
 		}
 	}
-});
+} );
 
 /**Parse to Object
  * @param element
  * @returns {Object}
  */
-Syrup.add('toObject', function (element) {
-	if (_.isString(element)) {
-		element = element.split('');
+Syrup.add ( 'toObject', function ( element ) {
+	if ( _.isString ( element ) ) {
+		element = element.split ( '' );
 	}
 
-	if (!_.isArray(element)) {
-		_.error(WARNING_SYRUP.ERROR.NOARRAY);
+	if ( !_.isArray ( element ) ) {
+		_.error ( WARNING_SYRUP.ERROR.NOARRAY );
 	}
 
-	return element.reduce(function (o, v, i) {
+	return element.reduce ( function ( o, v, i ) {
 		o[i] = v;
 		return o;
-	}, {});
+	}, {} );
 
 
-});
+} );
 
 /**Distribute Array by index
  * @param obj
@@ -1667,64 +1667,64 @@ Syrup.add('toObject', function (element) {
  * @return {Object}
  */
 
-Syrup.add('objectDistribute', function (obj, index) {
+Syrup.add ( 'objectDistribute', function ( obj, index ) {
 	var _new = {};
 
-	if (!_.isObject(obj[index])) {
+	if ( !_.isObject ( obj[index] ) ) {
 		_new[obj[index]] = obj;
 	} else {
-		_.each(obj[index], function (v, i) {
+		_.each ( obj[index], function ( v, i ) {
 			_new[v] = {};
-			_.each(obj, function (r, j) {
-				if (j !== index) {
-					_new[v][j].push(r[i]);
+			_.each ( obj, function ( r, j ) {
+				if ( j !== index ) {
+					_new[v][j].push ( r[i] );
 				}
-			});
+			} );
 
-		});
+		} );
 	}
 
 	return _new;
-});
+} );
 
 
 /**Get Element Index
  * @param node
  * @returns {number}
  */
-Syrup.add('getElementIndex', function (node) {
+Syrup.add ( 'getElementIndex', function ( node ) {
 	var i = 1,
 	    prop = document.body.previousElementSibling
 		    ? 'previousElementSibling' : 'previousSibling';
-	while (node = node[prop]) {
+	while ( node = node[prop] ) {
 		++i
 	}
 	return i;
-});
+} );
 
 /**Extend
  * @param target
  * @param source
  * @returns {*}
  */
-Syrup.add('extend', function (target, source, overwrite) {
-	if (!_.isObject(target) || !source) {
+Syrup.add ( 'extend', function ( target, source, overwrite ) {
+	if ( !_.isObject ( target ) || !source ) {
 		return target;
 	}
 
-	if (_.isFunction(source)) {
+	if ( _.isFunction ( source ) ) {
 		source = new source;
 		target = target.__proto__
 	}
 
-	_.each(source, function (v, i) {
-		if (!target.hasOwnProperty(i)
-			|| _.isSet(overwrite)) {
+	_.each ( source, function ( v, i ) {
+		if ( !target.hasOwnProperty ( i )
+			|| _.isSet ( overwrite ) ) {
 			target[i] = v;
 		}
-	});
+	} );
 	return target;
-});
+} );
 
 
 /**Include
@@ -1733,63 +1733,63 @@ Syrup.add('extend', function (target, source, overwrite) {
  * @param callback
  * @return (Boolean|null)
  */
-Syrup.add('include', function (script, wait, callback) {
-	var _url = !_.isUrl(script)
+Syrup.add ( 'include', function ( script, wait, callback ) {
+	var _url = !_.isUrl ( script )
 		    ? setting.app_path + script + '.min.js'
 		    : script + '.min.js',
 	    _script = script
-		    .split('/')
-		    .pop();
+		    .split ( '/' )
+		    .pop ();
 
-	if (_.isFunction(wait)) {
+	if ( _.isFunction ( wait ) ) {
 		callback = arguments[1];
 		wait = false;
 	}
 
 	if (
 		wait
-		&& _.isSet(_.scriptCalls[wait])
-		&& _.isSet(_.waitingCalls[wait])
+		&& _.isSet ( _.scriptCalls[wait] )
+		&& _.isSet ( _.waitingCalls[wait] )
 		) {
-		if (_.waitingCalls[wait] !== 'done') {
-			if (!_.isSet(_.waitingCalls[wait])) {
+		if ( _.waitingCalls[wait] !== 'done' ) {
+			if ( !_.isSet ( _.waitingCalls[wait] ) ) {
 				_.waitingCalls[wait] = [];
 			}
 
-			_.waitingCalls[wait].push(function () {
-				_.include(script, false, callback)
-			});
+			_.waitingCalls[wait].push ( function () {
+				_.include ( script, false, callback )
+			} );
 
 			return false;
 		}
 	}
 
 
-	if (_.isSet(_.scriptCalls[_script])) {
-		_.callbackAudit(callback);
+	if ( _.isSet ( _.scriptCalls[_script] ) ) {
+		_.callbackAudit ( callback );
 		return false;
 	}
 
 	_.scriptCalls[_script] = script;
-	_.getScript(_url, function (e) {
-		if (_.isSet(_.waitingCalls[_script])) {
-			if (_.isObject(_.waitingCalls[_script])) {
-				_.each(_.waitingCalls[_script], function (v) {
-					v(e);
-				});
+	_.getScript ( _url, function ( e ) {
+		if ( _.isSet ( _.waitingCalls[_script] ) ) {
+			if ( _.isObject ( _.waitingCalls[_script] ) ) {
+				_.each ( _.waitingCalls[_script], function ( v ) {
+					v ( e );
+				} );
 				_.waitingCalls[_script] = 'done';
 			}
 		}
-		_.callbackAudit(callback);
-	});
+		_.callbackAudit ( callback );
+	} );
 
-});
+} );
 
 
 //Super Global Object Instance
 window._ = (function () {
-	return new Syrup();
-})();
+	return new Syrup ();
+}) ();
 
 _.VERSION = '1.0.0';
 
@@ -1803,11 +1803,11 @@ _.nav.unsupported =
 	|| !window.Worker
 	|| !window.WebSocket;
 _.nav.cookies = navigator.cookieEnabled;
-_.nav.javascript = navigator.javaEnabled();
+_.nav.javascript = navigator.javaEnabled ();
 _.nav.online = navigator.onLine;
-_.nav.local = navigator.userAgent.toLowerCase();
+_.nav.local = navigator.userAgent.toLowerCase ();
 
 window._$ = (function () {
-	return (new _$_()).$;
-})();
+	return (new _$_ ()).$;
+}) ();
 
