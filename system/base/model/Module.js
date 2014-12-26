@@ -142,7 +142,9 @@ Module.add ( '_serve', function ( moduleId, template ) {
 				} )
 			} )
 		} else {
-			var _parse = _dom.html ();
+			var _dom_template = _$ ( '[syrup-template="' + moduleId + '"]' ),
+			    _parse = _dom_template.exist ? _dom_template.html () : _dom.html ();
+
 			_parse = _parse.replace ( /(&lt;)/g, '<' );
 			_parse = _parse.replace ( /(&gt;)/g, '>' );
 
