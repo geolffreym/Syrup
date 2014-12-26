@@ -145,7 +145,6 @@ Module.add ( '_serve', function ( moduleId, template ) {
 			var _dom_template = _$ ( '[syrup-template="' + (_.isString ( template ) ? template : moduleId) + '"]' ),
 			    _parse = _dom_template.exist ? _dom_template.html () : _dom.html ();
 
-			console.log ( template );
 			if ( _.isSet ( _parse ) ) {
 				_parse = _parse.replace ( /(&lt;)/g, '<' );
 				_parse = _parse.replace ( /(&gt;)/g, '>' );
