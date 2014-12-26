@@ -185,7 +185,7 @@ Module.add ( '_taste', function ( moduleId, event ) {
 			_self.modules[moduleId].instance = _self._trigger ( moduleId );
 			_self.modules[moduleId].instance.name = moduleId;
 			_self.modules[moduleId].instance.parent = _parent;
-			_self.modules[moduleId].instance.dom = _$ ( '[syrup-event="' + moduleId + '"]+' );
+			_self.modules[moduleId].instance.dom = _$ ( '[rel="' + moduleId + '"]+' );
 			_self.modules[moduleId].instance.template = _.isSet ( _self.modules[moduleId].instance.template );
 
 			_self.modules[moduleId].instance.setScope = function ( object ) {
