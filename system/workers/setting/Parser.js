@@ -115,7 +115,7 @@ addEventListener('message', function (e) {
 		    }
 	    };
 
-	new_template = template.replace(/(\r?\n)/g, '');
+	new_template = template.replace ( /(\r?\n|((?!>)(\s)+(?=<)))/g, '' );
 	new_template = new_template.replace(/([^{]+([A-Za-z0-9]))(?=}|{)/g, function (match) {
 		if (!!fields[match]) {
 			return fields[match];
