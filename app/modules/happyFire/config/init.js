@@ -8,7 +8,7 @@ exports.files = {
     js: {
         src: [
             'src/accordion',
-            'src/message-box'
+            'src/messageBox'
         ]
 
     }
