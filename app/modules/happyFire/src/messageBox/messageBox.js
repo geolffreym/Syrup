@@ -11,12 +11,14 @@ Module.recipe('happyFire.messageBox', function (_, _$, globalScope) {
             self.template = 'Tooltip.Template';
             self.on('change', this.manage);
         },
-        box_type: function (style) {
-            return {
-                'error': 'message-box-error',
-                'default': 'message-box-alert'
-            }[style];
-        },
+	    box_type: function (style) {
+		    return {
+			    'error': 'message-box-error',
+			    'default': 'message-box-alert',
+			    'success': 'message-box-success',
+			    'info': 'message-box-info'
+		    }[style];
+	    },
         manage: function (object) {
             var _style = _.isSet(object.object.style) ? object.object.style : 'default';
             _style = self.box_type(_style);
