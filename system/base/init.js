@@ -891,7 +891,7 @@ _$_.add ( 'sort', function ( _prop, _desc, _object ) {
  * @param conf
  * @return Object
  */
-_$_.add ( 'animate', function ( prop, conf ) {
+_$_.add ( 'animate', function ( prop, conf, callback ) {
 	this.each ( function ( elem ) {
 		if ( _.isSet ( elem.animate ) ) {
 
@@ -907,12 +907,9 @@ _$_.add ( 'animate', function ( prop, conf ) {
 				? conf.delay : 300;
 
 			var _animation = elem.animate ( prop, conf );
-
-//            _animation.addEventListener('finish', function () {
-//                if (conf.iterations <= 1) {
-//                    _animation.cancel();
-//                }
-//            })
+			_animation.addEventListener ( 'finish', function () {
+				_.callbackAudit ( callback, _$ ( elem ) );
+			} )
 		}
 	} );
 	return this;
