@@ -180,7 +180,7 @@ Module.add ( '_taste', function ( moduleId, event ) {
 
 	if ( _.isSet ( _self.modules[moduleId] ) && _.isSet ( _self.modules[moduleId].parent ) ) {
 		_parent = _self.modules[moduleId].parent.split ( '.' ).pop ();
-		_dom = _$ ( '[rel="' + moduleId + '"]+' )
+		_dom = _$ ( '[rel="' + moduleId + '"]+' );
 		if ( !_.isSet ( event ) ) {
 			_self._add ( moduleId );
 			_self.modules[moduleId].instance = _self._trigger ( moduleId );
