@@ -23,7 +23,7 @@ Module.recipe('happyFire.messageBox', function (_, _$, globalScope) {
 			var _style = _.isSet(object.object.style) ? object.object.style : 'default';
 			_style = self.box_type(_style);
 
-			self.setScope({'message': object.object.error});
+			self.setScope({'message': _.isSet(object.object.content) ? object.object.content : ''});
 			self.serve();
 			self.dom
 				.addClass(_style)
