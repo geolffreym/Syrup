@@ -21,7 +21,7 @@ Module.blend('happyFire.messageBox', function (_, _$, globalScope) {
             var _style = _.isSet(object.object.style) ? object.object.style : 'default';
             _style = self.box_type(_style);
 
-            self.setScope({'message': object.object.error, unattended: true});
+            self.setScope({'message': object.object.error});
             self.serve();
             self.dom
                 .addClass(_style)

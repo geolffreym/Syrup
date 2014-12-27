@@ -190,7 +190,10 @@ Module.add ( '_taste', function ( moduleId, event ) {
 			_self.modules[moduleId].instance.template = _.isSet ( _self.modules[moduleId].instance.template );
 
 			_self.modules[moduleId].instance.setScope = function ( object ) {
-				_self.setScope ( moduleId, object );
+				if ( _.isObject ( object ) ) {
+					object.unattended = true;
+					_self.setScope ( moduleId, object );
+				}
 			};
 
 			_self.modules[moduleId].instance.getScope = function () {

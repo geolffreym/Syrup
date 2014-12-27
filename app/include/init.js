@@ -46,9 +46,11 @@ WARNING_SYRUP = {
 		NOPROTOCOL: 'No protocol specified in the configuration.',
 		NOURL:      'URL is required for the request.',
 		NOHTML:     'Html string is required',
-		NOPOPUP:    'There are no popup created.'
+		NOPOPUP:    'There are no popup created.',
+		NOPACK:     'Error pack form'
 	}
-};
+}
+	;
 
 nativeFunction.blend = function ( child ) {
 	var name = child.prototype.constructor.name || (child.toString ().match ( regexConstructor )[0]).trim ();
@@ -128,6 +130,7 @@ _$_.add ( '$', function ( dom ) {
 	 }*/
 
 	_self.exist = _.isSet ( _self.collection );
+	_self.name = dom;
 	return _self;
 } );
 
@@ -352,8 +355,9 @@ _$_.add ( 'removeAttr', function ( attr ) {
  * @returns {_$_}
  */
 _$_.add ( 'css', function ( css ) {
-	var _css = [];
-	this.each ( function ( dom ) {
+	var _css = [],
+	    _self = this;
+	_self.each ( function ( dom ) {
 		if ( _.isString ( css ) ) {
 			var _style = window.getComputedStyle ( dom, null );
 			_css.push ( _style.getPropertyValue ( css ) );
@@ -692,14 +696,13 @@ _$_.add ( 'removeClass', function ( cls ) {
  * @returns {_$_}
  */
 _$_.add ( 'fadeOut', function ( delay ) {
-	this.each ( function ( _elem ) {
-		_.interval ( function ( x ) {
-			_elem.style.opacity = (x - 1) / 0xA;
-		}, {
-			             delay: delay || 0x32,
-			             limit: 0xA
-		             } );
-	} );
+	this.animate ( [
+		               {opacity: '1'},
+		               {opacity: '0'}
+	               ], {
+		               delay: 0,
+		               duration: _.isNumber ( delay ) ? delay : 50
+	               } );
 
 	return this;
 } );
@@ -709,16 +712,13 @@ _$_.add ( 'fadeOut', function ( delay ) {
  * @returns {_$_}
  */
 _$_.add ( 'fadeIn', function ( delay ) {
-	this.each ( function ( _elem ) {
-		_elem.style.opacity = 0;
-		_.interval ( function ( x ) {
-			_elem.style.opacity = x / 0xA;
-		}, {
-			             delay: delay || 0x32,
-			             limit: -0xA
-		             } );
-	} );
-
+	this.animate ( [
+		               {opacity: '0'},
+		               {opacity: '1'}
+	               ], {
+		               delay: 0,
+		               duration: _.isNumber ( delay ) ? delay : 50
+	               } );
 	return this;
 } );
 
@@ -777,7 +777,7 @@ _$_.add ( 'is', function ( context ) {
 	return _return;
 } );
 
-/***Get Childs Element
+/***Get Child Element
  * @param find
  * */
 _$_.add ( 'get', function ( find ) {
@@ -836,15 +836,25 @@ _$_.add ( 'offset', function ( _object ) {
 	this.each ( function ( elem ) {
 		var _cartesian = _.cartesianPlane ( elem );
 		if ( _.isObject ( _object ) ) {
-			elem.style.position = 'absolute';
-			if ( _.isSet ( _object.x ) ) {
-				elem.style.left = _.isNumber ( _object.x )
-					? _object.x + 'px' : _object.x;
+			//elem.style.position = 'absolute';
+			if ( _.isSet ( _object.top ) ) {
+				elem.style.left = _.isNumber ( _object.top )
+					? _object.top + 'px' : _object.top;
 			}
 
-			if ( _.isSet ( _object.y ) ) {
-				elem.style.top = _.isNumber ( _object.y )
-					? _object.y + 'px' : _object.y;
+			if ( _.isSet ( _object.left ) ) {
+				elem.style.top = _.isNumber ( _object.left )
+					? _object.left + 'px' : _object.left;
+			}
+
+			if ( _.isSet ( _object.bottom ) ) {
+				elem.style.bottom = _.isNumber ( _object.bottom )
+					? _object.bottom + 'px' : _object.bottom;
+			}
+
+			if ( _.isSet ( _object.right ) ) {
+				elem.style.right = _.isNumber ( _object.right )
+					? _object.right + 'px' : _object.right;
 			}
 		}
 
@@ -899,28 +909,30 @@ _$_.add ( 'sort', function ( _prop, _desc, _object ) {
  * @param conf
  * @return Object
  */
-_$_.add ( 'animate', function ( prop, conf ) {
+_$_.add ( 'animate', function ( prop, conf, callback ) {
 	this.each ( function ( elem ) {
 		if ( _.isSet ( elem.animate ) ) {
-			elem.animate ( conf );
-		} else {
-			_.each ( prop, function ( v, i ) {
-				conf[i].from = conf[i].from || 0;
-				conf[i].to = conf[i].to || 0x64;
-				conf[i].measure = conf[i].measure || 'px';
+
+			if ( _.isFunction ( conf ) )
+				callback = conf;
+
+			conf = ((!_.isObject ( conf ) && !_.isNumber ( conf )) ) ? {} : conf;
 
 
-				elem.style[v] = conf[i].from + conf[i].measure;
-				_.interval ( function ( e ) {
-					elem.style[v] = e + conf[i].measure;
-				}, {
-					             delay: conf[i].smooth || 0x32,
-					             limit: -parseInt ( conf[i].to )
-				             } )
+			conf.iterations = _.isSet ( conf.iterations )
+				? conf.iterations : 1;
+
+			conf.duration = _.isSet ( conf.duration )
+				? conf.duration : 1000;
+
+			conf.delay = _.isSet ( conf.delay )
+				? conf.delay : 300;
+
+			var _animation = elem.animate ( prop, conf );
+			_animation.addEventListener ( 'finish', function () {
+				_.callbackAudit ( callback, _$ ( elem ) );
 			} )
 		}
-
-
 	} );
 	return this;
 } );
@@ -1189,6 +1201,11 @@ Syrup.add ( 'replace', function ( _string, _find, _replace ) {
 	return this.recursiveStr;
 } );
 
+//Optional
+
+//Syrup.add('replace', function(str, r1, r2){
+//	return str.split(r1 ).join(r2);
+//});
 
 /**Retorna la fecha en un objeto
  * @param fecha
@@ -1350,7 +1367,7 @@ Syrup.add ( 'objectWatch', function ( obj, callback, conf ) {
  * @param orientation
  */
 Syrup.add ( 'interval', function ( callback, conf ) {
-	var _worker = new Workers;
+	var _worker = _.Workers;
 
 	_worker.set ( 'system/workers/setting/Interval', function () {
 		_worker.send ( conf );
@@ -1843,7 +1860,7 @@ function Lib () {
 
 Lib.add ( 'blend', function ( name, dependencies ) {
 	var _split = _.splitString ( name, '.' );
-	if ( _.isArray(_split) ) {
+	if ( _.isArray ( _split ) ) {
 		name = _split[0];
 	}
 
@@ -1857,7 +1874,12 @@ Lib.add ( 'blend', function ( name, dependencies ) {
 		Syrup.blend ( _anonymous () );
 		_self.name = name;
 		_self.object = _[name];
+		_self.object.name = name;
 		_self.breadcrumb[name] = _self.object;
+		_self.cook ( 'add', _self._mix );
+		_self.cook ( 'clone', function () {
+			return _[this.name];
+		} );
 		_self._dependencies ( dependencies );
 	}
 	else {
@@ -1913,10 +1935,17 @@ Lib.add ( 'supply', function ( supplier ) {
 
 
 Lib.add ( 'cook', function ( name, callback ) {
-    this.object.__proto__[name] = callback;
-    //this.object[name] = callback;
+	this.object.__proto__[name] = callback;
+	//this.object[name] = callback;
 	return this;
 } );
+
+Lib.add ( '_mix', function ( name, callback ) {
+	this.__proto__[name] = callback;
+	return this;
+
+} );
+
 
 window.Lib = new Lib;
 
@@ -1967,9 +1996,10 @@ Module.add ( '_watch', function ( moduleId ) {
 		_.each ( change, function ( v ) {
 			if ( _.isSet ( _self.onchange[v.name] )
 				&& _.getObjectSize ( v.object ) > 0
+				&& !_.isSet ( v.object[v.name]['unattended'] )
 				&& moduleId === v.name
 				) {
-				_self.onchange[v.name] ( v );
+				_self.onchange[v.name] ( {name: v.name, old: v.oldValue, type: v.type, object: v.object[v.name]} );
 			}
 		} );
 	} );
@@ -2002,13 +2032,13 @@ Module.add ( 'value', function () {
 
 } );
 
-Module.add ( 'set', function ( moduleId, object ) {
+Module.add ( 'setScope', function ( moduleId, object ) {
 	if ( _.isSet ( this.scope[this.modules[moduleId].parent][moduleId] ) ) {
 		this.scope[this.modules[moduleId].parent][moduleId] = object;
 	}
 } );
 
-Module.add ( 'get', function ( moduleId ) {
+Module.add ( 'getScope', function ( moduleId ) {
 	if ( _.isSet ( this.scope[this.modules[moduleId].parent][moduleId] ) ) {
 		return this.scope[this.modules[moduleId].parent][moduleId];
 	}
@@ -2018,8 +2048,7 @@ Module.add ( 'get', function ( moduleId ) {
 Module.add ( 'addEvent', function ( event, callback ) {
 	var _self = this,
 	    _callback,
-	    _dom = _$ ( '[syrup-event="' + _self.temp + '"]' );
-
+	    _dom = _$ ( '[syrup-event="' + _self.modules[_self.temp].instance.name + '"]' );
 
 	_callback = _.isSet ( callback ) && _.isFunction ( callback )
 		? callback : function ( e ) {
@@ -2035,17 +2064,17 @@ Module.add ( 'addEvent', function ( event, callback ) {
 	return this;
 } );
 
-Module.add ( 'on', function ( event, moduleId, callback ) {
+Module.add ( 'on', function ( event, name, callback ) {
 	var self = this;
 	return [{
 		change: function () {
-			self.onchange[moduleId] = callback;
+			self.onchange[name] = callback;
 		},
 		stop:   function () {
-			self.onstop[moduleId] = callback;
+			self.onstop[name] = callback;
 		},
 		drop:   function () {
-			self.ondrop[moduleId] = callback;
+			self.ondrop[name] = callback;
 		}
 	}[event] ()]
 } );
@@ -2057,22 +2086,27 @@ Module.add ( '_serve', function ( moduleId, template ) {
 	    _dom = _$ ( '[syrup-controller="' + moduleId + '"]' );
 
 	if ( _dom.exist && _.getObjectSize ( _scope ) > 0 ) {
-		if ( _.isSet ( template ) ) {
-			_.include ( 'app/view/' + _self.modules[moduleId].parent + '/init', function () {
+		if ( _.isSet ( template ) && _.isBoolean ( template ) ) {
+			_.include ( 'app/view/' + _self.modules[moduleId].parent + '/' + moduleId.replace ( /\./g, '_' ), function () {
 				_template[moduleId] ( _scope, function ( my_html ) {
 					_dom.html ( my_html );
 				} )
 			} )
 		} else {
-			//if ( !_.isSet ( _self.modules[moduleId]['parse'] ) )
-			_self.modules[moduleId]['parse'] = _dom.text ();
+			var _dom_template = _$ ( '[syrup-template="' + (_.isString ( template ) ? template : moduleId) + '"]' ),
+			    _parse = _dom_template.exist ? _dom_template.html () : _dom.html ();
 
-			_template.parse ( _self.modules[moduleId]['parse'], _scope, function ( result ) {
-				_dom.html ( result );
-			} );
+			if ( _.isSet ( _parse ) ) {
+				_parse = _parse.replace ( /(&lt;)/g, '<' );
+				_parse = _parse.replace ( /(&gt;)/g, '>' );
+				_template.parse ( _parse, _scope, function ( result ) {
+					_dom.html ( result );
+				} );
+			}
 		}
 	}
 } );
+
 
 Module.add ( 'factory', function ( name, callback ) {
 	var _self = this;
@@ -2082,9 +2116,7 @@ Module.add ( 'factory', function ( name, callback ) {
 } );
 
 Module.add ( 'service', function ( name, callback ) {
-	Lib.cook ( name, function () {
-		callback ( _, _$ );
-	} );
+	Lib.cook ( name, callback );
 } );
 
 Module.add ( 'services', function ( callback ) {
@@ -2094,45 +2126,59 @@ Module.add ( 'services', function ( callback ) {
 
 Module.add ( '_taste', function ( moduleId, event ) {
 	var _self = this,
-	    _parent;
+	    _dance = false,
+	    _parent, _dom;
 
 	if ( _.isSet ( _self.modules[moduleId] ) && _.isSet ( _self.modules[moduleId].parent ) ) {
 		_parent = _self.modules[moduleId].parent.split ( '.' ).pop ();
+		_dom = _$ ( '[rel="' + moduleId + '"]+' )
 		if ( !_.isSet ( event ) ) {
 			_self._add ( moduleId );
 			_self.modules[moduleId].instance = _self._trigger ( moduleId );
+			_self.modules[moduleId].instance.name = moduleId;
+			_self.modules[moduleId].instance.parent = _parent;
+			_self.modules[moduleId].instance.dom = _dom.exist ? _dom : false;
 			_self.modules[moduleId].instance.template = _.isSet ( _self.modules[moduleId].instance.template );
+
+			_self.modules[moduleId].instance.setScope = function ( object ) {
+				if ( _.isObject ( object ) ) {
+					object.unattended = true;
+					_self.setScope ( moduleId, object );
+				}
+			};
+
+			_self.modules[moduleId].instance.getScope = function () {
+				return _self.getScope ( moduleId );
+			};
+
 			_self.modules[moduleId].instance.on = function ( event, callback ) {
 				_self.on ( event, moduleId, callback );
 			};
 			_self.modules[moduleId].instance.serve = function ( _template ) {
-				_self._serve ( moduleId, _template );
+				_self._serve ( moduleId, _.isSet ( _template ) ? _template : this.template );
 			};
-			_self.modules[moduleId].instance.listen = function ( callback ) {
-				return _self.listen ( callback );
-			};
-			_self.modules[moduleId].instance.source = function ( data, callback ) {
-				return _self.source ( data, callback );
-			};
+
+
 			_self._watch ( moduleId );
-			_self._serve ( moduleId, _self.modules[moduleId].instance.template );
 
 		} else {
 			if ( _.isSet ( event.dance ) ) {
 				if ( _.isSet ( _self.modules[moduleId].instance[event.dance] ) ) {
 					if ( _.isFunction ( _self.modules[moduleId].instance[event.dance] ) ) {
 						_self.modules[moduleId].instance[event.dance] ( Lib.get ( _parent ), event );
+						_dance = true;
 					}
 				}
 			}
 		}
 
-		if ( _self.modules[moduleId].instance.init ) {
+		if ( _self.modules[moduleId].instance.init && !_dance ) {
 			/**
 			 * @param parentObject
 			 * @param event
 			 * */
 			_self.modules[moduleId].instance.init ( Lib.get ( _parent ), event );
+			_self._serve ( moduleId, _self.modules[moduleId].instance.template );
 		}
 
 	}
@@ -2143,7 +2189,7 @@ Module.add ( 'drop', function ( moduleId ) {
 	if ( _.isSet ( this.modules[moduleId] ) ) {
 		if ( this.modules[moduleId].instance ) {
 			if ( this.modules[moduleId].instance.destroy )
-				this.modules[moduleId].instance.destroy ();
+				this.modules[moduleId].instance.destroy ( moduleId );
 
 			if ( this.ondrop[moduleId] )
 				this.ondrop[moduleId] ( moduleId );
@@ -2191,7 +2237,7 @@ Lib.blend ( 'Ajax', [] ).make ( function () {
 	}
 } ).supply ( function () {
 	return {
-		event:         function ( event, callback ) {
+		on:         function ( event, callback ) {
 			var self = this;
 			return [{
 				before:   function () {
@@ -2361,7 +2407,7 @@ Lib.blend ( 'Ajax', [] ).make ( function () {
 
 
 Lib.blend ( 'Workers', [] ).make ( function () {
-	return{
+	return {
 		Worker:    null,
 		onsuccess: null
 	}
@@ -2381,7 +2427,7 @@ Lib.blend ( 'Workers', [] ).make ( function () {
 			self.Worker.addEventListener ( 'message', function ( e ) {
 				_.callbackAudit ( self.onsuccess, e );
 			}, false );
-			_.callbackAudit ( callback );
+			_.callbackAudit ( callback, self.Worker );
 
 		},
 		get:  function () {
@@ -2391,7 +2437,7 @@ Lib.blend ( 'Workers', [] ).make ( function () {
 			this.Worker.postMessage ( !!message ? message : '' );
 		},
 		kill: function ( callback ) {
-			if ( this.Worker ) {
+			if ( _.isSet ( this.Worker ) ) {
 				this.Worker.terminate ();
 				this.Worker = null;
 				_.callbackAudit ( callback );
@@ -2450,7 +2496,7 @@ Lib.blend ( 'Template', ['Repository', 'Ajax', 'Workers'] ).make ( function () {
 	return {
 		lookup: function ( template, callback ) {
 			var _conf = {
-				url:       setting.app_path + 'app/templates/' + template,
+				url:       setting.app_path + 'templates/' + template,
 				dataType:  'text/plain',
 				processor: '.html'
 			};
@@ -2486,8 +2532,7 @@ Lib.blend ( 'Template', ['Repository', 'Ajax', 'Workers'] ).make ( function () {
 		},
 		parse:  function ( _template, _fields, callback ) {
 			var _self = this;
-
-			_self.Workers.set ( 'system/workers/setting/Parser', function () {
+			_self.Workers.set ( 'system/workers/setting/Parser', function ( worker ) {
 				_self.Workers.send ( {template: _template, fields: _fields} );
 			} );
 
@@ -2605,7 +2650,7 @@ Lib.blend ( 'Socket', [] ).make ( function () {
 			this.socket = null;
 
 		},
-		get:   function () {
+		get:   function ( name ) {
 			return this.socket;
 
 		},
@@ -2655,6 +2700,7 @@ Lib.blend ( 'Shortcuts', ['Ajax', 'Socket'] ).supply ( function () {
 			if ( !!send ) {
 				_self.Socket.on ( 'open', function () {
 					_self.Socket.send ( send );
+					_self.Socket.stop ( _conf.protocol );
 				} )
 			}
 
@@ -2690,9 +2736,7 @@ Lib.blend ( 'Shortcuts', ['Ajax', 'Socket'] ).supply ( function () {
  */
 
 
-Module.blend ( 'happyFire', [
-	'accordion'
-] ).service ( 'log', function ( string ) {
+Module.blend ( 'happyFire', [] ).service ( 'log', function ( string ) {
 	_.warning ( string );
 } );
 /**
@@ -2703,6 +2747,50 @@ Module.blend ( 'happyFire', [
 Module.blend('happyFire.accordion', function () {
     return {
         init: function () {
+
+        }
+    }
+});
+/**
+ * Created by gmena on 08-06-14.
+ */
+
+//Module name -> Controller and Event Syrup
+Module.blend('happyFire.messageBox', function (_, _$, globalScope) {
+    var self;
+    return {
+        init: function (tools) {
+            self = this;
+            self.template = 'Tooltip.Template';
+            self.on('change', this.manage);
+        },
+        box_type: function (style) {
+            return {
+                'error': 'message-box-error',
+                'default': 'message-box-alert'
+            }[style];
+        },
+        manage: function (object) {
+            var _style = _.isSet(object.object.style) ? object.object.style : 'default';
+            _style = self.box_type(_style);
+
+            self.setScope({'message': object.object.error});
+            self.serve();
+            self.dom
+                .addClass(_style)
+                .animate([
+                    {left: '-30%'},
+                    {left: '3%'}
+                ], function (elem) {
+                    elem.css({left: "3%"});
+                    elem.animate([
+                        {left: '3%'},
+                        {left: '-30%'}
+                    ], {delay: 3500}, function (elem) {
+                        elem.css({left: "-30%"});
+                    });
+                })
+
 
         }
     }
