@@ -3,7 +3,7 @@
  */
 
 //Module name -> Controller and Event Syrup
-Module.blend('happyFire.accordion', function () {
+Module.recipe('happyFire.accordion', function (_, _$, globalScope) {
     return {
         init: function () {
 

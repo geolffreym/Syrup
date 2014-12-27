@@ -3,7 +3,7 @@
  */
 
 //Module name -> Controller and Event Syrup
-Module.blend('happyFire.messageBox', function (_, _$, globalScope) {
+Module.recipe('happyFire.messageBox', function (_, _$, globalScope) {
     var self;
     return {
         init: function (tools) {
