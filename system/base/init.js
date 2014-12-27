@@ -895,7 +895,11 @@ _$_.add ( 'animate', function ( prop, conf, callback ) {
 	this.each ( function ( elem ) {
 		if ( _.isSet ( elem.animate ) ) {
 
+			if ( _.isFunction ( conf ) )
+				callback = conf;
+
 			conf = ((!_.isObject ( conf ) && !_.isNumber ( conf )) ) ? {} : conf;
+
 
 			conf.iterations = _.isSet ( conf.iterations )
 				? conf.iterations : 1;
