@@ -5,11 +5,12 @@
 
 //Development
 exports.files = {
-	js: {
-		src: [
-			'src/accordion'
-		]
+    js: {
+        src: [
+            'src/accordion',
+            'src/message-box'
+        ]
 
-	}
+    }
 };
 
