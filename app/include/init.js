@@ -2131,7 +2131,7 @@ Module.add ( '_taste', function ( moduleId, event ) {
 
 	if ( _.isSet ( _self.modules[moduleId] ) && _.isSet ( _self.modules[moduleId].parent ) ) {
 		_parent = _self.modules[moduleId].parent.split ( '.' ).pop ();
-		_dom = _$ ( '[rel="' + moduleId + '"]+' )
+		_dom = _$ ( '[rel="' + moduleId + '"]+' );
 		if ( !_.isSet ( event ) ) {
 			_self._add ( moduleId );
 			_self.modules[moduleId].instance = _self._trigger ( moduleId );
@@ -2744,7 +2744,7 @@ Module.blend ( 'happyFire', [] ).service ( 'log', function ( string ) {
  */
 
 //Module name -> Controller and Event Syrup
-Module.blend('happyFire.accordion', function () {
+Module.recipe('happyFire.accordion', function (_, _$, globalScope) {
     return {
         init: function () {
 
@@ -2756,42 +2756,43 @@ Module.blend('happyFire.accordion', function () {
  */
 
 //Module name -> Controller and Event Syrup
-Module.blend('happyFire.messageBox', function (_, _$, globalScope) {
-    var self;
-    return {
-        init: function (tools) {
-            self = this;
-            self.template = 'Tooltip.Template';
-            self.on('change', this.manage);
-        },
-        box_type: function (style) {
-            return {
-                'error': 'message-box-error',
-                'default': 'message-box-alert'
-            }[style];
-        },
-        manage: function (object) {
-            var _style = _.isSet(object.object.style) ? object.object.style : 'default';
-            _style = self.box_type(_style);
+Module.recipe ( 'happyFire.messageBox', function ( _, _$, globalScope ) {
+	var self;
+	return {
+		init:     function ( tools ) {
+			self = this;
+			self.on ( 'change', this.manage );
+		},
+		box_type: function ( style ) {
+			return {
+				'error':   'message-box-error',
+				'info':    'message-box-alert',
+				'success': 'message-box-success',
+				'default': 'message-box-default'
+			}[style];
+		},
+		manage:   function ( object ) {
+			var _style = _.isSet ( object.object.style ) ? object.object.style : 'default';
+			_style = self.box_type ( _style );
 
-            self.setScope({'message': object.object.error});
-            self.serve();
-            self.dom
-                .addClass(_style)
-                .animate([
-                    {left: '-30%'},
-                    {left: '3%'}
-                ], function (elem) {
-                    elem.css({left: "3%"});
-                    elem.animate([
-                        {left: '3%'},
-                        {left: '-30%'}
-                    ], {delay: 3500}, function (elem) {
-                        elem.css({left: "-30%"});
-                    });
-                })
+			self.setScope ( {'message': _.isSet ( object.object.content ) ? object.object.content : ''} );
+			self.serve ();
+			self.dom
+				.addClass ( _style )
+				.animate ( [
+					           {left: '-30%'},
+					           {left: '3%'}
+				           ], function ( elem ) {
+					           elem.css ( {left: "3%"} );
+					           elem.animate ( [
+						                          {left: '3%'},
+						                          {left: '-30%'}
+					                          ], {delay: 3500}, function ( elem ) {
+						           elem.css ( {left: "-30%"} );
+					           } );
+				           } )
 
 
-        }
-    }
-});
+		}
+	}
+} );
