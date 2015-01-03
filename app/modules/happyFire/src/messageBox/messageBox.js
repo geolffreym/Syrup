@@ -19,7 +19,8 @@ Module.recipe ( 'happyFire.messageBox', function ( _, _$, globalScope ) {
 			}[style];
 		},
 		manage:   function ( object ) {
-			var _style = _.isSet ( object.object.style ) ? object.object.style : 'default';
+			var _style = _.isSet ( object.object.style ) ? object.object.style : 'default',
+			    _delay = _.isSet ( object.object.delay ) ? object.object.delay : 2000;
 			_style = self.box_type ( _style );
 
 			self.setScope ( {'message': _.isSet ( object.object.content ) ? object.object.content : ''} );
@@ -29,12 +30,12 @@ Module.recipe ( 'happyFire.messageBox', function ( _, _$, globalScope ) {
 				.animate ( [
 					           {left: '-30%'},
 					           {left: '3%'}
-				           ], function ( elem ) {
+				           ], {duration: Math.round ( _delay / 2 )}, function ( elem ) {
 					           elem.css ( {left: "3%"} );
 					           elem.animate ( [
 						                          {left: '3%'},
 						                          {left: '-30%'}
-					                          ], {delay: 3500}, function ( elem ) {
+					                          ], {delay: _delay}, function ( elem ) {
 						           elem.css ( {left: "-30%"} );
 					           } );
 				           } )
