@@ -136,7 +136,7 @@ Module.add ( '_serve', function ( moduleId, template ) {
 
 	if ( _dom.exist && _.getObjectSize ( _scope ) > 0 ) {
 		if ( _.isSet ( template ) && _.isBoolean ( template ) ) {
-			_.include ( 'app/view/' + _self.modules[moduleId].parent + '/' + moduleId.replace ( /\./g, '_' ), function () {
+            _.include('app/view/' + _self.modules[moduleId].parent + '/' + _.replace(moduleId, /\./g, '_'), function () {
 				_template[moduleId] ( _scope, function ( my_html ) {
 					_dom.html ( my_html );
 				} )
