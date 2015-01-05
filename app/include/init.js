@@ -1299,11 +1299,10 @@ Syrup.add ( 'windowScrollTo', function ( conf ) {
 
 	conf.limit = _limit;
 	var _scrolling = _.interval ( function ( result ) {
-		_.isSet ( conf.step )
-		&& _.isNumber ( conf.step )
-		&& _limit < 0
-			? (_result += (result * conf.step))
-			: (_result -= ((conf.limit - result) * conf.step));
+		if ( _.isSet ( conf.step ) && _.isNumber ( conf.step ) )
+			_limit < 0
+				? (_result += (result * conf.step))
+				: (_result -= ((conf.limit - result) * conf.step));
 
 
 		if ( (_result >= (_limit * -1) && _limit < 0)
