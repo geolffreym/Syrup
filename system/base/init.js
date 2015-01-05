@@ -18,7 +18,7 @@ regexConstructor = /(([^function])([a-zA-z])+(?=\())/g,
 WARNING_SYRUP = {
 	ERROR: {
 		NOPARAM:               'Param needed',
-		NOOBJECT:              'An object necessary.',
+		NOOBJECT:              'An object param is necessary.',
 		NOARRAY:               'An array necessary.',
 		NOFUNCTION:            'An function necessary.',
 		NODATE:                'Invalid Date',
@@ -1268,9 +1268,31 @@ Syrup.add ( 'getNav', function () {
  * @param conf {delay,limit}
  */
 Syrup.add ( 'windowScrollTo', function ( conf ) {
-	return _.interval ( function ( result ) {
-		window.scrollTo ( 0, result );
-	}, conf );
+	if ( !_.isObject ( conf ) ) {
+		_.error ( WARNING_SYRUP.ERROR.NOOBJECT )
+	}
+	var _limit = conf.limit,
+	    _result = _limit < 0 ? 0 : _limit,
+	    _scrolling = _.interval ( function ( result ) {
+
+		    if ( _.isSet ( conf.step ) ) {
+			    if ( _limit < 0 ) {
+				    _result += (result * conf.step);
+				    if ( _result > (conf.limit * -1) ) {
+					    _scrolling.kill ();
+				    }
+			    } else {
+				    _result -= ((conf.limit - result) * conf.step);
+				    if ( _result < 0 ) {
+					    _scrolling.kill ();
+				    }
+			    }
+
+		    }
+		    window.scrollTo ( 0, _result );
+	    }, conf );
+
+	return _scrolling;
 } );
 
 
