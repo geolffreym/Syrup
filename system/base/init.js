@@ -1280,26 +1280,27 @@ Syrup.add ( 'windowScrollTo', function ( conf ) {
 	    _min = _.isSet ( conf.hold ) && window.scrollY < conf.limit ? window.scrollY : conf.limit;
 
 	conf.limit = _limit;
-
 	var _scrolling = _.interval ( function ( result ) {
-		if ( _.isSet ( conf.step ) ) {
+		if ( _.isSet ( conf.step ) && _.isNumber ( conf.step ) ) {
 			if ( _limit < 0 ) {
 				_result += (result * conf.step);
-				if ( _result >= (_limit * -1) ) {
-					_scrolling.kill ();
-				}
 			} else {
 				_result -= ((conf.limit - result) * conf.step);
-				if ( _result <= _min ) {
-					_scrolling.kill ();
-				}
 			}
+		}
+
+		if ( (_result >= (_limit * -1) && _limit < 0)
+			|| (_result <= _min && _limit > 0) ) {
+			_scrolling.kill ();
+			if ( !_.isSet ( conf.hold ) )
+				window.scrollY = 0;
 		}
 		window.scrollTo ( 0, _result );
 	}, conf );
 
 	return _scrolling;
 } );
+
 
 /**Genera un id
  * @param longitud
