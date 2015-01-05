@@ -1265,7 +1265,7 @@ Syrup.add ( 'getNav', function () {
 //});
 
 /**Window ScrollTo
- * @param conf {delay,limit}
+ * @param conf {delay:int,limit:int, hold:bool,step:int}
  */
 Syrup.add ( 'windowScrollTo', function ( conf ) {
 	if ( !_.isObject ( conf ) ) {
