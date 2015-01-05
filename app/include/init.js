@@ -1283,32 +1283,37 @@ Syrup.add ( 'getNav', function () {
 //});
 
 /**Window ScrollTo
- * @param conf {delay,limit}
+ * @param conf {delay:int,limit:int, hold:bool,step:int}
  */
 Syrup.add ( 'windowScrollTo', function ( conf ) {
 	if ( !_.isObject ( conf ) ) {
 		_.error ( WARNING_SYRUP.ERROR.NOOBJECT )
 	}
-	var _limit = conf.limit,
-	    _result = _limit < 0 ? 0 : _limit,
-	    _scrolling = _.interval ( function ( result ) {
 
-		    if ( _.isSet ( conf.step ) ) {
-			    if ( _limit < 0 ) {
-				    _result += (result * conf.step);
-				    if ( _result > (conf.limit * -1) ) {
-					    _scrolling.kill ();
-				    }
-			    } else {
-				    _result -= ((conf.limit - result) * conf.step);
-				    if ( _result < 0 ) {
-					    _scrolling.kill ();
-				    }
-			    }
+	if ( !_.isSet ( conf.limit ) )
+		_.error ( 'Limit needed' );
 
-		    }
-		    window.scrollTo ( 0, _result );
-	    }, conf );
+	var _limit = window.scrollY > conf.limit ? window.scrollY : -conf.limit,
+	    _result = _.isSet ( conf.hold ) ? window.scrollY : 0,
+	    _min = _.isSet ( conf.hold ) && window.scrollY < conf.limit ? window.scrollY : conf.limit;
+
+	conf.limit = _limit;
+	var _scrolling = _.interval ( function ( result ) {
+		_.isSet ( conf.step )
+		&& _.isNumber ( conf.step )
+		&& _limit < 0
+			? (_result += (result * conf.step))
+			: (_result -= ((conf.limit - result) * conf.step));
+
+
+		if ( (_result >= (_limit * -1) && _limit < 0)
+			|| (_result <= _min && _limit > 0) ) {
+			_scrolling.kill ();
+			if ( !_.isSet ( conf.hold ) )
+				window.scrollY = 0;
+		}
+		window.scrollTo ( 0, _result );
+	}, conf );
 
 	return _scrolling;
 } );
