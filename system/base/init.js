@@ -1280,11 +1280,11 @@ Syrup.add ( 'windowScrollTo', function ( conf ) {
 	    _min = _.isSet ( conf.hold ) && window.scrollY < conf.limit ? window.scrollY : conf.limit;
 
 	conf.limit = _limit;
+	conf.step = _.isSet ( conf.step ) ? conf.step : 1;
 	var _scrolling = _.interval ( function ( result ) {
-		if ( _.isSet ( conf.step ) && _.isNumber ( conf.step ) )
-			_limit < 0
-				? (_result += (result * conf.step))
-				: (_result -= ((conf.limit - result) * conf.step));
+		_limit < 0
+			? (_result += (result * conf.step))
+			: (_result -= ((conf.limit - result) * conf.step));
 
 
 		if ( (_result >= (_limit * -1) && _limit < 0)
@@ -1298,7 +1298,6 @@ Syrup.add ( 'windowScrollTo', function ( conf ) {
 
 	return _scrolling;
 } );
-
 
 /**Genera un id
  * @param longitud
