@@ -66,8 +66,8 @@ Concepts
 *@param _$ {$ object}
 *@param scope {object}
 */
-var my_module = Module.blend('my_module', []); 
-my_module.recipe('my_module', function( _, _$, scope ){
+var my_module = Module.blend('my_module', ['dependencie1', 'dependencie2']); 
+my_module.recipe('my_module', function( _, _$, globalScope ){
     return {
             //Constructor needed
             init: function(){
@@ -185,7 +185,7 @@ Syrup Is modular so you can create your own libraries and integrate the autoload
                 'app/config/init', // Needed do not change
                 'system/base/init', // Needed do not change
                 'system/base/model/App', // Needed do not change
-                'my_own_lib_dir/my_lib',
+                'my_own_lib_dir/my_lib', // Module Package
 //              'lib/Form',
 //              'lib/Upload' // Add all the necessary scripts for startup
             ]
@@ -801,15 +801,15 @@ my_selector.sort()
 var body = _$('body'),
 my_selector = _$('.div');
 
-my_select.addEventListener('click', function(){
+my_select.addListener('click', function(){
     alert('I am clicked');
 });
 
-body.addEventListener('click', '.div', function(){
+body.addListener('click', '.div', function(){
         alert('I am clicked as delegated');
 });
 
-body.addEventListener('click', '.div1', function(){
+body.addListener('click', '.div1', function(){
             alert('I am clicked as delegated in div1');
 });   
 
@@ -1500,7 +1500,7 @@ Using modules
                 
                 var _self = this;
 
-                scope.bookList = {info: [
+                libraryStore.setScope('bookUsers', {info: [
                     { name: 'Juan', lastname: 'Rodriguez'},
                     { name: 'Pedro', lastname: 'Martinez'}
                 ]};
@@ -1525,13 +1525,12 @@ Using modules
             init:    function (tools) {
 
                 //Changing bookList. This notify to booklist for a new change
-                scope.bookList = {info: [
-                    { name: 'Carlos', lastname: 'Rodriguez'},
-                    { name: 'Pedro', lastname: 'Martinez'}
-                ]};
+                libraryStore.setScope('bookList', {info: [
+                    { book: 'Azul', auto: 'Ruben Dario'}
+                ]});
                 
                 //When bookUsers change
-                libraryStore.on ( 'change', 'bookUsers', function () {
+                this.on ( 'change', function (object) {
                    //What to do?
                 } );
 
@@ -1591,10 +1590,10 @@ _$ ( function () {
         return {
             
             init:    function () {
-                scope.info = [
-                    { name: 'Juan', lastname: 'Rodriguez'},
-                    { name: 'Pedro', lastname: 'Martinez'}
-                ];
+                this.setScope('info', [
+                                   { name: 'Juan', lastname: 'Rodriguez'},
+                                   { name: 'Pedro', lastname: 'Martinez'}
+                               ]);
 
             },
             destroy: function () {
@@ -1641,7 +1640,7 @@ it is worth briefly discussing JavaScript templating and its relationship to vie
 ```js
 
 //Defining View /view/libraryStore/init.js
-Template.add('bookList', function (data, callback) {
+_.Template.add('bookList', function (data, callback) {
     var _self = this;
     _self.get('libraryStore/bookList', function (template) {
         if (_.isSet(callback)) {
@@ -1682,14 +1681,14 @@ Using modules
 //The Controller /controller/libraryStore/init.js
  _$ ( function () {
     var libraryStore = Module.blend ( 'libraryStore', [] );
-    libraryStore.recipe ( 'bookList', function ( _, _$, scope ) {
+    libraryStore.recipe ( 'bookList', function ( _, _$, globalScope ) {
         return {
             init:    function () {
 
-                scope.info = [
+                this.setScope('info', [
                     { name: 'Juan', lastname: 'Rodriguez'},
                     { name: 'Pedro', lastname: 'Martinez'}
-                ];
+                ]);
 
             },
             destroy: function () {
@@ -1706,171 +1705,6 @@ Using modules
 
 Syrup Libs
 ========
-
-Form
--------
-The Form library allows rapid processing of forms, with simple and efficient methods.
-
-```html
-<form id="my_form">
-    
-    <!-- If value is empty throw error "empty"-->
-    <label for="my_name">Name</label>
-    <input type="text" name="name" id="my_name" />
-    
-    <!-- If value is not valid mail throw error "invalid_mail"-->
-    <label for="my_email">Email</label>
-    <input type="text" name="email" id="my_email" data-email="true" />
-    
-    <!-- If value not match with custom throw error "invalid_custom"-->
-    <label for="my_phone">Phone</label>
-    <input type="text" name="phone" id="my_phone" data-custom="/[0-9]-[0-5]/g" />
-    
-    <!-- If value is higher to max throw error "overflow_chars"-->
-    <label for="my_code">Code</label>
-    <input type="text" name="code" id="my_code" data-max="8" />
-    
-    <!-- Skip validation-->
-    <label for="my_zip">Zip-Code</label>
-    <input type="text" name="zip" id="my_zip" data-skip="true" />
-          
-</form>
-```
-```js
-
-_$(document).ready(function(){
-    
-    //Include is used if the library is not in the precompiled library 
-    //else just instance the class
-    
-    _.include('setting/lib/Form', function(){
-
-        var my_form = new _.Form;
-        
-        my_form.on('before', function(XHR){
-            //Event executed before send data
-        });
-        
-        my_form.on('complete', function(ajax_response){
-             //Event executed on request completed
-        });
-        
-        my_form.on('error', function(error){
-             //Event executed on error
-             
-             error object {
-                field: field, // the input that generated the error
-                error: error, // the error string (invalid_mail, invalid_custom,..)
-                coords: {x:100,y:200} // the position of the input that generated the error
-             }
-        });
-        
-        
-        _$('#my_form').addListener('submit', function(e){
-                my_form.method('POST'); // Set method
-                my_form.action('/contact/'); // Set url for Ajax Request
-                my_form.pack(e.target); // Pack the input values
-                my_form.attach('my_key','my_value'); // Attach additional data to request
-                my_form.submit(e) // Submit auto prevent default event
-        })
-
-    });
-
-});
-```
-
-Ajax
------
-The Ajax library provides simple tools for the execution of asynchronous requests to our application.
-
-```js
-//Assuming Ajax lib is in the precompiled library
-//Else include the lib with _.include('setting/lib/Ajax')
-
-var _ajax = new _.Ajax,
-    _config_object;
-
-_ajax.on('error', function(error_object){
-    //If error what to do?
-});
-
-_ajax.on('complete', function(XHR){
-    //If the request is complete regardless of whether 
-    //it was successful or not what to do?
-});
-
-_ajax.on('abort', function(XHR){
-    //If request aborted what to do?
-});
-
-_ajax.on('state', function(readyState,XHR){
-    //readyState 
-    //UNSENT = 0
-    //OPENED = 1
-    //HEADERS_RECEIVED = 2
-    //LOADING = 3
-    //DONE = 4
-    
-    //If request state change what to do?
-});
-
-//Used in the file upload control progress or request
-_ajax.on('progress', function(progress_object){
-    /*progress_object
-    {
-        lengthComputable : value
-        total: value
-        loaded : value
-    }*/
-})
-
-_ajax.on('timeout', function(XHR){
-    //If request timeout what to do?
-})
-
-//Requesting Ajax
-
-**Needed in config**
- - url 
-
-config_object = {
- url: '/user/create', 
-    // Url to request. No need to use the extension, 
-    //if it was already set to /config/init 
- method: 'POST', 
-    // Default GET
- data: {name:'Carl',id:'3'}, 
-    //Data to send in request. Default {}
- dataType: 'application/json'. Data MIME,
- processor: '.php', 
-    //Overwrite ajax_processor in config/init
- token: 'my_token', 
-    //Token for request, cookie name for token autoloader. 
-    //Default 'csrftoken' assuming exist it.
- timeout: 3000, 
-    //Default 4000
- 
-}
-
-/*
-The default header to request is 'application/x-www-form-urlencoded;charset=utf-8'.
-If you need the browser automatically get the request header, as in the case of 
-needing to process object FormData
-Use dataType: 'auto' 
-*/
-
-//Additional Headers
-_ajax.requestHeader('HEADER', 'VALUE');
-
-//Killing request
-_ajax.kill(); // Event abort triggered
-
-//Request
-_ajax.request(config_object, function(ajax_response){
-    //Callback for success
-    //Do something
-})
-
-```
-
+                 
 *Pending Documentation*
+
