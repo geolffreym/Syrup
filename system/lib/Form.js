@@ -103,11 +103,11 @@ Lib.blend ( 'Form', ['Ajax'] ).make ( function () {
 						self.fail ( field, 'invalid_mail' );
 						break
 					} else {
-						if ( _$ ( field ).data ( 'min' ) && (+_$ ( field ).data ( 'min' ) < fieldValue.length) ) {
+						if ( _$ ( field ).data ( 'min' ) && (+_$ ( field ).data ( 'min' ) > fieldValue.length) ) {
 							self.fail ( field, 'minim_chars' );
 							break;
 						} else {
-							if ( _$ ( field ).data ( 'max' ) && (+_$ ( field ).data ( 'max' ) > fieldValue.length) ) {
+							if ( _$ ( field ).data ( 'max' ) && (+_$ ( field ).data ( 'max' ) < fieldValue.length) ) {
 								self.fail ( field, 'overflow_chars' );
 								break;
 							} else {
