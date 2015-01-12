@@ -678,14 +678,14 @@ _$_.add ( 'removeClass', function ( cls ) {
  * @param delay
  * @returns {_$_}
  */
-_$_.add ( 'fadeOut', function ( delay ) {
+_$_.add ( 'fadeOut', function ( delay, callback ) {
 	this.animate ( [
 		               {opacity: '1'},
 		               {opacity: '0'}
 	               ], {
 		               delay: 0,
 		               duration: _.isNumber ( delay ) ? delay : 50
-	               } );
+	               }, _.isFunction ( delay ) ? delay : callback );
 
 	return this;
 } );
@@ -694,16 +694,17 @@ _$_.add ( 'fadeOut', function ( delay ) {
  * @param delay
  * @returns {_$_}
  */
-_$_.add ( 'fadeIn', function ( delay ) {
+_$_.add ( 'fadeIn', function ( delay, callback ) {
 	this.animate ( [
 		               {opacity: '0'},
 		               {opacity: '1'}
 	               ], {
 		               delay: 0,
 		               duration: _.isNumber ( delay ) ? delay : 50
-	               } );
+	               }, _.isFunction ( delay ) ? delay : callback );
 	return this;
 } );
+
 
 /**Return and set Heigth of DOM
  * @param height
