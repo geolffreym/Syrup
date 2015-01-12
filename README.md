@@ -503,6 +503,21 @@ var my_selector = _$('div');
 
 my_selector.show(); //Element display block
 ```
+
+**Method `.animate([{'prop':'init'},{'prop':'next'}...], {delay:int, duration: int, iterations:1} , callback)`**
+
+*(Animate elements. If callback is passed in second parameters default conf is {delay:300, duration:1000, iterations:1} )*
+```js
+var my_selector = _$('.selector');
+
+my_selector.animate ( [{opacity: '0'},{opacity: '1'}], {delay: 0, duration: 50}, 
+                       function() {
+                            //On finish?
+                       }
+                    );
+            	               
+
+```
 **Method `.parent(callback)`**
 
 *(Get Node Parent first. Callback Needed)*
@@ -1456,7 +1471,7 @@ Controllers
 Controllers are an intermediary between models and views which are classically responsible for two tasks: 
 they both update the view when the model changes and update the model when the user manipulates the view.
 
-*In B drivers are handled from a dedicated environment (application modules), not combined application*
+*In Syrup drivers are handled from a dedicated environment (application modules), not combined application*
 
 *The Controllers are located in the folder "app/controller/module_name/init.js", and are called to our site with script tags right after call Syrup core*
 
@@ -1471,13 +1486,15 @@ they both update the view when the model changes and update the model when the u
 ```
 
 ```html
-<div syrup-controller="bookList">
-    <% for |i| in |info| %>
+<div syrup-controller="bookList"></div>
+<button syrup-event="bookUsers">View</button>
+
+"In situ template" when template attribute in module is false
+<template syrup-template="bookList">
+  <% for |i| in |info| %>
         {i.name}
     <% endfor %>
-</div>
-
-<button syrup-event="bookUsers">View</button>
+</template>
 ```
 
 Using modules
@@ -1495,6 +1512,7 @@ Using modules
 
     libraryStore.recipe ( 'bookList', function ( _, _$, scope ) {
         return {
+            template: true,
             init:    function (tools) {
                 //Tools object with dependencies
                 
@@ -1522,6 +1540,7 @@ Using modules
 
     libraryStore.recipe ( 'bookUsers', function ( _, _$, scope ) {
         return {
+            template: true, //Find the template in directory
             init:    function (tools) {
 
                 //Changing bookList. This notify to booklist for a new change
@@ -1561,7 +1580,7 @@ Views are a visual representation of models that present a filtered view of thei
 A view typically observes a model and is notified when the model changes, allowing the view to update itself accordingly. 
 Design pattern literature commonly refers to views as 'dumb' given that their knowledge of models and controllers in an application is limited.
 
-*In B views are handled from a dedicated environment (application modules), not combined application*
+*In Syrup views are handled from a dedicated environment (application modules), not combined application*
 
 *The Views are located in the folder "app/views/module_name/init.js", and are called inside the controller*
 
@@ -1570,7 +1589,7 @@ Design pattern literature commonly refers to views as 'dumb' given that their kn
 ```js
 
 //Defining View
-Template.add('bookList', function (data, callback) {
+_.Template.add('bookList', function (data, callback) {
     var _self = this;
     _self.get('index/bookList', function (template) {
         if (_.isSet(callback)) {
@@ -1588,7 +1607,7 @@ _$ ( function () {
     var libraryStore = Module.blend ( 'libraryStore', [] );
     libraryStore.recipe ( 'bookList', function ( _, _$, scope ) {
         return {
-            
+            template: true, //Find the template in directory if false, template in situ is needed
             init:    function () {
                 this.setScope('info', [
                                    { name: 'Juan', lastname: 'Rodriguez'},

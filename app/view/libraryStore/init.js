@@ -3,7 +3,7 @@
  */
 
 //QUOTE VIEW
-Template.add ('bookList', function ( data, callback ) {
+_.Template.add ('bookList', function ( data, callback ) {
 	var _self = this;
 	_self.get ('library/bookList', function ( template ) {
 		if ( _.isSet (callback) ) {
