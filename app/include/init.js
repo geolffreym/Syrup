@@ -696,14 +696,14 @@ _$_.add ( 'removeClass', function ( cls ) {
  * @param delay
  * @returns {_$_}
  */
-_$_.add ( 'fadeOut', function ( delay ) {
+_$_.add ( 'fadeOut', function ( delay, callback ) {
 	this.animate ( [
 		               {opacity: '1'},
 		               {opacity: '0'}
 	               ], {
 		               delay: 0,
 		               duration: _.isNumber ( delay ) ? delay : 50
-	               } );
+	               }, _.isFunction ( delay ) ? delay : callback );
 
 	return this;
 } );
@@ -712,16 +712,17 @@ _$_.add ( 'fadeOut', function ( delay ) {
  * @param delay
  * @returns {_$_}
  */
-_$_.add ( 'fadeIn', function ( delay ) {
+_$_.add ( 'fadeIn', function ( delay, callback ) {
 	this.animate ( [
 		               {opacity: '0'},
 		               {opacity: '1'}
 	               ], {
 		               delay: 0,
 		               duration: _.isNumber ( delay ) ? delay : 50
-	               } );
+	               }, _.isFunction ( delay ) ? delay : callback );
 	return this;
 } );
+
 
 /**Return and set Heigth of DOM
  * @param height
@@ -1298,11 +1299,11 @@ Syrup.add ( 'windowScrollTo', function ( conf ) {
 	    _min = _.isSet ( conf.hold ) && window.scrollY < conf.limit ? window.scrollY : conf.limit;
 
 	conf.limit = _limit;
+	conf.step = _.isSet ( conf.step ) ? conf.step : 1;
 	var _scrolling = _.interval ( function ( result ) {
-		if ( _.isSet ( conf.step ) && _.isNumber ( conf.step ) )
-			_limit < 0
-				? (_result += (result * conf.step))
-				: (_result -= ((conf.limit - result) * conf.step));
+		_limit < 0
+			? (_result += (result * conf.step))
+			: (_result -= ((conf.limit - result) * conf.step));
 
 
 		if ( (_result >= (_limit * -1) && _limit < 0)
@@ -1316,7 +1317,6 @@ Syrup.add ( 'windowScrollTo', function ( conf ) {
 
 	return _scrolling;
 } );
-
 
 /**Genera un id
  * @param longitud
