@@ -840,12 +840,12 @@ _$_.add ( 'offset', function ( _object ) {
 		if ( _.isObject ( _object ) ) {
 			//elem.style.position = 'absolute';
 			if ( _.isSet ( _object.top ) ) {
-				elem.style.left = _.isNumber ( _object.top )
+				elem.style.top = _.isNumber ( _object.top )
 					? _object.top + 'px' : _object.top;
 			}
 
 			if ( _.isSet ( _object.left ) ) {
-				elem.style.top = _.isNumber ( _object.left )
+				elem.style.left = _.isNumber ( _object.left )
 					? _object.left + 'px' : _object.left;
 			}
 
@@ -1060,9 +1060,7 @@ Syrup.add ( 'isEmpty', function ( input ) {
 		return input.length === 0;
 	}
 
-	var value = _.isString ( input )
-		? input
-		: input.value;
+	var value = input;
 	return (!value || value === '' || /^\s+$/.test ( value ))
 } );
 

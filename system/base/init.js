@@ -1042,9 +1042,7 @@ Syrup.add ( 'isEmpty', function ( input ) {
 		return input.length === 0;
 	}
 
-	var value = _.isString ( input )
-		? input
-		: input.value;
+	var value = input;
 	return (!value || value === '' || /^\s+$/.test ( value ))
 } );
 
