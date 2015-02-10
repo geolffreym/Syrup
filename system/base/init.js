@@ -1799,20 +1799,14 @@ Syrup.add ( 'include', function ( script, wait, callback ) {
 		wait = false;
 	}
 
-	if (
-		wait
-		&& _.isSet ( _.scriptCalls[wait] )
-		&& _.isSet ( _.waitingCalls[wait] )
-		) {
+	if ( wait && _.isSet ( _.scriptCalls[wait] ) ) {
+		if ( !_.isSet ( _.waitingCalls[wait] ) ) {
+			_.waitingCalls[wait] = [];
+		}
 		if ( _.waitingCalls[wait] !== 'done' ) {
-			if ( !_.isSet ( _.waitingCalls[wait] ) ) {
-				_.waitingCalls[wait] = [];
-			}
-
 			_.waitingCalls[wait].push ( function () {
-				_.include ( script, false, callback )
+				_.include ( script, callback )
 			} );
-
 			return false;
 		}
 	}
@@ -1826,10 +1820,12 @@ Syrup.add ( 'include', function ( script, wait, callback ) {
 	_.scriptCalls[_script] = script;
 	_.getScript ( _url, function ( e ) {
 		if ( _.isSet ( _.waitingCalls[_script] ) ) {
-			if ( _.isObject ( _.waitingCalls[_script] ) ) {
-				_.each ( _.waitingCalls[_script], function ( v ) {
-					v ( e );
-				} );
+			if ( _.isArray ( _.waitingCalls[_script] ) ) {
+				var i = 0,
+				    max = _.waitingCalls[_script].length;
+				for ( ; i < max; i++ ) {
+					_.waitingCalls[_script][i] ( e );
+				}
 				_.waitingCalls[_script] = 'done';
 			}
 		}
