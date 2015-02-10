@@ -24,7 +24,7 @@ Lib.blend ( 'Ajax', [] ).make ( function () {
 	}
 } ).supply ( function () {
 	return {
-		on:         function ( event, callback ) {
+		on: function ( event, callback ) {
 			var self = this;
 			return [{
 				before:   function () {
@@ -52,7 +52,7 @@ Lib.blend ( 'Ajax', [] ).make ( function () {
 
 		},
 
-		request:       function ( config, callback ) {
+		request: function ( config, callback ) {
 			if ( !_.isObject ( config ) ) {
 				throw (WARNING_SYRUP.ERROR.NOOBJECT)
 			}
@@ -66,7 +66,7 @@ Lib.blend ( 'Ajax', [] ).make ( function () {
 			    _contentType = config.dataType || 'application/x-www-form-urlencoded;charset=utf-8',
 			    _data = config.data
 				    ? config.data : null,
-			    _contentHeader = [
+			    _contentHeader = config.contentHeader || [
 				    {
 					    header: 'Content-Type',
 					    value:  _contentType
@@ -175,7 +175,7 @@ Lib.blend ( 'Ajax', [] ).make ( function () {
 			this.xhr.setRequestHeader ( header, type );
 		},
 
-		kill:          function () {
+		kill: function () {
 			var i = this.xhr_list.length;
 			while ( i-- ) {
 				if ( !!this.xhr_list[i] )
