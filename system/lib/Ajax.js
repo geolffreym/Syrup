@@ -66,12 +66,12 @@ Lib.blend ( 'Ajax', [] ).make ( function () {
 			    _contentType = config.dataType || 'application/x-www-form-urlencoded;charset=utf-8',
 			    _data = config.data
 				    ? config.data : null,
-			    _contentHeader = config.contentHeader || [
-				    {
-					    header: 'Content-Type',
-					    value:  _contentType
-				    }
-			    ],
+			    _contentHeader = config.contentHeader ||
+			    {
+				    header: 'Content-Type',
+				    value:  _contentType
+			    }
+				,
 			    _type = config.method || 'GET';
 
 			if ( !_.isSet ( config.url ) ) {

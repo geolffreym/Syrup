@@ -1817,20 +1817,14 @@ Syrup.add ( 'include', function ( script, wait, callback ) {
 		wait = false;
 	}
 
-	if (
-		wait
-		&& _.isSet ( _.scriptCalls[wait] )
-		&& _.isSet ( _.waitingCalls[wait] )
-		) {
+	if ( wait && _.isSet ( _.scriptCalls[wait] ) ) {
+		if ( !_.isSet ( _.waitingCalls[wait] ) ) {
+			_.waitingCalls[wait] = [];
+		}
 		if ( _.waitingCalls[wait] !== 'done' ) {
-			if ( !_.isSet ( _.waitingCalls[wait] ) ) {
-				_.waitingCalls[wait] = [];
-			}
-
 			_.waitingCalls[wait].push ( function () {
-				_.include ( script, false, callback )
+				_.include ( script, callback )
 			} );
-
 			return false;
 		}
 	}
@@ -1844,10 +1838,12 @@ Syrup.add ( 'include', function ( script, wait, callback ) {
 	_.scriptCalls[_script] = script;
 	_.getScript ( _url, function ( e ) {
 		if ( _.isSet ( _.waitingCalls[_script] ) ) {
-			if ( _.isObject ( _.waitingCalls[_script] ) ) {
-				_.each ( _.waitingCalls[_script], function ( v ) {
-					v ( e );
-				} );
+			if ( _.isArray ( _.waitingCalls[_script] ) ) {
+				var i = 0,
+				    max = _.waitingCalls[_script].length;
+				for ( ; i < max; i++ ) {
+					_.waitingCalls[_script][i] ( e );
+				}
 				_.waitingCalls[_script] = 'done';
 			}
 		}
@@ -2275,7 +2271,7 @@ Lib.blend ( 'Ajax', [] ).make ( function () {
 	}
 } ).supply ( function () {
 	return {
-		on:         function ( event, callback ) {
+		on: function ( event, callback ) {
 			var self = this;
 			return [{
 				before:   function () {
@@ -2303,7 +2299,7 @@ Lib.blend ( 'Ajax', [] ).make ( function () {
 
 		},
 
-		request:       function ( config, callback ) {
+		request: function ( config, callback ) {
 			if ( !_.isObject ( config ) ) {
 				throw (WARNING_SYRUP.ERROR.NOOBJECT)
 			}
@@ -2317,12 +2313,12 @@ Lib.blend ( 'Ajax', [] ).make ( function () {
 			    _contentType = config.dataType || 'application/x-www-form-urlencoded;charset=utf-8',
 			    _data = config.data
 				    ? config.data : null,
-			    _contentHeader = [
-				    {
-					    header: 'Content-Type',
-					    value:  _contentType
-				    }
-			    ],
+			    _contentHeader = config.contentHeader ||
+			    {
+				    header: 'Content-Type',
+				    value:  _contentType
+			    }
+				,
 			    _type = config.method || 'GET';
 
 			if ( !_.isSet ( config.url ) ) {
@@ -2426,7 +2422,7 @@ Lib.blend ( 'Ajax', [] ).make ( function () {
 			this.xhr.setRequestHeader ( header, type );
 		},
 
-		kill:          function () {
+		kill: function () {
 			var i = this.xhr_list.length;
 			while ( i-- ) {
 				if ( !!this.xhr_list[i] )
