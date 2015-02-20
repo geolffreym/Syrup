@@ -63,16 +63,17 @@ Lib.blend ( 'Ajax', [] ).make ( function () {
 			    _timeout = config.timeout || 4000,
 			    _processor = config.processor || setting.ajax_processor || '',
 			    _token = config.token || true,
-			    _contentType = config.dataType || 'application/x-www-form-urlencoded;charset=utf-8',
+			    _contentType = config.contentType || 'application/x-www-form-urlencoded;charset=utf-8',
 			    _data = config.data
 				    ? config.data : null,
 			    _contentHeader = config.contentHeader ||
-			    {
-				    header: 'Content-Type',
-				    value:  _contentType
-			    }
-				,
-			    _type = config.method || 'GET';
+				    [
+					    {
+						    header: 'Content-Type',
+						    value:  _contentType
+					    }
+				    ]
+				, _type = config.method || 'GET';
 
 			if ( !_.isSet ( config.url ) ) {
 				throw (WARNING_SYRUP.ERROR.NOURL);
@@ -94,7 +95,10 @@ Lib.blend ( 'Ajax', [] ).make ( function () {
 
 			//Setting Headers
 			if ( !_.isFormData ( _data ) && _contentHeader !== 'auto' ) {
-				_self.requestHeader ( _contentHeader.header, _contentHeader.value );
+				_.each ( _contentHeader, function ( v ) {
+					_self.requestHeader ( v.header, v.value );
+				} )
+
 			}
 
 			//Using Token
