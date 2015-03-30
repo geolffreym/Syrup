@@ -3,84 +3,81 @@
  */
 
 
-Lib.blend ( 'Socket', [] ).make ( function () {
+Lib.blend('Socket', []).make(function () {
 	return {
-		socket:   null,
-		open:     null,
-		close:    null,
-		message:  null,
-		error:    null,
+		socket: null,
+		open: null,
+		close: null,
+		message: null,
+		error: null,
 		protocol: null,
-		user:     null,
-		admin:    null,
-		host:     window.location.host
+		user: null,
+		admin: null,
+		host: '127.0.0.1'
 
 	}
-} ).supply ( function () {
+
+}).supply(function () {
 	return {
-		set:   function ( config ) {
+		set: function (config) {
 			var self = this;
 
-			if ( !config && !(_.isObject ( config )) ) {
+			if (!config && !(_.isObject(config))) {
 				throw (WARNING_SYRUP.ERROR.NOOBJECT);
 			}
 
-			var protocol = !!config.protocol ? config.protocol : false,
-			    user = !!config.user ? config.user : false,
+			var protocol = !!config.protocol ? config.protocol : 'default',
+			    user = !!config.user ? config.user : 'default',
 			    port = !!config.port ? config.port : 0x1F90,
 			    admin = !!config.admin ? config.admin : 'default';
 
+			self.host = !!config.host ? config.host : self.host;
 			self.user = user;
 			self.protocol = protocol;
 			self.admin = admin;
 
-			if ( !!protocol && !!user ) {
-				var _query = '?protocol=' + protocol + '&user=' + user + '&admin=' + admin;
-				self.socket = new WebSocket ( 'ws://' + self.host + ':' + port + _query );
-				self.socket.addEventListener ( 'open', function ( e ) {
-					if ( self.open ) {
-						self.open ( e )
-					}
-				} );
-				self.socket.addEventListener ( 'error', function ( e ) {
-					if ( self.error ) {
-						self.error ( e )
-					}
-				} );
-				self.socket.addEventListener ( 'close', function ( e ) {
-					if ( self.close ) {
-						self.close ( e )
-					}
-				} );
-				self.socket.addEventListener ( 'message', function ( e ) {
-					if ( self.message ) {
-						self.message ( e );
-					}
-				} );
-				return self.socket;
-			} else {
-				return false;
-			}
-
+			var _query = '?protocol=' + protocol + '&user=' + user + '&admin=' + admin;
+			self.socket = new WebSocket('ws://' + self.host + ':' + port + _query);
+			self.socket.addEventListener('open', function (e) {
+				if (self.open) {
+					self.open(e)
+				}
+			});
+			self.socket.addEventListener('error', function (e) {
+				if (self.error) {
+					self.error(e)
+				}
+			});
+			self.socket.addEventListener('close', function (e) {
+				if (self.close) {
+					self.close(e)
+				}
+			});
+			self.socket.addEventListener('message', function (e) {
+				if (self.message) {
+					self.message(e);
+				}
+			});
+			return self.socket;
 		},
-		on:    function ( event, callback ) {
+		on: function (event, callback) {
 			var self = this;
 			return [{
 				message: function () {
 					self.message = callback;
 				},
-				open:    function () {
+				open: function () {
 					self.open = callback;
 				},
-				close:   function () {
+				close: function () {
 					self.close = callback;
 				},
-				error:   function () {
+				error: function () {
 					self.error = callback;
 				}
-			}[event] ()]
+			}[event]()]
 		},
-		send:  function ( config ) {
+		send: function (config) {
 			var _myconf = {};
 
 			_myconf.all = false;
@@ -88,29 +85,29 @@ Lib.blend ( 'Socket', [] ).make ( function () {
 			_myconf.from = this.user;
 			_myconf.admin = this.admin;
 
-			config = _.extend ( _myconf, config );
+			config = _.extend(_myconf, config);
 
 
-			if ( !config.protocol ) {
+			if (!config.protocol) {
 				throw (WARNING_SYRUP.ERROR.NOPROTOCOL);
 			}
 
-			if ( this.socket ) {
-				this.socket.send ( JSON.stringify ( config ) );
+			if (this.socket) {
+				this.socket.send(JSON.stringify(config));
 			}
 		},
 		clear: function () {
 			this.socket = null;
 
 		},
-		get:   function ( name ) {
+		get: function (name) {
 			return this.socket;
 
 		},
-		stop:  function () {
-			this.socket.close ();
+		stop: function () {
+			this.socket.close();
 
 		}
 	}
 
-} );
+});
