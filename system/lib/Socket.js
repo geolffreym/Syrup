@@ -99,11 +99,6 @@ Socket.add ( 'send', function ( config ) {
 
 	config = _.extend ( _myconf, config );
 
-
-	if ( !config.protocol ) {
-		throw (WARNING_SYRUP.ERROR.NOPROTOCOL);
-	}
-
 	if ( this.socket ) {
 		this.socket.send ( JSON.stringify ( config ) );
 	}

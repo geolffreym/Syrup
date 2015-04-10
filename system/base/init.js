@@ -27,7 +27,6 @@ WARNING_SYRUP = {
 		NOCALLBACK:            'Callback error on execution time.',
 		NOURL:                 'URL is required for the request.',
 		NOHTML:                'Html string is required',
-		NOPOPUP:               'There are no popup created.',
 		NOPACK:                'Error pack form',
 		NOOBJECTREPLACEREGEXP: 'A object is needed to replace a regexp ex: {match:replace}'
 	}
