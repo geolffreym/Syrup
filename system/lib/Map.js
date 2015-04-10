@@ -72,7 +72,7 @@ GoogleMap = function () {
 	 * @param callback
 	 * */
 	_proto.on = function ( event, callback ) {
-		if ( _.isSet ( this.mapa ) )
+		if ( !_.isSet ( this.mapa ) )
 			_.error ( WARNING_GOOGLE_MAP.ERROR.NOMAP );
 		_self.mapObject.event.addListener ( this.mapa, event, callback );
 	};
