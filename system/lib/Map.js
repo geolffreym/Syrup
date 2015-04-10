@@ -68,13 +68,25 @@ GoogleMap = function () {
 	};
 
 	/**Event Handler
+	 * @param elem Marker | Map | GoogleMapObject
 	 * @param event
 	 * @param callback
 	 * */
-	_proto.on = function ( event, callback ) {
-		if ( !_.isSet ( this.mapa ) )
+	_proto.on = function ( elem, event, callback ) {
+		if ( _.isString ( elem ) ) {
+			callback = event;
+			event = elem;
+			if ( _.isSet ( this.mapa ) )
+				elem = this.mapa;
+		}
+
+		if ( !_.isFunction ( callback ) )
+			_.error ( WARNING_SYRUP.ERROR.NOFUNCTION );
+
+		if ( !_.isObject ( elem ) )
 			_.error ( WARNING_GOOGLE_MAP.ERROR.NOMAP );
-		_self.mapObject.event.addListener ( this.mapa, event, callback );
+
+		_self.mapObject.event.addListener ( elem, event, callback );
 	};
 
 	/**Set Map Position
