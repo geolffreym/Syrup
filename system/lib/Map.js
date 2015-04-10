@@ -59,6 +59,8 @@ GoogleMap = function () {
 	 * @param container
 	 */
 	_proto.setMapContainer = function ( container ) {
+		if ( _.is$ ( container ) )
+			container = container.object ()
 		this.container = container;
 	};
 
