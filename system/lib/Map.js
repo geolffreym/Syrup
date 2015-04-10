@@ -20,12 +20,11 @@ var GoogleMap,
 	    }
     };
 
-GoogleMap = function ( latlong ) {
+GoogleMap = function () {
 	var _proto = this.__proto__ || GoogleMap.prototype,
 	    _self = this || _proto;
 
 	/**Atributos*/
-	_self.latlong = latlong;
 	_self.markersCollection = [];
 	_self.coordsCollection = [];
 	_self.routesCollection = [];

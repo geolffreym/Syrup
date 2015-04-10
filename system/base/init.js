@@ -38,7 +38,7 @@ WARNING_SYRUP = {
 nativeFunction.blend = function ( child ) {
 	var name = child.prototype.constructor.name || (child.toString ().match ( regexConstructor )[0]).trim ();
 	this.prototype[name] = child;
-	_.__proto__[name] = new child;
+	//_.__proto__[name] = child;
 };
 
 nativeFunction.drop = function ( child ) {

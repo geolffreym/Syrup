@@ -5,7 +5,7 @@
 //Basic Config
 
 var setting = {
-	ajax_processor: '.php',
+	ajax_processor: '',
 	app_path:       '/',
 	env:            'development'
 };
