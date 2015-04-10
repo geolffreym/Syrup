@@ -25,7 +25,6 @@ WARNING_SYRUP = {
 		NOSTRING:              'String is required',
 		NODOM:                 ' not exist in the DOM document',
 		NOCALLBACK:            'Callback error on execution time.',
-		NOPROTOCOL:            'No protocol specified in the configuration.',
 		NOURL:                 'URL is required for the request.',
 		NOHTML:                'Html string is required',
 		NOPOPUP:               'There are no popup created.',
