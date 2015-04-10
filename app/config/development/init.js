@@ -11,6 +11,7 @@ exports.files = {
 		src:    [
 			'app/config/init', // Needed do not change
 			'system/base/init', // Needed do not change
+			'system/lib/Ajax'
 			// Add all the necessary modules
 		]
 
