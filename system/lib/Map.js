@@ -243,7 +243,7 @@ GoogleMap = function () {
 	};
 
 	_proto.geoCodeRequest = function ( object, callback ) {
-		self.geocoder.geocode ( object, callback );
+		this.geocoder.geocode ( object, callback );
 	};
 
 	/**Location String Info
