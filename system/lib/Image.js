@@ -4,9 +4,9 @@
 
 "use strict";
 
-var Image;
+var Images;
 
-Image = function () {
+Images = function () {
     var _self = this,
         _proto = _self.__proto__;
 
