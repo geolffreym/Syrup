@@ -67,6 +67,14 @@ GoogleMap = function () {
 		return this.position;
 	};
 
+	/**Event Handler
+	 * @param event
+	 * @param callback
+	 * */
+	_proto.on = function ( event, callback ) {
+		_self.mapObject.event.addListener ( event, callback );
+	};
+
 	/**Set Map Position
 	 * @param latLong
 	 */
@@ -166,7 +174,7 @@ GoogleMap = function () {
 		self.marker = new self.mapObject.Marker ( {
 			                                          position: self.position,
 			                                          map:      self.mapa,
-			                                          title:    msg && _.isString ( msg ) ? msg : ''
+			                                          title: msg && _.isString ( msg ) ? msg : ''
 		                                          } );
 
 		if ( animated ) {
@@ -244,11 +252,11 @@ GoogleMap = function () {
 		this.geoCodeRequest ( {'latLng': self.position}, function ( result, status ) {
 			if ( status === self.mapObject.GeocoderStatus.OK ) {
 				_.callbackAudit ( callback, {
-					street:  _.isSet ( result[0].address_components[0] )
+					street: _.isSet ( result[0].address_components[0] )
 						? result[0].address_components[0].long_name : null,
-					city:    _.isSet ( result[0].address_components[1] )
+					city: _.isSet ( result[0].address_components[1] )
 						? result[0].address_components[1].long_name : null,
-					state:   _.isSet ( result[0].address_components[2] )
+					state: _.isSet ( result[0].address_components[2] )
 						? result[0].address_components[2].long_name : null,
 					country: _.isSet ( result[0].address_components[3] )
 						? result[0].address_components[3].long_name : null
