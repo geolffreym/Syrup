@@ -251,6 +251,7 @@ GoogleMap = function () {
 	 * @param callback
 	 */
 	_proto.getLocationInfo = function ( position, callback ) {
+		var self = this;
 		if ( _.isSet ( position ) && _.isObject ( position ) ) {
 			self.position = position;
 		} else {
