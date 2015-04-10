@@ -7,7 +7,7 @@
 //Errors
 var WARNING_SYRUP_SOCKET = {
 	ERROR: {
-		NOPROTOCOL: 'No protocol specified in the configuration.',
+		NOPROTOCOL: 'No protocol specified in the configuration.'
 	}
 };
 

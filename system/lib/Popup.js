@@ -9,7 +9,7 @@
 
 var WARNING_SYRUP_POPUP = {
 	ERROR: {
-		NOPOPUP: 'There are no popup created.',
+		NOPOPUP: 'There are no popup created.'
 	}
 };
 
