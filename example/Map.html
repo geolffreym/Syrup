@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Map Test</title>
+</head>
+<body>
+
+<div>
+    <button id="close-poligon" type="button">Close Zone</button>
+    <button id="clear-poligon" type="button">Clear</button>
+</div>
+
+<div id="map-box" style="height: 400px; width: 500px;"></div>
+
+<section id='selected-point'></section>
+
+
+
+<script src="/app/include/init.min.js"></script>
+<script>
+    var _map = new GoogleMap,
+        _map_box = _$ ( '#map-box' ),
+        _map_selected_point = _$ ( '#selected-point' );
+
+    // The map container
+    _map.setMapContainer ( _map_box );
+    _map.setMapPosition ( {latitude: 12.1328079, longitude: -86.2474458} );
+
+    function appendRouteToList ( e, _ltln ) {
+
+    }
+
+
+    _$ ( '#close-poligon' ).addListener ( 'click', function () {
+        if ( _map.getCoords ().length > 0 ) {
+            _map.appendCoord ( _map.coordsCollection[0] );
+            _map.drawRoute ();
+            _map.createInfoLabel ( 'Zone', {
+                position: _map.makePosition ( _map.getCoordsCenterPoint () )
+            } ).open ( _map.mapa );
+        }
+    } );
+
+    _$ ( '#clear-poligon' ).addListener ( 'click', function () {
+        _map.clearInfoLabels ();
+        _map.cleanCoords ();
+        _map.clearMarkers ();
+        _map.clearRoutes ()
+    } );
+
+    //_map.setMapType('satellite');
+    _map.createMap ( {zoom: 12}, function ( map ) {
+        _map.on ( 'click', function ( e ) {
+            var _ltln = _map.parseLatLngEvent ( e );
+            _map.setMarker ( _ltln, {} );
+            _map.drawRoute ();
+            _map.getLocationInfo ( _ltln, function ( e ) {
+                _map_selected_point.append (
+                                '<div class="font-size-xs">' + e.city + ': ' + _ltln.latitude + ', ' + _ltln.longitude + ' </div><hr>'
+                )
+            } );
+
+        } )
+    } );
+
+</script>
+</body>
+</html>
