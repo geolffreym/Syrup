@@ -1186,7 +1186,7 @@ _.objectDistribute({a:'Hi',b:'What',c:'MyIndex'},'c')
 
 **Method `.objectWatch(Object, callback)`**
 
-*(Watch for object changes. If a change is made the callback is triggered)*
+*(Watch for object changes. If a change is made the callback is triggered). Check Support*
 ```js    
 var obj = {a:'Hi',b:'What',c:'MyIndex'};
 
