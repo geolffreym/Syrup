@@ -84,6 +84,12 @@ GoogleMap = function () {
 		return this.mapa;
 	};
 
+	//Return coords Collection
+	_proto.getCoords = function () {
+		return this.coordsCollection;
+	};
+
+
 	/**Event Handler
 	 * @param elem Marker | Map
 	 * @param event
@@ -314,7 +320,7 @@ GoogleMap = function () {
 	};
 
 	/**Rutas*/
-	_proto.drawRoute = function ( config, callback ) {
+	_proto.setRoute = function ( config, callback ) {
 		var self = this;
 		if ( self.coordsCollection.length == 0 ) {
 			self.error ( WARNING_GOOGLE_MAP.ERROR.NOROUTES );
@@ -334,7 +340,7 @@ GoogleMap = function () {
 
 		self.ruta = new self.mapObject.Polyline ( _Conf );
 		self.routesCollection.push ( self.ruta );
-		self.ruta.setMap ( self.mapa );
+		//self.ruta.setMap(self.mapa);
 
 		_.callbackAudit ( callback, self.ruta );
 	};
