@@ -28,6 +28,7 @@ GoogleMap = function () {
 	_self.markersCollection = [];
 	_self.coordsCollection = [];
 	_self.routesCollection = [];
+	_self.infoLabels = [];
 	_self.distanceCollection = {};
 	_self.container = null;
 	_self.mapa = null;
@@ -104,22 +105,15 @@ GoogleMap = function () {
 		    y = 0.0,
 		    z = 0.0,
 		    lat = 0,
-		    long = 0,
-		    a = 0,
-		    b = 0,
-		    c = 0;
+		    long = 0;
 
-		_.each ( coords, function ( v, i ) {
+		_.each ( coords, function ( v ) {
 			lat = (v.lat () * Math.PI) / 180;
 			long = (v.lng () * Math.PI) / 180;
 
-			a = Math.cos ( lat ) * Math.cos ( long );
-			b = Math.cos ( lat ) * Math.sin ( long );
-			c = Math.sin ( lat );
-
-			x += a;
-			y += b;
-			z += c;
+			x += (Math.cos ( lat ) * Math.cos ( long ));
+			y += (Math.cos ( lat ) * Math.sin ( long ));
+			z += (Math.sin ( lat ));
 
 		} );
 
@@ -295,10 +289,9 @@ GoogleMap = function () {
 	 *  @param map object Map Class
 	 * */
 	_proto.showAllMarkers = function ( map ) {
-		var x = this.markersCollection.length;
-		while ( x-- ) {
-			this.markersCollection[x].setMap ( map );
-		}
+		_.each ( this.markersCollection, function ( v ) {
+			v.setMap ( map );
+		} );
 	};
 
 	_proto.clearMarkers = function () {
@@ -330,7 +323,7 @@ GoogleMap = function () {
 	};
 
 	/**Create a info label in map
-	 * https://developers.google.com/maps/documentation/javascript/reference?hl=es#InfoWindowOptions
+	 * https://developers.google.com/maps/documentation/javascript/reference?hl=es#InfoWindow
 	 * @param content string
 	 * @param config object
 	 * */
@@ -339,9 +332,21 @@ GoogleMap = function () {
 		config = _.extend ( {content: content}, config );
 
 		self.infoWindow = new self.mapObject.InfoWindow ( config );
+		self.infoLabels.push ( self.infoWindow );
 		return self.infoWindow;
 	};
 
+	//Clear all info labels
+	_proto.clearAllInfoLabels = function () {
+		_.each ( this.infoLabels, function ( v ) {
+			v.close ();
+		} )
+	};
+
+	//Clear actual Info Label
+	_proto.clearInfoLabel = function () {
+		self.infoWindow.close ()
+	};
 
 	_proto.geoCodeRequest = function ( object, callback ) {
 		this.geocoder.geocode ( object, callback );
@@ -438,10 +443,9 @@ GoogleMap = function () {
 	};
 
 	_proto.clearRoutes = function () {
-		var x = this.routesCollection.length;
-		while ( x-- ) {
-			this.routesCollection[x].setMap ( null )
-		}
+		_.each ( this.routesCollection, function ( v ) {
+			v.setMap ( null );
+		} );
 	};
 
 	_proto.deleteRoutes = function () {
