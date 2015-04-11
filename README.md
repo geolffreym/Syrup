@@ -84,8 +84,6 @@ Syrup Is modular so you can create your own libraries and integrate the autoload
             src: [
                 'app/config/init', // Needed do not change
                 'system/base/init', // Needed do not change
-                'system/base/model/App', // Needed do not change
-                'my_own_lib_dir/my_lib', // Module Package
 //              'lib/Form',
 //              'lib/Upload' // Add all the necessary scripts for startup
             ]
