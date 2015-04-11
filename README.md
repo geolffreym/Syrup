@@ -1239,10 +1239,10 @@ _.truncateString(_string, 9); // 'I need be'
 ```js     
 var _string = 'I need be truncated until here'      
 
+//Simple string replace
 _.replace(_string, 'truncated', 'happy'); // 'I need be happy until here' 
 
 //Or using regexp
-
 _.replace(_string, /truncated/, {'truncated': 'new_val'}); // 'I need be new_val until here'
 ```     
 
