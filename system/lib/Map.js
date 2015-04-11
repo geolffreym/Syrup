@@ -91,7 +91,7 @@ GoogleMap = function () {
 			_.error ( WARNING_SYRUP.ERROR.NOFUNCTION );
 
 		if ( !_.isObject ( elem ) )
-            _.error(WARNING_GOOGLE_MAP.ERROR.NOMAP);
+			_.error ( WARNING_GOOGLE_MAP.ERROR.NOMAP );
 
 		_self.mapObject.event.addListener ( elem, event, callback );
 	};
@@ -163,38 +163,33 @@ GoogleMap = function () {
 	 * https://developers.google.com/maps/documentation/javascript/3.exp/reference?hl=es#Marker
 	 * @param position
 	 * @param config
-	 * @returns {}
+	 * @returns object
 	 */
-    _proto.setMarker = function (position, config) {
-        var self = this,
-            conf = {
-                position: self.position,
-                map: self.mapa
-            };
+	_proto.setMarker = function ( position, config ) {
 
-        if (!self.mapa)
-            _.error(WARNING_GOOGLE_MAP.ERROR.NOMAP);
+		if ( !this.mapa )
+			_.error ( WARNING_GOOGLE_MAP.ERROR.NOMAP );
 
-        if(!_.isObject(config))
-            _.error(WARNING_SYRUP.ERROR.NOOBJECT);
+		if ( !_.isObject ( config ) )
+			_.error ( WARNING_SYRUP.ERROR.NOOBJECT );
 
-        if (position && _.isObject(position)) {
-            _self.setMapPosition(position);
-        } else {
-            if (!self.position) {
-                _.error(WARNING_GOOGLE_MAP.ERROR.NOLOCATION);
-            }
-        }
+		if ( position && _.isObject ( position ) ) {
+			this.setMapPosition ( position );
+		} else {
+			if ( !this.position ) {
+				_.error ( WARNING_GOOGLE_MAP.ERROR.NOLOCATION );
+			}
+		}
 
-        conf = _.extend(conf, config);
+		var conf = _.extend ( {position: this.position, map: this.mapa}, config );
 
-        self.marker = new self.mapObject.Marker(conf);
-        self.marker.setAnimation(self.animationType);
+		this.marker = new this.mapObject.Marker ( conf );
+		this.marker.setAnimation ( this.animationType );
+		this.markersCollection.push ( this.marker );
+		this.coordsCollection.push ( this.position );
 
-        self.markersCollection.push(self.marker);
-        self.coordsCollection.push(self.position);
-        return self.marker;
-    };
+		return this.marker;
+	};
 
 
 	_proto.setMarkerAnimationType = function ( animation ) {
