@@ -1,5 +1,6 @@
 /**
  * Created by gmena on 07-26-14.
+ * https://www.npmjs.com/package/b_wsserver
  */
 
 "use strict";
@@ -108,7 +109,6 @@ Socket.add ( 'send', function ( config ) {
 //Kill Socket
 Socket.add('clear',  function () {
 	this.socket.close ();
-
 });
 
 
