@@ -33,12 +33,12 @@ GoogleMap = function () {
 	_self.mapa = null;
 	_self.position = null;
 	_self.mapType = 'roadmap';
-	_self.animationType = 1;
 	_self.travelType = 'DRIVING';
 	_self.marker = null;
 	_self.ruta = null;
 	_self.mapObject = google.maps;
 	_self.infoWindow = null;
+	_self.animationType = _self.mapObject.Animation.DROP;
 	_self.geocoder = new _self.mapObject.Geocoder ();
 	_self.distance = new _self.mapObject.DistanceMatrixService ();
 
@@ -60,7 +60,7 @@ GoogleMap = function () {
 	 */
 	_proto.setMapContainer = function ( container ) {
 		if ( _.is$ ( container ) )
-			container = container.object ()
+			container = container.object ();
 		this.container = container;
 	};
 
@@ -69,13 +69,23 @@ GoogleMap = function () {
 		return this.position;
 	};
 
+	_proto.parseLatLngEvent = function ( e ) {
+		if ( e.latLng ) {
+			return {
+				latitude:  e.latLng.lat (),
+				longitude: e.latLng.lng ()
+			}
+		}
+		return null;
+	};
+
 	//Return Map
 	_proto.getMap = function () {
 		return this.mapa;
 	};
 
 	/**Event Handler
-	 * @param elem Marker | Map | GoogleMapObject
+	 * @param elem Marker | Map
 	 * @param event
 	 * @param callback
 	 * */
@@ -171,7 +181,7 @@ GoogleMap = function () {
 			_.error ( WARNING_GOOGLE_MAP.ERROR.NOMAP );
 
 		if ( !_.isObject ( config ) )
-			_.error ( WARNING_SYRUP.ERROR.NOOBJECT );
+			config = {};
 
 		if ( position && _.isObject ( position ) ) {
 			this.setMapPosition ( position );
@@ -182,18 +192,18 @@ GoogleMap = function () {
 		}
 
 		var conf = _.extend ( {position: this.position, map: this.mapa}, config );
-
+		console.log ( conf )
 		this.marker = new this.mapObject.Marker ( conf );
 		this.marker.setAnimation ( this.animationType );
+		this.marker.setMap ( this.mapa );
+
 		this.markersCollection.push ( this.marker );
 		this.coordsCollection.push ( this.position );
 
 		return this.marker;
 	};
 
-	/** Set Marker Animation Type
-	 *  @param animation fall | infinitejump
-	 * */
+
 	_proto.setMarkerAnimationType = function ( animation ) {
 		var self = this;
 		self.animationType = [{
@@ -202,14 +212,10 @@ GoogleMap = function () {
 		}[animation]].toString () || self.animationType;
 	};
 
-	//Stop Marker Animation
 	_proto.stopMarkerAnimation = function () {
 		this.marker.setAnimation ( null );
 	};
 
-	/** Display al markers in map
-	 *  @param map | Map Object
-	 * */
 	_proto.showAllMarkers = function ( map ) {
 		var x = this.markersCollection.length;
 		while ( x-- ) {
@@ -251,7 +257,7 @@ GoogleMap = function () {
 	_proto.getLocationInfo = function ( position, callback ) {
 		var self = this;
 		if ( _.isSet ( position ) && _.isObject ( position ) ) {
-			self.position = position;
+			self.setMapPosition ( position );
 		} else {
 			if ( !_.isSet ( self.position ) ) {
 				self.error ( WARNING_GOOGLE_MAP.ERROR.NOLOCATION );
@@ -407,5 +413,3 @@ GoogleMap = function () {
 	}
 
 };
-
-Syrup.blend ( GoogleMap );
