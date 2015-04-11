@@ -337,7 +337,7 @@ GoogleMap = function () {
 	};
 
 	//Clear all info labels
-	_proto.clearAllInfoLabels = function () {
+	_proto.clearInfoLabels = function () {
 		_.each ( this.infoLabels, function ( v ) {
 			v.close ();
 		} )
