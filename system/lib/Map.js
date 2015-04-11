@@ -339,10 +339,17 @@ GoogleMap = function () {
 		                       }, config, true );
 
 		self.ruta = new self.mapObject.Polyline ( _Conf );
-		self.routesCollection.push ( self.ruta );
-		//self.ruta.setMap(self.mapa);
 
+		//self.ruta.setMap(self.mapa);
+		self.appendRoute ( self.ruta );
 		_.callbackAudit ( callback, self.ruta );
+	};
+
+	/**Append Route
+	 * @param route PoliLyne
+	 * */
+	_proto.appendRoute = function ( route ) {
+		this.routesCollection.push ( route );
 	};
 
 	_proto.showAllRoutes = function ( map ) {
