@@ -106,18 +106,29 @@ GoogleMap = function () {
 		_self.mapObject.event.addListener ( elem, event, callback );
 	};
 
+	/** Make a google map position with coords latitude, longitude
+	 * @param latLong
+	 * */
+	_proto.makePosition = function ( latLong ) {
+
+		if ( !_.isObject ( latLong ) ) {
+			_.error ( WARNING_GOOGLE_MAP.ERROR.NOCONFIG );
+		}
+
+		return new this.mapObject.LatLng (
+			latLong.latitude,
+			latLong.longitude
+		);
+	};
+
 	/**Set Map Position
 	 * @param latLong
 	 */
 	_proto.setMapPosition = function ( latLong ) {
-		var self = this;
 		if ( !_.isObject ( latLong ) ) {
 			_.error ( WARNING_GOOGLE_MAP.ERROR.NOCONFIG );
 		}
-		self.position = new self.mapObject.LatLng (
-			latLong.latitude,
-			latLong.longitude
-		);
+		this.position = this.makePosition ( latLong );
 	};
 
 	/**Change Map Position
@@ -192,10 +203,9 @@ GoogleMap = function () {
 		}
 
 		var conf = _.extend ( {position: this.position, map: this.mapa}, config );
-		console.log ( conf )
+
 		this.marker = new this.mapObject.Marker ( conf );
 		this.marker.setAnimation ( this.animationType );
-		this.marker.setMap ( this.mapa );
 
 		this.markersCollection.push ( this.marker );
 		this.coordsCollection.push ( this.position );
@@ -384,6 +394,11 @@ GoogleMap = function () {
 		return self.distanceCollection;
 	};
 
+	/**Get the distance of a collection of routes
+	 *  @param routes | routes object getRoutes
+	 *  @param config
+	 *  @param callback
+	 * */
 	_proto.getDistance = function ( routes, config, callback ) {
 		var self = this;
 		if ( !routes || _.isObject ( routes ) ) {
