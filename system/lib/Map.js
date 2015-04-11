@@ -69,6 +69,9 @@ GoogleMap = function () {
 		return this.position;
 	};
 
+	/**Parse event object google.maps.event to coordinates
+	 *  @param e object Event Class
+	 * */
 	_proto.parseLatLngEvent = function ( e ) {
 		if ( e.latLng ) {
 			return {
@@ -242,10 +245,14 @@ GoogleMap = function () {
 		}[animation]].toString () || self.animationType;
 	};
 
+	//Stop Marker Animation
 	_proto.stopMarkerAnimation = function () {
 		this.marker.setAnimation ( null );
 	};
 
+	/**Show all Markers
+	 *  @param map object Map Class
+	 * */
 	_proto.showAllMarkers = function ( map ) {
 		var x = this.markersCollection.length;
 		while ( x-- ) {
