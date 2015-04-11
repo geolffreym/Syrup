@@ -191,7 +191,9 @@ GoogleMap = function () {
 		return this.marker;
 	};
 
-
+	/** Set Marker Animation Type
+	 *  @param animation fall | infinitejump
+	 * */
 	_proto.setMarkerAnimationType = function ( animation ) {
 		var self = this;
 		self.animationType = [{
@@ -200,10 +202,14 @@ GoogleMap = function () {
 		}[animation]].toString () || self.animationType;
 	};
 
+	//Stop Marker Animation
 	_proto.stopMarkerAnimation = function () {
 		this.marker.setAnimation ( null );
 	};
 
+	/** Display al markers in map
+	 *  @param map | Map Object
+	 * */
 	_proto.showAllMarkers = function ( map ) {
 		var x = this.markersCollection.length;
 		while ( x-- ) {
