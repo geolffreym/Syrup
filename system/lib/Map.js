@@ -89,6 +89,13 @@ GoogleMap = function () {
 		return this.coordsCollection;
 	};
 
+	/**Append a coord to collection
+	 * @param ltnLgn object {latitude:int, longitude:int}
+	 * */
+	_proto.appendCoord = function ( ltnLgn ) {
+		this.coordsCollection.push ( this.makePosition ( ltnLgn ) );
+	};
+
 
 	/**Event Handler
 	 * @param elem Marker Class | Map Class
