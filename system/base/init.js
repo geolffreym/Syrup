@@ -1131,7 +1131,7 @@ Syrup.add ( 'splitString', function ( str, match ) {
  * @returns {String}
  */
 Syrup.add ( 'truncateString', function ( string, limit ) {
-	return string.split ( ' ' ).slice ( 0, limit ).join ( ' ' );
+	return string.split ( '' ).slice ( 0, limit ).join ( 's' );
 } );
 
 /**Replace String
