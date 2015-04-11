@@ -1240,6 +1240,10 @@ _.truncateString(_string, 9); // 'I need be'
 var _string = 'I need be truncated until here'      
 
 _.replace(_string, 'truncated', 'happy'); // 'I need be happy until here' 
+
+//Or using regexp
+
+_.replace(_string, /truncated/, {'truncated': 'new_val'}); // 'I need be new_val until here'
 ```     
 
 **Method `.objectAsString(string, search, replace)`**
