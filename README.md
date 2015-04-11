@@ -172,6 +172,11 @@ var my_selector = _$(document);
 my_selector.ready(function(){
     /* My code */
 }); 
+
+//Or Just
+_$(function(){
+
+})
 ``` 
    
 **Method `.load()`**
