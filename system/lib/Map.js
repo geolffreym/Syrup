@@ -69,6 +69,11 @@ GoogleMap = function () {
 		return this.position;
 	};
 
+	//Return Map
+	_proto.getMap = function () {
+		return this.mapa;
+	};
+
 	/**Event Handler
 	 * @param elem Marker | Map | GoogleMapObject
 	 * @param event
