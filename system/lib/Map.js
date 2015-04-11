@@ -89,6 +89,11 @@ GoogleMap = function () {
 		return this.coordsCollection;
 	};
 
+	//Clean Coords
+	_proto.cleanCoords = function(){
+		this.coordsCollection = [];
+	};
+
 	/**Append a coord to collection
 	 * @param ltnLgn LatLng Class
 	 * */
