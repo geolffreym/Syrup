@@ -90,12 +90,11 @@ GoogleMap = function () {
 	};
 
 	/**Append a coord to collection
-	 * @param ltnLgn object {latitude:int, longitude:int}
+	 * @param ltnLgn LatLng Class
 	 * */
-	_proto.appendCoord = function ( ltnLgn ) {
-		this.coordsCollection.push ( this.makePosition ( ltnLgn ) );
+	_proto.appendCoord = function (ltnLgn) {
+		this.coordsCollection.push(ltnLgn);
 	};
-
 
 	/**Event Handler
 	 * @param elem Marker Class | Map Class
