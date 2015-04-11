@@ -56,7 +56,7 @@ GoogleMap = function () {
 	};
 
 	/**Set Container of Map
-	 * @param container
+	 * @param container DOM
 	 */
 	_proto.setMapContainer = function ( container ) {
 		if ( _.is$ ( container ) )
@@ -91,7 +91,7 @@ GoogleMap = function () {
 
 
 	/**Event Handler
-	 * @param elem Marker | Map
+	 * @param elem Marker Class | Map Class
 	 * @param event
 	 * @param callback
 	 * */
@@ -113,7 +113,7 @@ GoogleMap = function () {
 	};
 
 	/** Make a google map position with coords latitude, longitude
-	 * @param latLong
+	 * @param latLong object {latitude:int, longitude:int}
 	 * */
 	_proto.makePosition = function ( latLong ) {
 
@@ -128,7 +128,7 @@ GoogleMap = function () {
 	};
 
 	/**Set Map Position
-	 * @param latLong
+	 * @param latLong object {latitude:int, longitude:int}
 	 */
 	_proto.setMapPosition = function ( latLong ) {
 		if ( !_.isObject ( latLong ) ) {
@@ -138,7 +138,7 @@ GoogleMap = function () {
 	};
 
 	/**Change Map Position
-	 * @param latLong
+	 * @param latLong object {latitude:int, longitude:int}
 	 */
 	_proto.changeMapPosition = function ( latLong ) {
 		var self = this;
@@ -155,8 +155,8 @@ GoogleMap = function () {
 	};
 
 	/**Create a new map object
-	 * @param config
-	 * @param callback
+	 * @param config object
+	 * @param callback function
 	 */
 	_proto.createMap = function ( config, callback ) {
 		var self = this;
@@ -188,8 +188,8 @@ GoogleMap = function () {
 
 	/**Markers Create
 	 * https://developers.google.com/maps/documentation/javascript/3.exp/reference?hl=es#Marker
-	 * @param position
-	 * @param config
+	 * @param position object {latitude:int, longitude:int}
+	 * @param config object
 	 * @returns object
 	 */
 	_proto.setMarker = function ( position, config ) {
@@ -220,6 +220,9 @@ GoogleMap = function () {
 	};
 
 
+	/** Set Marker ANimation Type
+	 *  @param animation string fall|infinitejump
+	 * */
 	_proto.setMarkerAnimationType = function ( animation ) {
 		var self = this;
 		self.animationType = [{
@@ -346,12 +349,15 @@ GoogleMap = function () {
 	};
 
 	/**Append Route
-	 * @param route PoliLyne
+	 * @param route PoliLyne Class
 	 * */
 	_proto.appendRoute = function ( route ) {
 		this.routesCollection.push ( route );
 	};
 
+	/**Show all routes created in map
+	 * @param map Map Class
+	 * */
 	_proto.showAllRoutes = function ( map ) {
 		var x = this.routesCollection.length;
 		while ( x-- ) {
