@@ -329,7 +329,7 @@ GoogleMap = function () {
 	};
 
 	/**Rutas*/
-	_proto.setRoute = function ( config, callback ) {
+	_proto.drawRoute = function ( config, callback ) {
 		var self = this;
 		if ( self.coordsCollection.length == 0 ) {
 			self.error ( WARNING_GOOGLE_MAP.ERROR.NOROUTES );
@@ -349,7 +349,7 @@ GoogleMap = function () {
 
 		self.ruta = new self.mapObject.Polyline ( _Conf );
 
-		//self.ruta.setMap(self.mapa);
+		self.ruta.setMap(self.mapa);
 		self.appendRoute ( self.ruta );
 		_.callbackAudit ( callback, self.ruta );
 	};
