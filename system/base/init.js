@@ -1130,8 +1130,10 @@ Syrup.add ( 'splitString', function ( str, match ) {
  * @param limit
  * @returns {String}
  */
-Syrup.add ( 'truncateString', function ( string, limit ) {
-	return string.split ( '' ).slice ( 0, limit ).join ( 's' );
+Syrup.add ( 'truncateString', function ( string, limit, split ) {
+	if ( !_.isSet ( split ) )
+		split = '';
+	return string.split ( split ).slice ( 0, limit ).join ( split );
 } );
 
 /**Replace String

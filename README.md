@@ -1219,7 +1219,7 @@ var _string = '<div>I am a html</div>'
 _.htmlEntities(_string); // &lt;div&gt;I am a html&lt;/div&gt;
 ``` 
 
-**Method `.truncateString(str, limit)`**
+**Method `.truncateString(str, limit, split(optional=> Where cut the string to truncate?))`**
 
 *(Truncate string until limit)*
 ```js     
