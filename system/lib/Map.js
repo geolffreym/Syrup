@@ -475,10 +475,10 @@ GoogleMap = function () {
 				if ( _destination[i] != _origin[j] ) {
 					if ( _distance[i].elements[j].status == 'OK' ) {
 						self.distanceCollection[i][j] = {};
-						self.distanceCollection[i][j]['origen'] = _destination[i];
-						self.distanceCollection[i][j]['destino'] = _origin[j];
-						self.distanceCollection[i][j]['distancia'] = _distance[i].elements[j].distance.text;
-						self.distanceCollection[i][j]['tiempo'] = _distance[i].elements[j].duration.text
+						self.distanceCollection[i][j]['from'] = _destination[i];
+						self.distanceCollection[i][j]['destiny'] = _origin[j];
+						self.distanceCollection[i][j]['distance'] = _distance[i].elements[j].distance.text;
+						self.distanceCollection[i][j]['time'] = _distance[i].elements[j].duration.text
 					} else {
 						self.distanceCollection[i] = false;
 					}
@@ -489,7 +489,7 @@ GoogleMap = function () {
 	};
 
 	/**Get the distance of a collection of routes
-	 *  @param routes | routes object getRoutes
+	 *  @param routes | routes object LatLng Class Collection
 	 *  @param config
 	 *  @param callback
 	 * */
