@@ -27,7 +27,7 @@ WARNING_SYRUP = {
 		NOCALLBACK:            'Callback error on execution time.',
 		NOURL:                 'URL is required for the request.',
 		NOHTML:                'Html string is required',
-		NOOBJECTREPLACEREGEXP: 'A object is needed to replace a regexp ex: {match:replace}'
+		NOOBJECTREPLACEREGEXP: 'A object replace param is needed to replace a regexp ex: {match:replace}'
 	}
 }
 	;
