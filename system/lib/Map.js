@@ -97,6 +97,47 @@ GoogleMap = function () {
 		this.coordsCollection = [];
 	};
 
+	//Return the center point of a coords collection
+	_proto.getCoordsCenterPoint = function () {
+		var coords = this.coordsCollection,
+		    x = 0.0,
+		    y = 0.0,
+		    z = 0.0,
+		    lat = 0,
+		    long = 0,
+		    a = 0,
+		    b = 0,
+		    c = 0;
+
+		_.each ( coords, function ( v, i ) {
+			lat = (v.lat () * Math.PI) / 180;
+			long = (v.lng () * Math.PI) / 180;
+
+			a = Math.cos ( lat ) * Math.cos ( long );
+			b = Math.cos ( lat ) * Math.sin ( long );
+			c = Math.sin ( lat );
+
+			x += a;
+			y += b;
+			z += c;
+
+		} );
+
+		x /= coords.length;
+		y /= coords.length;
+		z /= coords.length;
+
+		long = Math.atan2 ( y, x );
+		lat = Math.atan2 ( z, Math.sqrt ( x * x + y * y ) );
+
+		return {
+			latitude:  lat * 180 / Math.PI,
+			longitude: long * 180 / Math.PI
+		}
+
+	};
+
+
 	/**Append a coord to collection
 	 * @param ltnLgn LatLng Class
 	 * */
