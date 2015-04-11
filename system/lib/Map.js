@@ -91,7 +91,7 @@ GoogleMap = function () {
 			_.error ( WARNING_SYRUP.ERROR.NOFUNCTION );
 
 		if ( !_.isObject ( elem ) )
-			_.error ( WARNING_GOOGLE_MAP.ERROR.NOMAP );
+            _.error(WARNING_GOOGLE_MAP.ERROR.NOMAP);
 
 		_self.mapObject.event.addListener ( elem, event, callback );
 	};
@@ -161,50 +161,40 @@ GoogleMap = function () {
 
 	/**Markers Create
 	 * @param position
-	 * @param msg
-	 * @param animated
-	 * @returns {self.mapObject.Marker|*}
+	 * @param config
+	 * @returns {}
 	 */
-	_proto.setMarker = function ( position, msg, animated ) {
-		var self = this;
-		if ( !self.mapa ) {
-			self.error ( WARNING_GOOGLE_MAP.ERROR.NOMAP );
-		}
+    _proto.setMarker = function (position, config) {
+        var self = this,
+            conf = {
+                position: self.position,
+                map: self.mapa
+            };
 
-		if ( position && _.isObject ( position ) ) {
-			_self.setMapPosition ( position );
-		} else {
-			if ( !self.position ) {
-				_.error ( WARNING_GOOGLE_MAP.ERROR.NOLOCATION );
-			}
+        if (!self.mapa)
+            _.error(WARNING_GOOGLE_MAP.ERROR.NOMAP);
 
-			if ( _.isString ( position ) ) {
-				msg = position;
-			}
-		}
+        if(!_.isObject(config))
+            _.error(WARNING_SYRUP.ERROR.NOOBJECT);
 
-		if ( _.isBoolean ( position ) ) {
-			animated = position;
-		} else {
-			if ( _.isBoolean ( msg ) ) {
-				animated = msg;
-			}
-		}
+        if (position && _.isObject(position)) {
+            _self.setMapPosition(position);
+        } else {
+            if (!self.position) {
+                _.error(WARNING_GOOGLE_MAP.ERROR.NOLOCATION);
+            }
+        }
 
 
-		self.marker = new self.mapObject.Marker ( {
-			                                          position: self.position,
-			                                          map:      self.mapa,
-			                                          title: msg && _.isString ( msg ) ? msg : ''
-		                                          } );
+        conf = _.extend(conf, config);
 
-		if ( animated ) {
-			self.marker.setAnimation ( self.animationType );
-		}
-		self.markersCollection.push ( self.marker );
-		self.coordsCollection.push ( self.position );
-		return self.marker;
-	};
+        self.marker = new self.mapObject.Marker(conf);
+        self.marker.setAnimation(self.animationType);
+
+        self.markersCollection.push(self.marker);
+        self.coordsCollection.push(self.position);
+        return self.marker;
+    };
 
 
 	_proto.setMarkerAnimationType = function ( animation ) {
