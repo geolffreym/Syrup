@@ -92,8 +92,8 @@ GoogleMap = function () {
 	/**Append a coord to collection
 	 * @param ltnLgn LatLng Class
 	 * */
-	_proto.appendCoord = function (ltnLgn) {
-		this.coordsCollection.push(ltnLgn);
+	_proto.appendCoord = function ( ltnLgn ) {
+		this.coordsCollection.push ( ltnLgn );
 	};
 
 	/**Event Handler
@@ -349,7 +349,7 @@ GoogleMap = function () {
 
 		self.ruta = new self.mapObject.Polyline ( _Conf );
 
-		self.ruta.setMap(self.mapa);
+		self.ruta.setMap ( self.mapa );
 		self.appendRoute ( self.ruta );
 		_.callbackAudit ( callback, self.ruta );
 	};
@@ -361,22 +361,15 @@ GoogleMap = function () {
 		this.routesCollection.push ( route );
 	};
 
-	/**Show all routes created in map
-	 * @param map Map Class
-	 * */
-	_proto.showAllRoutes = function ( map ) {
-		var x = this.routesCollection.length;
-		while ( x-- ) {
-			this.routesCollection[x].setMap ( map )
-		}
-	};
-
 	_proto.getRoutes = function () {
 		return this.routesCollection;
 	};
 
 	_proto.clearRoutes = function () {
-		this.showAllRoutes ( null );
+		var x = this.routesCollection.length;
+		while ( x-- ) {
+			this.routesCollection[x].setMap ( null )
+		}
 	};
 
 	_proto.deleteRoutes = function () {
