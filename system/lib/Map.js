@@ -160,6 +160,7 @@ GoogleMap = function () {
 
 
 	/**Markers Create
+	 * https://developers.google.com/maps/documentation/javascript/3.exp/reference?hl=es#Marker
 	 * @param position
 	 * @param config
 	 * @returns {}
@@ -184,7 +185,6 @@ GoogleMap = function () {
                 _.error(WARNING_GOOGLE_MAP.ERROR.NOLOCATION);
             }
         }
-
 
         conf = _.extend(conf, config);
 
