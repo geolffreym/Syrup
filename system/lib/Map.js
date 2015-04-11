@@ -93,7 +93,7 @@ GoogleMap = function () {
 	};
 
 	//Clean Coords
-	_proto.cleanCoords = function(){
+	_proto.cleanCoords = function () {
 		this.coordsCollection = [];
 	};
 
@@ -272,16 +272,35 @@ GoogleMap = function () {
 		return this.markersCollection;
 	};
 
+	/**Create a info label in marker
+	 * https://developers.google.com/maps/documentation/javascript/reference?hl=es#InfoWindowOptions
+	 * @param content string
+	 * @param marker object Marker Class
+	 * @param config object
+	 * */
 	_proto.setMarkerInfo = function ( content, marker, config ) {
 		var self = this;
-		content = content
-			? content : '';
-
 		config = _.extend ( {content: content}, config );
+
+		var info = this.createInfoLabel ( content, config );
+		info.open ( self.mapa, marker );
+
+		return info;
+	};
+
+	/**Create a info label in map
+	 * https://developers.google.com/maps/documentation/javascript/reference?hl=es#InfoWindowOptions
+	 * @param content string
+	 * @param config object
+	 * */
+	_proto.createInfoLabel = function ( content, config ) {
+		var self = this;
+		config = _.extend ( {content: content}, config );
+
 		self.infoWindow = new self.mapObject.InfoWindow ( config );
-		self.infoWindow.open ( self.mapa, marker );
 		return self.infoWindow;
 	};
+
 
 	_proto.geoCodeRequest = function ( object, callback ) {
 		this.geocoder.geocode ( object, callback );
