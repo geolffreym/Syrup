@@ -32,6 +32,7 @@ if ( typeof exports !== 'undefined' )
 
 var
 nativeFunction = Function.prototype,
+nativeObject = Object.prototype,
 regexConstructor = /(([^function])([a-zA-z])+(?=\())/g,
 WARNING_SYRUP = {
 	ERROR: {
@@ -1148,10 +1149,8 @@ Syrup.add ( 'splitString', function ( str, match ) {
  * @param limit
  * @returns {String}
  */
-Syrup.add ( 'truncateString', function ( string, limit, split ) {
-	if ( !_.isSet ( split ) )
-		split = '';
-	return string.split ( split ).slice ( 0, limit ).join ( split );
+Syrup.add ( 'truncateString', function ( string, limit ) {
+	return _.toObject ( string ).slice ( 0, limit );
 } );
 
 /**Replace String
@@ -1372,7 +1371,7 @@ Syrup.add ( 'getObjectValues', function ( obj ) {
  * @returns {string}
  */
 Syrup.add ( 'objectAsString', function ( obj ) {
-	return Object.prototype.toString.call ( obj );
+	return nativeObject.toString.call ( obj );
 } );
 
 /**Immutable Object
@@ -1495,6 +1494,16 @@ Syrup.add ( 'parseJsonUrl', function ( _object ) {
 
 	return _return.lastIndexOf ( '&' ) > -1
 		? _return.slice ( 0, -1 ) : _return;
+} );
+
+/**Pasa Json a String
+ * @param json object
+ * @return string | null
+ * */
+Syrup.add ( 'jsonToString', function ( json ) {
+	if ( _.isObject ( json ) )
+		return JSON.stringify ( json );
+	return null;
 } );
 
 
@@ -1705,9 +1714,20 @@ Syrup.add ( 'toArray', function ( element ) {
 		return [].slice.apply ( element );
 	} else {
 		if ( _.isString ( element ) ) {
-			return element.split ( '' );
+			return _.toObject ( element );
 		}
 	}
+} );
+
+
+/** Parse to String
+ * @param element object
+ * @return string
+ * */
+
+Syrup.add ( 'toString', function ( element ) {
+	if ( _.isObject ( element ) )
+		return JSON.stringify ( element );
 } );
 
 /**Parse to Object
@@ -1715,13 +1735,17 @@ Syrup.add ( 'toArray', function ( element ) {
  * @returns {Object}
  */
 Syrup.add ( 'toObject', function ( element ) {
-	if ( _.isString ( element ) ) {
-		element = element.split ( '' );
-	}
 
-	if ( !_.isArray ( element ) ) {
+	if ( _.isJson ( element ) )
+		return JSON.parse ( element );
+
+	if ( _.isString ( element ) )
+		return nativeObject.valueOf.call ( element );
+
+
+	if ( !_.isArray ( element ) )
 		_.error ( WARNING_SYRUP.ERROR.NOARRAY );
-	}
+
 
 	return element.reduce ( function ( o, v, i ) {
 		o[i] = v;
@@ -2355,10 +2379,10 @@ GoogleMap = function () {
 				if ( _destination[i] != _origin[j] ) {
 					if ( _distance[i].elements[j].status == 'OK' ) {
 						self.distanceCollection[i][j] = {};
-						self.distanceCollection[i][j]['origen'] = _destination[i];
-						self.distanceCollection[i][j]['destino'] = _origin[j];
-						self.distanceCollection[i][j]['distancia'] = _distance[i].elements[j].distance.text;
-						self.distanceCollection[i][j]['tiempo'] = _distance[i].elements[j].duration.text
+						self.distanceCollection[i][j]['from'] = _destination[i];
+						self.distanceCollection[i][j]['destiny'] = _origin[j];
+						self.distanceCollection[i][j]['distance'] = _distance[i].elements[j].distance.text;
+						self.distanceCollection[i][j]['time'] = _distance[i].elements[j].duration.text
 					} else {
 						self.distanceCollection[i] = false;
 					}
@@ -2369,7 +2393,7 @@ GoogleMap = function () {
 	};
 
 	/**Get the distance of a collection of routes
-	 *  @param routes | routes object getRoutes
+	 *  @param routes | routes object LatLng Class Collection
 	 *  @param config
 	 *  @param callback
 	 * */

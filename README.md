@@ -1360,6 +1360,23 @@ _.getObjectSize(_my_object); // Return 3
  _.getCookie('my_csrf'); // Return asdf584a2d48rwefr42
 ```
  
+**Method `.parseJsonUrl(object)` ** 
+
+*(Parse object to string Shortcut for JSON.stringify)*
+```js
+   var a = {a:1,b:2};
+   _.jsonToUrl(a); // 'a=1&b=2'
+``` 
+ 
+ 
+**Method `.jsonToString(object)` ** 
+
+*(Parse object to string Shortcut for JSON.stringify)*
+```js
+   var a = {a:1,b:2};
+   _.jsonToString(a); // '{"a":"1", "b":"2"}'
+```
+
 **Method `.getScript(url, callback)`**
 
 *(Get local or remote script.)*
