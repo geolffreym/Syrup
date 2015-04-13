@@ -1069,14 +1069,13 @@ _.extend(my_target, _my_source); //Return {a:1,b:5,c:3} not overwrite the target
 _.extend(my_target, _my_source, TRUE); //Return {a:1,b:2,c:3}
 ```    
 
-**Method `include(script, wait, callback)`**
+**Method `.include(script, wait, callback)`**
 
 *(Includes scripts in a controlled environment. Using de relative directory set in config)*
-*Files must have the extension extension .min.js*
 ```js    
 
 //FIRST SCENARIO
-_.include('app/controller/my_script.js', function(){
+_.include('app/controller/my_script', function(){
     //my_script ready
 })
 
@@ -1262,7 +1261,15 @@ _.objectAsString(_my_object); // Return [Object object];
 var _my_object = {a:1,b:2c:3};    
 
 _.parseJsonUrl(_my_object); // Return a=1&b=2&c=3; 
-```       
+```
+
+**Method `.jsonToString(object)` ** 
+
+*(Parse object to string Shortcut for JSON.stringify)*
+```js
+   var a = {a:1,b:2};
+   _.jsonToString(a); // '{"a":"1", "b":"2"}'
+```
 
 **Method `.repeatString(str, times)`**
  
@@ -1358,23 +1365,6 @@ _.getObjectSize(_my_object); // Return 3
 
  _.getCookie('my_cookie'); // Return asf58as52dsf84e5
  _.getCookie('my_csrf'); // Return asdf584a2d48rwefr42
-```
- 
-**Method `.parseJsonUrl(object)` ** 
-
-*(Parse object to string Shortcut for JSON.stringify)*
-```js
-   var a = {a:1,b:2};
-   _.jsonToUrl(a); // 'a=1&b=2'
-``` 
- 
- 
-**Method `.jsonToString(object)` ** 
-
-*(Parse object to string Shortcut for JSON.stringify)*
-```js
-   var a = {a:1,b:2};
-   _.jsonToString(a); // '{"a":"1", "b":"2"}'
 ```
 
 **Method `.getScript(url, callback)`**
