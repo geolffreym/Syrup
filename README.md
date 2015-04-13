@@ -72,9 +72,9 @@ Joining files
 
 **Node JS Required**
 
-blend files is relatively simple, you must first establish the libraries you want to use in environment.
+Blend files is relatively simple, you must first establish the libraries you want to use in environment.
 
-Syrup Is modular so you can create your own libraries and integrate the autoloader
+Syrup is modular so you can create your own libraries and integrate the autoloader
 
 ```js
 //Development
