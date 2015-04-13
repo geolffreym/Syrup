@@ -33,8 +33,8 @@ Socket.add ( 'set', function ( config ) {
 		_.error ( WARNING_SYRUP_SOCKET.ERROR.NOOBJECT );
 	}
 
-	var user = !!config.user ? config.user : 'default',
-	    port = !!config.port ? config.port : 0x1F90,
+	var user = config.user || 'default',
+	    port = config.port || 0x1F90,
 	    query = '?';
 
 
