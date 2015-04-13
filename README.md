@@ -129,7 +129,7 @@ var _alias = _$.noConflict();
 *This method helps you find Nodes objects and generate $ object*
 
 ```js
-var my_selector = _$('<div></div>');
+var my_selector = _$('<div>');
 var my_selector = _$('.selector');
 var my_selector = _$('.selector:pseudo'); //Pseudo codes must follow the CSS syntax
 var my_selector = _$('.selector_parent .selector_child');
