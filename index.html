@@ -12,10 +12,8 @@
 <script>
     _$ ( function () {
 
-
         var _tpl = new Template;
         _$ ( '#unclick' ).addListener ( 'click', function ( e ) {
-
 
             _tpl.get ( 'library/bookList', function ( r ) {
                 _tpl.parse ( r, {

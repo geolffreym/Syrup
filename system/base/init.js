@@ -960,17 +960,6 @@ _$_.add ( 'animate', function ( prop, conf, callback ) {
 	return this;
 } );
 
-/**Prepare animation
- */
-_$_.add ( 'requestAnimationFrame', function () {
-	return window.requestAnimationFrame ||
-		   window.webkitRequestAnimationFrame ||
-		   window.mozRequestAnimationFrame ||
-		   function ( callback ) {
-			   window.setTimeout ( callback, 0x3E8 / 0x3C );
-		   };
-} );
-
 /**Return object
  * @returns {Object|Array}
  */
@@ -1438,7 +1427,7 @@ Syrup.add ( 'objectWatch', function ( obj, callback, conf ) {
  */
 Syrup.add ( 'interval', function ( callback, conf ) {
 	var _worker = _.Workers;
-	
+
 	_worker.set ( 'system/workers/setting/Interval', function () {
 		_worker.send ( conf );
 	} );
@@ -1448,6 +1437,17 @@ Syrup.add ( 'interval', function ( callback, conf ) {
 	} );
 	
 	return _worker;
+} );
+
+/**Prepare animation
+ */
+Syrup.add ( 'requestAnimationFrame', function ( callback ) {
+	return (window.requestAnimationFrame ||
+			window.webkitRequestAnimationFrame ||
+			window.mozRequestAnimationFrame ||
+			function ( call ) {
+				window.setTimeout ( call, 0x3E8 / 0x3C );
+			}) ( callback );
 } );
 
 /**Devuelve la cookie segun el nombre
