@@ -43,6 +43,7 @@ Workers.add ( 'get', function () {
 //Send Message to Worker
 Workers.add ( 'send', function ( message ) {
 	this.Worker.postMessage ( !!message ? message : '' );
+	return this;
 } );
 
 //Kill Worker

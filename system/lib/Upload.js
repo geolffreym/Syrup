@@ -135,5 +135,3 @@ Upload = function () {
 
 
 };
-
-Syrup.blend ( Upload );

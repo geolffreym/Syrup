@@ -31,5 +31,3 @@ Router.add ( 'route', function ( path, callback ) {
 Router.add ( 'parse_query_string', function () {
 
 } );
-
-Syrup.blend ( Router );
