@@ -149,6 +149,10 @@ _$_.add ( 'load', function ( callback ) {
 
 
 /**Event Listener
+ * @param event
+ * @param delegate
+ * @param callback
+ * @return object
  */
 _$_.add ( 'addListener', function ( event, delegate, callback ) {
 	if ( _.isFunction ( delegate ) ) {
@@ -175,8 +179,10 @@ _$_.add ( 'addListener', function ( event, delegate, callback ) {
 			}
 			
 		};
-	
+
 	_self.each ( function ( elem ) {
+
+
 		if ( elem.addEventListener ) {
 			elem.addEventListener ( event, _event, true )
 		} else {
@@ -186,14 +192,44 @@ _$_.add ( 'addListener', function ( event, delegate, callback ) {
 				elem[ 'on' + event ] = _event;
 			}
 		}
+
+		if ( !_.isSet ( elem[ 'listListener' ] ) ) {
+			elem[ 'listListener' ] = {}
+		}
+
+		elem.listListener[ event ] = _event;
 	} );
-	
+
 	return this;
 } );
 
-//TODO
-_$_.add ( 'removeListener', function () {
-	
+/**Remove Event Listener
+ * @param event
+ * @param delegate
+ * @param callback
+ * @return object
+ */
+_$_.add ( 'removeListener', function ( event ) {
+	this.each ( function ( elem ) {
+
+		if ( _.isSet ( elem.listListener ) ) {
+
+			if ( event in elem.listListener ) {
+				if ( elem.removeEventListener ) {
+					elem.removeEventListener ( event, elem.listListener[ event ], true );
+
+				} else {
+					if ( elem.detachEvent ( event ) ) {
+						elem.attachEvent ( 'on' + event, elem.listListener[ event ] );
+					} else {
+						elem[ 'on' + event ] = null;
+					}
+				}
+				delete elem.listListener[ event ];
+			}
+		}
+	} )
+
 } );
 
 /**Filter Pattern match

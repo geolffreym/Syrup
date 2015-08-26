@@ -766,7 +766,22 @@ my_selector('click', function(e){
 })
 ```
 
-**Method removeListener in dev**
+**Method `.removeListener(event)`**
+
+*(Remove event listener to object)*
+```js
+var body = _$('body');
+
+//Event assign
+body.addListener('click',  function(e){
+
+    /*My Code*/
+
+})
+
+//Remove Event assign
+body.removeListener('click')
+```
     
 Helpers
 --------

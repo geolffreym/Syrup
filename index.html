@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<script src="app/include/init.min.js"></script>
+<a href="#" id="click">CLick</a>
+<a href="#" id="unclick">UCLick</a>
+
+
+<script>
+    _$ ( function () {
+
+        var a = function ( e ) {
+            e.preventDefault ();
+            console.log ( 'click' );
+        }
+
+        _$ ( '#click' ).addListener ( 'click', a );
+        _$ ( '#unclick' ).addListener ( 'click', function ( e ) {
+            _$ ( '#click' ).removeListener ( 'click');
+        } )
+
+    } )
+
+</script>
+</body>
+</html>
