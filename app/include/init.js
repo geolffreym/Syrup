@@ -2630,6 +2630,7 @@ Ajax.add ( 'request', function ( config, callback ) {
 //Set request header
 Ajax.add ( 'requestHeader', function ( header, type ) {
 	this.xhr.setRequestHeader ( header, type );
+	return this;
 } );
 
 //Kill Ajax
@@ -2640,10 +2641,60 @@ Ajax.add ( 'kill', function () {
 			this.xhr_list[i].abort ();
 	}
 	this.xhr_list.length = 0;
+
+	return this;
 } );
 
 
 
+/**
+ * Created by gmena on 07-26-14.
+ */
+'use strict';
+
+function Repository () {
+
+}
+
+//Set registry to bucket
+Repository.add ( 'set', function ( key, data, callback ) {
+	localStorage.setItem ( key, JSON.stringify ( data ) );
+	_.callbackAudit ( callback, data, this );
+} );
+
+
+//Get registry from bucket
+Repository.add ( 'get', function ( key ) {
+	return _.isJson ( localStorage.getItem ( key ) )
+		? JSON.parse ( localStorage.getItem ( key ) ) : null;
+} );
+
+//Append data to existing bucket
+Repository.add ( 'append', function ( key, element, callback ) {
+	var _existent = this.get ( key ),
+	    _new = _.extend ( _.isSet ( _existent ) ? _existent : {}, element );
+
+	this.set ( key, _new, false );
+	_.callbackAudit ( callback, _new );
+	return this;
+} );
+
+//Detroy all buckets
+Repository.add ( 'destroy', function () {
+	localStorage.clear ();
+} );
+
+//Clear a bucket
+Repository.add ( 'clear', function ( key ) {
+	localStorage.removeItem ( key );
+	return this;
+} );
+
+
+//Return count buckets
+Repository.add ( 'count', function () {
+	return localStorage.length;
+} );
 /**
  * Created by gmena on 07-26-14.
  */
@@ -2659,27 +2710,31 @@ function Workers () {
 //Worker event handler
 Workers.add ( 'on', function ( event, callback ) {
 	var self = this;
-	return [{
-		message: function () {
-			self.onsuccess = callback;
-		}
-	}[event] ()]
+	return [
+		{
+			message: function () {
+				self.onsuccess = callback;
+			}
+		}[ event ] ()
+	]
 } );
 
 //Set new Worker
 Workers.add ( 'set', function ( url, callback ) {
 	var self = this;
-	self.Worker = (new Worker ( setting.app_path + url + '.min.js' ));
+	self.Worker = (new Worker ( setting.system_path + url + '.min.js' ));
 	self.Worker.addEventListener ( 'message', function ( e ) {
 		_.callbackAudit ( self.onsuccess, e );
 	}, false );
 	_.callbackAudit ( callback, self.Worker );
 
+	return this;
+
 } );
 
 //Get Worker
 Workers.add ( 'get', function () {
-	return  this.Worker;
+	return this.Worker;
 } );
 
 //Send Message to Worker
@@ -2694,6 +2749,8 @@ Workers.add ( 'kill', function ( callback ) {
 		this.Worker = null;
 		_.callbackAudit ( callback );
 	}
+
+	return this;
 } );
 
 /**
@@ -2721,30 +2778,32 @@ function Template () {
 //Search for the template
 Template.add ( 'lookup', function ( template, callback ) {
 	var _conf = {
-		url:       setting.app_path + 'templates/' + template,
-		dataType:  'text/plain',
+		url      : setting.app_path + '/templates/' + template,
+		dataType : 'text/plain',
 		processor: '.html'
 	};
 
 	this.Ajax.request ( _conf, function ( response ) {
 		_.callbackAudit ( callback, response );
-	} )
+	} );
+
+	return this;
 } );
 
 //Get the template
 Template.add ( 'get', function ( template, callback ) {
 	var _self = this,
-	    _repo = _self.Repository,
-	    _template = _repo.get ( 'templates' ),
-	    _save = {};
+		_repo = _self.Repository,
+		_template = _repo.get ( 'templates' ),
+		_save = {};
 
 	_self.template = template;
 	if ( _.isSet ( _template ) ) {
-		if ( _.isSet ( _template[template] ) ) {
-			_.callbackAudit ( callback, _template[template] )
+		if ( _.isSet ( _template[ template ] ) ) {
+			_.callbackAudit ( callback, _template[ template ] )
 		} else {
 			_self.lookup ( template, function ( temp ) {
-				_save[template] = temp;
+				_save[ template ] = temp;
 				_repo.append ( 'templates', _save );
 				_.callbackAudit ( callback, temp );
 			} )
@@ -2753,23 +2812,43 @@ Template.add ( 'get', function ( template, callback ) {
 		_repo.set ( 'templates', {} );
 		this.get ( template, callback )
 	}
+
+	return this;
+} );
+
+//Clear Template from Repository
+Template.add ( 'clear', function () {
+	this.Repository.clear ( 'templates' );
+	return this;
 } );
 
 //Clear Template from Repository
 Template.add ( 'remove', function () {
-	this.Repository.clear ( this.template );
+	if ( this.template ) {
+		var old_templates = this.Repository.get ( 'templates' );
+		if ( old_templates ) {
+			delete old_templates[ this.template ]
+		}
+
+		this.Repository.set ( 'templates', old_templates );
+		this.template = null;
+	}
+
+	return this;
 } );
 
 //Parse the Template
 Template.add ( 'parse', function ( _template, _fields, callback ) {
 	var _self = this;
-	_self.Workers.set ( 'system/workers/setting/Parser', function ( worker ) {
-		_self.Workers.send ( {template: _template, fields: _fields} );
+	_self.Workers.set ( '/workers/setting/Parser', function ( worker ) {
+		_self.Workers.send ( { template: _template, fields: _fields } );
 	} );
 
 	_self.Workers.on ( 'message', function ( e ) {
 		_.callbackAudit ( callback, e.data )
-	} )
+	} );
+
+	return this;
 } );
 
 
@@ -2781,8 +2860,9 @@ Template.add ( 'parse', function ( _template, _fields, callback ) {
 
 var setting = {
 	ajax_processor: '',
-	app_path:       '/app/',
-	env:            'development'
+	app_path      : '/Syrup/app',
+	system_path   : '/Syrup/system',
+	env: 'development'
 };
 
 

@@ -179,6 +179,7 @@ Ajax.add ( 'request', function ( config, callback ) {
 //Set request header
 Ajax.add ( 'requestHeader', function ( header, type ) {
 	this.xhr.setRequestHeader ( header, type );
+	return this;
 } );
 
 //Kill Ajax
@@ -189,6 +190,8 @@ Ajax.add ( 'kill', function () {
 			this.xhr_list[i].abort ();
 	}
 	this.xhr_list.length = 0;
+
+	return this;
 } );
 
 

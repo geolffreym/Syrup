@@ -13,27 +13,31 @@ function Workers () {
 //Worker event handler
 Workers.add ( 'on', function ( event, callback ) {
 	var self = this;
-	return [{
-		message: function () {
-			self.onsuccess = callback;
-		}
-	}[event] ()]
+	return [
+		{
+			message: function () {
+				self.onsuccess = callback;
+			}
+		}[ event ] ()
+	]
 } );
 
 //Set new Worker
 Workers.add ( 'set', function ( url, callback ) {
 	var self = this;
-	self.Worker = (new Worker ( setting.app_path + url + '.min.js' ));
+	self.Worker = (new Worker ( setting.system_path + url + '.min.js' ));
 	self.Worker.addEventListener ( 'message', function ( e ) {
 		_.callbackAudit ( self.onsuccess, e );
 	}, false );
 	_.callbackAudit ( callback, self.Worker );
 
+	return this;
+
 } );
 
 //Get Worker
 Workers.add ( 'get', function () {
-	return  this.Worker;
+	return this.Worker;
 } );
 
 //Send Message to Worker
@@ -48,4 +52,6 @@ Workers.add ( 'kill', function ( callback ) {
 		this.Worker = null;
 		_.callbackAudit ( callback );
 	}
+
+	return this;
 } );

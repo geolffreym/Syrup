@@ -6,8 +6,9 @@
 
 var setting = {
 	ajax_processor: '',
-	app_path:       '/app/',
-	env:            'development'
+	app_path      : '/Syrup/app',
+	system_path   : '/Syrup/system',
+	env: 'development'
 };
 
 

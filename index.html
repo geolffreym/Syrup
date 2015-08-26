@@ -13,13 +13,15 @@
     _$ ( function () {
 
 
-
+        var _tpl = new Template;
         _$ ( '#unclick' ).addListener ( 'click', function ( e ) {
-            var _tpl = new Template;
-console.log(_tpl)
-//            _tpl.get('library/bookList', function(r){
-//                console.log(r)
-//            })
+
+
+            _tpl.get ( 'library/bookList', function ( r ) {
+                _tpl.parse ( r, { name: 'Juan' }, function ( res ) {
+                    console.log ( res )
+                } )
+            } )
         } )
 
     } )

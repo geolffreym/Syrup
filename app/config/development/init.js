@@ -12,6 +12,7 @@ exports.files = {
 			'system/base/init', // Needed do not change
 			'system/lib/Map',
 			'system/lib/Ajax',
+			'system/lib/Repository',
 			'system/lib/Workers',
 			'system/lib/Template'
 			// Add all the necessary modules

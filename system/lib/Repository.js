@@ -27,6 +27,7 @@ Repository.add ( 'append', function ( key, element, callback ) {
 
 	this.set ( key, _new, false );
 	_.callbackAudit ( callback, _new );
+	return this;
 } );
 
 //Detroy all buckets
@@ -37,6 +38,7 @@ Repository.add ( 'destroy', function () {
 //Clear a bucket
 Repository.add ( 'clear', function ( key ) {
 	localStorage.removeItem ( key );
+	return this;
 } );
 
 
