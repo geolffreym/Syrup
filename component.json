@@ -10,7 +10,7 @@
 	},
 	"main":         "Syrup.js",
 	"scripts":      ["Syrup.js"],
-	"name":         "__b__",
+	"name":         "Syrup",
 	"version":      "0.1.",
 	"description":  "Give your JS App MVC | MTV pattern with Models, Views, Controllers, Templates, Events and Connections.",
 	"keywords":     ["model", "view", "controller", "router", "server", "client", "browser"],
@@ -18,7 +18,7 @@
 	"dependencies": {
 		"jashkenas/underscore": "*"
 	},
-	"main":         "__b__.js",
-	"scripts":      ["__b__.js"],
+	"main":         "Syrup.js",
+	"scripts":      ["Syrup.js"],
 	"license":      "GNU GPL"
 }

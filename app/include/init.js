@@ -1,22 +1,4 @@
 /**
- * Created by gmena on 07-26-14.
- */
-
-//Basic Config
-
-var setting = {
-	ajax_processor: '',
-	app_path:       '/',
-	env:            'development'
-};
-
-
-//Please install Node and run the command `npm install` and `npm start` to execute
-//Set Environment
-if ( typeof exports !== 'undefined' )
-	exports.setting = setting;
-
-/**
  * Created with JetBrains PhpStorm.
  * User: Geolffrey
  * Date: 25/11/13
@@ -31,36 +13,36 @@ if ( typeof exports !== 'undefined' )
  */
 
 var
-nativeFunction = Function.prototype,
-nativeObject = Object.prototype,
-regexConstructor = /(([^function])([a-zA-z])+(?=\())/g,
-WARNING_SYRUP = {
-	ERROR: {
-		NOPARAM:               'Param needed',
-		NOOBJECT:              'An object param is necessary.',
-		NOARRAY:               'An array necessary.',
-		NOFUNCTION:            'An function necessary.',
-		NODATE:                'Invalid Date',
-		NOSTRING:              'String is required',
-		NODOM:                 ' not exist in the DOM document',
-		NOCALLBACK:            'Callback error on execution time.',
-		NOURL:                 'URL is required for the request.',
-		NOHTML:                'Html string is required',
-		NOOBJECTREPLACEREGEXP: 'A object replace param is needed to replace a regexp ex: {match:replace}'
+	nativeFunction = Function.prototype,
+	nativeObject = Object.prototype,
+	regexConstructor = /(([^function])([a-zA-z])+(?=\())/g,
+	WARNING_SYRUP = {
+		ERROR: {
+			NOPARAM              : 'Param needed',
+			NOOBJECT             : 'An object param is necessary.',
+			NOARRAY              : 'An array necessary.',
+			NOFUNCTION           : 'An function necessary.',
+			NODATE               : 'Invalid Date',
+			NOSTRING             : 'String is required',
+			NODOM                : ' not exist in the DOM document',
+			NOCALLBACK           : 'Callback error on execution time.',
+			NOURL                : 'URL is required for the request.',
+			NOHTML               : 'Html string is required',
+			NOOBJECTREPLACEREGEXP: 'A object replace param is needed to replace a regexp ex: {match:replace}'
+		}
 	}
-}
 	;
 
 nativeFunction.blend = function ( child ) {
-	var name = child.prototype.constructor.name || (child.toString ().match ( regexConstructor )[0]).trim ();
-	this.prototype[name] = child;
+	var name = child.prototype.constructor.name || (child.toString ().match ( regexConstructor )[ 0 ]).trim ();
+	this.prototype[ name ] = child;
 	//_.__proto__[name] = child;
 };
 
 nativeFunction.drop = function ( child ) {
-	var name = child.prototype.constructor.name || (child.toString ().match ( regexConstructor )[0]).trim ();
-	if ( _[name] ) {
-		_[name] = null;
+	var name = child.prototype.constructor.name || (child.toString ().match ( regexConstructor )[ 0 ]).trim ();
+	if ( _[ name ] ) {
+		_[ name ] = null;
 		return true;
 	}
 	return false;
@@ -72,7 +54,7 @@ nativeFunction.drop = function ( child ) {
  */
 nativeFunction.add = function ( name, fn ) {
 	name = name.trim ();
-	this.prototype[name] = fn;
+	this.prototype[ name ] = fn;
 };
 
 
@@ -101,33 +83,33 @@ function _$_ () {
  */
 _$_.add ( '$', function ( dom ) {
 	var _tmp,
-	    _self = new _$_;
-
+		_self = new _$_;
+	
 	if ( _.isFunction ( dom ) ) {
 		_$ ( document ).ready ( dom );
 		return;
 	}
-
+	
 	if ( _.isHtml ( dom ) ) {
 		_tmp = document.createElement ( 'div' );
 		_tmp.innerHTML = dom;
 		_self.collection = _tmp.children.length > 1
 			? _tmp.children
 			: _tmp.firstChild;
-
+		
 	} else {
 		_self.collection = !_.isObject ( dom ) && _.isString ( dom )
 			? dom.indexOf ( '+' ) > -1
-			                   ? document.querySelectorAll ( _.replace ( dom, '+', '' ) )
-			                   : document.querySelector ( dom )
+			? document.querySelectorAll ( _.replace ( dom, '+', '' ) )
+			: document.querySelector ( dom )
 			: dom;
-
+		
 	}
-
+	
 	/*if (!_.isSet(_self.collection)) {
 	 _.error(dom + WARNING_SYRUP.ERROR.NODOM);
 	 }*/
-
+	
 	_self.exist = _.isSet ( _self.collection );
 	_self.name = dom;
 	return _self;
@@ -142,7 +124,7 @@ _$_.add ( 'noConflict', function () {
  * @param callback
  */
 _$_.add ( 'fn', function ( name, fn ) {
-	return _$.__proto__[name] = fn;
+	return _$.__proto__[ name ] = fn;
 } );
 
 /***Event Handler
@@ -172,28 +154,28 @@ _$_.add ( 'addListener', function ( event, delegate, callback ) {
 	if ( _.isFunction ( delegate ) ) {
 		callback = delegate;
 	}
-
+	
 	var _self = this,
-	    _event = function ( e ) {
-		    e = e || window.event;
-		    var _target = event.srcElement || e.target;
-		    if ( _.isSet ( delegate ) && !_.isFunction ( delegate ) ) {
-			    if ( _.isSet ( _target.className.baseVal ) ) {
-				    if ( _target.className.baseval === delegate ) {
-					    _.callbackAudit ( callback, e );
-				    }
-			    } else {
-				    _$ ( _target ).filter ( delegate, function () {
-					    _.callbackAudit ( callback, e );
-				    } );
-			    }
-
-		    } else {
-			    _.callbackAudit ( callback, e );
-		    }
-
-	    };
-
+		_event = function ( e ) {
+			e = e || window.event;
+			var _target = event.srcElement || e.target;
+			if ( _.isSet ( delegate ) && !_.isFunction ( delegate ) ) {
+				if ( _.isSet ( _target.className.baseVal ) ) {
+					if ( _target.className.baseval === delegate ) {
+						_.callbackAudit ( callback, e );
+					}
+				} else {
+					_$ ( _target ).filter ( delegate, function () {
+						_.callbackAudit ( callback, e );
+					} );
+				}
+				
+			} else {
+				_.callbackAudit ( callback, e );
+			}
+			
+		};
+	
 	_self.each ( function ( elem ) {
 		if ( elem.addEventListener ) {
 			elem.addEventListener ( event, _event, true )
@@ -201,17 +183,17 @@ _$_.add ( 'addListener', function ( event, delegate, callback ) {
 			if ( elem.attachEvent ) {
 				elem.attachEvent ( 'on' + event, _event );
 			} else {
-				elem['on' + event] = _event;
+				elem[ 'on' + event ] = _event;
 			}
 		}
 	} );
-
+	
 	return this;
 } );
 
 //TODO
 _$_.add ( 'removeListener', function () {
-
+	
 } );
 
 /**Filter Pattern match
@@ -222,11 +204,11 @@ _$_.add ( 'removeListener', function () {
 _$_.add ( 'filter', function ( filter, callback, e_handler ) {
 	this.each ( function ( elem ) {
 		var match = elem.matchesSelector ||
-			elem.webkitMatchesSelector ||
-			elem.mozMatchesSelector ||
-			elem.oMatchesSelector ||
-			elem.msMatchesSelector;
-
+					elem.webkitMatchesSelector ||
+					elem.mozMatchesSelector ||
+					elem.oMatchesSelector ||
+					elem.msMatchesSelector;
+		
 		if ( match.call ( elem, filter ) ) {
 			_.callbackAudit ( callback, _$ ( elem ) );
 		} else {
@@ -234,7 +216,7 @@ _$_.add ( 'filter', function ( filter, callback, e_handler ) {
 				_.callbackAudit ( e_handler, elem );
 		}
 	} );
-
+	
 	return this;
 } );
 
@@ -257,7 +239,7 @@ _$_.add ( 'clone', function ( childs ) {
 		_clones.push ( _$ ( v.cloneNode ( childs ) ) );
 	} );
 	return _.specArray ( _clones );
-
+	
 } );
 
 
@@ -268,32 +250,32 @@ _$_.add ( 'clone', function ( childs ) {
  */
 _$_.add ( 'data', function ( name, value ) {
 	var _self = this,
-	    _data_set,
-	    _values = [];
+		_data_set,
+		_values = [];
 	_self.each ( function ( dom, i ) {
 		if ( !_.isSet ( dom.dataset ) ) {
 			_data_set = 'data-' + name;
 			if ( _.isSet ( value ) ) {
 				var _set = {};
-				_set[_data_set] = value;
+				_set[ _data_set ] = value;
 				_self.attr ( _set );
 			} else {
 				var _attr = _self.attr ( _data_set );
 				_values = _.isArray ( _attr )
-					? _attr : [_attr];
+					? _attr : [ _attr ];
 			}
 		} else {
 			_data_set = dom.dataset;
 			if ( _.isSet ( value ) || _.isNumber ( value ) ) {
-				_data_set[name] = _.isArray ( value ) ? value[i] : value;
+				_data_set[ name ] = _.isArray ( value ) ? value[ i ] : value;
 			} else {
-				if ( _.isSet ( _data_set[name] ) ) {
-					_values.push ( _data_set[name] )
+				if ( _.isSet ( _data_set[ name ] ) ) {
+					_values.push ( _data_set[ name ] )
 				}
 			}
 		}
 	} );
-
+	
 	return _.specArray ( _values );
 } );
 
@@ -305,14 +287,14 @@ _$_.add ( 'prop', function ( _prop ) {
 	var _props = [];
 	this.each ( function ( v ) {
 		if ( _.isString ( _prop ) ) {
-			_props.push ( v[_prop] );
+			_props.push ( v[ _prop ] );
 		} else {
 			_.each ( _prop, function ( value, index ) {
-				v[index] = value;
+				v[ index ] = value;
 			} );
 		}
 	} );
-
+	
 	return _.specArray ( _props );
 } );
 
@@ -340,8 +322,8 @@ _$_.add ( 'attr', function ( attr ) {
  */
 _$_.add ( 'removeAttr', function ( attr ) {
 	this.each ( function ( v ) {
-		if ( v[attr] ) {
-			v[attr] = false;
+		if ( v[ attr ] ) {
+			v[ attr ] = false;
 		} else {
 			v.removeAttr ( attr );
 		}
@@ -355,18 +337,18 @@ _$_.add ( 'removeAttr', function ( attr ) {
  */
 _$_.add ( 'css', function ( css ) {
 	var _css = [],
-	    _self = this;
+		_self = this;
 	_self.each ( function ( dom ) {
 		if ( _.isString ( css ) ) {
 			var _style = window.getComputedStyle ( dom, null );
 			_css.push ( _style.getPropertyValue ( css ) );
 		} else {
 			_.each ( css, function ( value, index ) {
-				dom.style[index] = value;
+				dom.style[ index ] = value;
 			} );
 		}
 	} );
-
+	
 	return _.specArray ( _css );
 } );
 
@@ -401,7 +383,7 @@ _$_.add ( 'before', function ( elem ) {
 			_parent.insertBefore ( v, obj )
 		} )
 	} );
-
+	
 	return this;
 } );
 /**Append Element or Html
@@ -413,13 +395,13 @@ _$_.add ( 'append', function ( childs ) {
 	if ( _.isHtml ( childs ) || !_.is$ ( childs ) ) {
 		childs = _$ ( childs );
 	}
-
+	
 	parent.each ( function ( p ) {
 		childs.each ( function ( elm ) {
 			p.appendChild ( elm )
 		} );
 	} );
-
+	
 	return this;
 } );
 
@@ -432,13 +414,13 @@ _$_.add ( 'prepend', function ( childs ) {
 	if ( _.isHtml ( childs ) || !_.is$ ( childs ) ) {
 		childs = _$ ( childs );
 	}
-
+	
 	parent.each ( function ( p ) {
 		childs.each ( function ( elm ) {
 			p.insertBefore ( elm, p.firstChild )
 		} );
 	} );
-
+	
 	return this;
 } );
 
@@ -448,7 +430,7 @@ _$_.add ( 'prepend', function ( childs ) {
  */
 _$_.add ( 'html', function ( html ) {
 	if ( _.isHtml ( html ) || _.isString ( html ) ) {
-		this.prop ( {'innerHTML': html} );
+		this.prop ( { 'innerHTML': html } );
 	} else {
 		return this.prop ( 'innerHTML' );
 	}
@@ -461,7 +443,7 @@ _$_.add ( 'html', function ( html ) {
  */
 _$_.add ( 'text', function ( text ) {
 	if ( _.isString ( text ) ) {
-		this.prop ( {'textContent': text} );
+		this.prop ( { 'textContent': text } );
 	} else {
 		return this.prop ( 'textContent' );
 	}
@@ -474,7 +456,7 @@ _$_.add ( 'text', function ( text ) {
  */
 _$_.add ( 'val', function ( text ) {
 	if ( _.isString ( text ) ) {
-		this.prop ( {'value': text} );
+		this.prop ( { 'value': text } );
 		return this;
 	} else {
 		return this.prop ( 'value' );
@@ -516,8 +498,8 @@ _$_.add ( 'children', function ( callback ) {
 		if ( _elem.children.length > 0 ) {
 			_.each ( _elem.children, function ( v, i ) {
 				if ( _.isObject ( v )
-					&& !_.isFunction ( v )
-					&& _.isSet ( _elem.children[i] ) ) {
+					 && !_.isFunction ( v )
+					 && _.isSet ( _elem.children[ i ] ) ) {
 					_.callbackAudit ( callback, _$ ( v ) )
 				}
 			} )
@@ -534,7 +516,7 @@ _$_.add ( 'next', function ( callback ) {
 	_self.each ( function ( _elem ) {
 		_.callbackAudit ( callback, _$ ( _elem.nextElementSibling ) );
 	} );
-
+	
 	return this;
 } );
 
@@ -557,7 +539,7 @@ _$_.add ( 'nexts', function ( filter, callback ) {
 			elem = _sibling;
 		} while ( (_sibling = _$ ( elem.collection.nextElementSibling )).exist )
 	} );
-
+	
 	return this;
 } );
 
@@ -566,22 +548,22 @@ _$_.add ( 'nexts', function ( filter, callback ) {
  */
 _$_.add ( 'trigger', function ( event, callback ) {
 	var _event = new CustomEvent ( event, {
-		bubbles:    true,
+		bubbles   : true,
 		cancelable: true
 	} );
-
+	
 	if ( document.createEvent ) {
 		_event = document.createEvent ( 'Event' );
 		_event.initEvent ( event, true, false );
 		//_event.eventType = event;
 	}
-
+	
 	this.each ( function ( v ) {
 		v.dispatchEvent ( _event );
 	} );
-
+	
 	_.callbackAudit ( callback, _event );
-
+	
 	return this;
 } );
 
@@ -598,7 +580,7 @@ _$_.add ( 'find', function ( filter, callback ) {
 			elem.find ( filter, callback );
 		} )
 	} );
-
+	
 	return this;
 } );
 
@@ -646,7 +628,7 @@ _$_.add ( 'addClass', function ( cls ) {
 				} else {
 					elem.className += ' ' + cls;
 				}
-
+				
 			}
 		}
 	} );
@@ -683,7 +665,7 @@ _$_.add ( 'removeClass', function ( cls ) {
 				} else {
 					elem.className = _.replace ( elem.className.baseVal_regex, '' )
 				}
-
+				
 			}
 		}
 	} );
@@ -696,13 +678,13 @@ _$_.add ( 'removeClass', function ( cls ) {
  */
 _$_.add ( 'fadeOut', function ( delay, callback ) {
 	this.animate ( [
-		               {opacity: '1'},
-		               {opacity: '0'}
-	               ], {
-		               delay: 0,
-		               duration: _.isNumber ( delay ) ? delay : 50
-	               }, _.isFunction ( delay ) ? delay : callback );
-
+		{ opacity: '1' },
+		{ opacity: '0' }
+	], {
+		delay   : 0,
+		duration: _.isNumber ( delay ) ? delay : 50
+	}, _.isFunction ( delay ) ? delay : callback );
+	
 	return this;
 } );
 
@@ -712,12 +694,12 @@ _$_.add ( 'fadeOut', function ( delay, callback ) {
  */
 _$_.add ( 'fadeIn', function ( delay, callback ) {
 	this.animate ( [
-		               {opacity: '0'},
-		               {opacity: '1'}
-	               ], {
-		               delay: 0,
-		               duration: _.isNumber ( delay ) ? delay : 50
-	               }, _.isFunction ( delay ) ? delay : callback );
+		{ opacity: '0' },
+		{ opacity: '1' }
+	], {
+		delay   : 0,
+		duration: _.isNumber ( delay ) ? delay : 50
+	}, _.isFunction ( delay ) ? delay : callback );
 	return this;
 } );
 
@@ -728,10 +710,12 @@ _$_.add ( 'fadeIn', function ( delay, callback ) {
  */
 _$_.add ( 'height', function ( height ) {
 	if ( _.isSet ( height ) ) {
-		this.css ( {'height': _.isNumber ( height )
-			? height + 'px' : height} );
+		this.css ( {
+			'height': _.isNumber ( height )
+				? height + 'px' : height
+		} );
 	}
-
+	
 	var _height = [];
 	this.each ( function ( elem ) {
 		_height.push ( (_.cartesianPlane ( elem )).height );
@@ -745,14 +729,16 @@ _$_.add ( 'height', function ( height ) {
  */
 _$_.add ( 'width', function ( width ) {
 	if ( _.isSet ( width ) ) {
-		this.css ( {'width': _.isNumber ( width )
-			? width + 'px' : width} );
+		this.css ( {
+			'width': _.isNumber ( width )
+				? width + 'px' : width
+		} );
 	}
 	var _width = [];
 	this.each ( function ( elem ) {
 		_width.push ( (_.cartesianPlane ( elem )).width );
 	} );
-
+	
 	return _.specArray ( _width );
 } );
 
@@ -767,13 +753,13 @@ _$_.add ( 'is', function ( context ) {
 		_$ ( v ).filter ( context, function () {
 			_return = true;
 		}, function () {
-			_return = v[context] || v['type'] === context;
+			_return = v[ context ] || v[ 'type' ] === context;
 		} );
-
+		
 		if ( _return )
 			return false;
 	} );
-
+	
 	return _return;
 } );
 
@@ -782,8 +768,8 @@ _$_.add ( 'is', function ( context ) {
  * */
 _$_.add ( 'get', function ( find ) {
 	var _return = [],
-	    _self = this;
-
+		_self = this;
+	
 	_self.each ( function ( v ) {
 		if ( find.indexOf ( ':' ) > -1 ) {
 			_$ ( v ).find ( find, function ( node ) {
@@ -793,7 +779,7 @@ _$_.add ( 'get', function ( find ) {
 			_return.push ( _$ ( v.querySelector ( find ) ) );
 		}
 	} );
-
+	
 	return _.specArray ( _return );
 } );
 
@@ -815,7 +801,7 @@ _$_.add ( 'remove', function () {
 _$_.add ( 'each', function ( callback ) {
 	var _element = this.collection;
 	if ( _.isSet ( _element.childNodes )
-		|| _.isGlobal ( _element ) ) {
+		 || _.isGlobal ( _element ) ) {
 		_.callbackAudit ( callback, _element, 0 );
 	} else {
 		_.each ( _element, function ( v, i, p ) {
@@ -841,31 +827,31 @@ _$_.add ( 'offset', function ( _object ) {
 				elem.style.top = _.isNumber ( _object.top )
 					? _object.top + 'px' : _object.top;
 			}
-
+			
 			if ( _.isSet ( _object.left ) ) {
 				elem.style.left = _.isNumber ( _object.left )
 					? _object.left + 'px' : _object.left;
 			}
-
+			
 			if ( _.isSet ( _object.bottom ) ) {
 				elem.style.bottom = _.isNumber ( _object.bottom )
 					? _object.bottom + 'px' : _object.bottom;
 			}
-
+			
 			if ( _.isSet ( _object.right ) ) {
 				elem.style.right = _.isNumber ( _object.right )
 					? _object.right + 'px' : _object.right;
 			}
 		}
-
+		
 		_offset.push ( {
-			               top:    _cartesian.top,
-			               left:   _cartesian.left,
-			               bottom: _cartesian.bottom,
-			               right:  _cartesian.right
-		               } )
+			top   : _cartesian.top,
+			left  : _cartesian.left,
+			bottom: _cartesian.bottom,
+			right : _cartesian.right
+		} )
 	} );
-
+	
 	return _.specArray ( _offset );
 } );
 
@@ -878,29 +864,29 @@ _$_.add ( 'offset', function ( _object ) {
  */
 _$_.add ( 'sort', function ( _prop, _desc, _object ) {
 	if ( _.isBoolean ( _prop ) ) {
-		_desc = arguments[0];
+		_desc = arguments[ 0 ];
 		_prop = false;
 	}
-
+	
 	_desc = !_desc ? 1 : -1;
 	_prop = _prop ? _prop : 'innerHTML';
 	_object = _.isObject ( _object ) ? _object : this.collection;
 	_object = _.toArray ( _object );
-
+	
 	return _object.sort ( function ( a, b ) {
-
-		var _a = a[_prop],
-		    _b = b[_prop];
-
+		
+		var _a = a[ _prop ],
+			_b = b[ _prop ];
+		
 		if ( _.isSet ( _a ) && _.isSet ( _b ) ) {
 			a = !isNaN ( +_a ) ? +_a : _a.toLowerCase ();
 			b = !isNaN ( +_b ) ? +_b : _b.toLowerCase ();
 		}
-
+		
 		return (a > b)
 			? _desc : (_desc * -1);
 	} );
-
+	
 } );
 
 
@@ -912,22 +898,22 @@ _$_.add ( 'sort', function ( _prop, _desc, _object ) {
 _$_.add ( 'animate', function ( prop, conf, callback ) {
 	this.each ( function ( elem ) {
 		if ( _.isSet ( elem.animate ) ) {
-
+			
 			if ( _.isFunction ( conf ) )
 				callback = conf;
-
+			
 			conf = ((!_.isObject ( conf ) && !_.isNumber ( conf )) ) ? {} : conf;
-
-
+			
+			
 			conf.iterations = _.isSet ( conf.iterations )
 				? conf.iterations : 1;
-
+			
 			conf.duration = _.isSet ( conf.duration )
 				? conf.duration : 1000;
-
+			
 			conf.delay = _.isSet ( conf.delay )
 				? conf.delay : 300;
-
+			
 			var _animation = elem.animate ( prop, conf );
 			_animation.addEventListener ( 'finish', function () {
 				_.callbackAudit ( callback, _$ ( elem ) );
@@ -964,7 +950,7 @@ Syrup.add ( 'assert', function ( obj, msg ) {
  * @returns {boolean}
  */
 Syrup.add ( 'isArray', function ( obj ) {
-	return  _.objectAsString ( obj ) === '[object Array]';
+	return _.objectAsString ( obj ) === '[object Array]';
 } );
 
 /**Valida si un elemento es un object
@@ -981,9 +967,9 @@ Syrup.add ( 'isObject', function ( obj ) {
  */
 Syrup.add ( 'isGlobal', function ( obj ) {
 	return (_.objectAsString ( obj ) === "[object global]"
-		|| _.objectAsString ( obj ) === "[object Window]"
-		|| _.objectAsString ( obj ) === "[object HTMLDocument]"
-		|| _.objectAsString ( obj ) === "[object Document]");
+			|| _.objectAsString ( obj ) === "[object Window]"
+			|| _.objectAsString ( obj ) === "[object HTMLDocument]"
+			|| _.objectAsString ( obj ) === "[object Document]");
 } );
 /**Valida si un elemento es un object _$_
  * @param obj
@@ -1057,7 +1043,7 @@ Syrup.add ( 'isEmpty', function ( input ) {
 	if ( _.isArray ( input ) ) {
 		return input.length === 0;
 	}
-
+	
 	var value = input;
 	return (!value || value === '' || /^\s+$/.test ( value ))
 } );
@@ -1123,11 +1109,11 @@ Syrup.add ( 'error', function ( msg ) {
  */
 Syrup.add ( 'htmlEntities', function ( str ) {
 	var match = {
-		'<':  '&lt',
-		'>':  '&gt;',
-		'"':  '&quot;',
+		'<' : '&lt',
+		'>' : '&gt;',
+		'"' : '&quot;',
 		'\'': '&#39;',
-		'&':  '&amp;'
+		'&' : '&amp;'
 	};
 	return _.replace ( str, /<|>|&|"|'/g, match );
 } );
@@ -1162,22 +1148,22 @@ Syrup.add ( 'truncateString', function ( string, limit ) {
  */
 Syrup.add ( 'replace', function ( _string, _find, _replace ) {
 	var o = _string.toString (),
-	    s = o.toLowerCase (),
-	    r = '', b = 0, e = 1, _tmp;
-
-
+		s = o.toLowerCase (),
+		r = '', b = 0, e = 1, _tmp;
+	
+	
 	if ( !_.isRegexp ( _find ) ) {
 		_find = _find.toLowerCase ();
 	} else {
 		_find = o.match ( _find );
 		this.recursiveStr = s;
 	}
-
+	
 	if ( _.isArray ( _find ) ) {
 		if ( _.isObject ( _replace ) ) {
 			if ( _find.length > 0 ) {
 				_tmp = _find.pop ();
-				this.recursiveStr = _.replace ( this.recursiveStr, _tmp, _replace[_tmp] );
+				this.recursiveStr = _.replace ( this.recursiveStr, _tmp, _replace[ _tmp ] );
 			}
 		} else {
 			_.error ( WARNING_SYRUP.ERROR.NOOBJECTREPLACEREGEXP );
@@ -1188,16 +1174,16 @@ Syrup.add ( 'replace', function ( _string, _find, _replace ) {
 			s = s.substring ( e + _find.length, s.length );
 			b += e + _find.length;
 		}
-
+		
 		if ( !_.isEmpty ( s ) > 0 ) {
 			r += o.substring ( o.length - s.length, o.length );
 		}
-
+		
 		if ( !_.isEmpty ( r ) ) {
 			this.recursiveStr = r;
 		}
 	}
-
+	
 	return this.recursiveStr;
 } );
 
@@ -1213,44 +1199,44 @@ Syrup.add ( 'replace', function ( _string, _find, _replace ) {
  */
 Syrup.add ( 'getDate', function ( fecha ) {
 	var _fecha = new Date (),
-	    meridiano_,
-	    mes_ = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-	    minutos_ = _fecha.getMinutes (),
-	    hora_ = _fecha.getHours (),
-	    segundos_ = _fecha.getSeconds (),
-	    dia_ = _fecha.getDate ();
-
+		meridiano_,
+		mes_ = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ],
+		minutos_ = _fecha.getMinutes (),
+		hora_ = _fecha.getHours (),
+		segundos_ = _fecha.getSeconds (),
+		dia_ = _fecha.getDate ();
+	
 	_fecha = _.isSet ( fecha )
 		? new Date ( fecha ) : _fecha;
-
+	
 	if ( _fecha === 'Invalid Date' ) {
 		_.error ( _fecha );
 	}
-
+	
 	dia_ = dia_ < 0xA
 		? '0' + dia_ : dia_;
-
+	
 	meridiano_ = hora_ > 0xC
 		? 'PM' : 'AM';
-
+	
 	hora_ = hora_ > 0xC
 		? (hora_ - 0xC) === 0
-		        ? 0xC : (hora_ - 0xC) : hora_ < 0xA
-		        ? '0' + hora_ : hora_;
-
+		? 0xC : (hora_ - 0xC) : hora_ < 0xA
+		? '0' + hora_ : hora_;
+	
 	minutos_ = minutos_ < 0xA
 		? '0' + minutos_ : minutos_;
-
+	
 	segundos_ = segundos_ < 0xA
 		? '0' + segundos_ : segundos_;
-
+	
 	return {
-		day:      dia_,
-		month:    mes_[_fecha.getMonth ()],
-		year:     _fecha.getFullYear (),
-		hour:     hora_,
-		minutes:  minutos_,
-		seconds:  segundos_,
+		day     : dia_,
+		month   : mes_[ _fecha.getMonth () ],
+		year    : _fecha.getFullYear (),
+		hour    : hora_,
+		minutes : minutos_,
+		seconds : segundos_,
 		meridian: meridiano_
 	}
 } );
@@ -1260,12 +1246,12 @@ Syrup.add ( 'getDate', function ( fecha ) {
  */
 Syrup.add ( 'getNav', function () {
 	var _regex = /(?:trident\/(?=\w.+rv:)|(?:chrome\/|firefox\/|opera\/|msie\s|safari\/))[\w.]{1,4}/,
-	    _matches = _.nav.local.match ( _regex ),
-	    _split = _.isSet ( _matches ) ? _matches[0].split ( '/' ) : false;
-
+		_matches = _.nav.local.match ( _regex ),
+		_split = _.isSet ( _matches ) ? _matches[ 0 ].split ( '/' ) : false;
+	
 	return _split ? {
-		nav: !!_split[0] ? _.replace ( _split[0], 'trident', 'msie' ) : false,
-		version: !!_split[1] ? _split[1] : false,
+		nav     : !!_split[ 0 ] ? _.replace ( _split[ 0 ], 'trident', 'msie' ) : false,
+		version : !!_split[ 1 ] ? _split[ 1 ] : false,
 		platform: navigator.platform.toLocaleLowerCase ()
 	} : false;
 } );
@@ -1286,31 +1272,31 @@ Syrup.add ( 'windowScrollTo', function ( conf ) {
 	if ( !_.isObject ( conf ) ) {
 		_.error ( WARNING_SYRUP.ERROR.NOOBJECT )
 	}
-
+	
 	if ( !_.isSet ( conf.limit ) )
 		_.error ( 'Limit needed' );
-
+	
 	var _limit = window.scrollY > conf.limit ? window.scrollY : -conf.limit,
-	    _result = _.isSet ( conf.hold ) ? window.scrollY : 0,
-	    _min = _.isSet ( conf.hold ) && window.scrollY < conf.limit ? window.scrollY : conf.limit;
-
+		_result = _.isSet ( conf.hold ) ? window.scrollY : 0,
+		_min = _.isSet ( conf.hold ) && window.scrollY < conf.limit ? window.scrollY : conf.limit;
+	
 	conf.limit = _limit;
 	conf.step = _.isSet ( conf.step ) ? conf.step : 1;
 	var _scrolling = _.interval ( function ( result ) {
 		_limit < 0
 			? (_result += (result * conf.step))
 			: (_result -= ((conf.limit - result) * conf.step));
-
-
+		
+		
 		if ( (_result >= (_limit * -1) && _limit < 0)
-			|| (_result <= _min && _limit > 0) ) {
+			 || (_result <= _min && _limit > 0) ) {
 			_scrolling.kill ();
 			if ( !_.isSet ( conf.hold ) )
 				window.scrollY = 0;
 		}
 		window.scrollTo ( 0, _result );
 	}, conf );
-
+	
 	return _scrolling;
 } );
 
@@ -1320,12 +1306,12 @@ Syrup.add ( 'windowScrollTo', function ( conf ) {
  */
 Syrup.add ( 'getEncodedId', function ( longitud ) {
 	var _text = "",
-	    _longitud = !!longitud ? longitud : 5,
-	    _possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789=_";
-
+		_longitud = !!longitud ? longitud : 5,
+		_possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789=_";
+	
 	for ( var i = 0; i < _longitud; i++ )
 		_text += _possible.charAt ( Math.floor ( Math.random () * _possible.length ) );
-
+	
 	return _text;
 } );
 
@@ -1338,7 +1324,7 @@ Syrup.add ( 'getObjectKeys', function ( obj ) {
 		return Object.keys ( obj );
 	}
 	return [];
-
+	
 } );
 
 /**Devuelve el tamano de un objeto
@@ -1380,7 +1366,7 @@ Syrup.add ( 'objectAsString', function ( obj ) {
 Syrup.add ( 'objectImmutable', function ( obj ) {
 	if ( _.isObject ( obj ) )
 		return Object.freeze ( obj );
-
+	
 	return obj;
 } );
 
@@ -1390,7 +1376,7 @@ Syrup.add ( 'objectImmutable', function ( obj ) {
 Syrup.add ( 'objectWatch', function ( obj, callback, conf ) {
 	if ( _.isObject ( obj ) && _.isSet ( callback ) )
 		Object.observe ( obj, callback, conf ? conf : [] );
-
+	
 	return obj;
 } );
 
@@ -1402,15 +1388,15 @@ Syrup.add ( 'objectWatch', function ( obj, callback, conf ) {
  */
 Syrup.add ( 'interval', function ( callback, conf ) {
 	var _worker = _.Workers;
-
+	
 	_worker.set ( 'system/workers/setting/Interval', function () {
 		_worker.send ( conf );
 	} );
-
+	
 	_worker.on ( 'message', function ( e ) {
 		_.callbackAudit ( callback, e.data );
 	} );
-
+	
 	return _worker;
 } );
 
@@ -1420,13 +1406,13 @@ Syrup.add ( 'interval', function ( callback, conf ) {
  */
 Syrup.add ( 'getCookie', function ( name ) {
 	var _mcookie = document.cookie,
-	    _cookie = null;
+		_cookie = null;
 	if ( !!_mcookie && _mcookie !== '' ) {
 		var cookies = _mcookie.split ( ';' );
 		_.each ( cookies, function ( cookie ) {
 			cookie = cookie.split ( '=' );
-			var _pre = cookie[0].trim (),
-			    _pos = cookie[1].trim ();
+			var _pre = cookie[ 0 ].trim (),
+				_pos = cookie[ 1 ].trim ();
 			if ( _pre === name ) {
 				_cookie = _pos;
 				return false;
@@ -1461,17 +1447,17 @@ Syrup.add ( 'limitBoxInput', function ( _event, _max_value ) {
 		_.error ( 'Event Object Needed' );
 	}
 	var _obj = _event.target,
-	    _value = _obj.value.length,
-	    _out = _max_value - _value;
-
+		_value = _obj.value.length,
+		_out = _max_value - _value;
+	
 	if (
 		(_out <= 0 && _event.keyCode !== 8)
 		|| (_value === 0 && _event.keyCode === 8)
 		|| _event.type == 'paste'
-		) {
+	) {
 		_event.preventDefault ();
 	}
-
+	
 	return _out;
 } );
 
@@ -1481,17 +1467,17 @@ Syrup.add ( 'limitBoxInput', function ( _event, _max_value ) {
  */
 Syrup.add ( 'parseJsonUrl', function ( _object ) {
 	var _return = '',
-	    _size = _.isObject ( _object )
-		    ? _.getObjectSize ( _object )
-		    : 0;
-
+		_size = _.isObject ( _object )
+			? _.getObjectSize ( _object )
+			: 0;
+	
 	_.each ( _object, function ( value, key ) {
 		_return += key + '=' + value;
 		if ( _size > 1 ) {
 			_return += '&';
 		}
 	} );
-
+	
 	return _return.lastIndexOf ( '&' ) > -1
 		? _return.slice ( 0, -1 ) : _return;
 } );
@@ -1513,23 +1499,23 @@ Syrup.add ( 'jsonToString', function ( json ) {
  */
 Syrup.add ( 'getScript', function ( url, callback ) {
 	var _script = document.createElement ( 'script' ),
-	    _body = document.body,
-	    _loaded = function () {
-		    _$ ( _script ).remove ();
-		    _.callbackAudit ( callback );
-	    };
-
+		_body = document.body,
+		_loaded = function () {
+			_$ ( _script ).remove ();
+			_.callbackAudit ( callback );
+		};
+	
 	if ( _.isSet ( _script.readyState ) ) {
 		_script.addEventListener ( 'readystatechange', function () {
 			if ( _script.readyState == 'loaded'
-				|| _script.readyState == 'complete' ) {
+				 || _script.readyState == 'complete' ) {
 				_loaded ();
 			}
 		}, false );
 	} else {
 		_script.addEventListener ( 'load', _loaded, false );
 	}
-
+	
 	_script.src = url;
 	_script.async = true;
 	_body.appendChild ( _script );
@@ -1541,30 +1527,30 @@ Syrup.add ( 'getScript', function ( url, callback ) {
  * @returns {boolean}
  */
 Syrup.add ( 'each', function ( _object, callback ) {
-	var _p = {first: false, last: false};
+	var _p = { first: false, last: false };
 	if ( _.isArray ( _object ) ) {
 		var i = 0,
-		    max = _object.length;
+			max = _object.length;
 		for ( ; i < max; i++ ) {
 			_p.first = i === 0;
 			_p.last = (i + 1) === max;
-			_.callbackAudit ( callback, _object[i], i, _p );
+			_.callbackAudit ( callback, _object[ i ], i, _p );
 		}
 	} else {
 		if ( _.isObject ( _object ) ) {
 			var _keys = Object.keys ( _object ),
-			    _tmp, _i = _tmp = _keys.length;
-
+				_tmp, _i = _tmp = _keys.length;
+			
 			while ( _i-- ) {
 				_p.first = (_i + 1) === _tmp;
 				_p.last = _i === 0;
-				_.callbackAudit ( callback, _object[_keys[_i]], _keys[_i], _p );
-
-
+				_.callbackAudit ( callback, _object[ _keys[ _i ] ], _keys[ _i ], _p );
+				
+				
 			}
 		}
 	}
-
+	
 	return this;
 } );
 
@@ -1577,20 +1563,20 @@ Syrup.add ( 'cartesianPlane', function ( _dom, all ) {
 	_dom = _.is$ ( _dom )
 		? _$ ( _dom ).object ()
 		: _dom;
-
+	
 	if ( _.isGlobal ( _dom ) ) {
 		return {
-			top:    _dom.pageYOffset,
-			left:   _dom.pageXOffset,
-			width:  _dom.outerWidth,
+			top   : _dom.pageYOffset,
+			left  : _dom.pageXOffset,
+			width : _dom.outerWidth,
 			height: _dom.outerHeight
 		}
 	}
-
+	
 	return !!all
 		? _dom.getClientRects ()
 		: _dom.getBoundingClientRect ();
-
+	
 } );
 
 /**Verifica el callback y sirve de auditor
@@ -1602,15 +1588,15 @@ Syrup.add ( 'callbackAudit', function ( callback ) {
 		if ( !_.isSet ( callback ) ) {
 			return false;
 		}
-
+		
 		var _args = _.toArray ( arguments );
 		_args = _.filterArray ( _args, function ( v, i ) {
 			return !_.isFunction ( v );
 		} );
-
+		
 		callback.apply ( null, _args.length > 0
 			? _args : null );
-
+		
 	}
 	catch ( e ) {
 		_.error ( WARNING_SYRUP.ERROR.NOCALLBACK );
@@ -1636,10 +1622,10 @@ Syrup.add ( 'specArray', function ( arr ) {
 	if ( !_.isArray ( arr ) ) {
 		_.error ( WARNING_SYRUP.ERROR.NOARRAY );
 	}
-
+	
 	return arr.length > 1
-		? arr : _.isSet ( arr[0] )
-		       ? arr[0] : null;
+		? arr : _.isSet ( arr[ 0 ] )
+		? arr[ 0 ] : null;
 } );
 
 
@@ -1700,7 +1686,7 @@ Syrup.add ( 'uniqueArray', function ( array ) {
 			_new.push ( v );
 		}
 	} );
-
+	
 	return _new;
 } );
 
@@ -1709,7 +1695,7 @@ Syrup.add ( 'uniqueArray', function ( array ) {
  * @returns {Array}
  */
 Syrup.add ( 'toArray', function ( element ) {
-
+	
 	if ( _.isObject ( element ) ) {
 		return [].slice.apply ( element );
 	} else {
@@ -1735,24 +1721,24 @@ Syrup.add ( 'toString', function ( element ) {
  * @returns {Object}
  */
 Syrup.add ( 'toObject', function ( element ) {
-
+	
 	if ( _.isJson ( element ) )
 		return JSON.parse ( element );
-
+	
 	if ( _.isString ( element ) )
 		return nativeObject.valueOf.call ( element );
-
-
+	
+	
 	if ( !_.isArray ( element ) )
 		_.error ( WARNING_SYRUP.ERROR.NOARRAY );
-
-
+	
+	
 	return element.reduce ( function ( o, v, i ) {
-		o[i] = v;
+		o[ i ] = v;
 		return o;
 	}, {} );
-
-
+	
+	
 } );
 
 /**Distribute Array by index
@@ -1763,21 +1749,21 @@ Syrup.add ( 'toObject', function ( element ) {
 
 Syrup.add ( 'objectDistribute', function ( obj, index ) {
 	var _new = {};
-
-	if ( !_.isObject ( obj[index] ) ) {
-		_new[obj[index]] = obj;
+	
+	if ( !_.isObject ( obj[ index ] ) ) {
+		_new[ obj[ index ] ] = obj;
 	} else {
-		_.each ( obj[index], function ( v, i ) {
-			_new[v] = {};
+		_.each ( obj[ index ], function ( v, i ) {
+			_new[ v ] = {};
 			_.each ( obj, function ( r, j ) {
 				if ( j !== index ) {
-					_new[v][j].push ( r[i] );
+					_new[ v ][ j ].push ( r[ i ] );
 				}
 			} );
-
+			
 		} );
 	}
-
+	
 	return _new;
 } );
 
@@ -1788,9 +1774,9 @@ Syrup.add ( 'objectDistribute', function ( obj, index ) {
  */
 Syrup.add ( 'getElementIndex', function ( node ) {
 	var i = 1,
-	    prop = document.body.previousElementSibling
-		    ? 'previousElementSibling' : 'previousSibling';
-	while ( node = node[prop] ) {
+		prop = document.body.previousElementSibling
+			? 'previousElementSibling' : 'previousSibling';
+	while ( node = node[ prop ] ) {
 		++i
 	}
 	return i;
@@ -1805,16 +1791,16 @@ Syrup.add ( 'extend', function ( target, source, overwrite ) {
 	if ( !_.isObject ( target ) || !source ) {
 		return target;
 	}
-
+	
 	if ( _.isFunction ( source ) ) {
 		source = new source;
 		target = target.__proto__
 	}
-
+	
 	_.each ( source, function ( v, i ) {
 		if ( !target.hasOwnProperty ( i )
-			|| _.isSet ( overwrite ) ) {
-			target[i] = v;
+			 || _.isSet ( overwrite ) ) {
+			target[ i ] = v;
 		}
 	} );
 	return target;
@@ -1829,50 +1815,50 @@ Syrup.add ( 'extend', function ( target, source, overwrite ) {
  */
 Syrup.add ( 'include', function ( script, wait, callback ) {
 	var _url = !_.isUrl ( script )
-		    ? setting.app_path + script + '.min.js'
-		    : script + '.min.js',
-	    _script = script
-		    .split ( '/' )
-		    .pop ();
-
+			? setting.app_path + script + '.min.js'
+			: script + '.min.js',
+		_script = script
+			.split ( '/' )
+			.pop ();
+	
 	if ( _.isFunction ( wait ) ) {
-		callback = arguments[1];
+		callback = arguments[ 1 ];
 		wait = false;
 	}
-
-	if ( wait && _.isSet ( _.scriptCalls[wait] ) ) {
-		if ( !_.isSet ( _.waitingCalls[wait] ) ) {
-			_.waitingCalls[wait] = [];
+	
+	if ( wait && _.isSet ( _.scriptCalls[ wait ] ) ) {
+		if ( !_.isSet ( _.waitingCalls[ wait ] ) ) {
+			_.waitingCalls[ wait ] = [];
 		}
-		if ( _.waitingCalls[wait] !== 'done' ) {
-			_.waitingCalls[wait].push ( function () {
+		if ( _.waitingCalls[ wait ] !== 'done' ) {
+			_.waitingCalls[ wait ].push ( function () {
 				_.include ( script, callback )
 			} );
 			return false;
 		}
 	}
-
-
-	if ( _.isSet ( _.scriptCalls[_script] ) ) {
+	
+	
+	if ( _.isSet ( _.scriptCalls[ _script ] ) ) {
 		_.callbackAudit ( callback );
 		return false;
 	}
-
-	_.scriptCalls[_script] = script;
+	
+	_.scriptCalls[ _script ] = script;
 	_.getScript ( _url, function ( e ) {
-		if ( _.isSet ( _.waitingCalls[_script] ) ) {
-			if ( _.isArray ( _.waitingCalls[_script] ) ) {
+		if ( _.isSet ( _.waitingCalls[ _script ] ) ) {
+			if ( _.isArray ( _.waitingCalls[ _script ] ) ) {
 				var i = 0,
-				    max = _.waitingCalls[_script].length;
+					max = _.waitingCalls[ _script ].length;
 				for ( ; i < max; i++ ) {
-					_.waitingCalls[_script][i] ( e );
+					_.waitingCalls[ _script ][ i ] ( e );
 				}
-				_.waitingCalls[_script] = 'done';
+				_.waitingCalls[ _script ] = 'done';
 			}
 		}
 		_.callbackAudit ( callback );
 	} );
-
+	
 } );
 
 
@@ -2426,3 +2412,21 @@ GoogleMap = function () {
 	}
 
 };
+
+/**
+ * Created by gmena on 07-26-14.
+ */
+
+//Basic Config
+
+var setting = {
+	ajax_processor: '',
+	app_path:       '/',
+	env:            'development'
+};
+
+
+//Please install Node and run the command `npm install` and `npm start` to execute
+//Set Environment
+if ( typeof exports !== 'undefined' )
+	exports.setting = setting;
