@@ -1263,7 +1263,7 @@ var _my_object = {a:1,b:2c:3};
 _.parseJsonUrl(_my_object); // Return a=1&b=2&c=3; 
 ```
 
-**Method `.jsonToString(object)` ** 
+**Method `.jsonToString(object)`**
 
 *(Parse object to string Shortcut for JSON.stringify)*
 ```js

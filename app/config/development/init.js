@@ -9,7 +9,6 @@ exports.files = {
 	js: {
 		output: 'app/include/init',
 		src:    [
-			'app/config/init', // Needed do not change
 			'system/base/init', // Needed do not change
 			'system/lib/Map'
 			// Add all the necessary modules
