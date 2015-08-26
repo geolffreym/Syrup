@@ -759,7 +759,7 @@ body.addListener('click', '.selector', function(e){
 })
 
 //Event assign
-my_selector('click', function(e){
+my_selector.addListener('click', function(e){
     
     /*My Code*/
     
