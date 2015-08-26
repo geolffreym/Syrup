@@ -1426,13 +1426,11 @@ Syrup.add ( 'objectWatch', function ( obj, callback, conf ) {
  * @param orientation
  */
 Syrup.add ( 'interval', function ( callback, conf ) {
-	var _worker = _.Workers;
+	var _worker = new Workers;
 
 	_worker.set ( 'system/workers/setting/Interval', function () {
 		_worker.send ( conf );
-	} );
-	
-	_worker.on ( 'message', function ( e ) {
+	} ).on ( 'message', function ( e ) {
 		_.callbackAudit ( callback, e.data );
 	} );
 	
@@ -1440,6 +1438,8 @@ Syrup.add ( 'interval', function ( callback, conf ) {
 } );
 
 /**Prepare animation
+ * @param callback
+ * @return function
  */
 Syrup.add ( 'requestAnimationFrame', function ( callback ) {
 	return (window.requestAnimationFrame ||

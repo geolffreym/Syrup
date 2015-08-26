@@ -87,9 +87,7 @@ Template.add ( 'parse', function ( _template, _fields, callback ) {
 	var _self = this;
 	_self.Workers.set ( '/workers/setting/Parser', function ( worker ) {
 		_self.Workers.send ( { template: _template, fields: _fields } );
-	} );
-
-	_self.Workers.on ( 'message', function ( e ) {
+	} ).on ( 'message', function ( e ) {
 		_.callbackAudit ( callback, e.data )
 	} );
 
