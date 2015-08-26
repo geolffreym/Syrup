@@ -6,21 +6,20 @@
 </head>
 <body>
 <script src="app/include/init.min.js"></script>
-<a href="#" id="click">CLick</a>
 <a href="#" id="unclick">UCLick</a>
 
 
 <script>
     _$ ( function () {
 
-        var a = function ( e ) {
-            e.preventDefault ();
-            console.log ( 'click' );
-        }
 
-        _$ ( '#click' ).addListener ( 'click', a );
+
         _$ ( '#unclick' ).addListener ( 'click', function ( e ) {
-            _$ ( '#click' ).removeListener ( 'click');
+            var _tpl = new Template;
+console.log(_tpl)
+//            _tpl.get('library/bookList', function(r){
+//                console.log(r)
+//            })
         } )
 
     } )
