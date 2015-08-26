@@ -932,6 +932,7 @@ _$_.add ( 'sort', function ( _prop, _desc, _object ) {
  * @return Object
  */
 _$_.add ( 'animate', function ( prop, conf, callback ) {
+
 	this.each ( function ( elem ) {
 		if ( _.isSet ( elem.animate ) ) {
 			
@@ -959,6 +960,16 @@ _$_.add ( 'animate', function ( prop, conf, callback ) {
 	return this;
 } );
 
+/**Prepare animation
+ */
+_$_.add ( 'requestAnimationFrame', function () {
+	return window.requestAnimationFrame ||
+		   window.webkitRequestAnimationFrame ||
+		   window.mozRequestAnimationFrame ||
+		   function ( callback ) {
+			   window.setTimeout ( callback, 0x3E8 / 0x3C );
+		   };
+} );
 
 /**Return object
  * @returns {Object|Array}
@@ -1179,7 +1190,6 @@ Syrup.add ( 'truncateString', function ( string, limit ) {
  * @param _string
  * @param _find
  * @param _replace
- * @para _case
  * @return String
  */
 Syrup.add ( 'replace', function ( _string, _find, _replace ) {
@@ -1199,12 +1209,16 @@ Syrup.add ( 'replace', function ( _string, _find, _replace ) {
 		if ( _.isObject ( _replace ) ) {
 			if ( _find.length > 0 ) {
 				_tmp = _find.pop ();
-				this.recursiveStr = _.replace ( this.recursiveStr, _tmp, _replace[ _tmp ] );
+				this.recursiveStr = _.replace (
+					this.recursiveStr, _tmp,
+					_replace[ _tmp ]
+				);
 			}
 		} else {
 			_.error ( WARNING_SYRUP.ERROR.NOOBJECTREPLACEREGEXP );
 		}
 	} else {
+
 		while ( ((e = s.indexOf ( _find )) > -1) ) {
 			r += o.substring ( b, b + e ) + _replace;
 			s = s.substring ( e + _find.length, s.length );

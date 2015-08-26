@@ -18,10 +18,17 @@
 
 
             _tpl.get ( 'library/bookList', function ( r ) {
-                _tpl.parse ( r, { name: 'Juan' }, function ( res ) {
+                _tpl.parse ( r, {
+                    "beatles": [
+                        { "firstName": "John", "lastName": "Lennon" },
+                        { "firstName": "Paul", "lastName": "McCartney" },
+                        { "firstName": "George", "lastName": "Harrison" },
+                        { "firstName": "Ringo", "lastName": "Starr" }
+                    ]
+                }, function ( res ) {
                     console.log ( res )
                 } )
-            } ).remove()
+            } ).remove ()
         } )
 
     } )

@@ -8,6 +8,6 @@ addEventListener ( 'message', function ( e ) {
 		fields = data.fields,
 		template = data.template;
 
+	Mustache.parse ( template );
 	this.postMessage ( Mustache.render ( template, fields ) );
-} )
-;
+} );
