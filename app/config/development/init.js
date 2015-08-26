@@ -10,7 +10,9 @@ exports.files = {
 		output: 'app/include/init',
 		src:    [
 			'system/base/init', // Needed do not change
-			'system/lib/Map'
+			'system/lib/Map',
+			'system/lib/Workers',
+			'system/lib/Template'
 			// Add all the necessary modules
 		]
 

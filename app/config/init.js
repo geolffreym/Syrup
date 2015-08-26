@@ -6,7 +6,7 @@
 
 var setting = {
 	ajax_processor: '',
-	app_path:       '/',
+	app_path:       '/app/',
 	env:            'development'
 };
 
