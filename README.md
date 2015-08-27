@@ -110,6 +110,19 @@ When you need to add libraries to your drivers that were not pre-compiled in the
 
 DOM Tools
 =======
+**Avoid conflicts**
+
+```js
+
+//Using function
+
+(function(alias){
+    alias('<div></div>');
+    alias('.selector');
+})(_$)
+
+```
+
 **Creating a $ object**
 
 *This method helps you find Nodes objects and generate $ object*
