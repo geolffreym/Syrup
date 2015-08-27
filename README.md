@@ -1260,13 +1260,13 @@ var _my_object = {a:1,b:2c:3};
 _.objectAsString(_my_object); // Return [Object object]; 
 ```
   
-**Method `.parseJsonUrl(object)`**
+**Method `.jsonToQueryString(object)`**
  
 *(Return a URL query string)*
 ```js  
 var _my_object = {a:1,b:2c:3};    
 
-_.parseJsonUrl(_my_object); // Return a=1&b=2&c=3; 
+_.jsonToQueryString(_my_object); // Return a=1&b=2&c=3; 
 ```
 
 **Method `.jsonToString(object)`**

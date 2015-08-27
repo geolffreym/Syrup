@@ -1435,7 +1435,7 @@ Syrup.add ( 'dotDirectory', function ( dotDir ) {
  * @param _object
  * @returns {string}
  */
-Syrup.add ( 'parseJsonUrl', function ( _object ) {
+Syrup.add ( 'jsonToQueryString', function ( _object ) {
 	var _return = '',
 		_size = _.isObject ( _object )
 			? _.getObjectSize ( _object )
