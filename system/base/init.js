@@ -1650,13 +1650,12 @@ Syrup.add ( 'matchInArray', function ( find, haystack ) {
  */
 Syrup.add ( 'uniqueArray', function ( array ) {
 	var _new = [];
-	_.each ( array, function ( v ) {
-		if ( !_.inObject ( v, _new ) ) {
+	return array.filter ( function ( v ) {
+		if ( _new.indexOf ( v ) == -1 ) {
 			_new.push ( v );
+			return v;
 		}
 	} );
-	
-	return _new;
 } );
 
 /**Parse to Array

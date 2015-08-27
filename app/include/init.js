@@ -1424,33 +1424,6 @@ Syrup.add ( 'dotDirectory', function ( dotDir ) {
 	return dotDir;
 } );
 
-/**Limita la cantidad de elementos ingresados en un input
- * @param _event
- * @param _max_value
- * @returns {*}
- */
-Syrup.add ( 'limitBoxInput', function ( _event, _max_value ) {
-	if ( !_.isObject ( _event ) && !_event.target ) {
-		_.error ( 'Event Object Needed' );
-	}
-	var _obj = _event.target,
-		_value = _obj.value.length,
-		_out = _max_value - _value;
-	
-	if (
-		(
-			_out <= 0 && _event.keyCode !== 8
-		)
-		|| (
-			_value === 0 && _event.keyCode === 8
-		)
-		|| _event.type == 'paste'
-	) {
-		_event.preventDefault ();
-	}
-	
-	return _out;
-} );
 
 /**Pasa Json a format URL
  * @param _object
@@ -1677,13 +1650,12 @@ Syrup.add ( 'matchInArray', function ( find, haystack ) {
  */
 Syrup.add ( 'uniqueArray', function ( array ) {
 	var _new = [];
-	_.each ( array, function ( v ) {
-		if ( !_.inObject ( v, _new ) ) {
+	return array.filter ( function ( v ) {
+		if ( _new.indexOf ( v ) == -1 ) {
 			_new.push ( v );
+			return v;
 		}
 	} );
-	
-	return _new;
 } );
 
 /**Parse to Array
