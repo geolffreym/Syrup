@@ -114,8 +114,11 @@ DOM Tools
 
 ```js
 
-//Using function
+//Returns a _$ object
+var S = _.noConflict(),
+    element = S('#my-element');
 
+//Using function
 (function(alias){
     alias('<div></div>');
     alias('.selector');

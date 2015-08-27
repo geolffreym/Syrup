@@ -955,6 +955,13 @@ _$_.add ( 'object', function () {
 	return this.collection;
 } );
 
+/** No Conflict
+ * @return _$ object
+ * **/
+Syrup.add ( 'noConflict', function () {
+	return _$;
+} );
+
 
 /**Valida si esta seteado un elemento y envia un mensaje
  * @param obj
@@ -1214,11 +1221,6 @@ Syrup.add ( 'replace', function ( _string, _find, _replace ) {
 	return this.recursiveStr;
 } );
 
-//Optional
-
-//Syrup.add('replace', function(str, r1, r2){
-//	return str.split(r1 ).join(r2);
-//});
 
 /**Retorna la fecha en un objeto
  * @param fecha
@@ -1283,49 +1285,6 @@ Syrup.add ( 'getNav', function () {
 	} : false;
 } );
 
-
-///**Set var by reference
-// * @param ver_name
-// * @return object
-// */
-//Syrup.add('get_pointer', function (_var) {
-//    return window[_var.toString()] = _var;
-//});
-
-/**Window ScrollTo
- * @param conf {delay:int,limit:int, hold:bool,step:int}
- */
-Syrup.add ( 'windowScrollTo', function ( conf ) {
-	if ( !_.isObject ( conf ) ) {
-		_.error ( WARNING_SYRUP.ERROR.NOOBJECT )
-	}
-	
-	if ( !_.isSet ( conf.limit ) )
-		_.error ( 'Limit needed' );
-	
-	var _limit = window.scrollY > conf.limit ? window.scrollY : -conf.limit,
-		_result = _.isSet ( conf.hold ) ? window.scrollY : 0,
-		_min = _.isSet ( conf.hold ) && window.scrollY < conf.limit ? window.scrollY : conf.limit;
-	
-	conf.limit = _limit;
-	conf.step = _.isSet ( conf.step ) ? conf.step : 1;
-	var _scrolling = _.interval ( function ( result ) {
-		_limit < 0
-			? (_result += (result * conf.step))
-			: (_result -= ((conf.limit - result) * conf.step));
-		
-		
-		if ( (_result >= (_limit * -1) && _limit < 0)
-			 || (_result <= _min && _limit > 0) ) {
-			_scrolling.kill ();
-			if ( !_.isSet ( conf.hold ) )
-				window.scrollY = 0;
-		}
-		window.scrollTo ( 0, _result );
-	}, conf );
-	
-	return _scrolling;
-} );
 
 /**Genera un id
  * @param longitud
@@ -1460,7 +1419,7 @@ Syrup.add ( 'getCookie', function ( name ) {
 	return _cookie;
 } );
 
-
+/****/
 Syrup.add ( 'simplifyDirectory', function ( slashDir ) {
 	if ( _.isString ( slashDir ) ) {
 		return slashDir.split ( '/' ).join ( '.' )
