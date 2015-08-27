@@ -122,6 +122,13 @@ _$_.add ( '$', function ( dom ) {
 	return _self;
 } );
 
+/***Add fn to object
+ * @param callback
+ */
+_$_.add('fn', function (name, fn) {
+    return this.__proto__[name] = fn;
+});
+
 /***Event Handler
  * @param callback
  */
@@ -1835,6 +1842,7 @@ window._ = (
 ) ();
 
 _.VERSION = '1.1';
+_.$fn = _$_;
 
 _.nav = {};
 _.nav.unsupported =
