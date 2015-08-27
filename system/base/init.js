@@ -125,9 +125,9 @@ _$_.add ( '$', function ( dom ) {
 /***Add fn to object
  * @param callback
  */
-_$_.add('fn', function (name, fn) {
-    return this.__proto__[name] = fn;
-});
+_$_.add ( 'fn', function ( name, fn ) {
+	return this.__proto__[ name ] = fn;
+} );
 
 /***Event Handler
  * @param callback
@@ -1058,10 +1058,9 @@ Syrup.add ( 'isEmpty', function ( input ) {
 	if ( _.isArray ( input ) ) {
 		return input.length === 0;
 	}
-	
-	var value = input;
+
 	return (
-		!value || value === '' || /^\s+$/.test ( value )
+		!input || input === '' || /^\s+$/.test ( input )
 	)
 } );
 

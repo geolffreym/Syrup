@@ -10,7 +10,7 @@
  * Ajax Lib
  * */
 
- var WARNING_SYRUP_FORM = {
+var WARNING_SYRUP_FORM = {
 	ERROR: {
 		NOPACK: 'Error pack form'
 	}
@@ -50,14 +50,16 @@ Form.add ( 'attach', function ( name, attach ) {
 //Getting a array of values name="input[]"
 Form.add ( 'multiple', function ( name ) {
 	var _top = 0, _input_array,
-	    _return = [],
-	    _form_obj = this.form.object ();
+		_return = [],
+		_form_obj = this.form.object ();
 
 
-	if ( _.isSet ( _form_obj.elements[name] ) ) {
-		if ( (_input_array = _form_obj.elements[name].length) ) {
+	if ( _.isSet ( _form_obj.elements[ name ] ) ) {
+		if ( (
+				_input_array = _form_obj.elements[ name ].length
+			) ) {
 			for ( ; _top < _input_array; _top++ ) {
-				_return.push ( _form_obj.elements[name][_top].value )
+				_return.push ( _form_obj.elements[ name ][ _top ].value )
 			}
 		}
 	}
@@ -67,11 +69,11 @@ Form.add ( 'multiple', function ( name ) {
 //Form fail what to do?
 Form.add ( 'fail', function ( field, error ) {
 	var self = this,
-	    _notify = {
-		    field:  field,
-		    error:  error,
-		    coords: _.cartesianPlane ( field )
-	    };
+		_notify = {
+			field : field,
+			error : error,
+			coords: _.cartesianPlane ( field )
+		};
 
 	self.failed = true;
 	if ( self.onerror ) {
@@ -84,23 +86,25 @@ Form.add ( 'fail', function ( field, error ) {
 Form.add ( 'on', function ( event, callback ) {
 	var self = this;
 
-	return [{
-		before:   function () {
-			if ( callback ) {
-				self.onbefore = callback;
+	return [
+		{
+			before  : function () {
+				if ( callback ) {
+					self.onbefore = callback;
+				}
+			},
+			error   : function () {
+				if ( callback ) {
+					self.onerror = callback;
+				}
+			},
+			complete: function () {
+				if ( callback ) {
+					self.oncomplete = callback;
+				}
 			}
-		},
-		error:    function () {
-			if ( callback ) {
-				self.onerror = callback;
-			}
-		},
-		complete: function () {
-			if ( callback ) {
-				self.oncomplete = callback;
-			}
-		}
-	}[event] ()]
+		}[ event ] ()
+	]
 } );
 
 Form.add ( 'submit', function ( event ) {
@@ -116,9 +120,9 @@ Form.add ( 'submit', function ( event ) {
 	}
 
 	var Ajax = {
-		url:    self.url,
+		url   : self.url,
 		method: self.type,
-		data:   self.formData
+		data  : self.formData
 	};
 
 	self.Ajax.kill ();
@@ -139,30 +143,32 @@ Form.add ( 'pack', function ( form ) {
 	self.form = _$ ( form );
 
 	var _formData = new FormData,
-	    _field_array,
-	    _form_obj = self.form.object (),
-	    _fields = _form_obj.querySelectorAll ( 'input, textarea, select' ),
-	    x = _fields.length;
+		_field_array,
+		_form_obj = self.form.object (),
+		_fields = _form_obj.querySelectorAll ( 'input, textarea, select' ),
+		x = _fields.length;
 
 	self.failed = false;
 
 	while ( x-- ) {
 
-		if ( _fields[x].type === 'file' || !_fields[x] ) {
+		if ( _fields[ x ].type === 'file' || !_fields[ x ] ) {
 			continue;
 		}
 
-		if ( _fields[x].type === 'checkbox' || _fields[x].type === 'radio' ) {
-			if ( !_fields[x].checked ) {
+		if ( _fields[ x ].type === 'checkbox' || _fields[ x ].type === 'radio' ) {
+			if ( !_fields[ x ].checked ) {
 				continue;
 			}
 		}
 
-		var field = _fields[x],
-		    fieldValue = field.value;
+		var field = _fields[ x ],
+			fieldValue = field.value;
 
 
-		if ( !(_$ ( field ).data ( 'skip' )) && _.isEmpty ( fieldValue ) ) {
+		if ( !(
+				_$ ( field ).data ( 'skip' )
+			) && _.isEmpty ( fieldValue ) ) {
 			self.fail ( field, 'empty' );
 			break;
 		} else {
@@ -170,11 +176,15 @@ Form.add ( 'pack', function ( form ) {
 				self.fail ( field, 'invalid_mail' );
 				break
 			} else {
-				if ( _$ ( field ).data ( 'min' ) && (+_$ ( field ).data ( 'min' ) > fieldValue.length) ) {
+				if ( _$ ( field ).data ( 'min' ) && (
+					+_$ ( field ).data ( 'min' ) > fieldValue.length
+					) ) {
 					self.fail ( field, 'minim_chars' );
 					break;
 				} else {
-					if ( _$ ( field ).data ( 'max' ) && (+_$ ( field ).data ( 'max' ) < fieldValue.length) ) {
+					if ( _$ ( field ).data ( 'max' ) && (
+						+_$ ( field ).data ( 'max' ) < fieldValue.length
+						) ) {
 						self.fail ( field, 'overflow_chars' );
 						break;
 					} else {
@@ -186,12 +196,14 @@ Form.add ( 'pack', function ( form ) {
 							}
 						}
 
-						if ( !!(_field_array = self.multiple ( field.name )) ) {
+						if ( !!(
+								_field_array = self.multiple ( field.name )
+							) ) {
 							fieldValue = _field_array
 						}
 
 						_formData.append ( field.name, fieldValue );
-						self.object[field.name] = fieldValue;
+						self.object[ field.name ] = fieldValue;
 
 
 					}

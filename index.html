@@ -6,20 +6,8 @@
 </head>
 <body>
 <script src="app/include/init.min.js"></script>
-<a href="#" id="click" data-hi="1" class="a b c">
-    <span>
-
-        <div id="day">
-            <div id="hi">
-                <hr/>
-            </div>
-
-        </div>
-
-        Hola
-    </span>
-
-    <p>H</p>
+<a href="#" id="click" data-hi="1" class="a b c" data-tooltip="Hi!">
+Test
 </a>
 <a href="#" id="unclick" data-hi="1" class="a b c">UCLick</a>
 
@@ -27,27 +15,29 @@
 <script>
 
     _$ ( function () {
-
-        var _tpl = new Template;
-
-        _$ ( '#unclick' ).addListener ( 'click', function ( e ) {
-
-            var e = _$ ( e.target );
-            console.log ( e.data ( 'hi' ) )
-
-//            _tpl.get ( 'library/bookList', function ( r ) {
-//                _tpl.parse ( r, {
-//                    "beatles": [
-//                        { "firstName": "John", "lastName": "Lennon" },
-//                        { "firstName": "Paul", "lastName": "McCartney" },
-//                        { "firstName": "George", "lastName": "Harrison" },
-//                        { "firstName": "Ringo", "lastName": "Starr" }
-//                    ]
-//                }, function ( res ) {
-//                    console.log ( res )
-//                } )
-//            } ).remove ()
-        } )
+        _.include('/plugins/Tooltip', function(){
+            _$('#click' ).tooltip()
+        })
+//        var _tpl = new Template;
+//
+//        _$ ( '#unclick' ).addListener ( 'click', function ( e ) {
+//
+//            var e = _$ ( e.target );
+//            console.log ( e.data ( 'hi' ) )
+//
+////            _tpl.get ( 'library/bookList', function ( r ) {
+////                _tpl.parse ( r, {
+////                    "beatles": [
+////                        { "firstName": "John", "lastName": "Lennon" },
+////                        { "firstName": "Paul", "lastName": "McCartney" },
+////                        { "firstName": "George", "lastName": "Harrison" },
+////                        { "firstName": "Ringo", "lastName": "Starr" }
+////                    ]
+////                }, function ( res ) {
+////                    console.log ( res )
+////                } )
+////            } ).remove ()
+//        } )
 
     } )
 
