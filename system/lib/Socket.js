@@ -22,7 +22,7 @@ function Socket () {
 	this.protocol = null;
 	this.user = null;
 	this.admin = null;
-	this.host = '127.0.0.1';
+	this.host = location.host;
 }
 
 //Create a new Socket
@@ -34,15 +34,16 @@ Socket.add ( 'set', function ( config ) {
 	}
 
 	var user = config.user || 'default',
-	    port = config.port || 0x1F90,
-	    query = '?';
+		port = config.port || 0x1F90,
+		query = '?';
 
 
-	self.host = !!config.host ? config.host : self.host;
+	self.host = !!config.host
+		? config.host : self.host;
 	self.user = user;
 
-	delete config['port'];
-	delete config['host'];
+	delete config[ 'port' ];
+	delete config[ 'host' ];
 
 	//Parse the config in url to Websocket
 	query = query + _.parseJsonUrl ( config );
@@ -74,20 +75,22 @@ Socket.add ( 'set', function ( config ) {
 //Socket Event Handler
 Socket.add ( 'on', function ( event, callback ) {
 	var self = this;
-	return [{
-		message: function () {
-			self.message = callback;
-		},
-		open:    function () {
-			self.open = callback;
-		},
-		close:   function () {
-			self.close = callback;
-		},
-		error:   function () {
-			self.error = callback;
-		}
-	}[event] ()]
+	return [
+		{
+			message: function () {
+				self.message = callback;
+			},
+			open   : function () {
+				self.open = callback;
+			},
+			close  : function () {
+				self.close = callback;
+			},
+			error  : function () {
+				self.error = callback;
+			}
+		}[ event ] ()
+	]
 } );
 
 
@@ -103,12 +106,12 @@ Socket.add ( 'send', function ( config ) {
 	if ( this.socket ) {
 		this.socket.send ( JSON.stringify ( config ) );
 	}
-}) ;
+} );
 
 
 //Kill Socket
-Socket.add('clear',  function () {
+Socket.add ( 'clear', function () {
 	this.socket.close ();
-});
+} );
 
 

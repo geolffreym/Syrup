@@ -8,16 +8,16 @@
 
 'use strict';
 var Upload,
-    WARNING_UPLOAD_FILE = {
-	    ERROR: {
-		    NOURL:  'Url needed.',
-		    NOPACK: 'Files pack needed.'
-	    }
-    };
+	WARNING_UPLOAD_FILE = {
+		ERROR: {
+			NOURL : 'Url needed.',
+			NOPACK: 'Files pack needed.'
+		}
+	};
 
 Upload = function () {
 	var _ajax = new _.Ajax,
-	    _proto = this.__proto__;
+		_proto = this.__proto__;
 
 
 	this.url = null;
@@ -34,18 +34,18 @@ Upload = function () {
 
 	_proto.pack = function ( file, callback ) {
 		var self = this,
-		    _formData = new FormData (),
-		    _files = [],
-		    _campo = !!_.isString ( file )
-			    ? document.querySelector ( file ) : file;
+			_formData = new FormData (),
+			_files = [],
+			_campo = !!_.isString ( file )
+				? document.querySelector ( file ) : file;
 
 		if ( _campo.type === "file" ) {
 			var _temp = _campo.files,
-			    x = _temp.length;
+				x = _temp.length;
 
 			while ( x-- ) {
-				_files[x] = _temp[x];
-				_formData.append ( _campo.name, _temp[x] );
+				_files[ x ] = _temp[ x ];
+				_formData.append ( _campo.name, _temp[ x ] );
 			}
 		}
 
@@ -58,16 +58,16 @@ Upload = function () {
 
 	_proto.packAll = function ( form ) {
 		var self = this,
-		    _formData = new FormData (),
-		    _files = {}, _temp,
-		    _form = !!_.isObject ( form ) ? form : document,
-		    _campos = _form.querySelectorAll ( 'input[type="file"]' ),
-		    z = _campos.length;
+			_formData = new FormData (),
+			_files = {}, _temp,
+			_form = !!_.isObject ( form ) ? form : document,
+			_campos = _form.querySelectorAll ( 'input[type="file"]' ),
+			z = _campos.length;
 
 		while ( z-- ) {
-			_temp = self.pack ( _campos[z] );
-			_files[_campos[z].name] = _temp;
-			_formData.append ( _campos[z].name, _temp );
+			_temp = self.pack ( _campos[ z ] );
+			_files[ _campos[ z ].name ] = _temp;
+			_formData.append ( _campos[ z ].name, _temp );
 		}
 
 		self.formData = _formData;
@@ -80,20 +80,22 @@ Upload = function () {
 			return false;
 		}
 
-		return [{
-			start:    function () {
-				_ajax.on ( 'before', callback );
-			},
-			complete: function () {
-				self.complete = callback;
-			},
-			progress: function () {
-				self.progress = callback;
-			},
-			error:    function () {
-				self.error = callback;
-			}
-		}[event] ()]
+		return [
+			{
+				start   : function () {
+					_ajax.on ( 'before', callback );
+				},
+				complete: function () {
+					self.complete = callback;
+				},
+				progress: function () {
+					self.progress = callback;
+				},
+				error   : function () {
+					self.error = callback;
+				}
+			}[ event ] ()
+		]
 	};
 
 	_proto.upload = function ( _files ) {
@@ -108,11 +110,11 @@ Upload = function () {
 
 
 		var _request = {
-			url:      self.url,
-			method:   'POST',
-			data:     _files,
-			upload:   true,
-			dataType: 'auto'
+			url        : self.url,
+			method     : 'POST',
+			data       : _files,
+			upload     : true,
+			contentType: 'auto'
 		};
 
 		_ajax.kill ();
@@ -135,5 +137,3 @@ Upload = function () {
 
 
 };
-
-Syrup.blend ( Upload );

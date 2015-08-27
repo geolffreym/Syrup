@@ -21,7 +21,7 @@ Description
 Compatibility with browsers
 =======
     
-    -IE > 9
+    -IE > 10
     -Chrome > 32
     -Firefox > 28
     -Opera 23 >
@@ -113,10 +113,12 @@ DOM Tools
 **Avoid conflicts**
 
 ```js
-var _alias = _$.noConflict();
+
+//Returns a _$ object
+var S = _.noConflict(),
+    element = S('#my-element');
 
 //Using function
-
 (function(alias){
     alias('<div></div>');
     alias('.selector');
@@ -784,18 +786,7 @@ body.removeListener('click')
 ```
     
 Helpers
---------
-    
-**Method `.limitBoxInput(event Object, max_input_length)`**
-
-*(Validate if input value length is less to max_input_length)*
-```js    
-_$('input[type="text"]').addListener('keydown', function(e){
-    _.limitBoxInput(e,50); // If input times is greater than 50, the event is prevented   
-
-    //Code
-})
-```      
+--------   
       
 **Method `.cartesianPlane($ Object || Object, all)`**
 

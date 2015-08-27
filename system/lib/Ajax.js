@@ -11,7 +11,7 @@
 
 function Ajax () {
 	this.xhr = new window.XMLHttpRequest
-		|| new window.ActiveXObject ( "Microsoft.XMLHTTP" );
+			   || new window.ActiveXObject ( "Microsoft.XMLHTTP" );
 	this.xhr_list = [];
 	this.upload = null;
 	this.before = null;
@@ -23,66 +23,91 @@ function Ajax () {
 	this.time_out = null;
 }
 
-//Event Handler
+/*** Event handler
+ * @param event
+ * @param callback
+ * @return void
+ * */
 Ajax.add ( 'on', function ( event, callback ) {
 	var self = this;
-	return [{
-		before:   function () {
-			self.before = callback;
-		},
-		complete: function () {
-			self.complete = callback;
-		},
-		error:    function () {
-			self.error = callback;
-		},
-		abort:    function () {
-			self.abort = callback;
-		},
-		state:    function () {
-			self.state = callback;
-		},
-		timeout:  function () {
-			self.time_out = callback;
-		},
-		progress: function () {
-			self.progress = callback;
-		}
-	}[event] ()]
+	return [
+		{
+			before  : function () {
+				self.before = callback;
+			},
+			complete: function () {
+				self.complete = callback;
+			},
+			error   : function () {
+				self.error = callback;
+			},
+			abort   : function () {
+				self.abort = callback;
+			},
+			state   : function () {
+				self.state = callback;
+			},
+			timeout : function () {
+				self.time_out = callback;
+			},
+			progress: function () {
+				self.progress = callback;
+			}
+		}[ event ] ()
+	]
 
 } );
 
-//Ajax request
+/** Ajax Request
+ * @param config
+ * @param callback
+ * @return object
+ *
+ * Config object {
+ *  url: (string) the request url
+ *  type: (string) the request type GET or POST
+ *	async: bool,
+ *	timeout: (int) request timeout,
+ *	processor: (string) ajax server side processor file extension,
+ *	token: (string or bool) CSRF token needed?,
+ *	contentType: (string) the content type,
+ *	contentHeader: (object) the content header request,
+ *	data: (object) the request data,
+ *	upload: (bool) is upload process?
+ *
+ * }
+ * **/
 Ajax.add ( 'request', function ( config, callback ) {
 	if ( !_.isObject ( config ) ) {
 		throw (WARNING_SYRUP.ERROR.NOOBJECT)
 	}
 
 	var _self = this,
-	    _xhr = _self.xhr,
-	    _async = true,
-	    _timeout = config.timeout || 4000,
-	    _processor = config.processor || setting.ajax_processor || '',
-	    _token = config.token || true,
-	    _contentType = config.contentType || 'application/x-www-form-urlencoded;charset=utf-8',
-	    _data = config.data
-		    ? config.data : null,
-	    _contentHeader = config.contentHeader ||
-		    [
-			    {
-				    header: 'Content-Type',
-				    value:  _contentType
-			    }
-		    ]
-		, _type = config.method || 'GET';
+		_xhr = _self.xhr,
+		_async = true,
+		_type = config.method || 'GET',
+		_timeout = config.timeout || 4000,
+		_processor = config.processor || setting.ajax_processor || '',
+		_token = config.token || false,
+		_contentType = config.contentType || 'application/x-www-form-urlencoded;charset=utf-8',
+		_data = config.data
+			? config.data : null,
+		_contentHeader = config.contentHeader ||
+						 [
+							 {
+								 header: 'Content-Type',
+								 value : _contentType
+							 }
+						 ]
+		;
 
 	if ( !_.isSet ( config.url ) ) {
 		throw (WARNING_SYRUP.ERROR.NOURL);
 	}
 
 	if ( !_.isFormData ( _data )
-		&& _.isSet ( _data )
-		&& _contentHeader !== 'auto' ) {
+		 && _.isSet ( _data )
+		 && _contentHeader !== 'auto' ) {
 		_data = _.parseJsonUrl ( _data );
 	}
 
@@ -176,19 +201,26 @@ Ajax.add ( 'request', function ( config, callback ) {
 	return _self.xhr;
 } );
 
-//Set request header
+/** Set Request Header
+ * @param header
+ * @param type
+ * @return object
+ * **/
 Ajax.add ( 'requestHeader', function ( header, type ) {
 	this.xhr.setRequestHeader ( header, type );
+	return this;
 } );
 
 //Kill Ajax
 Ajax.add ( 'kill', function () {
 	var i = this.xhr_list.length;
 	while ( i-- ) {
-		if ( !!this.xhr_list[i] )
-			this.xhr_list[i].abort ();
+		if ( !!this.xhr_list[ i ] )
+			this.xhr_list[ i ].abort ();
 	}
 	this.xhr_list.length = 0;
+
+	return this;
 } );
 
 

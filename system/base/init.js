@@ -16,6 +16,8 @@ var
 	nativeFunction = Function.prototype,
 	nativeObject = Object.prototype,
 	regexConstructor = /(([^function])([a-zA-z])+(?=\())/g,
+	regexUrl = /^(https?|ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i,
+	regexMail = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/,
 	WARNING_SYRUP = {
 		ERROR: {
 			NOPARAM              : 'Param needed',
@@ -34,13 +36,22 @@ var
 	;
 
 nativeFunction.blend = function ( child ) {
-	var name = child.prototype.constructor.name || (child.toString ().match ( regexConstructor )[ 0 ]).trim ();
+	var name = (
+		child.prototype.constructor.name
+		|| (
+			child.toString ().match ( regexConstructor )[ 0 ]
+		).trim ()
+	);
 	this.prototype[ name ] = child;
-	//_.__proto__[name] = child;
 };
 
 nativeFunction.drop = function ( child ) {
-	var name = child.prototype.constructor.name || (child.toString ().match ( regexConstructor )[ 0 ]).trim ();
+	var name = (
+		child.prototype.constructor.name
+		|| (
+			child.toString ().match ( regexConstructor )[ 0 ]
+		).trim ()
+	);
 	if ( _[ name ] ) {
 		_[ name ] = null;
 		return true;
@@ -105,36 +116,30 @@ _$_.add ( '$', function ( dom ) {
 			: dom;
 		
 	}
-	
-	/*if (!_.isSet(_self.collection)) {
-	 _.error(dom + WARNING_SYRUP.ERROR.NODOM);
-	 }*/
-	
+
 	_self.exist = _.isSet ( _self.collection );
 	_self.name = dom;
 	return _self;
 } );
 
-//Avoid Conflict Libraries
-_$_.add ( 'noConflict', function () {
-	return _$;
-} );
-
 /***Add fn to object
  * @param callback
  */
-_$_.add ( 'fn', function ( name, fn ) {
-	return _$.__proto__[ name ] = fn;
-} );
+_$_.add('fn', function (name, fn) {
+    return this.__proto__[name] = fn;
+});
 
 /***Event Handler
  * @param callback
  */
 _$_.add ( 'ready', function ( callback ) {
 	var _self = this;
-	if ( _.isGlobal ( _self.collection ) ) {
-		_self.collection.addEventListener ( "DOMContentLoaded", callback );
-	}
+	if ( _.isGlobal ( _self.collection ) )
+		_self.collection.addEventListener (
+			"DOMContentLoaded",
+			callback
+		);
+	return this;
 } );
 
 /***Event Load
@@ -160,37 +165,24 @@ _$_.add ( 'addListener', function ( event, delegate, callback ) {
 	}
 	
 	var _self = this,
+		_target = null,
 		_event = function ( e ) {
 			e = e || window.event;
-			var _target = event.srcElement || e.target;
+			_target = event.srcElement || e.target;
+
 			if ( _.isSet ( delegate ) && !_.isFunction ( delegate ) ) {
-				if ( _.isSet ( _target.className.baseVal ) ) {
-					if ( _target.className.baseval === delegate ) {
-						_.callbackAudit ( callback, e );
-					}
-				} else {
-					_$ ( _target ).filter ( delegate, function () {
-						_.callbackAudit ( callback, e );
-					} );
-				}
-				
-			} else {
-				_.callbackAudit ( callback, e );
-			}
-			
+				_$ ( _target ).filter ( delegate, function () {
+					_.callbackAudit ( callback, e );
+				} );
+			} else { _.callbackAudit ( callback, e ); }
 		};
 
 	_self.each ( function ( elem ) {
 
-
 		if ( elem.addEventListener ) {
 			elem.addEventListener ( event, _event, true )
-		} else {
-			if ( elem.attachEvent ) {
-				elem.attachEvent ( 'on' + event, _event );
-			} else {
-				elem[ 'on' + event ] = _event;
-			}
+		} else if ( elem.attachEvent ) {
+			elem.attachEvent ( 'on' + event, _event );
 		}
 
 		if ( !_.isSet ( elem[ 'listListener' ] ) ) {
@@ -217,13 +209,8 @@ _$_.add ( 'removeListener', function ( event ) {
 			if ( event in elem.listListener ) {
 				if ( elem.removeEventListener ) {
 					elem.removeEventListener ( event, elem.listListener[ event ], true );
-
-				} else {
-					if ( elem.detachEvent ( event ) ) {
-						elem.attachEvent ( 'on' + event, elem.listListener[ event ] );
-					} else {
-						elem[ 'on' + event ] = null;
-					}
+				} else if ( elem.detachEvent ) {
+					elem.detachEvent ( 'on' + event, elem.listListener[ event ] );
 				}
 				delete elem.listListener[ event ];
 			}
@@ -247,26 +234,27 @@ _$_.add ( 'filter', function ( filter, callback, e_handler ) {
 		
 		if ( match.call ( elem, filter ) ) {
 			_.callbackAudit ( callback, _$ ( elem ) );
-		} else {
-			if ( _.isFunction ( e_handler ) )
-				_.callbackAudit ( e_handler, elem );
+		} else if ( _.isFunction ( e_handler ) ) {
+			_.callbackAudit ( e_handler, elem );
 		}
 	} );
 	
 	return this;
 } );
 
-/**Empty Dom*/
-
+/**Empty Dom
+ * @return void
+ * */
 _$_.add ( 'empty', function () {
 	this.each ( function ( v ) {
 		v.innerHTML = '';
 	} );
+	return this;
 } );
 
 /**Clone Objects
  * @param childs
- * @returns {Array}
+ * @return array
  */
 _$_.add ( 'clone', function ( childs ) {
 	childs = _.isSet ( childs );
@@ -282,34 +270,21 @@ _$_.add ( 'clone', function ( childs ) {
 /***Data set
  * @param name
  * @param value
- * @returns {Array}
+ * @return array
  */
 _$_.add ( 'data', function ( name, value ) {
 	var _self = this,
 		_data_set,
 		_values = [];
+
 	_self.each ( function ( dom, i ) {
-		if ( !_.isSet ( dom.dataset ) ) {
-			_data_set = 'data-' + name;
-			if ( _.isSet ( value ) ) {
-				var _set = {};
-				_set[ _data_set ] = value;
-				_self.attr ( _set );
-			} else {
-				var _attr = _self.attr ( _data_set );
-				_values = _.isArray ( _attr )
-					? _attr : [ _attr ];
-			}
-		} else {
-			_data_set = dom.dataset;
-			if ( _.isSet ( value ) || _.isNumber ( value ) ) {
-				_data_set[ name ] = _.isArray ( value ) ? value[ i ] : value;
-			} else {
-				if ( _.isSet ( _data_set[ name ] ) ) {
-					_values.push ( _data_set[ name ] )
-				}
-			}
+		_data_set = dom.dataset;
+		if ( _.isSet ( value ) || _.isNumber ( value ) ) {
+			_data_set[ name ] = _.isArray ( value ) ? value[ i ] : value;
+		} else if ( _.isSet ( _data_set[ name ] ) ) {
+			_values.push ( _data_set[ name ] )
 		}
+
 	} );
 	
 	return _.specArray ( _values );
@@ -317,7 +292,7 @@ _$_.add ( 'data', function ( name, value ) {
 
 /***Assign Properties
  * @param _prop
- * @returns {Array}
+ * @return array
  */
 _$_.add ( 'prop', function ( _prop ) {
 	var _props = [];
@@ -336,7 +311,7 @@ _$_.add ( 'prop', function ( _prop ) {
 
 /***Assign Atributes
  * @param _attr
- * @returns {Array}
+ * @return array
  */
 _$_.add ( 'attr', function ( attr ) {
 	var _attr = [];
@@ -354,7 +329,7 @@ _$_.add ( 'attr', function ( attr ) {
 
 /***Remove Atributes
  * @param _attr
- * @returns {Array}
+ * @return object
  */
 _$_.add ( 'removeAttr', function ( attr ) {
 	this.each ( function ( v ) {
@@ -374,6 +349,7 @@ _$_.add ( 'removeAttr', function ( attr ) {
 _$_.add ( 'css', function ( css ) {
 	var _css = [],
 		_self = this;
+
 	_self.each ( function ( dom ) {
 		if ( _.isString ( css ) ) {
 			var _style = window.getComputedStyle ( dom, null );
@@ -396,10 +372,10 @@ _$_.add ( 'after', function ( elem ) {
 	if ( _.isHtml ( elem ) || !_.is$ ( elem ) ) {
 		elem = _$ ( elem );
 	}
+
 	this.each ( function ( obj ) {
-		var _parent = obj.parentNode;
 		elem.each ( function ( v ) {
-			_parent.insertBefore ( v, obj.nextSibling )
+			obj.parentNode.insertBefore ( v, obj.nextSibling )
 		} )
 	} );
 	return this;
@@ -407,16 +383,17 @@ _$_.add ( 'after', function ( elem ) {
 
 /***Insert Before
  * @param elem
+ * @return object
  */
 
 _$_.add ( 'before', function ( elem ) {
 	if ( _.isHtml ( elem ) || !_.is$ ( elem ) ) {
 		elem = _$ ( elem );
 	}
+
 	this.each ( function ( obj ) {
-		var _parent = obj.parentNode;
 		elem.each ( function ( v ) {
-			_parent.insertBefore ( v, obj )
+			obj.parentNode.insertBefore ( v, obj )
 		} )
 	} );
 	
@@ -424,15 +401,14 @@ _$_.add ( 'before', function ( elem ) {
 } );
 /**Append Element or Html
  * @param childs
- * @returns {_$_}
+ * @return object
  */
 _$_.add ( 'append', function ( childs ) {
-	var parent = this;
 	if ( _.isHtml ( childs ) || !_.is$ ( childs ) ) {
 		childs = _$ ( childs );
 	}
 	
-	parent.each ( function ( p ) {
+	this.each ( function ( p ) {
 		childs.each ( function ( elm ) {
 			p.appendChild ( elm )
 		} );
@@ -443,15 +419,14 @@ _$_.add ( 'append', function ( childs ) {
 
 /**Prepend Element or Html
  * @param childs
- * @returns {_$_}
+ * @return object
  */
 _$_.add ( 'prepend', function ( childs ) {
-	var parent = this;
 	if ( _.isHtml ( childs ) || !_.is$ ( childs ) ) {
 		childs = _$ ( childs );
 	}
 	
-	parent.each ( function ( p ) {
+	this.each ( function ( p ) {
 		childs.each ( function ( elm ) {
 			p.insertBefore ( elm, p.firstChild )
 		} );
@@ -462,14 +437,12 @@ _$_.add ( 'prepend', function ( childs ) {
 
 /**Inner HTML
  * @param html
- * @returns {_$_}
+ * @returns object
  */
 _$_.add ( 'html', function ( html ) {
 	if ( _.isHtml ( html ) || _.isString ( html ) ) {
 		this.prop ( { 'innerHTML': html } );
-	} else {
-		return this.prop ( 'innerHTML' );
-	}
+	} else { return this.prop ( 'innerHTML' ); }
 	return this;
 } );
 
@@ -480,9 +453,7 @@ _$_.add ( 'html', function ( html ) {
 _$_.add ( 'text', function ( text ) {
 	if ( _.isString ( text ) ) {
 		this.prop ( { 'textContent': text } );
-	} else {
-		return this.prop ( 'textContent' );
-	}
+	} else { return this.prop ( 'textContent' ); }
 	return this;
 } );
 
@@ -493,10 +464,8 @@ _$_.add ( 'text', function ( text ) {
 _$_.add ( 'val', function ( text ) {
 	if ( _.isString ( text ) ) {
 		this.prop ( { 'value': text } );
-		return this;
-	} else {
-		return this.prop ( 'value' );
-	}
+	} else { return this.prop ( 'value' ); }
+	return this;
 } );
 
 //Hide Element
@@ -520,7 +489,8 @@ _$_.add ( 'show', function () {
  */
 _$_.add ( 'parent', function ( callback ) {
 	this.each ( function ( _elem ) {
-		_.callbackAudit ( callback, _$ ( _elem.parentNode ) )
+		if ( _elem.parentNode )
+			_.callbackAudit ( callback, _$ ( _elem.parentNode ) )
 	} );
 	return this;
 } );
@@ -529,15 +499,11 @@ _$_.add ( 'parent', function ( callback ) {
  * @param callback
  */
 _$_.add ( 'children', function ( callback ) {
-	var _self = this;
-	_self.each ( function ( _elem ) {
+	this.each ( function ( _elem ) {
 		if ( _elem.children.length > 0 ) {
 			_.each ( _elem.children, function ( v, i ) {
-				if ( _.isObject ( v )
-					 && !_.isFunction ( v )
-					 && _.isSet ( _elem.children[ i ] ) ) {
+				if ( _.isNumber ( i ) )
 					_.callbackAudit ( callback, _$ ( v ) )
-				}
 			} )
 		}
 	} );
@@ -548,8 +514,7 @@ _$_.add ( 'children', function ( callback ) {
  * @param callback
  */
 _$_.add ( 'next', function ( callback ) {
-	var _self = this;
-	_self.each ( function ( _elem ) {
+	this.each ( function ( _elem ) {
 		_.callbackAudit ( callback, _$ ( _elem.nextElementSibling ) );
 	} );
 	
@@ -560,20 +525,21 @@ _$_.add ( 'next', function ( callback ) {
  * @param callback
  */
 _$_.add ( 'nexts', function ( filter, callback ) {
-	callback = _.isFunction ( filter ) ? filter : callback;
-	var _self = this;
-	_self.next ( function ( elem ) {
-		var _sibling = elem;
+	var _sibling = null;
+	callback = _.isFunction ( filter )
+		? filter : callback;
+
+	this.next ( function ( elem ) {
+		_sibling = elem;
 		do {
 			if ( _.isSet ( filter ) && !_.isFunction ( filter ) ) {
 				_sibling.filter ( filter, function ( elem ) {
 					_.callbackAudit ( callback, elem );
 				} )
-			} else {
-				_.callbackAudit ( callback, _sibling );
-			}
-			elem = _sibling;
-		} while ( (_sibling = _$ ( elem.collection.nextElementSibling )).exist )
+			} else { _.callbackAudit ( callback, _sibling ); }
+		} while ( (
+			_sibling = _$ ( _sibling.collection.nextElementSibling )
+		).exist )
 	} );
 	
 	return this;
@@ -606,10 +572,10 @@ _$_.add ( 'trigger', function ( event, callback ) {
 /**Find Elements
  * @param filter
  * @param callback
+ * @return object
  */
 _$_.add ( 'find', function ( filter, callback ) {
-	var _self = this;
-	_self.children ( function ( elem ) {
+	this.children ( function ( elem ) {
 		elem.filter ( filter, function ( e ) {
 			_.callbackAudit ( callback, e );
 		}, function () {
@@ -623,19 +589,21 @@ _$_.add ( 'find', function ( filter, callback ) {
 /**Full Parent
  * @param parent_class
  * @param callback
- * @returns {_$_}
+ * @return object
  */
 _$_.add ( 'parents', function ( parent_class, callback ) {
-	var _self = this;
-	_self.each ( function ( _elem ) {
-		var _parent = _$ ( _elem.parentNode );
-		_parent.filter ( parent_class, function ( parent ) {
-			_.callbackAudit ( callback, parent );
-		}, function () {
-			_parent.parents ( parent_class, callback );
+
+	this.each ( function ( _elem ) {
+		_$ ( _elem ).parent ( function ( _parent ) {
+			_parent.filter ( parent_class, function ( parent ) {
+				_.callbackAudit ( callback, parent );
+			}, function () {
+				_parent.parents ( parent_class, callback );
+			} );
 		} );
 	} );
-	return _self;
+
+	return this;
 } );
 
 /***Veriy Class
@@ -643,9 +611,9 @@ _$_.add ( 'parents', function ( parent_class, callback ) {
  * @param cls
  */
 _$_.add ( 'hasClass', function ( elem, cls ) {
-	return (new RegExp ( '(\\s|^)' + cls + '(\\s|$)' )).test (
-		_.isSet ( elem.className.baseVal )
-			? elem.className.baseVal : elem.className );
+	return (
+		new RegExp ( '(\\s|^)' + cls + '(\\s|$)' )
+	).test ( elem.className );
 } );
 
 /**AddClass Element
@@ -658,14 +626,7 @@ _$_.add ( 'addClass', function ( cls ) {
 		if ( !_self.hasClass ( elem, cls ) ) {
 			if ( elem.classList ) {
 				elem.classList.add ( cls )
-			} else {
-				if ( _.isSet ( elem.className.baseVal ) ) {
-					elem.className.baseVal += ' ' + cls
-				} else {
-					elem.className += ' ' + cls;
-				}
-				
-			}
+			} else { elem.className += ' ' + cls; }
 		}
 	} );
 	return this;
@@ -678,9 +639,9 @@ _$_.add ( 'addClass', function ( cls ) {
 _$_.add ( 'toggleClass', function ( cls ) {
 	var _self = this;
 	_self.each ( function ( elem ) {
-		if ( _self.hasClass ( elem, cls ) ) {
+		if ( _self.hasClass ( elem, cls ) )
 			elem.classList.toggle ( cls )
-		}
+
 	} );
 	return this;
 } );
@@ -695,13 +656,9 @@ _$_.add ( 'removeClass', function ( cls ) {
 			if ( elem.classList ) {
 				elem.classList.remove ( cls )
 			} else {
-				var _regex = new RegExp ( cls, 'g' );
-				if ( _.isSet ( elem.className.baseVal ) ) {
-					elem.className.baseVal = _.replace ( elem.className.baseVal, _regex, '' )
-				} else {
-					elem.className = _.replace ( elem.className.baseVal_regex, '' )
-				}
-				
+				elem.className = _.replace ( elem.className, (
+					new RegExp ( cls, 'g' )
+				), '' )
 			}
 		}
 	} );
@@ -710,7 +667,7 @@ _$_.add ( 'removeClass', function ( cls ) {
 
 /**Fade Out
  * @param delay
- * @returns {_$_}
+ * @return object
  */
 _$_.add ( 'fadeOut', function ( delay, callback ) {
 	this.animate ( [
@@ -726,7 +683,7 @@ _$_.add ( 'fadeOut', function ( delay, callback ) {
 
 /**Fade In
  * @param delay
- * @returns {_$_}
+ * @return object
  */
 _$_.add ( 'fadeIn', function ( delay, callback ) {
 	this.animate ( [
@@ -742,7 +699,7 @@ _$_.add ( 'fadeIn', function ( delay, callback ) {
 
 /**Return and set Heigth of DOM
  * @param height
- * @returns {Object}
+ * @return object
  */
 _$_.add ( 'height', function ( height ) {
 	if ( _.isSet ( height ) ) {
@@ -750,18 +707,21 @@ _$_.add ( 'height', function ( height ) {
 			'height': _.isNumber ( height )
 				? height + 'px' : height
 		} );
+		return this;
 	}
 	
 	var _height = [];
 	this.each ( function ( elem ) {
-		_height.push ( (_.cartesianPlane ( elem )).height );
+		_height.push ( (
+						   _.cartesianPlane ( elem )
+					   ).height );
 	} );
 	return _.specArray ( _height );
 } );
 
 /**Return and set width of DOM
  * @param width
- * @returns {Object}
+ * @return object
  */
 _$_.add ( 'width', function ( width ) {
 	if ( _.isSet ( width ) ) {
@@ -769,10 +729,13 @@ _$_.add ( 'width', function ( width ) {
 			'width': _.isNumber ( width )
 				? width + 'px' : width
 		} );
+		return this;
 	}
 	var _width = [];
 	this.each ( function ( elem ) {
-		_width.push ( (_.cartesianPlane ( elem )).width );
+		_width.push ( (
+						  _.cartesianPlane ( elem )
+					  ).width );
 	} );
 	
 	return _.specArray ( _width );
@@ -780,7 +743,7 @@ _$_.add ( 'width', function ( width ) {
 
 /**Validate is
  * @param context
- * @return Object
+ * @retur object
  * */
 _$_.add ( 'is', function ( context ) {
 	_.assert ( context, WARNING_SYRUP.ERROR.NOPARAM );
@@ -801,19 +764,14 @@ _$_.add ( 'is', function ( context ) {
 
 /***Get Child Element
  * @param find
+ * @return array
  * */
 _$_.add ( 'get', function ( find ) {
-	var _return = [],
-		_self = this;
+	var _return = [];
 	
-	_self.each ( function ( v ) {
-		if ( find.indexOf ( ':' ) > -1 ) {
-			_$ ( v ).find ( find, function ( node ) {
-				_return.push ( node );
-			} );
-		} else {
-			_return.push ( _$ ( v.querySelector ( find ) ) );
-		}
+	this.children ( function ( node ) {
+		if ( node.is ( find ) )
+			_return.push ( node );
 	} );
 	
 	return _.specArray ( _return );
@@ -824,15 +782,13 @@ _$_.add ( 'remove', function () {
 	this.each ( function ( v ) {
 		if ( v.remove ) {
 			v.remove ();
-		} else {
-			v.parentNode.removeChild ( v );
-		}
+		} else { v.parentNode.removeChild ( v ); }
 	} );
 } );
 
 /***Each Element
  * @param callback
- * @returns {_$_}
+ * @return object
  */
 _$_.add ( 'each', function ( callback ) {
 	var _element = this.collection;
@@ -851,33 +807,33 @@ _$_.add ( 'each', function ( callback ) {
 
 /**Return and set offset of DOM
  * @param _object
- * @returns {Object}
+ * @return object
  * */
 _$_.add ( 'offset', function ( _object ) {
 	var _offset = [];
 	this.each ( function ( elem ) {
 		var _cartesian = _.cartesianPlane ( elem );
 		if ( _.isObject ( _object ) ) {
-			//elem.style.position = 'absolute';
-			if ( _.isSet ( _object.top ) ) {
+
+			if ( _.isSet ( _object.top ) )
 				elem.style.top = _.isNumber ( _object.top )
 					? _object.top + 'px' : _object.top;
-			}
+
 			
-			if ( _.isSet ( _object.left ) ) {
+			if ( _.isSet ( _object.left ) )
 				elem.style.left = _.isNumber ( _object.left )
 					? _object.left + 'px' : _object.left;
-			}
+
 			
-			if ( _.isSet ( _object.bottom ) ) {
+			if ( _.isSet ( _object.bottom ) )
 				elem.style.bottom = _.isNumber ( _object.bottom )
 					? _object.bottom + 'px' : _object.bottom;
-			}
+
 			
-			if ( _.isSet ( _object.right ) ) {
+			if ( _.isSet ( _object.right ) )
 				elem.style.right = _.isNumber ( _object.right )
 					? _object.right + 'px' : _object.right;
-			}
+
 		}
 		
 		_offset.push ( {
@@ -919,8 +875,12 @@ _$_.add ( 'sort', function ( _prop, _desc, _object ) {
 			b = !isNaN ( +_b ) ? +_b : _b.toLowerCase ();
 		}
 		
-		return (a > b)
-			? _desc : (_desc * -1);
+		return (
+			a > b
+		)
+			? _desc : (
+			_desc * -1
+		);
 	} );
 	
 } );
@@ -932,13 +892,18 @@ _$_.add ( 'sort', function ( _prop, _desc, _object ) {
  * @return Object
  */
 _$_.add ( 'animate', function ( prop, conf, callback ) {
+
 	this.each ( function ( elem ) {
 		if ( _.isSet ( elem.animate ) ) {
 			
 			if ( _.isFunction ( conf ) )
 				callback = conf;
 			
-			conf = ((!_.isObject ( conf ) && !_.isNumber ( conf )) ) ? {} : conf;
+			conf = (
+				(
+					!_.isObject ( conf ) && !_.isNumber ( conf )
+				)
+			) ? {} : conf;
 			
 			
 			conf.iterations = _.isSet ( conf.iterations )
@@ -959,12 +924,18 @@ _$_.add ( 'animate', function ( prop, conf, callback ) {
 	return this;
 } );
 
-
 /**Return object
  * @returns {Object|Array}
  */
 _$_.add ( 'object', function () {
 	return this.collection;
+} );
+
+/** No Conflict
+ * @return _$ object
+ * **/
+Syrup.add ( 'noConflict', function () {
+	return _$;
 } );
 
 
@@ -994,7 +965,11 @@ Syrup.add ( 'isArray', function ( obj ) {
  * @returns {boolean}
  */
 Syrup.add ( 'isObject', function ( obj ) {
-	return (_.objectAsString ( obj ) === '[object Object]' || (typeof obj === 'object' && _.objectAsString ( obj ) !== '[object Null]'));
+	return (
+		_.objectAsString ( obj ) === '[object Object]' || (
+			typeof obj === 'object' && _.objectAsString ( obj ) !== '[object Null]'
+		)
+	);
 } );
 
 /**Valida si un elemento es un object
@@ -1002,17 +977,21 @@ Syrup.add ( 'isObject', function ( obj ) {
  * @returns {boolean}
  */
 Syrup.add ( 'isGlobal', function ( obj ) {
-	return (_.objectAsString ( obj ) === "[object global]"
-			|| _.objectAsString ( obj ) === "[object Window]"
-			|| _.objectAsString ( obj ) === "[object HTMLDocument]"
-			|| _.objectAsString ( obj ) === "[object Document]");
+	return (
+		_.objectAsString ( obj ) === "[object global]"
+		|| _.objectAsString ( obj ) === "[object Window]"
+		|| _.objectAsString ( obj ) === "[object HTMLDocument]"
+		|| _.objectAsString ( obj ) === "[object Document]"
+	);
 } );
 /**Valida si un elemento es un object _$_
  * @param obj
  * @returns {boolean}
  */
 Syrup.add ( 'is$', function ( obj ) {
-	return (obj instanceof _$_);
+	return (
+		obj instanceof _$_
+	);
 } );
 
 /**Valida si es un FormData
@@ -1081,7 +1060,9 @@ Syrup.add ( 'isEmpty', function ( input ) {
 	}
 	
 	var value = input;
-	return (!value || value === '' || /^\s+$/.test ( value ))
+	return (
+		!value || value === '' || /^\s+$/.test ( value )
+	)
 } );
 
 /**Validar Url
@@ -1089,7 +1070,7 @@ Syrup.add ( 'isEmpty', function ( input ) {
  * @returns {boolean}
  */
 Syrup.add ( 'isUrl', function ( url ) {
-	return /(http:\/\/|https:\/\/|\/\/)[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:/~\+#]*[\w\-\@?^=%&amp;/~\+#])?/g.test ( url );
+	return regexUrl.test ( url );
 } );
 
 /**Valida Correo
@@ -1097,7 +1078,7 @@ Syrup.add ( 'isUrl', function ( url ) {
  * @returns {boolean}
  */
 Syrup.add ( 'isMail', function ( mail ) {
-	return /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/.test ( mail );
+	return regexMail.test ( mail );
 } );
 
 /**Valida JSON
@@ -1135,7 +1116,9 @@ Syrup.add ( 'warning', function ( msg ) {
  */
 Syrup.add ( 'error', function ( msg ) {
 	var date = _.getDate ( false );
-	throw (date.hour + ':' + date.minutes + ':' + date.seconds + ' ' + date.meridian + ' -> ' + msg);
+	throw (
+		date.hour + ':' + date.minutes + ':' + date.seconds + ' ' + date.meridian + ' -> ' + msg
+	);
 } );
 
 
@@ -1179,7 +1162,6 @@ Syrup.add ( 'truncateString', function ( string, limit ) {
  * @param _string
  * @param _find
  * @param _replace
- * @para _case
  * @return String
  */
 Syrup.add ( 'replace', function ( _string, _find, _replace ) {
@@ -1199,13 +1181,21 @@ Syrup.add ( 'replace', function ( _string, _find, _replace ) {
 		if ( _.isObject ( _replace ) ) {
 			if ( _find.length > 0 ) {
 				_tmp = _find.pop ();
-				this.recursiveStr = _.replace ( this.recursiveStr, _tmp, _replace[ _tmp ] );
+				this.recursiveStr = _.replace (
+					this.recursiveStr, _tmp,
+					_replace[ _tmp ]
+				);
 			}
 		} else {
 			_.error ( WARNING_SYRUP.ERROR.NOOBJECTREPLACEREGEXP );
 		}
 	} else {
-		while ( ((e = s.indexOf ( _find )) > -1) ) {
+
+		while ( (
+			(
+				e = s.indexOf ( _find )
+			) > -1
+		) ) {
 			r += o.substring ( b, b + e ) + _replace;
 			s = s.substring ( e + _find.length, s.length );
 			b += e + _find.length;
@@ -1223,11 +1213,6 @@ Syrup.add ( 'replace', function ( _string, _find, _replace ) {
 	return this.recursiveStr;
 } );
 
-//Optional
-
-//Syrup.add('replace', function(str, r1, r2){
-//	return str.split(r1 ).join(r2);
-//});
 
 /**Retorna la fecha en un objeto
  * @param fecha
@@ -1256,8 +1241,12 @@ Syrup.add ( 'getDate', function ( fecha ) {
 		? 'PM' : 'AM';
 	
 	hora_ = hora_ > 0xC
-		? (hora_ - 0xC) === 0
-		? 0xC : (hora_ - 0xC) : hora_ < 0xA
+		? (
+			  hora_ - 0xC
+		  ) === 0
+		? 0xC : (
+		hora_ - 0xC
+	) : hora_ < 0xA
 		? '0' + hora_ : hora_;
 	
 	minutos_ = minutos_ < 0xA
@@ -1292,49 +1281,6 @@ Syrup.add ( 'getNav', function () {
 	} : false;
 } );
 
-
-///**Set var by reference
-// * @param ver_name
-// * @return object
-// */
-//Syrup.add('get_pointer', function (_var) {
-//    return window[_var.toString()] = _var;
-//});
-
-/**Window ScrollTo
- * @param conf {delay:int,limit:int, hold:bool,step:int}
- */
-Syrup.add ( 'windowScrollTo', function ( conf ) {
-	if ( !_.isObject ( conf ) ) {
-		_.error ( WARNING_SYRUP.ERROR.NOOBJECT )
-	}
-	
-	if ( !_.isSet ( conf.limit ) )
-		_.error ( 'Limit needed' );
-	
-	var _limit = window.scrollY > conf.limit ? window.scrollY : -conf.limit,
-		_result = _.isSet ( conf.hold ) ? window.scrollY : 0,
-		_min = _.isSet ( conf.hold ) && window.scrollY < conf.limit ? window.scrollY : conf.limit;
-	
-	conf.limit = _limit;
-	conf.step = _.isSet ( conf.step ) ? conf.step : 1;
-	var _scrolling = _.interval ( function ( result ) {
-		_limit < 0
-			? (_result += (result * conf.step))
-			: (_result -= ((conf.limit - result) * conf.step));
-		
-		
-		if ( (_result >= (_limit * -1) && _limit < 0)
-			 || (_result <= _min && _limit > 0) ) {
-			_scrolling.kill ();
-			if ( !_.isSet ( conf.hold ) )
-				window.scrollY = 0;
-		}
-		window.scrollTo ( 0, _result );
-	}, conf );
-	
-	return _scrolling;
-} );
 
 /**Genera un id
  * @param longitud
@@ -1379,13 +1325,12 @@ Syrup.add ( 'getObjectSize', function ( obj ) {
  * @returns (Number|null|Boolean)
  */
 Syrup.add ( 'getObjectValues', function ( obj ) {
-	var _values = [];
 	if ( _.isObject ( obj ) ) {
-		_.each ( obj, function ( v ) {
-			_values.push ( v );
-		} );
+		return _.getObjectKeys ( obj ).map ( function ( k ) {
+			return obj[ k ];
+		} )
 	}
-	return _values;
+	return [];
 } );
 
 /**Retorna un objeto en String
@@ -1423,17 +1368,30 @@ Syrup.add ( 'objectWatch', function ( obj, callback, conf ) {
  * @param orientation
  */
 Syrup.add ( 'interval', function ( callback, conf ) {
-	var _worker = _.Workers;
-	
+	var _worker = new Workers;
+
 	_worker.set ( 'system/workers/setting/Interval', function () {
 		_worker.send ( conf );
-	} );
-	
-	_worker.on ( 'message', function ( e ) {
+	} ).on ( 'message', function ( e ) {
 		_.callbackAudit ( callback, e.data );
 	} );
 	
 	return _worker;
+} );
+
+/**Prepare animation
+ * @param callback
+ * @return function
+ */
+Syrup.add ( 'requestAnimationFrame', function ( callback ) {
+	return (
+		window.requestAnimationFrame ||
+		window.webkitRequestAnimationFrame ||
+		window.mozRequestAnimationFrame ||
+		function ( call ) {
+			window.setTimeout ( call, 0x3E8 / 0x3C );
+		}
+	) ( callback );
 } );
 
 /**Devuelve la cookie segun el nombre
@@ -1458,7 +1416,7 @@ Syrup.add ( 'getCookie', function ( name ) {
 	return _cookie;
 } );
 
-
+/****/
 Syrup.add ( 'simplifyDirectory', function ( slashDir ) {
 	if ( _.isString ( slashDir ) ) {
 		return slashDir.split ( '/' ).join ( '.' )
@@ -1473,29 +1431,6 @@ Syrup.add ( 'dotDirectory', function ( dotDir ) {
 	return dotDir;
 } );
 
-/**Limita la cantidad de elementos ingresados en un input
- * @param _event
- * @param _max_value
- * @returns {*}
- */
-Syrup.add ( 'limitBoxInput', function ( _event, _max_value ) {
-	if ( !_.isObject ( _event ) && !_event.target ) {
-		_.error ( 'Event Object Needed' );
-	}
-	var _obj = _event.target,
-		_value = _obj.value.length,
-		_out = _max_value - _value;
-	
-	if (
-		(_out <= 0 && _event.keyCode !== 8)
-		|| (_value === 0 && _event.keyCode === 8)
-		|| _event.type == 'paste'
-	) {
-		_event.preventDefault ();
-	}
-	
-	return _out;
-} );
 
 /**Pasa Json a format URL
  * @param _object
@@ -1569,7 +1504,9 @@ Syrup.add ( 'each', function ( _object, callback ) {
 			max = _object.length;
 		for ( ; i < max; i++ ) {
 			_p.first = i === 0;
-			_p.last = (i + 1) === max;
+			_p.last = (
+						  i + 1
+					  ) === max;
 			_.callbackAudit ( callback, _object[ i ], i, _p );
 		}
 	} else {
@@ -1578,7 +1515,9 @@ Syrup.add ( 'each', function ( _object, callback ) {
 				_tmp, _i = _tmp = _keys.length;
 			
 			while ( _i-- ) {
-				_p.first = (_i + 1) === _tmp;
+				_p.first = (
+							   _i + 1
+						   ) === _tmp;
 				_p.last = _i === 0;
 				_.callbackAudit ( callback, _object[ _keys[ _i ] ], _keys[ _i ], _p );
 				
@@ -1698,7 +1637,8 @@ Syrup.add ( 'inObject', function ( needle, haystack ) {
 			}
 		}
 	} );
-	return _exist === 0 ? true : _exist;
+	return _exist === 0
+		? true : _exist;
 } );
 
 /**Busca un elemento en un arreglo por RegExp
@@ -1717,13 +1657,12 @@ Syrup.add ( 'matchInArray', function ( find, haystack ) {
  */
 Syrup.add ( 'uniqueArray', function ( array ) {
 	var _new = [];
-	_.each ( array, function ( v ) {
-		if ( !_.inObject ( v, _new ) ) {
+	return array.filter ( function ( v ) {
+		if ( _new.indexOf ( v ) == -1 ) {
 			_new.push ( v );
+			return v;
 		}
 	} );
-	
-	return _new;
 } );
 
 /**Parse to Array
@@ -1734,10 +1673,8 @@ Syrup.add ( 'toArray', function ( element ) {
 	
 	if ( _.isObject ( element ) ) {
 		return [].slice.apply ( element );
-	} else {
-		if ( _.isString ( element ) ) {
-			return _.toObject ( element );
-		}
+	} else if ( _.isString ( element ) ) {
+		return _.toObject ( element );
 	}
 } );
 
@@ -1763,7 +1700,6 @@ Syrup.add ( 'toObject', function ( element ) {
 	
 	if ( _.isString ( element ) )
 		return nativeObject.valueOf.call ( element );
-	
 	
 	if ( !_.isArray ( element ) )
 		_.error ( WARNING_SYRUP.ERROR.NOARRAY );
@@ -1899,11 +1835,14 @@ Syrup.add ( 'include', function ( script, wait, callback ) {
 
 
 //Super Global Object Instance
-window._ = (function () {
-	return new Syrup ();
-}) ();
+window._ = (
+	function () {
+		return new Syrup ();
+	}
+) ();
 
-_.VERSION = '1.0.0';
+_.VERSION = '1.1';
+_.$fn = _$_;
 
 _.nav = {};
 _.nav.unsupported =
@@ -1919,7 +1858,11 @@ _.nav.javascript = navigator.javaEnabled ();
 _.nav.online = navigator.onLine;
 _.nav.local = navigator.userAgent.toLowerCase ();
 
-window._$ = (function () {
-	return (new _$_ ()).$;
-}) ();
+window._$ = (
+	function () {
+		return (
+			new _$_ ()
+		).$;
+	}
+) ();
 

@@ -18,8 +18,8 @@ function CSRF () {
 CSRF.add ( 'get', function ( key ) {
 	var _db = this.storage.get ( this.name );
 	if ( !!_db ) {
-		if ( _.isSet ( key ) && _.isSet ( _db[key] ) ) {
-			return _db[key];
+		if ( _.isSet ( key ) && _.isSet ( _db[ key ] ) ) {
+			return _db[ key ];
 		} else {
 			return _db;
 		}
@@ -32,10 +32,11 @@ CSRF.add ( 'get', function ( key ) {
  */
 CSRF.add ( 'save', function ( key ) {
 	var _db = this.get ( this.name ),
-	    _tokens = !!_db ? _db : {};
+		_tokens = !!_db ? _db : {};
 
-	_tokens[key] = this.tokenAt;
+	_tokens[ key ] = this.tokenAt;
 	this.storage.set ( this.name, _tokens, false );
+	return this;
 } );
 
 /**Valida si exsite una cookie almacenada y la retorna sino es false
@@ -52,8 +53,8 @@ CSRF.add ( 'token', function ( name ) {
  */
 CSRF.add ( 'clear', function ( key ) {
 	var _db = this.get ( false );
-	if ( _db && _db[key] ) {
-		_db[key] = null;
+	if ( _db && _db[ key ] ) {
+		_db[ key ] = null;
 		this.storage.set ( this.name, _db, false );
 	}
 } );
@@ -71,6 +72,5 @@ CSRF.add ( 'isSafeMethod', function ( method ) {
 	return (/^(GET|HEAD|OPTIONS|TRACE)$/.test ( method ));
 } );
 
-Syrup.blend ( CSRF );
 
 
