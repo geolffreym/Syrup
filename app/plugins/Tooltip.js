@@ -7,7 +7,7 @@
  */
 
 
-_$.fn ( 'tooltip', function ( _conf ) {
+_$.add ( 'tooltip', function ( _conf ) {
 	var _self = this,
 	    _tool = _$ ( '<div class="tooltip"></div>' ),
 	    _storage = _.Repository,

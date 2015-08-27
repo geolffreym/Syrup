@@ -115,18 +115,6 @@ _$_.add ( '$', function ( dom ) {
 	return _self;
 } );
 
-//Avoid Conflict Libraries
-_$_.add ( 'noConflict', function () {
-	return _$;
-} );
-
-/***Add fn to object
- * @param callback
- */
-_$_.add ( 'fn', function ( name, fn ) {
-	return _$.__proto__[ name ] = fn;
-} );
-
 /***Event Handler
  * @param callback
  */
