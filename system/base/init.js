@@ -16,6 +16,8 @@ var
 	nativeFunction = Function.prototype,
 	nativeObject = Object.prototype,
 	regexConstructor = /(([^function])([a-zA-z])+(?=\())/g,
+	regexUrl = /^(https?|ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i,
+	regexMail = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/,
 	WARNING_SYRUP = {
 		ERROR: {
 			NOPARAM              : 'Param needed',
@@ -493,7 +495,8 @@ _$_.add ( 'children', function ( callback ) {
 	this.each ( function ( _elem ) {
 		if ( _elem.children.length > 0 ) {
 			_.each ( _elem.children, function ( v, i ) {
-				_.callbackAudit ( callback, _$ ( _elem.children[ i ] ) )
+				if ( _.isNumber ( i ) )
+					_.callbackAudit ( callback, _$ ( v ) )
 			} )
 		}
 	} );
@@ -804,26 +807,26 @@ _$_.add ( 'offset', function ( _object ) {
 	this.each ( function ( elem ) {
 		var _cartesian = _.cartesianPlane ( elem );
 		if ( _.isObject ( _object ) ) {
-			//elem.style.position = 'absolute';
-			if ( _.isSet ( _object.top ) ) {
+
+			if ( _.isSet ( _object.top ) )
 				elem.style.top = _.isNumber ( _object.top )
 					? _object.top + 'px' : _object.top;
-			}
+
 			
-			if ( _.isSet ( _object.left ) ) {
+			if ( _.isSet ( _object.left ) )
 				elem.style.left = _.isNumber ( _object.left )
 					? _object.left + 'px' : _object.left;
-			}
+
 			
-			if ( _.isSet ( _object.bottom ) ) {
+			if ( _.isSet ( _object.bottom ) )
 				elem.style.bottom = _.isNumber ( _object.bottom )
 					? _object.bottom + 'px' : _object.bottom;
-			}
+
 			
-			if ( _.isSet ( _object.right ) ) {
+			if ( _.isSet ( _object.right ) )
 				elem.style.right = _.isNumber ( _object.right )
 					? _object.right + 'px' : _object.right;
-			}
+
 		}
 		
 		_offset.push ( {
@@ -1060,7 +1063,7 @@ Syrup.add ( 'isEmpty', function ( input ) {
  * @returns {boolean}
  */
 Syrup.add ( 'isUrl', function ( url ) {
-	return /(http:\/\/|https:\/\/|\/\/)[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:/~\+#]*[\w\-\@?^=%&amp;/~\+#])?/g.test ( url );
+	return regexUrl.test ( url );
 } );
 
 /**Valida Correo
@@ -1068,7 +1071,7 @@ Syrup.add ( 'isUrl', function ( url ) {
  * @returns {boolean}
  */
 Syrup.add ( 'isMail', function ( mail ) {
-	return /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/.test ( mail );
+	return regexMail.test ( mail );
 } );
 
 /**Valida JSON
@@ -1315,13 +1318,12 @@ Syrup.add ( 'getObjectSize', function ( obj ) {
  * @returns (Number|null|Boolean)
  */
 Syrup.add ( 'getObjectValues', function ( obj ) {
-	var _values = [];
 	if ( _.isObject ( obj ) ) {
-		_.each ( obj, function ( v ) {
-			_values.push ( v );
-		} );
+		return _.getObjectKeys ( obj ).map ( function ( k ) {
+			return obj[ k ];
+		} )
 	}
-	return _values;
+	return [];
 } );
 
 /**Retorna un objeto en String
@@ -1422,33 +1424,6 @@ Syrup.add ( 'dotDirectory', function ( dotDir ) {
 	return dotDir;
 } );
 
-/**Limita la cantidad de elementos ingresados en un input
- * @param _event
- * @param _max_value
- * @returns {*}
- */
-Syrup.add ( 'limitBoxInput', function ( _event, _max_value ) {
-	if ( !_.isObject ( _event ) && !_event.target ) {
-		_.error ( 'Event Object Needed' );
-	}
-	var _obj = _event.target,
-		_value = _obj.value.length,
-		_out = _max_value - _value;
-	
-	if (
-		(
-			_out <= 0 && _event.keyCode !== 8
-		)
-		|| (
-			_value === 0 && _event.keyCode === 8
-		)
-		|| _event.type == 'paste'
-	) {
-		_event.preventDefault ();
-	}
-	
-	return _out;
-} );
 
 /**Pasa Json a format URL
  * @param _object
@@ -1655,7 +1630,8 @@ Syrup.add ( 'inObject', function ( needle, haystack ) {
 			}
 		}
 	} );
-	return _exist === 0 ? true : _exist;
+	return _exist === 0
+		? true : _exist;
 } );
 
 /**Busca un elemento en un arreglo por RegExp

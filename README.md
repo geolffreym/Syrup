@@ -786,18 +786,7 @@ body.removeListener('click')
 ```
     
 Helpers
---------
-    
-**Method `.limitBoxInput(event Object, max_input_length)`**
-
-*(Validate if input value length is less to max_input_length)*
-```js    
-_$('input[type="text"]').addListener('keydown', function(e){
-    _.limitBoxInput(e,50); // If input times is greater than 50, the event is prevented   
-
-    //Code
-})
-```      
+--------   
       
 **Method `.cartesianPlane($ Object || Object, all)`**
 
