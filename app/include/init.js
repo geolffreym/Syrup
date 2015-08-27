@@ -492,8 +492,8 @@ _$_.add ( 'parent', function ( callback ) {
 _$_.add ( 'children', function ( callback ) {
 	this.each ( function ( _elem ) {
 		if ( _elem.children.length > 0 ) {
-			_.each ( _elem.children, function ( v ) {
-				_.callbackAudit ( callback, _$ ( v ) );
+			_.each ( _elem.children, function ( v, i ) {
+				_.callbackAudit ( callback, _$ ( _elem.children[ i ] ) )
 			} )
 		}
 	} );
@@ -657,7 +657,7 @@ _$_.add ( 'removeClass', function ( cls ) {
 
 /**Fade Out
  * @param delay
- * @returns {_$_}
+ * @return object
  */
 _$_.add ( 'fadeOut', function ( delay, callback ) {
 	this.animate ( [
@@ -673,7 +673,7 @@ _$_.add ( 'fadeOut', function ( delay, callback ) {
 
 /**Fade In
  * @param delay
- * @returns {_$_}
+ * @return object
  */
 _$_.add ( 'fadeIn', function ( delay, callback ) {
 	this.animate ( [
@@ -689,7 +689,7 @@ _$_.add ( 'fadeIn', function ( delay, callback ) {
 
 /**Return and set Heigth of DOM
  * @param height
- * @returns {Object}
+ * @return object
  */
 _$_.add ( 'height', function ( height ) {
 	if ( _.isSet ( height ) ) {
@@ -697,6 +697,7 @@ _$_.add ( 'height', function ( height ) {
 			'height': _.isNumber ( height )
 				? height + 'px' : height
 		} );
+		return this;
 	}
 	
 	var _height = [];
@@ -710,7 +711,7 @@ _$_.add ( 'height', function ( height ) {
 
 /**Return and set width of DOM
  * @param width
- * @returns {Object}
+ * @return object
  */
 _$_.add ( 'width', function ( width ) {
 	if ( _.isSet ( width ) ) {
@@ -718,6 +719,7 @@ _$_.add ( 'width', function ( width ) {
 			'width': _.isNumber ( width )
 				? width + 'px' : width
 		} );
+		return this;
 	}
 	var _width = [];
 	this.each ( function ( elem ) {
@@ -731,7 +733,7 @@ _$_.add ( 'width', function ( width ) {
 
 /**Validate is
  * @param context
- * @return Object
+ * @retur object
  * */
 _$_.add ( 'is', function ( context ) {
 	_.assert ( context, WARNING_SYRUP.ERROR.NOPARAM );
@@ -752,19 +754,14 @@ _$_.add ( 'is', function ( context ) {
 
 /***Get Child Element
  * @param find
+ * @return array
  * */
 _$_.add ( 'get', function ( find ) {
-	var _return = [],
-		_self = this;
+	var _return = [];
 	
-	_self.each ( function ( v ) {
-		if ( find.indexOf ( ':' ) > -1 ) {
-			_$ ( v ).find ( find, function ( node ) {
-				_return.push ( node );
-			} );
-		} else {
-			_return.push ( _$ ( v.querySelector ( find ) ) );
-		}
+	this.children ( function ( node ) {
+		if ( node.is ( find ) )
+			_return.push ( node );
 	} );
 	
 	return _.specArray ( _return );
@@ -783,7 +780,7 @@ _$_.add ( 'remove', function () {
 
 /***Each Element
  * @param callback
- * @returns {_$_}
+ * @return object
  */
 _$_.add ( 'each', function ( callback ) {
 	var _element = this.collection;
@@ -802,7 +799,7 @@ _$_.add ( 'each', function ( callback ) {
 
 /**Return and set offset of DOM
  * @param _object
- * @returns {Object}
+ * @return object
  * */
 _$_.add ( 'offset', function ( _object ) {
 	var _offset = [];
