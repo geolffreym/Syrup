@@ -152,24 +152,15 @@ _$_.add ( 'addListener', function ( event, delegate, callback ) {
 			e = e || window.event;
 			var _target = event.srcElement || e.target;
 			if ( _.isSet ( delegate ) && !_.isFunction ( delegate ) ) {
-				if ( _.isSet ( _target.className.baseVal ) ) {
-					if ( _target.className.baseval === delegate ) {
-						_.callbackAudit ( callback, e );
-					}
-				} else {
-					_$ ( _target ).filter ( delegate, function () {
-						_.callbackAudit ( callback, e );
-					} );
-				}
-				
+				_$ ( _target ).filter ( delegate, function () {
+					_.callbackAudit ( callback, e );
+				} );
 			} else {
 				_.callbackAudit ( callback, e );
 			}
-			
 		};
 
 	_self.each ( function ( elem ) {
-
 
 		if ( elem.addEventListener ) {
 			elem.addEventListener ( event, _event, true )
@@ -277,27 +268,15 @@ _$_.add ( 'data', function ( name, value ) {
 		_data_set,
 		_values = [];
 	_self.each ( function ( dom, i ) {
-		if ( !_.isSet ( dom.dataset ) ) {
-			_data_set = 'data-' + name;
-			if ( _.isSet ( value ) ) {
-				var _set = {};
-				_set[ _data_set ] = value;
-				_self.attr ( _set );
-			} else {
-				var _attr = _self.attr ( _data_set );
-				_values = _.isArray ( _attr )
-					? _attr : [ _attr ];
-			}
+		_data_set = dom.dataset;
+		if ( _.isSet ( value ) || _.isNumber ( value ) ) {
+			_data_set[ name ] = _.isArray ( value ) ? value[ i ] : value;
 		} else {
-			_data_set = dom.dataset;
-			if ( _.isSet ( value ) || _.isNumber ( value ) ) {
-				_data_set[ name ] = _.isArray ( value ) ? value[ i ] : value;
-			} else {
-				if ( _.isSet ( _data_set[ name ] ) ) {
-					_values.push ( _data_set[ name ] )
-				}
+			if ( _.isSet ( _data_set[ name ] ) ) {
+				_values.push ( _data_set[ name ] )
 			}
 		}
+
 	} );
 	
 	return _.specArray ( _values );
@@ -631,9 +610,7 @@ _$_.add ( 'parents', function ( parent_class, callback ) {
  * @param cls
  */
 _$_.add ( 'hasClass', function ( elem, cls ) {
-	return (new RegExp ( '(\\s|^)' + cls + '(\\s|$)' )).test (
-		_.isSet ( elem.className.baseVal )
-			? elem.className.baseVal : elem.className );
+	return (new RegExp ( '(\\s|^)' + cls + '(\\s|$)' )).test ( elem.className );
 } );
 
 /**AddClass Element
@@ -647,12 +624,7 @@ _$_.add ( 'addClass', function ( cls ) {
 			if ( elem.classList ) {
 				elem.classList.add ( cls )
 			} else {
-				if ( _.isSet ( elem.className.baseVal ) ) {
-					elem.className.baseVal += ' ' + cls
-				} else {
-					elem.className += ' ' + cls;
-				}
-				
+				elem.className += ' ' + cls;
 			}
 		}
 	} );
@@ -684,12 +656,7 @@ _$_.add ( 'removeClass', function ( cls ) {
 				elem.classList.remove ( cls )
 			} else {
 				var _regex = new RegExp ( cls, 'g' );
-				if ( _.isSet ( elem.className.baseVal ) ) {
-					elem.className.baseVal = _.replace ( elem.className.baseVal, _regex, '' )
-				} else {
-					elem.className = _.replace ( elem.className.baseVal_regex, '' )
-				}
-				
+				elem.className = _.replace ( elem.className, _regex, '' )
 			}
 		}
 	} );
@@ -1864,7 +1831,7 @@ window._ = (function () {
 	return new Syrup ();
 }) ();
 
-_.VERSION = '1.0.0';
+_.VERSION = '1.1';
 
 _.nav = {};
 _.nav.unsupported =
