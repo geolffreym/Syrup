@@ -6,17 +6,34 @@
 </head>
 <body>
 <script src="app/include/init.min.js"></script>
+<a href="#" id="click" data-hi="1" class="a b c">
+    <span>
+
+        <div>
+            <div id="h">
+            <hr/>
+            </div>
+
+        </div>
+
+        Hola
+    </span>
+
+    <p>H</p>
+</a>
 <a href="#" id="unclick" data-hi="1" class="a b c">UCLick</a>
 
 
 <script>
+
     _$ ( function () {
 
         var _tpl = new Template;
+
         _$ ( '#unclick' ).addListener ( 'click', function ( e ) {
 
-            var e = _$( e.target);
-            console.log( e.data('hi'))
+            var e = _$ ( e.target );
+            console.log ( e.data ( 'hi' ) )
 
 //            _tpl.get ( 'library/bookList', function ( r ) {
 //                _tpl.parse ( r, {

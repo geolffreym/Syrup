@@ -21,7 +21,7 @@ Description
 Compatibility with browsers
 =======
     
-    -IE > 9
+    -IE > 10
     -Chrome > 32
     -Firefox > 28
     -Opera 23 >
