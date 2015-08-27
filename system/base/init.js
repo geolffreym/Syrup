@@ -1666,10 +1666,8 @@ Syrup.add ( 'toArray', function ( element ) {
 	
 	if ( _.isObject ( element ) ) {
 		return [].slice.apply ( element );
-	} else {
-		if ( _.isString ( element ) ) {
-			return _.toObject ( element );
-		}
+	} else if ( _.isString ( element ) ) {
+		return _.toObject ( element );
 	}
 } );
 
@@ -1695,7 +1693,6 @@ Syrup.add ( 'toObject', function ( element ) {
 	
 	if ( _.isString ( element ) )
 		return nativeObject.valueOf.call ( element );
-	
 	
 	if ( !_.isArray ( element ) )
 		_.error ( WARNING_SYRUP.ERROR.NOARRAY );
