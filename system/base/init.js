@@ -1782,7 +1782,7 @@ Syrup.add ('extend', function (target, source, overwrite) {
  * @param script
  * @param wait
  * @param callback
- * @return (Boolean|null)
+ * @return object
  */
 Syrup.add ('include', function (script, wait, callback) {
 	var _url = !_.isUrl (script)
