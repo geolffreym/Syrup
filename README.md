@@ -1382,6 +1382,29 @@ _.getScript('//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js', funct
 });
 ```
 
+**Method `.requestAnimationFrame(callback)`**
+
+*(Simple fallback. Gives the browser control over how many frames it renders..)*
+```js    
+
+ function render(time){
+    console.log(time);
+ }
+ 
+ _$('body').addListener('click','#startRender', function(){
+        _.requestAnimationFrame(render);
+ })
+```
+
+**Method `.getScript(url, callback)`**
+
+*(Get local or remote script.)*
+```js    
+_.getScript('//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js', function(){
+    //Script ready
+});
+```
+
 Syrup Working
 ========
 

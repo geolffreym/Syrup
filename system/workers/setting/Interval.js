@@ -5,7 +5,7 @@
 addEventListener ( 'message', function ( e ) {
 	var data = e.data, x = 0,
 	    delay = parseInt ( data.delay ) || 1000,
-	    limit = parseInt ( data.limit ) || x,
+	    limit = parseInt ( data.max ) || x,
 	    answer = function ( msg ) {
 		    this.postMessage ( msg );
 	    },
