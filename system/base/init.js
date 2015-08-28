@@ -111,7 +111,7 @@ _$_.add ('$', function (dom) {
 	} else {
 		_self.collection = !_.isObject (dom) && _.isString (dom)
 			? dom.indexOf ('+') > -1
-			? document.querySelectorAll (_.replace (dom, '+', ''))
+			? document.querySelectorAll (_.replace (dom, '+', _.emptyStr))
 			: document.querySelector (dom)
 			: dom;
 		
@@ -247,7 +247,7 @@ _$_.add ('filter', function (filter, callback, e_handler) {
  * */
 _$_.add ('empty', function () {
 	this.each (function (v) {
-		v.innerHTML = '';
+		v.innerHTML = _.emptyStr;
 	});
 	return this;
 });
@@ -658,7 +658,7 @@ _$_.add ('removeClass', function (cls) {
 			} else {
 				elem.className = _.replace (elem.className, (
 					new RegExp (cls, 'g')
-				), '')
+				), _.emptyStr)
 			}
 		}
 	});
@@ -1060,7 +1060,7 @@ Syrup.add ('isEmpty', function (input) {
 	}
 
 	return (
-		!input || input === '' || /^\s+$/.test (input)
+		!input || input === _.emptyStr || /^\s+$/.test (input)
 	)
 });
 
@@ -1166,7 +1166,7 @@ Syrup.add ('truncateString', function (string, limit) {
 Syrup.add ('replace', function (_string, _find, _replace) {
 	var o = _string.toString (),
 		s = o.toLowerCase (),
-		r = '', b = 0, e = 1, _tmp;
+		r = _.emptyStr, b = 0, e = 1, _tmp;
 	
 	
 	if ( !_.isRegexp (_find) ) {
@@ -1286,7 +1286,7 @@ Syrup.add ('getNav', function () {
  * @returns {string}
  */
 Syrup.add ('getEncodedId', function (longitud) {
-	var _text = "",
+	var _text = _.emptyStr,
 		_longitud = !!longitud ? longitud : 5,
 		_possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789=_";
 	
@@ -1400,7 +1400,7 @@ Syrup.add ('requestAnimationFrame', function (callback) {
 Syrup.add ('getCookie', function (name) {
 	var _mcookie = document.cookie,
 		_cookie = null;
-	if ( !!_mcookie && _mcookie !== '' ) {
+	if ( !!_mcookie && _mcookie !== _.emptyStr ) {
 		var cookies = _mcookie.split (';');
 		_.each (cookies, function (cookie) {
 			cookie = cookie.split ('=');
@@ -1436,7 +1436,7 @@ Syrup.add ('dotDirectory', function (dotDir) {
  * @returns {string}
  */
 Syrup.add ('jsonToQueryString', function (_object) {
-	var _return = '',
+	var _return = _.emptyStr,
 		_size = _.isObject (_object)
 			? _.getObjectSize (_object)
 			: 0;
@@ -1829,6 +1829,7 @@ Syrup.add ('include', function (script, wait, callback) {
 		}
 		_.callbackAudit (callback);
 	});
+	return this;
 	
 });
 
@@ -1842,6 +1843,7 @@ window._ = (
 
 _.VERSION = '1.1';
 _.$fn = _$_;
+_.emptyStr = '';
 
 _.nav = {};
 _.nav.unsupported =
