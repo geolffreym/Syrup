@@ -32,9 +32,12 @@ var
 			NOHTML               : 'Html string is required',
 			NOOBJECTREPLACEREGEXP: 'A object replace param is needed to replace a regexp ex: {match:replace}'
 		}
-	}
-	;
+	};
 
+/** Extend a function
+ *  @param child
+ *  @return void
+ * **/
 nativeFunction.blend = function (child) {
 	var name = (
 		child.prototype.constructor.name
@@ -45,6 +48,22 @@ nativeFunction.blend = function (child) {
 	this.prototype[name] = child;
 };
 
+/** Create a custom function
+ *  @param name
+ *  @return object
+ * **/
+nativeFunction.factory = function (name) {
+	return (
+		new Function (
+			'return function ' + name + '(){}'
+		)
+	)
+};
+
+/** Remove extend
+ * @param child
+ * @reutn bool
+ * */
 nativeFunction.drop = function (child) {
 	var name = (
 		child.prototype.constructor.name
@@ -59,13 +78,13 @@ nativeFunction.drop = function (child) {
 	return false;
 };
 
-/**Add method to class
+
+/**Add method to function
  * @param name
  * @param fn
  */
 nativeFunction.add = function (name, fn) {
-	name = name.trim ();
-	this.prototype[name] = fn;
+	this.prototype[name.trim ()] = fn;
 };
 
 

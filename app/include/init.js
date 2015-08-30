@@ -32,9 +32,12 @@ var
 			NOHTML               : 'Html string is required',
 			NOOBJECTREPLACEREGEXP: 'A object replace param is needed to replace a regexp ex: {match:replace}'
 		}
-	}
-	;
+	};
 
+/** Extend a function
+ *  @param child
+ *  @return void
+ * **/
 nativeFunction.blend = function (child) {
 	var name = (
 		child.prototype.constructor.name
@@ -45,6 +48,22 @@ nativeFunction.blend = function (child) {
 	this.prototype[name] = child;
 };
 
+/** Create a custom function
+ *  @param name
+ *  @return object
+ * **/
+nativeFunction.factory = function (name) {
+	return (
+		new Function (
+			'return function ' + name + '(){}'
+		)
+	)
+};
+
+/** Remove extend
+ * @param child
+ * @reutn bool
+ * */
 nativeFunction.drop = function (child) {
 	var name = (
 		child.prototype.constructor.name
@@ -59,13 +78,13 @@ nativeFunction.drop = function (child) {
 	return false;
 };
 
-/**Add method to class
+
+/**Add method to function
  * @param name
  * @param fn
  */
 nativeFunction.add = function (name, fn) {
-	name = name.trim ();
-	this.prototype[name] = fn;
+	this.prototype[name.trim ()] = fn;
 };
 
 
@@ -1867,6 +1886,739 @@ window._$ = (
 	}
 ) ();
 
+
+/*
+ Tested against Chromium build with Object.observe and acts EXACTLY the same,
+ though Chromium build is MUCH faster
+ Trying to stay as close to the spec as possible,
+ this is a work in progress, feel free to comment/update
+ Specification:
+ http://wiki.ecmascript.org/doku.php?id=harmony:observe
+ Built using parts of:
+ https://github.com/tvcutsem/harmony-reflect/blob/master/examples/observer.js
+ Limits so far;
+ Built using polling... Will update again with polling/getter&setters to make things better at some point
+ TODO:
+ Add support for Object.prototype.watch -> https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/watch
+ */
+if(!Object.observe){
+	(function(extend, global){
+		"use strict";
+		var isCallable = (function(toString){
+			var s = toString.call(toString),
+				u = typeof u;
+			return typeof global.alert === "object" ?
+				function isCallable(f){
+					return s === toString.call(f) || (!!f && typeof f.toString == u && typeof f.valueOf == u && /^\s*\bfunction\b/.test("" + f));
+				}:
+				function isCallable(f){
+					return s === toString.call(f);
+				}
+				;
+		})(extend.prototype.toString);
+		// isNode & isElement from http://stackoverflow.com/questions/384286/javascript-isdom-how-do-you-check-if-a-javascript-object-is-a-dom-object
+		//Returns true if it is a DOM node
+		var isNode = function isNode(o){
+			return (
+				typeof Node === "object" ? o instanceof Node :
+				o && typeof o === "object" && typeof o.nodeType === "number" && typeof o.nodeName==="string"
+			);
+		};
+		//Returns true if it is a DOM element
+		var isElement = function isElement(o){
+			return (
+				typeof HTMLElement === "object" ? o instanceof HTMLElement : //DOM2
+				o && typeof o === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName==="string"
+			);
+		};
+		var _isImmediateSupported = (function(){
+			return !!global.setImmediate;
+		})();
+		var _doCheckCallback = (function(){
+			if(_isImmediateSupported){
+				return function _doCheckCallback(f){
+					return setImmediate(f);
+				};
+			}else{
+				return function _doCheckCallback(f){
+					return setTimeout(f, 10);
+				};
+			}
+		})();
+		var _clearCheckCallback = (function(){
+			if(_isImmediateSupported){
+				return function _clearCheckCallback(id){
+					clearImmediate(id);
+				};
+			}else{
+				return function _clearCheckCallback(id){
+					clearTimeout(id);
+				};
+			}
+		})();
+		var isNumeric=function isNumeric(n){
+			return !isNaN(parseFloat(n)) && isFinite(n);
+		};
+		var sameValue = function sameValue(x, y){
+			if(x===y){
+				return x !== 0 || 1 / x === 1 / y;
+			}
+			return x !== x && y !== y;
+		};
+		var isAccessorDescriptor = function isAccessorDescriptor(desc){
+			if (typeof(desc) === 'undefined'){
+				return false;
+			}
+			return ('get' in desc || 'set' in desc);
+		};
+		var isDataDescriptor = function isDataDescriptor(desc){
+			if (typeof(desc) === 'undefined'){
+				return false;
+			}
+			return ('value' in desc || 'writable' in desc);
+		};
+
+		var validateArguments = function validateArguments(O, callback, accept){
+			if(typeof(O)!=='object'){
+				// Throw Error
+				throw new TypeError("Object.observeObject called on non-object");
+			}
+			if(isCallable(callback)===false){
+				// Throw Error
+				throw new TypeError("Object.observeObject: Expecting function");
+			}
+			if(Object.isFrozen(callback)===true){
+				// Throw Error
+				throw new TypeError("Object.observeObject: Expecting unfrozen function");
+			}
+			if (accept !== undefined) {
+				if (!Array.isArray(accept)) {
+					throw new TypeError("Object.observeObject: Expecting acceptList in the form of an array");
+				}
+			}
+		};
+
+		var Observer = (function Observer(){
+			var wraped = [];
+			var Observer = function Observer(O, callback, accept){
+				validateArguments(O, callback, accept);
+				if (!accept) {
+					accept = ["add", "update", "delete", "reconfigure", "setPrototype", "preventExtensions"];
+				}
+				Object.getNotifier(O).addListener(callback, accept);
+				if(wraped.indexOf(O)===-1){
+					wraped.push(O);
+				}else{
+					Object.getNotifier(O)._checkPropertyListing();
+				}
+			};
+
+			Observer.prototype.deliverChangeRecords = function Observer_deliverChangeRecords(O){
+				Object.getNotifier(O).deliverChangeRecords();
+			};
+
+			wraped.lastScanned = 0;
+			var f = (function f(wrapped){
+				return function _f(){
+					var i = 0, l = wrapped.length, startTime = new Date(), takingTooLong=false;
+					for(i=wrapped.lastScanned; (i<l)&&(!takingTooLong); i++){
+						if(_indexes.indexOf(wrapped[i]) > -1){
+							Object.getNotifier(wrapped[i])._checkPropertyListing();
+							takingTooLong=((new Date())-startTime)>100; // make sure we don't take more than 100 milliseconds to scan all objects
+						}else{
+							wrapped.splice(i, 1);
+							i--;
+							l--;
+						}
+					}
+					wrapped.lastScanned=i<l?i:0; // reset wrapped so we can make sure that we pick things back up
+					_doCheckCallback(_f);
+				};
+			})(wraped);
+			_doCheckCallback(f);
+			return Observer;
+		})();
+
+		var Notifier = function Notifier(watching){
+			var _listeners = [], _acceptLists = [], _updates = [], _updater = false, properties = [], values = [];
+			var self = this;
+			Object.defineProperty(self, '_watching', {
+				enumerable: true,
+				get: (function(watched){
+					return function(){
+						return watched;
+					};
+				})(watching)
+			});
+			var wrapProperty = function wrapProperty(object, prop){
+				var propType = typeof(object[prop]), descriptor = Object.getOwnPropertyDescriptor(object, prop);
+				if((prop==='getNotifier')||isAccessorDescriptor(descriptor)||(!descriptor.enumerable)){
+					return false;
+				}
+				if((object instanceof Array)&&isNumeric(prop)){
+					var idx = properties.length;
+					properties[idx] = prop;
+					values[idx] = object[prop];
+					return true;
+				}
+				(function(idx, prop){
+					properties[idx] = prop;
+					values[idx] = object[prop];
+					function getter(){
+						return values[getter.info.idx];
+					}
+					function setter(value){
+						if(!sameValue(values[setter.info.idx], value)){
+							Object.getNotifier(object).queueUpdate(object, prop, 'update', values[setter.info.idx]);
+							values[setter.info.idx] = value;
+						}
+					}
+					getter.info = setter.info = {
+						idx: idx
+					};
+					Object.defineProperty(object, prop, {
+						get: getter,
+						set: setter
+					});
+				})(properties.length, prop);
+				return true;
+			};
+			self._checkPropertyListing = function _checkPropertyListing(dontQueueUpdates){
+				var object = self._watching, keys = Object.keys(object), i=0, l=keys.length;
+				var newKeys = [], oldKeys = properties.slice(0), updates = [];
+				var prop, queueUpdates = !dontQueueUpdates, propType, value, idx, aLength;
+
+				if(object instanceof Array){
+					aLength = self._oldLength;//object.length;
+					//aLength = object.length;
+				}
+
+				for(i=0; i<l; i++){
+					prop = keys[i];
+					value = object[prop];
+					propType = typeof(value);
+					if((idx = properties.indexOf(prop))===-1){
+						if(wrapProperty(object, prop)&&queueUpdates){
+							self.queueUpdate(object, prop, 'add', null, object[prop]);
+						}
+					}else{
+						if(!(object instanceof Array)||(isNumeric(prop))){
+							if(values[idx] !== value){
+								if(queueUpdates){
+									self.queueUpdate(object, prop, 'update', values[idx], value);
+								}
+								values[idx] = value;
+							}
+						}
+						oldKeys.splice(oldKeys.indexOf(prop), 1);
+					}
+				}
+
+				if(object instanceof Array && object.length !== aLength){
+					if(queueUpdates){
+						self.queueUpdate(object, 'length', 'update', aLength, object);
+					}
+					self._oldLength = object.length;
+				}
+
+				if(queueUpdates){
+					l = oldKeys.length;
+					for(i=0; i<l; i++){
+						idx = properties.indexOf(oldKeys[i]);
+						self.queueUpdate(object, oldKeys[i], 'delete', values[idx]);
+						properties.splice(idx,1);
+						values.splice(idx,1);
+						for(var i=idx;i<properties.length;i++){
+							if(!(properties[i] in object))
+								continue;
+							var getter = Object.getOwnPropertyDescriptor(object,properties[i]).get;
+							if(!getter)
+								continue;
+							var info = getter.info;
+							info.idx = i;
+						}
+					};
+				}
+			};
+			self.addListener = function Notifier_addListener(callback, accept){
+				var idx = _listeners.indexOf(callback);
+				if(idx===-1){
+					_listeners.push(callback);
+					_acceptLists.push(accept);
+				}
+				else {
+					_acceptLists[idx] = accept;
+				}
+			};
+			self.removeListener = function Notifier_removeListener(callback){
+				var idx = _listeners.indexOf(callback);
+				if(idx>-1){
+					_listeners.splice(idx, 1);
+					_acceptLists.splice(idx, 1);
+				}
+			};
+			self.listeners = function Notifier_listeners(){
+				return _listeners;
+			};
+			self.queueUpdate = function Notifier_queueUpdate(what, prop, type, was){
+				this.queueUpdates([{
+					type: type,
+					object: what,
+					name: prop,
+					oldValue: was
+				}]);
+			};
+			self.queueUpdates = function Notifier_queueUpdates(updates){
+				var self = this, i = 0, l = updates.length||0, update;
+				for(i=0; i<l; i++){
+					update = updates[i];
+					_updates.push(update);
+				}
+				if(_updater){
+					_clearCheckCallback(_updater);
+				}
+				_updater = _doCheckCallback(function(){
+					_updater = false;
+					self.deliverChangeRecords();
+				});
+			};
+			self.deliverChangeRecords = function Notifier_deliverChangeRecords(){
+				var i = 0, l = _listeners.length,
+				//keepRunning = true, removed as it seems the actual implementation doesn't do this
+				// In response to BUG #5
+					retval;
+				for(i=0; i<l; i++){
+					if(_listeners[i]){
+						var currentUpdates;
+						if (_acceptLists[i]) {
+							currentUpdates = [];
+							for (var j = 0, updatesLength = _updates.length; j < updatesLength; j++) {
+								if (_acceptLists[i].indexOf(_updates[j].type) !== -1) {
+									currentUpdates.push(_updates[j]);
+								}
+							}
+						}
+						else {
+							currentUpdates = _updates;
+						}
+						if (currentUpdates.length) {
+							if(_listeners[i]===console.log){
+								console.log(currentUpdates);
+							}else{
+								_listeners[i](currentUpdates);
+							}
+						}
+					}
+				}
+				_updates=[];
+			};
+			self.notify = function Notifier_notify(changeRecord) {
+				if (typeof changeRecord !== "object" || typeof changeRecord.type !== "string") {
+					throw new TypeError("Invalid changeRecord with non-string 'type' property");
+				}
+				changeRecord.object = watching;
+				self.queueUpdates([changeRecord]);
+			};
+			self._checkPropertyListing(true);
+		};
+
+		var _notifiers=[], _indexes=[];
+		extend.getNotifier = function Object_getNotifier(O){
+			var idx = _indexes.indexOf(O), notifier = idx>-1?_notifiers[idx]:false;
+			if(!notifier){
+				idx = _indexes.length;
+				_indexes[idx] = O;
+				notifier = _notifiers[idx] = new Notifier(O);
+			}
+			return notifier;
+		};
+		extend.observe = function Object_observe(O, callback, accept){
+			// For Bug 4, can't observe DOM elements tested against canry implementation and matches
+			if(!isElement(O)){
+				return new Observer(O, callback, accept);
+			}
+		};
+		extend.unobserve = function Object_unobserve(O, callback){
+			validateArguments(O, callback);
+			var idx = _indexes.indexOf(O),
+				notifier = idx>-1?_notifiers[idx]:false;
+			if (!notifier){
+				return;
+			}
+			notifier.removeListener(callback);
+			if (notifier.listeners().length === 0){
+				_indexes.splice(idx, 1);
+				_notifiers.splice(idx, 1);
+			}
+		};
+	})(Object, this);
+}
+/**
+ * Created by gmena on 08-06-14.
+ */
+
+"use strict";
+
+function Lib () {
+	this.breadcrumb = {};
+	this.object = {};
+	this.name = null;
+}
+
+/** Blend a method in global Syrup object
+ * @param name
+ * @param dependencies []
+ * @return object
+ * **/
+Lib.add ('blend', function (name, dependencies) {
+	var _split = _.splitString (name, '.');
+	if ( _.isArray (_split) ) {
+		name = _split[0];
+	}
+
+	var _anonymous = (
+		Function.factory (name)
+	) ();
+
+
+	if ( !_.isSet (this.breadcrumb[name]) ) {
+		Syrup.blend (_anonymous);
+		this.name = name;
+		this.object = _[name];
+		this.breadcrumb[name] = this.object;
+	} else if ( !_.isSet (_[this.name][name]) ) {
+		name = _split.pop ();
+		_[this.name][name] = {};
+		this.object = _[this.name][name];
+		this.breadcrumb[name] = this.object;
+	}
+
+	this._dependencies (dependencies);
+
+	return this;
+
+});
+
+/** Return a method saved in breadcrumb
+ * @param name
+ * @return object
+ * **/
+Lib.add ('get', function (name) {
+	return _.isSet (this.breadcrumb[name]) && this.breadcrumb[name];
+});
+
+/**Dependencies gestor
+ * @param dependencies []
+ * @return void
+ * */
+Lib.add ('_dependencies', function (dependencies) {
+	var _self = this;
+	if ( _.isArray (dependencies) && _.isSet (_self.object) ) {
+		_.each (dependencies, function (v) {
+			_self.object.__proto__[v] = !_.isSet (_self.object[v])
+				? new window[v] : _self.object[v];
+		})
+	}
+});
+
+/**Attributes provider
+ * @param attributes object
+ * @return object
+ * */
+Lib.add ('make', function (attributes) {
+	var _self = this;
+	_.each (attributes, function (v, i) {
+		_self.object[i] = v;
+	});
+
+	return this;
+});
+
+/** Methods provider
+ * @param supplier
+ * @return object
+ * **/
+Lib.add ('supply', function (supplier) {
+	var _self = this,
+		_k = _.getObjectKeys (supplier),
+		_i = _k.length;
+
+	while ( _i-- ) {
+		if ( _.isFunction (supplier[_k[_i]]) )
+			_self.cook (_k[_i], supplier[_k[_i]]);
+	}
+
+	return this;
+});
+
+/**Append methods
+ * @param name
+ * @param callback
+ * @return object
+ * */
+Lib.add ('cook', function (name, callback) {
+	this.object.__proto__[name] =  callback;
+	return this;
+});
+
+
+window.Lib = new Lib;
+
+/**
+ * Created by gmena on 07-31-14.
+ */
+"use strict";
+
+function Modules () {
+	this.root = null;
+	this.temp = null;
+	this.scope = {};
+	this.modules = {};
+	this.onchange = {};
+	this.onstop = {};
+	this.ondrop = {};
+}
+
+/** Blend a method in global Syrup object
+ * @param name
+ * @param dependencies []
+ * @return object
+ * **/
+Modules.add ('blend', function (name, dependencies) {
+	Lib.blend (name, dependencies);
+	var _self = new Modules;
+	_self.root = name;
+	_self.scope = {};
+	return _self;
+});
+
+/** Make a recipe for blend
+ *  @param moduleId string
+ *  @param module function
+ *  @return object
+ * */
+Modules.add ('recipe', function (moduleId, module) {
+	if ( _.isSet (this.root) ) {
+		if ( _.isSet (module) ) {
+			this.temp = moduleId;
+			this.modules[moduleId] = {
+				creator : module,
+				instance: null
+			};
+			this._taste (moduleId);
+		}
+	}
+	return this;
+});
+
+/**Object Observer
+ * @param moduleId
+ * **/
+Modules.add ('_watch', function (moduleId) {
+	var _self = this;
+	Object.observe (_self.scope, function (change) {
+		_.each (change, function (v) {
+			if ( _.isSet (_self.onchange[v.name])
+				 && _.getObjectSize (v.object) > 0
+				 // && !_.isSet (v.object[v.name]['unattended'])
+				 && moduleId === v.name
+			) {
+				_self.onchange[v.name] ({
+					name  : v.name,
+					old   : v.oldValue,
+					type  : v.type,
+					object: v.object[v.name]
+				});
+			}
+		});
+	});
+
+});
+
+/**Add new child module
+ * @param moduleId
+ * @return void
+ * **/
+Modules.add ('_add', function (moduleId) {
+	if ( !_.isObject (this.scope[moduleId]) )
+		this.scope[moduleId] = {};
+});
+
+/**Trigger code execution
+ * @param moduleId
+ * @return void
+ * **/
+Modules.add ('_trigger', function (moduleId) {
+	if ( _.isSet (this.modules[moduleId]) )
+		return this.modules[moduleId].creator (_, _$, this.scope);
+	return {}
+});
+
+/**Object UnObserver
+ * @return void
+ * **/
+Modules.add ('stopWatch', function () {
+	var _self = this;
+	Object.unobserve (_self.scope, function () {
+		if ( _.isSet (_self.onstop) ) {
+			_self.onstop ();
+		}
+	})
+});
+
+
+Modules.add ('service', function (name, object) {
+	Lib.cook (name, object);
+});
+
+Modules.add ('services', function (object) {
+	Lib.supply (object);
+});
+
+
+Modules.add ('value', function () {
+
+});
+
+/**Set Scope
+ * @param moduleId
+ * @param object
+ * @return void
+ * **/
+Modules.add ('setScope', function (moduleId, object) {
+	if ( _.isSet (this.scope[moduleId]) ) {
+		this.scope[moduleId] = object;
+	}
+});
+
+/**Get Scope
+ * @param moduleId
+ * @return object
+ * **/
+Modules.add ('getScope', function (moduleId) {
+	if ( _.isSet (this.scope[moduleId]) ) {
+		return this.scope[moduleId];
+	}
+	return {};
+});
+
+Modules.add ('when', function (event, name, callback) {
+	var self = this;
+	return [
+		{
+			change: function () {
+				self.onchange[name] = callback;
+			},
+			stop  : function () {
+				self.onstop[name] = callback;
+			},
+			drop  : function () {
+				self.ondrop[name] = callback;
+			}
+		}[event] ()
+	]
+});
+
+Modules.add ('_serve', function (moduleId, template) {
+	var _self = this,
+		_template = new Template,
+		_scope = _self.scope[moduleId],
+		_dom = _$ ('[sp-controller="' + moduleId + '"]'),
+		_render_view = function () {
+			_template[moduleId] (_scope, function (my_html) {
+				_dom.html (my_html);
+			})
+		};
+
+	if ( _dom.exist && _.getObjectSize (_scope) > 0 ) {
+		if ( _.isBoolean (template) ) {
+			if ( !_.isSet (_template[moduleId]) ) {
+				_.include ('/app/view/' + _self.root + '/' + _.replace (moduleId, /\./g, '_'), function () {
+					_render_view ();
+				})
+			} else {
+				_render_view ();
+			}
+		} else {
+			var _dom_template = _$ ('[sp-template="' + template + '"]'),
+				_parse = _dom_template.exist ? _dom_template.html () : _dom.html ();
+
+			if ( _.isSet (_parse) ) {
+				_template.parse (_parse, _scope, function (result) {
+					_dom.html (result);
+				});
+			}
+		}
+	}
+});
+
+Modules.add ('_taste', function (moduleId, event) {
+	var _self = this;
+
+	if ( _.isSet (_self.modules[moduleId]) && _.isSet (_self.root) ) {
+
+		//Initialize module
+		_self._add (moduleId);
+		_self.modules[moduleId].instance = _self._trigger (moduleId);
+		_self.modules[moduleId].instance.name = moduleId;
+		_self.modules[moduleId].instance.parent = _self.root;
+
+		//Binding Methods
+		_self.modules[moduleId].instance.setScope = function (object) {
+			if ( _.isObject (object) ) {
+				//object.unattended = true;
+				_self.setScope (moduleId, object);
+			}
+		};
+
+		_self.modules[moduleId].instance.getScope = function () {
+			return _self.getScope (moduleId);
+		};
+
+		_self.modules[moduleId].instance.when = function (event, callback) {
+			_self.when (event, moduleId, callback);
+		};
+
+		_self.modules[moduleId].instance.serve = function (_template) {
+			_self._serve (moduleId, _.isSet (_template) ? _template : this.template);
+		};
+
+		//Observe scope
+		_self._watch (moduleId);
+
+		//Init the module
+		_self.modules[moduleId].instance.init (Lib.get (_self.root), event);
+		_self._serve (moduleId, _self.modules[moduleId].instance.template);
+	}
+
+	return this;
+});
+
+Modules.add ('drop', function (moduleId) {
+	if ( _.isSet (this.modules[moduleId]) ) {
+		if ( this.modules[moduleId].instance ) {
+			if ( this.modules[moduleId].instance.destroy )
+				this.modules[moduleId].instance.destroy (moduleId);
+
+			if ( this.ondrop[moduleId] )
+				this.ondrop[moduleId] (moduleId);
+
+			this.modules[moduleId] = null;
+		}
+	}
+	return this;
+});
+
+
+Modules.add ('dropAll', function () {
+	var _self = this;
+	_.each (this.modules, function (module, id) {
+		_self.drop (id);
+	});
+	return this;
+});
+
+window.Module = new Modules;
 
 /**
  * Created with JetBrains PhpStorm.

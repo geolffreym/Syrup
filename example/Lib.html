@@ -17,18 +17,16 @@
 
     _$ (function () {
 
-        var my_Lib = Module.blend ('Hey', ['Ajax']);
-        console.log(my_Lib)
-//
-//        my_Lib.recipe ('Hey.You', function (_, _$, scope) {
-//            return {
-//                init   : function () {
-//                    alert ('hi')
-//                },
-//                destroy: function () {}
-//            }
-//        }).when('click');
+        var my_Lib = Lib.blend ('Hey', ['Ajax']);
+        my_Lib.make ({ user: 'Pedro' });
 
+        my_Lib.supply ({
+            sayHi: function () {
+                alert (this.user)
+            }
+        });
+
+        console.log (_.Hey.sayHi())
 
     })
 
