@@ -6,9 +6,15 @@
 
 //Development
 exports.files = {
-	js: {
+	view: {
+		output: 'app/view/include/init',
+		src   : [
+			'app/view/libraryStore/init'
+		]
+	},
+	core: {
 		output: 'app/include/init',
-		src:    [
+		src   : [
 			'system/base/init', // Needed do not change
 			'system/lib/Map',
 			'system/lib/Ajax',
