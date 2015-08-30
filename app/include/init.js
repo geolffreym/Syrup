@@ -2259,7 +2259,7 @@ if(!Object.observe){
 
 "use strict";
 
-function Lib () {
+function Libs () {
 	this.breadcrumb = {};
 	this.object = {};
 	this.name = null;
@@ -2270,7 +2270,7 @@ function Lib () {
  * @param dependencies []
  * @return object
  * **/
-Lib.add ('blend', function (name, dependencies) {
+Libs.add ('blend', function (name, dependencies) {
 	var _split = _.splitString (name, '.');
 	if ( _.isArray (_split) ) {
 		name = _split[0];
@@ -2303,7 +2303,7 @@ Lib.add ('blend', function (name, dependencies) {
  * @param name
  * @return object
  * **/
-Lib.add ('get', function (name) {
+Libs.add ('get', function (name) {
 	return _.isSet (this.breadcrumb[name]) && this.breadcrumb[name];
 });
 
@@ -2311,7 +2311,7 @@ Lib.add ('get', function (name) {
  * @param dependencies []
  * @return void
  * */
-Lib.add ('_dependencies', function (dependencies) {
+Libs.add ('_dependencies', function (dependencies) {
 	var _self = this;
 	if ( _.isArray (dependencies) && _.isSet (_self.object) ) {
 		_.each (dependencies, function (v) {
@@ -2325,7 +2325,7 @@ Lib.add ('_dependencies', function (dependencies) {
  * @param attributes object
  * @return object
  * */
-Lib.add ('make', function (attributes) {
+Libs.add ('make', function (attributes) {
 	var _self = this;
 	_.each (attributes, function (v, i) {
 		_self.object[i] = v;
@@ -2338,7 +2338,7 @@ Lib.add ('make', function (attributes) {
  * @param supplier
  * @return object
  * **/
-Lib.add ('supply', function (supplier) {
+Libs.add ('supply', function (supplier) {
 	var _self = this,
 		_k = _.getObjectKeys (supplier),
 		_i = _k.length;
@@ -2356,13 +2356,13 @@ Lib.add ('supply', function (supplier) {
  * @param callback
  * @return object
  * */
-Lib.add ('cook', function (name, callback) {
-	this.object.__proto__[name] =  callback;
+Libs.add ('cook', function (name, callback) {
+	this.object.__proto__[name] = callback;
 	return this;
 });
 
 
-window.Lib = new Lib;
+window.Lib = new Libs;
 
 /**
  * Created by gmena on 07-31-14.
@@ -2371,7 +2371,7 @@ window.Lib = new Lib;
 
 function Modules () {
 	this.root = null;
-	this.temp = null;
+	this.lib = null;
 	this.scope = {};
 	this.modules = {};
 	this.onchange = {};
@@ -2385,10 +2385,12 @@ function Modules () {
  * @return object
  * **/
 Modules.add ('blend', function (name, dependencies) {
-	Lib.blend (name, dependencies);
 	var _self = new Modules;
+	_self.lib = new Libs;
 	_self.root = name;
 	_self.scope = {};
+	_self.lib.blend (name, dependencies);
+
 	return _self;
 });
 
@@ -2420,7 +2422,6 @@ Modules.add ('_watch', function (moduleId) {
 		_.each (change, function (v) {
 			if ( _.isSet (_self.onchange[v.name])
 				 && _.getObjectSize (v.object) > 0
-				 // && !_.isSet (v.object[v.name]['unattended'])
 				 && moduleId === v.name
 			) {
 				_self.onchange[v.name] ({
@@ -2429,6 +2430,7 @@ Modules.add ('_watch', function (moduleId) {
 					type  : v.type,
 					object: v.object[v.name]
 				});
+
 			}
 		});
 	});
@@ -2466,13 +2468,23 @@ Modules.add ('stopWatch', function () {
 	})
 });
 
-
-Modules.add ('service', function (name, object) {
-	Lib.cook (name, object);
+/** Append global service
+ * @param name
+ * @param callback function
+ * @return void
+ *
+ * */
+Modules.add ('service', function (name, callback) {
+	this.lib.cook (name, callback);
 });
 
+/** Append global services
+ * @param object
+ * @return void
+ *
+ * */
 Modules.add ('services', function (object) {
-	Lib.supply (object);
+	this.lib.supply (object);
 });
 
 
@@ -2552,7 +2564,7 @@ Modules.add ('_serve', function (moduleId, template) {
 	}
 });
 
-Modules.add ('_taste', function (moduleId, event) {
+Modules.add ('_taste', function (moduleId) {
 	var _self = this;
 
 	if ( _.isSet (_self.modules[moduleId]) && _.isSet (_self.root) ) {
@@ -2566,7 +2578,6 @@ Modules.add ('_taste', function (moduleId, event) {
 		//Binding Methods
 		_self.modules[moduleId].instance.setScope = function (object) {
 			if ( _.isObject (object) ) {
-				//object.unattended = true;
 				_self.setScope (moduleId, object);
 			}
 		};
@@ -2587,7 +2598,7 @@ Modules.add ('_taste', function (moduleId, event) {
 		_self._watch (moduleId);
 
 		//Init the module
-		_self.modules[moduleId].instance.init (Lib.get (_self.root), event);
+		_self.modules[moduleId].instance.init (this.lib.get (_self.root));
 		_self._serve (moduleId, _self.modules[moduleId].instance.template);
 	}
 

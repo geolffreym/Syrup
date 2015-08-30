@@ -5,7 +5,7 @@
 
 function Modules () {
 	this.root = null;
-	this.temp = null;
+	this.lib = null;
 	this.scope = {};
 	this.modules = {};
 	this.onchange = {};
@@ -19,10 +19,12 @@ function Modules () {
  * @return object
  * **/
 Modules.add ('blend', function (name, dependencies) {
-	Lib.blend (name, dependencies);
 	var _self = new Modules;
+	_self.lib = new Libs;
 	_self.root = name;
 	_self.scope = {};
+	_self.lib.blend (name, dependencies);
+
 	return _self;
 });
 
@@ -54,7 +56,6 @@ Modules.add ('_watch', function (moduleId) {
 		_.each (change, function (v) {
 			if ( _.isSet (_self.onchange[v.name])
 				 && _.getObjectSize (v.object) > 0
-				 // && !_.isSet (v.object[v.name]['unattended'])
 				 && moduleId === v.name
 			) {
 				_self.onchange[v.name] ({
@@ -63,6 +64,7 @@ Modules.add ('_watch', function (moduleId) {
 					type  : v.type,
 					object: v.object[v.name]
 				});
+
 			}
 		});
 	});
@@ -100,13 +102,23 @@ Modules.add ('stopWatch', function () {
 	})
 });
 
-
-Modules.add ('service', function (name, object) {
-	Lib.cook (name, object);
+/** Append global service
+ * @param name
+ * @param callback function
+ * @return void
+ *
+ * */
+Modules.add ('service', function (name, callback) {
+	this.lib.cook (name, callback);
 });
 
+/** Append global services
+ * @param object
+ * @return void
+ *
+ * */
 Modules.add ('services', function (object) {
-	Lib.supply (object);
+	this.lib.supply (object);
 });
 
 
@@ -157,22 +169,16 @@ Modules.add ('_serve', function (moduleId, template) {
 	var _self = this,
 		_template = new Template,
 		_scope = _self.scope[moduleId],
-		_dom = _$ ('[sp-controller="' + moduleId + '"]'),
-		_render_view = function () {
-			_template[moduleId] (_scope, function (my_html) {
-				_dom.html (my_html);
-			})
-		};
+		_dom = _$ ('[sp-controller="' + moduleId + '"]');
 
 	if ( _dom.exist && _.getObjectSize (_scope) > 0 ) {
 		if ( _.isBoolean (template) ) {
-			if ( !_.isSet (_template[moduleId]) ) {
-				_.include ('/app/view/' + _self.root + '/' + _.replace (moduleId, /\./g, '_'), function () {
-					_render_view ();
+			//TODO use cache lib
+			_.include ('/app/view/' + _self.root + '/' + _.replace (moduleId, /\./g, '_'), function () {
+				_template[moduleId] (_scope, function (my_html) {
+					_dom.html (my_html);
 				})
-			} else {
-				_render_view ();
-			}
+			})
 		} else {
 			var _dom_template = _$ ('[sp-template="' + template + '"]'),
 				_parse = _dom_template.exist ? _dom_template.html () : _dom.html ();
@@ -186,7 +192,7 @@ Modules.add ('_serve', function (moduleId, template) {
 	}
 });
 
-Modules.add ('_taste', function (moduleId, event) {
+Modules.add ('_taste', function (moduleId) {
 	var _self = this;
 
 	if ( _.isSet (_self.modules[moduleId]) && _.isSet (_self.root) ) {
@@ -200,7 +206,6 @@ Modules.add ('_taste', function (moduleId, event) {
 		//Binding Methods
 		_self.modules[moduleId].instance.setScope = function (object) {
 			if ( _.isObject (object) ) {
-				//object.unattended = true;
 				_self.setScope (moduleId, object);
 			}
 		};
@@ -221,7 +226,7 @@ Modules.add ('_taste', function (moduleId, event) {
 		_self._watch (moduleId);
 
 		//Init the module
-		_self.modules[moduleId].instance.init (Lib.get (_self.root), event);
+		_self.modules[moduleId].instance.init (this.lib.get (_self.root));
 		_self._serve (moduleId, _self.modules[moduleId].instance.template);
 	}
 

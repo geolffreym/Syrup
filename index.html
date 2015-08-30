@@ -18,16 +18,34 @@
     _$ (function () {
 
         var my_Lib = Module.blend ('Hey', ['Ajax']);
-        console.log(my_Lib)
-//
-//        my_Lib.recipe ('Hey.You', function (_, _$, scope) {
-//            return {
-//                init   : function () {
-//                    alert ('hi')
-//                },
-//                destroy: function () {}
-//            }
-//        }).when('click');
+
+        my_Lib.service ('HeyConsole', function () {
+            console.log ('hi')
+        });
+
+
+        my_Lib.recipe ('Hey.You', function (_, _$, scope) {
+            return {
+                init   : function (tools) {
+                    this.setScope ({ a: 2 });
+
+                    this.when ('change', function (d) {
+                        console.log (d)
+                    })
+                },
+                destroy: function () {}
+            }
+        });
+
+
+        my_Lib.recipe ('Hey.Do', function (_, _$, scope) {
+            return {
+                init   : function (tools) {
+                    my_Lib.setScope ('Hey.You', { a: 3 })
+                },
+                destroy: function () {}
+            }
+        });
 
 
     })
