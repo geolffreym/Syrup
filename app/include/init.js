@@ -2535,22 +2535,16 @@ Modules.add ('_serve', function (moduleId, template) {
 	var _self = this,
 		_template = new Template,
 		_scope = _self.scope[moduleId],
-		_dom = _$ ('[sp-controller="' + moduleId + '"]'),
-		_render_view = function () {
-			_template[moduleId] (_scope, function (my_html) {
-				_dom.html (my_html);
-			})
-		};
+		_dom = _$ ('[sp-controller="' + moduleId + '"]');
 
 	if ( _dom.exist && _.getObjectSize (_scope) > 0 ) {
 		if ( _.isBoolean (template) ) {
-			if ( !_.isSet (_template[moduleId]) ) {
-				_.include ('/app/view/' + _self.root + '/' + _.replace (moduleId, /\./g, '_'), function () {
-					_render_view ();
+			//TODO use cache lib
+			_.include ('/app/view/' + _self.root + '/' + _.replace (moduleId, /\./g, '_'), function () {
+				_template[moduleId] (_scope, function (my_html) {
+					_dom.html (my_html);
 				})
-			} else {
-				_render_view ();
-			}
+			})
 		} else {
 			var _dom_template = _$ ('[sp-template="' + template + '"]'),
 				_parse = _dom_template.exist ? _dom_template.html () : _dom.html ();
@@ -2598,8 +2592,10 @@ Modules.add ('_taste', function (moduleId) {
 		_self._watch (moduleId);
 
 		//Init the module
-		_self.modules[moduleId].instance.init (this.lib.get (_self.root));
-		_self._serve (moduleId, _self.modules[moduleId].instance.template);
+		if ( _.isSet (self.modules[moduleId].instance.init) ) {
+			_self.modules[moduleId].instance.init (this.lib.get (_self.root));
+			_self._serve (moduleId, _self.modules[moduleId].instance.template);
+		}
 	}
 
 	return this;

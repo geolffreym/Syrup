@@ -6,12 +6,6 @@
 
 //Development
 exports.files = {
-	view: {
-		output: 'app/view/include/init',
-		src   : [
-			'app/view/libraryStore/init'
-		]
-	},
 	core: {
 		output: 'app/include/init',
 		src   : [

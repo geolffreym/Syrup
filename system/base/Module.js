@@ -226,8 +226,10 @@ Modules.add ('_taste', function (moduleId) {
 		_self._watch (moduleId);
 
 		//Init the module
-		_self.modules[moduleId].instance.init (this.lib.get (_self.root));
-		_self._serve (moduleId, _self.modules[moduleId].instance.template);
+		if ( _.isSet (self.modules[moduleId].instance.init) ) {
+			_self.modules[moduleId].instance.init (this.lib.get (_self.root));
+			_self._serve (moduleId, _self.modules[moduleId].instance.template);
+		}
 	}
 
 	return this;
