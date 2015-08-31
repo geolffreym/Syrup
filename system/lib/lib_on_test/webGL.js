@@ -12,13 +12,13 @@ WebGL = function () {
 	this.canvas = null;
 	this.ctx = null;
 
-	_proto.init = function ( _canvas ) {
+	_proto.init = function (_canvas) {
 		var _self = this;
-		_self.canvas = _.isString ( _canvas )
-			? _$ ( canvas ).object () : _canvas;
+		_self.canvas = _.isString (_canvas)
+			? _$ (canvas).object () : _canvas;
 
-		if ( !_.isObject ( _self.canvas ) ) {
-			_.error ( WARNING_SYRUP.ERROR.NOOBJECT );
+		if ( !_.isObject (_self.canvas) ) {
+			_.error (WARNING_SYRUP.ERROR.NOOBJECT);
 		}
 
 	}

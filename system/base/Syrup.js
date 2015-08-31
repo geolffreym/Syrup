@@ -1854,11 +1854,9 @@ Syrup.add ('include', function (script, wait, callback) {
 
 
 //Super Global Object Instance
-window._ = (
-	function () {
+window._ = (function () {
 		return new Syrup ();
-	}
-) ();
+	}) ();
 
 _.VERSION = '1.1';
 _.$fn = _$_;
@@ -1878,11 +1876,9 @@ _.nav.javascript = navigator.javaEnabled ();
 _.nav.online = navigator.onLine;
 _.nav.local = navigator.userAgent.toLowerCase ();
 
-window._$ = (
-	function () {
+window._$ = (function () {
 		return (
 			new _$_ ()
 		).$;
-	}
-) ();
+	}) ();
 

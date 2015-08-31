@@ -13,13 +13,13 @@ exports.files = {
 			'system/base/Observer',
 			'system/base/Lib',
 			'system/base/Module',
-			// Until here needed do not change
-			'system/lib/Map',
 			'system/lib/Ajax',
 			'system/lib/Repository',
 			'system/lib/Workers',
-			'system/lib/Template'
+			'system/lib/Template',
+			// Until here needed do not change
 			// Add all the necessary modules
+			'system/lib/Map'
 		]
 
 	}
