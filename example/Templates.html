@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<script src="app/include/init.js"></script>
+
+
+<a href="#" id="click">
+    Test
+</a>
+
+
+<!--The controller-->
+<div sp-controller="Hey.You">
+
+</div>
+
+<!--THe Inline template-->
+<template sp-template="Hey.You">
+    <div>
+        <ul>
+            {{#beatles}}
+            <li>{{ firstName }} {{lastName}}</li>
+            {{/beatles}}
+        </ul>
+
+    </div>
+</template>
+
+
+<script>
+
+
+    _$ (function () {
+
+        //The Module
+        var my_Lib = Module.blend ('Hey', ['Ajax']);
+
+        //A global service
+        my_Lib.service ('HeyConsole', function () {
+            console.log ('hi')
+        });
+
+        //A new recipe for Hey
+        my_Lib.recipe ('Hey.You', function (_, _$, scope) {
+            return {
+                init   : function (tools) {
+                    var _self = this;
+                    this.setScope ({
+                        'beatles': [
+                            { "firstName": "John", "lastName": "Lennon" },
+                            { "firstName": "Paul", "lastName": "McCartney" },
+                            { "firstName": "George", "lastName": "Harrison" },
+                            { "firstName": "Ringo", "lastName": "Starr" }
+                        ]
+                    });
+
+
+                    //When Hey.You scope change
+                    this.when ('change', function (d) {
+                        //Render new data
+                        _self.serve ('Hey.You');
+                    })
+                },
+                destroy: function () {}
+            }
+        });
+
+        //A new recipe for Hey
+        my_Lib.recipe ('Hey.Do', function (_, _$, scope) {
+            return {
+                init   : function (tools) {
+
+                    //Trigger change in Hey.You
+                    _$ ('#click').listen ('click', function () {
+                        my_Lib.setScope ('Hey.You', {
+                            'beatles': [
+                                { "firstName": "Pedro", "lastName": "Lennon" }
+                            ]
+                        })
+                    });
+
+                },
+                destroy: function () {}
+            }
+        });
+
+
+    })
+
+</script>
+</body>
+</html>
