@@ -12,6 +12,7 @@ function Require () {
  * @param script
  * @param callback
  * @param conf
+ * @return bool
  * */
 Require.add ('toWait', function (script, callback, conf) {
 	var _self = this;
@@ -36,7 +37,12 @@ Require.add ('toWait', function (script, callback, conf) {
 	return false;
 });
 
-
+/** Request the file
+ * @param script
+ * @param callback
+ * @param object
+ * @return object
+ * */
 Require.add ('request', function (script, callback, conf) {
 	var _self = this,
 		_url = !_.isUrl (script)
