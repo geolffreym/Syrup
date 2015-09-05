@@ -8,21 +8,21 @@
 
 'use strict';
 var GoogleMap,
-    WARNING_GOOGLE_MAP = {
-	    ERROR: {
-		    NOLOCATION:  'No coordinates seted.',
-		    NOMAP:       'No map seted.',
-		    NOCONTAINER: 'No map container seted.',
-		    NOCONFIG:    'The configuration object is necessary.',
-		    NOROUTES:    'No mapped routes',
-		    NODISTANCE:  'You need the source and target to measure the distance.'
+	WARNING_GOOGLE_MAP = {
+		ERROR: {
+			NOLOCATION : 'No coordinates seted.',
+			NOMAP      : 'No map seted.',
+			NOCONTAINER: 'No map container seted.',
+			NOCONFIG   : 'The configuration object is necessary.',
+			NOROUTES   : 'No mapped routes',
+			NODISTANCE : 'You need the source and target to measure the distance.'
 
-	    }
-    };
+		}
+	};
 
 GoogleMap = function () {
 	var _proto = this.__proto__ || GoogleMap.prototype,
-	    _self = this || _proto;
+		_self = this || _proto;
 
 	/**Atributos*/
 	_self.markersCollection = [];
@@ -46,21 +46,23 @@ GoogleMap = function () {
 	/**Map Config
 	 * @param map
 	 */
-	_proto.setMapType = function ( map ) {
+	_proto.setMapType = function (map) {
 		var self = this;
-		self.mapType = [{
-			road:      self.mapObject.MapTypeId.ROADMAP,
-			satellite: self.mapObject.MapTypeId.SATELLITE,
-			hybrid:    self.mapObject.MapTypeId.HYBRID,
-			terrain:   self.mapObject.MapTypeId.TERRAIN
-		}[map]].toString () || self.mapType;
+		self.mapType = [
+						   {
+							   road     : self.mapObject.MapTypeId.ROADMAP,
+							   satellite: self.mapObject.MapTypeId.SATELLITE,
+							   hybrid   : self.mapObject.MapTypeId.HYBRID,
+							   terrain  : self.mapObject.MapTypeId.TERRAIN
+						   }[map]
+					   ].toString () || self.mapType;
 	};
 
 	/**Set Container of Map
 	 * @param container DOM
 	 */
-	_proto.setMapContainer = function ( container ) {
-		if ( _.is$ ( container ) )
+	_proto.setMapContainer = function (container) {
+		if ( _.is$ (container) )
 			container = container.object ();
 		this.container = container;
 	};
@@ -73,10 +75,10 @@ GoogleMap = function () {
 	/**Parse event object google.maps.event to coordinates
 	 *  @param e object Event Class
 	 * */
-	_proto.parseLatLngEvent = function ( e ) {
+	_proto.parseLatLngEvent = function (e) {
 		if ( e.latLng ) {
 			return {
-				latitude:  e.latLng.lat (),
+				latitude : e.latLng.lat (),
 				longitude: e.latLng.lng ()
 			}
 		}
@@ -101,31 +103,41 @@ GoogleMap = function () {
 	//Return the center point of a coords collection
 	_proto.getCoordsCenterPoint = function () {
 		var coords = this.coordsCollection,
-		    x = 0.0,
-		    y = 0.0,
-		    z = 0.0,
-		    lat = 0,
-		    long = 0;
+			x = 0.0,
+			y = 0.0,
+			z = 0.0,
+			lat = 0,
+			long = 0;
 
-		_.each ( coords, function ( v ) {
-			lat = (v.lat () * Math.PI) / 180;
-			long = (v.lng () * Math.PI) / 180;
+		_.each (coords, function (v) {
+			lat = (
+				  v.lat () * Math.PI
+				  ) / 180;
+			long = (
+				   v.lng () * Math.PI
+				   ) / 180;
 
-			x += (Math.cos ( lat ) * Math.cos ( long ));
-			y += (Math.cos ( lat ) * Math.sin ( long ));
-			z += (Math.sin ( lat ));
+			x += (
+			Math.cos (lat) * Math.cos (long)
+			);
+			y += (
+			Math.cos (lat) * Math.sin (long)
+			);
+			z += (
+				Math.sin (lat)
+			);
 
-		} );
+		});
 
 		x /= coords.length;
 		y /= coords.length;
 		z /= coords.length;
 
-		long = Math.atan2 ( y, x );
-		lat = Math.atan2 ( z, Math.sqrt ( x * x + y * y ) );
+		long = Math.atan2 (y, x);
+		lat = Math.atan2 (z, Math.sqrt (x * x + y * y));
 
 		return {
-			latitude:  lat * 180 / Math.PI,
+			latitude : lat * 180 / Math.PI,
 			longitude: long * 180 / Math.PI
 		}
 
@@ -135,8 +147,8 @@ GoogleMap = function () {
 	/**Append a coord to collection
 	 * @param ltnLgn LatLng Class
 	 * */
-	_proto.appendCoord = function ( ltnLgn ) {
-		this.coordsCollection.push ( ltnLgn );
+	_proto.appendCoord = function (ltnLgn) {
+		this.coordsCollection.push (ltnLgn);
 	};
 
 	/**Event Handler
@@ -144,30 +156,30 @@ GoogleMap = function () {
 	 * @param event
 	 * @param callback
 	 * */
-	_proto.on = function ( elem, event, callback ) {
-		if ( _.isString ( elem ) ) {
+	_proto.on = function (elem, event, callback) {
+		if ( _.isString (elem) ) {
 			callback = event;
 			event = elem;
-			if ( _.isSet ( this.mapa ) )
+			if ( _.isSet (this.mapa) )
 				elem = this.mapa;
 		}
 
-		if ( !_.isFunction ( callback ) )
-			_.error ( WARNING_SYRUP.ERROR.NOFUNCTION );
+		if ( !_.isFunction (callback) )
+			_.error (WARNING_SYRUP.ERROR.NOFUNCTION);
 
-		if ( !_.isObject ( elem ) )
-			_.error ( WARNING_GOOGLE_MAP.ERROR.NOMAP );
+		if ( !_.isObject (elem) )
+			_.error (WARNING_GOOGLE_MAP.ERROR.NOMAP);
 
-		_self.mapObject.event.addListener ( elem, event, callback );
+		_self.mapObject.event.addListener (elem, event, callback);
 	};
 
 	/** Make a google map position with coords latitude, longitude
 	 * @param latLong object {latitude:int, longitude:int}
 	 * */
-	_proto.makePosition = function ( latLong ) {
+	_proto.makePosition = function (latLong) {
 
-		if ( !_.isObject ( latLong ) ) {
-			_.error ( WARNING_GOOGLE_MAP.ERROR.NOCONFIG );
+		if ( !_.isObject (latLong) ) {
+			_.error (WARNING_GOOGLE_MAP.ERROR.NOCONFIG);
 		}
 
 		return new this.mapObject.LatLng (
@@ -179,59 +191,59 @@ GoogleMap = function () {
 	/**Set Map Position
 	 * @param latLong object {latitude:int, longitude:int}
 	 */
-	_proto.setMapPosition = function ( latLong ) {
-		if ( !_.isObject ( latLong ) ) {
-			_.error ( WARNING_GOOGLE_MAP.ERROR.NOCONFIG );
+	_proto.setMapPosition = function (latLong) {
+		if ( !_.isObject (latLong) ) {
+			_.error (WARNING_GOOGLE_MAP.ERROR.NOCONFIG);
 		}
-		this.position = this.makePosition ( latLong );
+		this.position = this.makePosition (latLong);
 	};
 
 	/**Change Map Position
 	 * @param latLong object {latitude:int, longitude:int}
 	 */
-	_proto.changeMapPosition = function ( latLong ) {
+	_proto.changeMapPosition = function (latLong) {
 		var self = this;
-		if ( !_.isObject ( latLong ) ) {
-			_.error ( WARNING_GOOGLE_MAP.ERROR.NOCONFIG );
+		if ( !_.isObject (latLong) ) {
+			_.error (WARNING_GOOGLE_MAP.ERROR.NOCONFIG);
 		}
 
 		if ( !self.mapa ) {
-			_.error ( WARNING_GOOGLE_MAP.ERROR.NOMAP );
+			_.error (WARNING_GOOGLE_MAP.ERROR.NOMAP);
 		}
 
-		self.setMapPosition ( latLong );
-		self.mapa.setCenter ( self.position );
+		self.setMapPosition (latLong);
+		self.mapa.setCenter (self.position);
 	};
 
 	/**Create a new map object
 	 * @param config object
 	 * @param callback function
 	 */
-	_proto.createMap = function ( config, callback ) {
+	_proto.createMap = function (config, callback) {
 		var self = this;
 		if ( !self.position ) {
-			_.error ( WARNING_GOOGLE_MAP.ERROR.NOLOCATION );
+			_.error (WARNING_GOOGLE_MAP.ERROR.NOLOCATION);
 		}
 
 		if ( !self.container ) {
-			_.error ( WARNING_GOOGLE_MAP.ERROR.NOCONTAINER );
+			_.error (WARNING_GOOGLE_MAP.ERROR.NOCONTAINER);
 		}
 
 		var mapOptionsDefault = {
-			zoom:      10,
-			center:    self.position,
+			zoom     : 10,
+			center   : self.position,
 			mapTypeId: self.mapType
 		}, options;
 
-		if ( !_.isFunction ( config ) ) {
-			options = _.extend ( config, mapOptionsDefault );
+		if ( !_.isFunction (config) ) {
+			options = _.extend (config, mapOptionsDefault);
 		} else {
 			options = mapOptionsDefault;
 			callback = arguments[0];
 		}
 
-		self.mapa = new self.mapObject.Map ( self.container, options );
-		_.callbackAudit ( callback, self.mapa );
+		self.mapa = new self.mapObject.Map (self.container, options);
+		_.callbackAudit (callback, self.mapa);
 	};
 
 
@@ -241,29 +253,29 @@ GoogleMap = function () {
 	 * @param config object
 	 * @returns object
 	 */
-	_proto.setMarker = function ( position, config ) {
+	_proto.setMarker = function (position, config) {
 
 		if ( !this.mapa )
-			_.error ( WARNING_GOOGLE_MAP.ERROR.NOMAP );
+			_.error (WARNING_GOOGLE_MAP.ERROR.NOMAP);
 
-		if ( !_.isObject ( config ) )
+		if ( !_.isObject (config) )
 			config = {};
 
-		if ( position && _.isObject ( position ) ) {
-			this.setMapPosition ( position );
+		if ( position && _.isObject (position) ) {
+			this.setMapPosition (position);
 		} else {
 			if ( !this.position ) {
-				_.error ( WARNING_GOOGLE_MAP.ERROR.NOLOCATION );
+				_.error (WARNING_GOOGLE_MAP.ERROR.NOLOCATION);
 			}
 		}
 
-		var conf = _.extend ( {position: this.position, map: this.mapa}, config );
+		var conf = _.extend ({ position: this.position, map: this.mapa }, config);
 
-		this.marker = new this.mapObject.Marker ( conf );
-		this.marker.setAnimation ( this.animationType );
+		this.marker = new this.mapObject.Marker (conf);
+		this.marker.setAnimation (this.animationType);
 
-		this.markersCollection.push ( this.marker );
-		this.coordsCollection.push ( this.position );
+		this.markersCollection.push (this.marker);
+		this.coordsCollection.push (this.position);
 
 		return this.marker;
 	};
@@ -272,30 +284,32 @@ GoogleMap = function () {
 	/** Set Marker ANimation Type
 	 *  @param animation string fall|infinitejump
 	 * */
-	_proto.setMarkerAnimationType = function ( animation ) {
+	_proto.setMarkerAnimationType = function (animation) {
 		var self = this;
-		self.animationType = [{
-			fall:         self.mapObject.Animation.DROP,
-			infinitejump: self.mapObject.Animation.BOUNCE
-		}[animation]].toString () || self.animationType;
+		self.animationType = [
+								 {
+									 fall        : self.mapObject.Animation.DROP,
+									 infinitejump: self.mapObject.Animation.BOUNCE
+								 }[animation]
+							 ].toString () || self.animationType;
 	};
 
 	//Stop Marker Animation
 	_proto.stopMarkerAnimation = function () {
-		this.marker.setAnimation ( null );
+		this.marker.setAnimation (null);
 	};
 
 	/**Show all Markers
 	 *  @param map object Map Class
 	 * */
-	_proto.showAllMarkers = function ( map ) {
-		_.each ( this.markersCollection, function ( v ) {
-			v.setMap ( map );
-		} );
+	_proto.showAllMarkers = function (map) {
+		_.each (this.markersCollection, function (v) {
+			v.setMap (map);
+		});
 	};
 
 	_proto.clearMarkers = function () {
-		this.showAllMarkers ( null );
+		this.showAllMarkers (null);
 	};
 
 	_proto.deleteMarkers = function () {
@@ -312,12 +326,12 @@ GoogleMap = function () {
 	 * @param marker object Marker Class
 	 * @param config object
 	 * */
-	_proto.setMarkerInfo = function ( content, marker, config ) {
+	_proto.setMarkerInfo = function (content, marker, config) {
 		var self = this;
-		config = _.extend ( {content: content}, config );
+		config = _.extend ({ content: content }, config);
 
-		var info = this.createInfoLabel ( content, config );
-		info.open ( self.mapa, marker );
+		var info = this.createInfoLabel (content, config);
+		info.open (self.mapa, marker);
 
 		return info;
 	};
@@ -327,20 +341,20 @@ GoogleMap = function () {
 	 * @param content string
 	 * @param config object
 	 * */
-	_proto.createInfoLabel = function ( content, config ) {
+	_proto.createInfoLabel = function (content, config) {
 		var self = this;
-		config = _.extend ( {content: content}, config );
+		config = _.extend ({ content: content }, config);
 
-		self.infoWindow = new self.mapObject.InfoWindow ( config );
-		self.infoLabels.push ( self.infoWindow );
+		self.infoWindow = new self.mapObject.InfoWindow (config);
+		self.infoLabels.push (self.infoWindow);
 		return self.infoWindow;
 	};
 
 	//Clear all info labels
 	_proto.clearInfoLabels = function () {
-		_.each ( this.infoLabels, function ( v ) {
+		_.each (this.infoLabels, function (v) {
 			v.close ();
-		} )
+		})
 	};
 
 	//Clear actual Info Label
@@ -348,43 +362,43 @@ GoogleMap = function () {
 		self.infoWindow.close ()
 	};
 
-	_proto.geoCodeRequest = function ( object, callback ) {
-		this.geocoder.geocode ( object, callback );
+	_proto.geoCodeRequest = function (object, callback) {
+		this.geocoder.geocode (object, callback);
 	};
 
 	/**Location String Info
 	 * @param position
 	 * @param callback
 	 */
-	_proto.getLocationInfo = function ( position, callback ) {
+	_proto.getLocationInfo = function (position, callback) {
 		var self = this;
-		if ( _.isSet ( position ) && _.isObject ( position ) ) {
-			self.setMapPosition ( position );
+		if ( _.isSet (position) && _.isObject (position) ) {
+			self.setMapPosition (position);
 		} else {
-			if ( !_.isSet ( self.position ) ) {
-				self.error ( WARNING_GOOGLE_MAP.ERROR.NOLOCATION );
+			if ( !_.isSet (self.position) ) {
+				self.error (WARNING_GOOGLE_MAP.ERROR.NOLOCATION);
 			}
 
-			if ( _.isFunction ( position ) ) {
+			if ( _.isFunction (position) ) {
 				callback = arguments[0];
 			}
 		}
 
-		this.geoCodeRequest ( {'latLng': self.position}, function ( result, status ) {
+		this.geoCodeRequest ({ 'latLng': self.position }, function (result, status) {
 			if ( status === self.mapObject.GeocoderStatus.OK ) {
-				_.callbackAudit ( callback, {
-					street: _.isSet ( result[0].address_components[0] )
+				_.callbackAudit (callback, {
+					street : _.isSet (result[0].address_components[0])
 						? result[0].address_components[0].long_name : null,
-					city: _.isSet ( result[0].address_components[1] )
+					city   : _.isSet (result[0].address_components[1])
 						? result[0].address_components[1].long_name : null,
-					state: _.isSet ( result[0].address_components[2] )
+					state  : _.isSet (result[0].address_components[2])
 						? result[0].address_components[2].long_name : null,
-					country: _.isSet ( result[0].address_components[3] )
+					country: _.isSet (result[0].address_components[3])
 						? result[0].address_components[3].long_name : null
 
-				} );
+				});
 			}
-		} );
+		});
 
 	};
 
@@ -392,50 +406,50 @@ GoogleMap = function () {
 	 * @param query
 	 * @param callback
 	 */
-	_proto.getLocationBySearch = function ( query, callback ) {
-		this.geoCodeRequest ( {'address': query}, function ( results, status ) {
+	_proto.getLocationBySearch = function (query, callback) {
+		this.geoCodeRequest ({ 'address': query }, function (results, status) {
 			if ( status == google.maps.GeocoderStatus.OK ) {
 				var data = results[0].geometry.location;
-				_.callbackAudit ( callback, {
-					latitude:  data.lat (),
+				_.callbackAudit (callback, {
+					latitude : data.lat (),
 					longitude: data.lng (),
-					altitude:  0
-				} );
+					altitude : 0
+				});
 			}
-		} );
+		});
 	};
 
 	/**Rutas*/
-	_proto.drawRoute = function ( config, callback ) {
+	_proto.drawRoute = function (config, callback) {
 		var self = this;
 		if ( self.coordsCollection.length == 0 ) {
-			self.error ( WARNING_GOOGLE_MAP.ERROR.NOROUTES );
+			self.error (WARNING_GOOGLE_MAP.ERROR.NOROUTES);
 		}
 
-		if ( _.isFunction ( config ) ) {
+		if ( _.isFunction (config) ) {
 			callback = arguments[0];
 		}
 
-		var _Conf = _.extend ( {
-			                       path:          self.coordsCollection,
-			                       geodesic:      true,
-			                       strokeColor:   '#FF0000',
-			                       strokeOpacity: 1.0,
-			                       strokeWeight:  2
-		                       }, config, true );
+		var _Conf = _.extend ({
+			path         : self.coordsCollection,
+			geodesic     : true,
+			strokeColor  : '#FF0000',
+			strokeOpacity: 1.0,
+			strokeWeight : 2
+		}, config, true);
 
-		self.ruta = new self.mapObject.Polyline ( _Conf );
+		self.ruta = new self.mapObject.Polyline (_Conf);
 
-		self.ruta.setMap ( self.mapa );
-		self.appendRoute ( self.ruta );
-		_.callbackAudit ( callback, self.ruta );
+		self.ruta.setMap (self.mapa);
+		self.appendRoute (self.ruta);
+		_.callbackAudit (callback, self.ruta);
 	};
 
 	/**Append Route
 	 * @param route PoliLyne Class
 	 * */
-	_proto.appendRoute = function ( route ) {
-		this.routesCollection.push ( route );
+	_proto.appendRoute = function (route) {
+		this.routesCollection.push (route);
 	};
 
 	_proto.getRoutes = function () {
@@ -443,9 +457,9 @@ GoogleMap = function () {
 	};
 
 	_proto.clearRoutes = function () {
-		_.each ( this.routesCollection, function ( v ) {
-			v.setMap ( null );
-		} );
+		_.each (this.routesCollection, function (v) {
+			v.setMap (null);
+		});
 	};
 
 	_proto.deleteRoutes = function () {
@@ -453,21 +467,23 @@ GoogleMap = function () {
 	};
 
 	/**Distances*/
-	_proto.setTravelMode = function ( type ) {
+	_proto.setTravelMode = function (type) {
 		var self = this;
-		self.travelType = [{
-			'drive': self.mapObject.TravelMode.DRIVING,
-			'walk':  self.mapObject.TravelMode.WALKING,
-			'bike':  self.mapObject.TravelMode.BICYCLING,
-			'bus':   self.mapObject.TravelMode.TRANSIT
-		}[type]] || self.travelType;
+		self.travelType = [
+				{
+					'drive': self.mapObject.TravelMode.DRIVING,
+					'walk' : self.mapObject.TravelMode.WALKING,
+					'bike' : self.mapObject.TravelMode.BICYCLING,
+					'bus'  : self.mapObject.TravelMode.TRANSIT
+				}[type]
+			] || self.travelType;
 	};
 
-	_proto.packDistances = function ( object ) {
+	_proto.packDistances = function (object) {
 		var self = this,
-		    _destination = object.destinationAddresses,
-		    _origin = object.originAddresses,
-		    _distance = object.rows;
+			_destination = object.destinationAddresses,
+			_origin = object.originAddresses,
+			_distance = object.rows;
 
 		for ( var i in _destination ) {
 			self.distanceCollection[i] = {};
@@ -493,31 +509,31 @@ GoogleMap = function () {
 	 *  @param config
 	 *  @param callback
 	 * */
-	_proto.getDistance = function ( routes, config, callback ) {
+	_proto.getDistance = function (routes, config, callback) {
 		var self = this;
-		if ( !routes || _.isObject ( routes ) ) {
-			self.error ( WARNING_GOOGLE_MAP.ERROR.NODISTANCE );
+		if ( !routes || _.isObject (routes) ) {
+			self.error (WARNING_GOOGLE_MAP.ERROR.NODISTANCE);
 		}
 
-		if ( _.isFunction ( config ) ) {
+		if ( _.isFunction (config) ) {
 			callback = arguments[1];
 		}
 
-		var _Conf = _.extend ( {
-			                       origins:      routes,
-			                       destinations: routes,
-			                       travelMode:   self.travelType
-		                       }, config ), _Distances = false;
+		var _Conf = _.extend ({
+			origins     : routes,
+			destinations: routes,
+			travelMode  : self.travelType
+		}, config), _Distances = false;
 
-		self.distance.getDistanceMatrix ( _Conf, function ( result, status ) {
+		self.distance.getDistanceMatrix (_Conf, function (result, status) {
 			if ( status == 'OK' ) {
-				_Distances = self.packDistances ( result );
+				_Distances = self.packDistances (result);
 			}
 
 			if ( callback ) {
-				callback ( _Distances );
+				callback (_Distances);
 			}
-		} );
+		});
 
 	}
 

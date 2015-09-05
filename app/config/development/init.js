@@ -6,17 +6,20 @@
 
 //Development
 exports.files = {
-	js: {
+	core: {
 		output: 'app/include/init',
-		src:    [
-			'system/base/init', // Needed do not change
-			'system/lib/Map',
+		src   : [
+			'system/base/Syrup',
+			'system/base/Observer',
+			'system/base/Lib',
+			'system/base/Module',
 			'system/lib/Ajax',
 			'system/lib/Repository',
 			'system/lib/Workers',
-			'system/lib/Template'
+			'system/lib/Template',
+			// Until here needed do not change
 			// Add all the necessary modules
+			'system/lib/Map'
 		]
-
 	}
 };

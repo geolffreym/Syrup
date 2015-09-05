@@ -5,39 +5,50 @@
     <title></title>
 </head>
 <body>
-<script src="app/include/init.min.js"></script>
+<script src="app/include/init.js"></script>
 <a href="#" id="click" data-hi="1" class="a b c" data-tooltip="Hi!">
-Test
+    Test
 </a>
 <a href="#" id="unclick" data-hi="1" class="a b c">UCLick</a>
 
 
 <script>
 
-    _$ ( function () {
 
-//        var _tpl = new Template;
-//
-//        _$ ( '#unclick' ).addListener ( 'click', function ( e ) {
-//
-//            var e = _$ ( e.target );
-//            console.log ( e.data ( 'hi' ) )
-//
-////            _tpl.get ( 'library/bookList', function ( r ) {
-////                _tpl.parse ( r, {
-////                    "beatles": [
-////                        { "firstName": "John", "lastName": "Lennon" },
-////                        { "firstName": "Paul", "lastName": "McCartney" },
-////                        { "firstName": "George", "lastName": "Harrison" },
-////                        { "firstName": "Ringo", "lastName": "Starr" }
-////                    ]
-////                }, function ( res ) {
-////                    console.log ( res )
-////                } )
-////            } ).remove ()
-//        } )
+    _$ (function () {
 
-    } )
+        var my_Lib = Module.blend ('Hey', ['Ajax']);
+
+        my_Lib.service ('HeyConsole', function () {
+            console.log ('hi')
+        });
+
+
+        my_Lib.recipe ('Hey.You', function (_, _$, scope) {
+            return {
+                init   : function (tools) {
+                    this.setScope ({ a: 2 });
+
+                    this.when ('change', function (d) {
+                        console.log (d)
+                    })
+                },
+                destroy: function () {}
+            }
+        });
+
+
+        my_Lib.recipe ('Hey.Do', function (_, _$, scope) {
+            return {
+                init   : function (tools) {
+                    my_Lib.setScope ('Hey.You', { a: 3 })
+                },
+                destroy: function () {}
+            }
+        });
+
+
+    })
 
 </script>
 </body>
