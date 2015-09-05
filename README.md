@@ -721,15 +721,15 @@ my_selector.sort()
 var body = _$('body'),
 my_selector = _$('.div');
 
-my_select.addListener('click', function(){
+my_select.listen('click', function(){
     alert('I am clicked');
 });
 
-body.addListener('click', '.div', function(){
+body.listen('click', '.div', function(){
         alert('I am clicked as delegated');
 });
 
-body.addListener('click', '.div1', function(){
+body.listen('click', '.div1', function(){
             alert('I am clicked as delegated in div1');
 });   
 
@@ -742,7 +742,7 @@ _$('.div1').trigger('click') // alert I am clicked as delegated in div1
 Events
 --------------
 
-**Method `.addListener(event, delegate(optional), callback)`**
+**Method `.listen(event, delegate(optional), callback)`**
 
 *(Add event listener to object)*
 ```js
@@ -750,39 +750,39 @@ var body = _$('body'),
     my_selector = _$('.selector');
     
 //Event delegation
-body.addListener('click', '.selector', function(e){
+body.listen('click', '.selector', function(e){
     
     /*My Code*/
     
-}).addListener('keydown','textarea', function(e){
+}).listen('keydown','textarea', function(e){
 
     /*My Code*/
     
 })
 
 //Event assign
-my_selector.addListener('click', function(e){
+my_selector.listen('click', function(e){
     
     /*My Code*/
     
 })
 ```
 
-**Method `.removeListener(event)`**
+**Method `.unlisten(event)`**
 
 *(Remove event listener to object)*
 ```js
 var body = _$('body');
 
 //Event assign
-body.addListener('click',  function(e){
+body.listen('click',  function(e){
 
     /*My Code*/
 
 })
 
 //Remove Event assign
-body.removeListener('click')
+body.unlisten('click')
 ```
     
 Helpers
@@ -1391,7 +1391,7 @@ _.getScript('//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js', funct
     console.log(time);
  }
  
- _$('body').addListener('click','#startRender', function(){
+ _$('body').listen('click','#startRender', function(){
         _.requestAnimationFrame(render);
  })
 ```

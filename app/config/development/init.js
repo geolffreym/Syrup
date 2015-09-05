@@ -13,6 +13,7 @@ exports.files = {
 			'system/base/Observer',
 			'system/base/Lib',
 			'system/base/Module',
+			'system/base/Require',
 			'system/lib/Ajax',
 			'system/lib/Repository',
 			'system/lib/Workers',
