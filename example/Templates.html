@@ -5,14 +5,14 @@
     <title></title>
 </head>
 <body>
-<script src="app/include/init.js"></script>
+<script src="../app/include/init.js"></script>
 
 
 <a href="#" id="click">
     Test
 </a>
 
-
+<!--The event listener-->
 <a href="#" sp-listen="Hey.You">
     Iam Hey You
 </a>
@@ -71,6 +71,7 @@
                     //Dom traversing, find sp-listen
                     this.listen ('click', function (e) {
                         e.preventDefault ();
+                        alert ('clicked');
                         //On click Hey.You listener what to do?
                     });
 
@@ -82,8 +83,8 @@
                         //The view's directory, respects namespace
                         _self.serve ('Hey.You');
 
-                        // The global service
-                        _self.myConsole ('Done');
+                        // The global service in tools
+                        tools.myConsole ('Done');
                     })
                 },
                 destroy: function () {
