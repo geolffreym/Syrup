@@ -2628,7 +2628,7 @@ Modules.add ('drop', function (moduleId) {
 	if ( _.isSet (this.modules[moduleId]) ) {
 		if ( this.modules[moduleId].instance ) {
 			if ( this.modules[moduleId].instance.destroy )
-				this.modules[moduleId].instance.destroy (moduleId);
+				this.modules[moduleId].instance.destroy (this.lib.get (this.root));
 
 			if ( this.ondrop[moduleId] )
 				this.ondrop[moduleId] (moduleId);
