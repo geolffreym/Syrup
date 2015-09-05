@@ -5,7 +5,7 @@
     <title></title>
 </head>
 <body>
-<script src="app/include/init.js"></script>
+<script src="../app/include/init.js"></script>
 <a href="#" id="click" data-hi="1" class="a b c" data-tooltip="Hi!">
     Test
 </a>
@@ -17,17 +17,23 @@
 
     _$ (function () {
 
+        //Blend a Lib to Syrup
         var my_Lib = Lib.blend ('Hey', ['Ajax']);
+
+        //Constructor
         my_Lib.make ({ user: 'Pedro' });
 
+        //Methods
         my_Lib.supply ({
             sayHi: function () {
-                alert (this.user)
+                console.log('Hey i\'m ' + this.user);
+
+                //Ajax in dependencies
+                console.log(this.Ajax);
             }
         });
 
-        console.log (_.Hey.sayHi())
-
+        _.Hey.sayHi();
     })
 
 </script>
