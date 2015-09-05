@@ -1854,11 +1854,9 @@ Syrup.add ('include', function (script, wait, callback) {
 
 
 //Super Global Object Instance
-window._ = (
-	function () {
+window._ = (function () {
 		return new Syrup ();
-	}
-) ();
+	}) ();
 
 _.VERSION = '1.1';
 _.$fn = _$_;
@@ -1878,13 +1876,11 @@ _.nav.javascript = navigator.javaEnabled ();
 _.nav.online = navigator.onLine;
 _.nav.local = navigator.userAgent.toLowerCase ();
 
-window._$ = (
-	function () {
+window._$ = (function () {
 		return (
 			new _$_ ()
 		).$;
-	}
-) ();
+	}) ();
 
 
 /*
@@ -2628,6 +2624,437 @@ Modules.add ('dropAll', function () {
 window.Module = new Modules;
 
 /**
+ * Created by gmena on 07-26-14.
+ */
+
+'use strict';
+
+/**Ajax
+ * @constructor
+ */
+
+
+function Ajax () {
+	this.xhr = new window.XMLHttpRequest
+			   || new window.ActiveXObject ( "Microsoft.XMLHTTP" );
+	this.xhr_list = [];
+	this.upload = null;
+	this.before = null;
+	this.complete = null;
+	this.progress = null;
+	this.state = null;
+	this.abort = null;
+	this.error = null;
+	this.time_out = null;
+}
+
+/*** Event handler
+ * @param event
+ * @param callback
+ * @return void
+ * */
+Ajax.add ( 'on', function ( event, callback ) {
+	var self = this;
+	return [
+		{
+			before  : function () {
+				self.before = callback;
+			},
+			complete: function () {
+				self.complete = callback;
+			},
+			error   : function () {
+				self.error = callback;
+			},
+			abort   : function () {
+				self.abort = callback;
+			},
+			state   : function () {
+				self.state = callback;
+			},
+			timeout : function () {
+				self.time_out = callback;
+			},
+			progress: function () {
+				self.progress = callback;
+			}
+		}[ event ] ()
+	]
+
+} );
+
+/** Ajax Request
+ * @param config
+ * @param callback
+ * @return object
+ *
+ * Config object {
+ *  url: (string) the request url
+ *  type: (string) the request type GET or POST
+ *	async: bool,
+ *	timeout: (int) request timeout,
+ *	processor: (string) ajax server side processor file extension,
+ *	token: (string or bool) CSRF token needed?,
+ *	contentType: (string) the content type,
+ *	contentHeader: (object) the content header request,
+ *	data: (object) the request data,
+ *	upload: (bool) is upload process?
+ *
+ * }
+ * **/
+Ajax.add ( 'request', function ( config, callback ) {
+	if ( !_.isObject ( config ) ) {
+		throw (WARNING_SYRUP.ERROR.NOOBJECT)
+	}
+
+	var _self = this,
+		_xhr = _self.xhr,
+		_async = true,
+		_type = config.method || 'GET',
+		_timeout = config.timeout || 4000,
+		_processor = config.processor || setting.ajax_processor || '',
+		_token = config.token || false,
+		_contentType = config.contentType || 'application/x-www-form-urlencoded;charset=utf-8',
+		_data = config.data
+			? config.data : null,
+		_contentHeader = config.contentHeader ||
+						 [
+							 {
+								 header: 'Content-Type',
+								 value : _contentType
+							 }
+						 ]
+		;
+
+	if ( !_.isSet ( config.url ) ) {
+		throw (WARNING_SYRUP.ERROR.NOURL);
+	}
+
+	if ( !_.isFormData ( _data )
+		 && _.isSet ( _data )
+		 && _contentHeader !== 'auto' ) {
+		_data = _.parseJsonUrl ( _data );
+	}
+
+	if ( _type === 'GET' && _.isSet ( _data ) ) {
+		_processor += '?' + _data;
+	}
+
+	_processor = config.url + (_processor || '');
+	_xhr.open ( _type, _processor, _async );
+	_xhr.timeout = _timeout;
+
+	//Setting Headers
+	if ( !_.isFormData ( _data ) && _contentHeader !== 'auto' ) {
+		_.each ( _contentHeader, function ( v ) {
+			_self.requestHeader ( v.header, v.value );
+		} )
+
+	}
+
+	//Using Token
+	if ( _.isSet ( _token ) )
+		_self.requestHeader ( "X-CSRFToken", _.getCookie ( _.isBoolean ( _token ) ? 'csrftoken' : _token ) );
+
+	//If upload needed
+	if ( _.isSet ( config.upload ) && _.isBoolean ( config.upload ) ) {
+		_self.upload = _self.xhr.upload;
+		_xhr = _self.upload;
+	}
+
+	//Event Listeners
+	_xhr.addEventListener ( 'load', function ( e ) {
+		if ( this.status >= 0xC8 && this.status < 0x190 ) {
+			var _response = this.response || this.responseText;
+			if ( _.isJson ( _response ) ) {
+				_response = JSON.parse ( _response );
+			}
+			_.callbackAudit ( callback, _response, e );
+
+		}
+	} );
+
+	_xhr.addEventListener ( 'progress', function ( e ) {
+		if ( _self.progress ) {
+			_self.progress ( e );
+		}
+	}, false );
+
+	_xhr.addEventListener ( 'readystatechange', function ( e ) {
+		if ( this.readyState ) {
+			if ( !!_self.state ) {
+				_self.state ( this.readyState, e );
+			}
+		}
+	} );
+
+	_xhr.addEventListener ( 'abort', function ( e ) {
+		if ( !!_self.abort ) {
+			_self.abort ( e );
+		}
+	} );
+
+	_xhr.addEventListener ( 'timeout', function ( e ) {
+		if ( !!_self.time_out ) {
+			_self.time_out ( e );
+		}
+	} );
+
+	_xhr.addEventListener ( 'loadend', function ( e ) {
+		if ( !!_self.complete ) {
+			_self.complete ( e );
+		}
+	} );
+
+	_xhr.addEventListener ( 'loadstart', function ( e ) {
+		if ( !!_self.before ) {
+			_self.before ( e );
+		}
+	} );
+
+	_xhr.addEventListener ( 'error', function ( e ) {
+		if ( !!_self.error ) {
+			_self.error ( e );
+		}
+	} );
+
+
+	//Send
+	_self.xhr_list.push ( _self.xhr );
+	_xhr.send ( _type !== 'GET' ? _data : null );
+
+	return _self.xhr;
+} );
+
+/** Set Request Header
+ * @param header
+ * @param type
+ * @return object
+ * **/
+Ajax.add ( 'requestHeader', function ( header, type ) {
+	this.xhr.setRequestHeader ( header, type );
+	return this;
+} );
+
+//Kill Ajax
+Ajax.add ( 'kill', function () {
+	var i = this.xhr_list.length;
+	while ( i-- ) {
+		if ( !!this.xhr_list[ i ] )
+			this.xhr_list[ i ].abort ();
+	}
+	this.xhr_list.length = 0;
+
+	return this;
+} );
+
+
+
+/**
+ * Created by gmena on 07-26-14.
+ */
+'use strict';
+
+function Repository () {
+
+}
+
+//Set registry to bucket
+Repository.add ( 'set', function ( key, data, callback ) {
+	localStorage.setItem ( key, JSON.stringify ( data ) );
+	_.callbackAudit ( callback, data, this );
+} );
+
+
+//Get registry from bucket
+Repository.add ( 'get', function ( key ) {
+	return _.isJson ( localStorage.getItem ( key ) )
+		? JSON.parse ( localStorage.getItem ( key ) ) : null;
+} );
+
+//Append data to existing bucket
+Repository.add ( 'append', function ( key, element, callback ) {
+	var _existent = this.get ( key ),
+	    _new = _.extend ( _.isSet ( _existent ) ? _existent : {}, element );
+
+	this.set ( key, _new, false );
+	_.callbackAudit ( callback, _new );
+	return this;
+} );
+
+//Detroy all buckets
+Repository.add ( 'destroy', function () {
+	localStorage.clear ();
+} );
+
+//Clear a bucket
+Repository.add ( 'clear', function ( key ) {
+	localStorage.removeItem ( key );
+	return this;
+} );
+
+
+//Return count buckets
+Repository.add ( 'count', function () {
+	return localStorage.length;
+} );
+/**
+ * Created by gmena on 07-26-14.
+ */
+
+
+'use strict';
+
+function Workers () {
+	this.Worker = null;
+	this.onsuccess = null;
+}
+
+//Worker event handler
+Workers.add ( 'on', function ( event, callback ) {
+	var self = this;
+	return [
+		{
+			message: function () {
+				self.onsuccess = callback;
+			}
+		}[ event ] ()
+	]
+} );
+
+//Set new Worker
+Workers.add ( 'set', function ( url, callback ) {
+	var self = this;
+	self.Worker = (new Worker ( setting.system_path + url + '.min.js' ));
+	self.Worker.addEventListener ( 'message', function ( e ) {
+		_.callbackAudit ( self.onsuccess, e );
+	}, false );
+	_.callbackAudit ( callback, self.Worker );
+
+	return this;
+
+} );
+
+//Get Worker
+Workers.add ( 'get', function () {
+	return this.Worker;
+} );
+
+//Send Message to Worker
+Workers.add ( 'send', function ( message ) {
+	this.Worker.postMessage ( !!message ? message : '' );
+	return this;
+} );
+
+//Kill Worker
+Workers.add ( 'kill', function ( callback ) {
+	if ( _.isSet ( this.Worker ) ) {
+		this.Worker.terminate ();
+		this.Worker = null;
+		_.callbackAudit ( callback );
+	}
+
+	return this;
+} );
+
+/**
+ * Created by gmena on 07-26-14.
+ */
+
+'use strict';
+/**Template
+ * @constructor
+ */
+
+/**Dependencies
+ * Ajax Lib
+ * Worker Lib
+ * Repository Lib
+ * */
+
+function Template () {
+	this.Ajax = new Ajax;
+	this.Repository = new Repository;
+	this.Workers = new Workers;
+	this.template = null;
+}
+
+//Search for the template
+Template.add ( 'lookup', function ( template, callback ) {
+	var _conf = {
+		url      : setting.app_path + '/templates/' + template,
+		dataType : 'text/plain',
+		processor: '.html'
+	};
+
+	this.Ajax.request ( _conf, function ( response ) {
+		_.callbackAudit ( callback, response );
+	} );
+
+	return this;
+} );
+
+//Get the template
+Template.add ( 'get', function ( template, callback ) {
+	var _self = this,
+		_repo = _self.Repository,
+		_template = _repo.get ( 'templates' ),
+		_save = {};
+
+	_self.template = template;
+	if ( _.isSet ( _template ) ) {
+		if ( _.isSet ( _template[ template ] ) ) {
+			_.callbackAudit ( callback, _template[ template ] )
+		} else {
+			_self.lookup ( template, function ( temp ) {
+				_save[ template ] = temp;
+				_repo.append ( 'templates', _save );
+				_.callbackAudit ( callback, temp );
+			} )
+		}
+	} else {
+		_repo.set ( 'templates', {} );
+		this.get ( template, callback )
+	}
+
+	return this;
+} );
+
+//Clear Template from Repository
+Template.add ( 'clear', function () {
+	this.Repository.clear ( 'templates' );
+	return this;
+} );
+
+//Clear Template from Repository
+Template.add ( 'remove', function () {
+	if ( this.template ) {
+		var old_templates = this.Repository.get ( 'templates' );
+		if ( old_templates ) {
+			delete old_templates[ this.template ]
+		}
+
+		this.Repository.set ( 'templates', old_templates );
+		this.template = null;
+	}
+
+	return this;
+} );
+
+//Parse the Template
+Template.add ( 'parse', function ( _template, _fields, callback ) {
+	var _self = this;
+	_self.Workers.set ( '/workers/setting/Parser', function ( worker ) {
+		_self.Workers.send ( { template: _template, fields: _fields } );
+	} ).on ( 'message', function ( e ) {
+		_.callbackAudit ( callback, e.data )
+	} );
+
+	return this;
+} );
+
+
+/**
  * Created with JetBrains PhpStorm.
  * User: Geolffrey Mena
  * Date: 18/11/13
@@ -3167,437 +3594,6 @@ GoogleMap = function () {
 	}
 
 };
-
-/**
- * Created by gmena on 07-26-14.
- */
-
-'use strict';
-
-/**Ajax
- * @constructor
- */
-
-
-function Ajax () {
-	this.xhr = new window.XMLHttpRequest
-			   || new window.ActiveXObject ( "Microsoft.XMLHTTP" );
-	this.xhr_list = [];
-	this.upload = null;
-	this.before = null;
-	this.complete = null;
-	this.progress = null;
-	this.state = null;
-	this.abort = null;
-	this.error = null;
-	this.time_out = null;
-}
-
-/*** Event handler
- * @param event
- * @param callback
- * @return void
- * */
-Ajax.add ( 'on', function ( event, callback ) {
-	var self = this;
-	return [
-		{
-			before  : function () {
-				self.before = callback;
-			},
-			complete: function () {
-				self.complete = callback;
-			},
-			error   : function () {
-				self.error = callback;
-			},
-			abort   : function () {
-				self.abort = callback;
-			},
-			state   : function () {
-				self.state = callback;
-			},
-			timeout : function () {
-				self.time_out = callback;
-			},
-			progress: function () {
-				self.progress = callback;
-			}
-		}[ event ] ()
-	]
-
-} );
-
-/** Ajax Request
- * @param config
- * @param callback
- * @return object
- *
- * Config object {
- *  url: (string) the request url
- *  type: (string) the request type GET or POST
- *	async: bool,
- *	timeout: (int) request timeout,
- *	processor: (string) ajax server side processor file extension,
- *	token: (string or bool) CSRF token needed?,
- *	contentType: (string) the content type,
- *	contentHeader: (object) the content header request,
- *	data: (object) the request data,
- *	upload: (bool) is upload process?
- *
- * }
- * **/
-Ajax.add ( 'request', function ( config, callback ) {
-	if ( !_.isObject ( config ) ) {
-		throw (WARNING_SYRUP.ERROR.NOOBJECT)
-	}
-
-	var _self = this,
-		_xhr = _self.xhr,
-		_async = true,
-		_type = config.method || 'GET',
-		_timeout = config.timeout || 4000,
-		_processor = config.processor || setting.ajax_processor || '',
-		_token = config.token || false,
-		_contentType = config.contentType || 'application/x-www-form-urlencoded;charset=utf-8',
-		_data = config.data
-			? config.data : null,
-		_contentHeader = config.contentHeader ||
-						 [
-							 {
-								 header: 'Content-Type',
-								 value : _contentType
-							 }
-						 ]
-		;
-
-	if ( !_.isSet ( config.url ) ) {
-		throw (WARNING_SYRUP.ERROR.NOURL);
-	}
-
-	if ( !_.isFormData ( _data )
-		 && _.isSet ( _data )
-		 && _contentHeader !== 'auto' ) {
-		_data = _.parseJsonUrl ( _data );
-	}
-
-	if ( _type === 'GET' && _.isSet ( _data ) ) {
-		_processor += '?' + _data;
-	}
-
-	_processor = config.url + (_processor || '');
-	_xhr.open ( _type, _processor, _async );
-	_xhr.timeout = _timeout;
-
-	//Setting Headers
-	if ( !_.isFormData ( _data ) && _contentHeader !== 'auto' ) {
-		_.each ( _contentHeader, function ( v ) {
-			_self.requestHeader ( v.header, v.value );
-		} )
-
-	}
-
-	//Using Token
-	if ( _.isSet ( _token ) )
-		_self.requestHeader ( "X-CSRFToken", _.getCookie ( _.isBoolean ( _token ) ? 'csrftoken' : _token ) );
-
-	//If upload needed
-	if ( _.isSet ( config.upload ) && _.isBoolean ( config.upload ) ) {
-		_self.upload = _self.xhr.upload;
-		_xhr = _self.upload;
-	}
-
-	//Event Listeners
-	_xhr.addEventListener ( 'load', function ( e ) {
-		if ( this.status >= 0xC8 && this.status < 0x190 ) {
-			var _response = this.response || this.responseText;
-			if ( _.isJson ( _response ) ) {
-				_response = JSON.parse ( _response );
-			}
-			_.callbackAudit ( callback, _response, e );
-
-		}
-	} );
-
-	_xhr.addEventListener ( 'progress', function ( e ) {
-		if ( _self.progress ) {
-			_self.progress ( e );
-		}
-	}, false );
-
-	_xhr.addEventListener ( 'readystatechange', function ( e ) {
-		if ( this.readyState ) {
-			if ( !!_self.state ) {
-				_self.state ( this.readyState, e );
-			}
-		}
-	} );
-
-	_xhr.addEventListener ( 'abort', function ( e ) {
-		if ( !!_self.abort ) {
-			_self.abort ( e );
-		}
-	} );
-
-	_xhr.addEventListener ( 'timeout', function ( e ) {
-		if ( !!_self.time_out ) {
-			_self.time_out ( e );
-		}
-	} );
-
-	_xhr.addEventListener ( 'loadend', function ( e ) {
-		if ( !!_self.complete ) {
-			_self.complete ( e );
-		}
-	} );
-
-	_xhr.addEventListener ( 'loadstart', function ( e ) {
-		if ( !!_self.before ) {
-			_self.before ( e );
-		}
-	} );
-
-	_xhr.addEventListener ( 'error', function ( e ) {
-		if ( !!_self.error ) {
-			_self.error ( e );
-		}
-	} );
-
-
-	//Send
-	_self.xhr_list.push ( _self.xhr );
-	_xhr.send ( _type !== 'GET' ? _data : null );
-
-	return _self.xhr;
-} );
-
-/** Set Request Header
- * @param header
- * @param type
- * @return object
- * **/
-Ajax.add ( 'requestHeader', function ( header, type ) {
-	this.xhr.setRequestHeader ( header, type );
-	return this;
-} );
-
-//Kill Ajax
-Ajax.add ( 'kill', function () {
-	var i = this.xhr_list.length;
-	while ( i-- ) {
-		if ( !!this.xhr_list[ i ] )
-			this.xhr_list[ i ].abort ();
-	}
-	this.xhr_list.length = 0;
-
-	return this;
-} );
-
-
-
-/**
- * Created by gmena on 07-26-14.
- */
-'use strict';
-
-function Repository () {
-
-}
-
-//Set registry to bucket
-Repository.add ( 'set', function ( key, data, callback ) {
-	localStorage.setItem ( key, JSON.stringify ( data ) );
-	_.callbackAudit ( callback, data, this );
-} );
-
-
-//Get registry from bucket
-Repository.add ( 'get', function ( key ) {
-	return _.isJson ( localStorage.getItem ( key ) )
-		? JSON.parse ( localStorage.getItem ( key ) ) : null;
-} );
-
-//Append data to existing bucket
-Repository.add ( 'append', function ( key, element, callback ) {
-	var _existent = this.get ( key ),
-	    _new = _.extend ( _.isSet ( _existent ) ? _existent : {}, element );
-
-	this.set ( key, _new, false );
-	_.callbackAudit ( callback, _new );
-	return this;
-} );
-
-//Detroy all buckets
-Repository.add ( 'destroy', function () {
-	localStorage.clear ();
-} );
-
-//Clear a bucket
-Repository.add ( 'clear', function ( key ) {
-	localStorage.removeItem ( key );
-	return this;
-} );
-
-
-//Return count buckets
-Repository.add ( 'count', function () {
-	return localStorage.length;
-} );
-/**
- * Created by gmena on 07-26-14.
- */
-
-
-'use strict';
-
-function Workers () {
-	this.Worker = null;
-	this.onsuccess = null;
-}
-
-//Worker event handler
-Workers.add ( 'on', function ( event, callback ) {
-	var self = this;
-	return [
-		{
-			message: function () {
-				self.onsuccess = callback;
-			}
-		}[ event ] ()
-	]
-} );
-
-//Set new Worker
-Workers.add ( 'set', function ( url, callback ) {
-	var self = this;
-	self.Worker = (new Worker ( setting.system_path + url + '.min.js' ));
-	self.Worker.addEventListener ( 'message', function ( e ) {
-		_.callbackAudit ( self.onsuccess, e );
-	}, false );
-	_.callbackAudit ( callback, self.Worker );
-
-	return this;
-
-} );
-
-//Get Worker
-Workers.add ( 'get', function () {
-	return this.Worker;
-} );
-
-//Send Message to Worker
-Workers.add ( 'send', function ( message ) {
-	this.Worker.postMessage ( !!message ? message : '' );
-	return this;
-} );
-
-//Kill Worker
-Workers.add ( 'kill', function ( callback ) {
-	if ( _.isSet ( this.Worker ) ) {
-		this.Worker.terminate ();
-		this.Worker = null;
-		_.callbackAudit ( callback );
-	}
-
-	return this;
-} );
-
-/**
- * Created by gmena on 07-26-14.
- */
-
-'use strict';
-/**Template
- * @constructor
- */
-
-/**Dependencies
- * Ajax Lib
- * Worker Lib
- * Repository Lib
- * */
-
-function Template () {
-	this.Ajax = new Ajax;
-	this.Repository = new Repository;
-	this.Workers = new Workers;
-	this.template = null;
-}
-
-//Search for the template
-Template.add ( 'lookup', function ( template, callback ) {
-	var _conf = {
-		url      : setting.app_path + '/templates/' + template,
-		dataType : 'text/plain',
-		processor: '.html'
-	};
-
-	this.Ajax.request ( _conf, function ( response ) {
-		_.callbackAudit ( callback, response );
-	} );
-
-	return this;
-} );
-
-//Get the template
-Template.add ( 'get', function ( template, callback ) {
-	var _self = this,
-		_repo = _self.Repository,
-		_template = _repo.get ( 'templates' ),
-		_save = {};
-
-	_self.template = template;
-	if ( _.isSet ( _template ) ) {
-		if ( _.isSet ( _template[ template ] ) ) {
-			_.callbackAudit ( callback, _template[ template ] )
-		} else {
-			_self.lookup ( template, function ( temp ) {
-				_save[ template ] = temp;
-				_repo.append ( 'templates', _save );
-				_.callbackAudit ( callback, temp );
-			} )
-		}
-	} else {
-		_repo.set ( 'templates', {} );
-		this.get ( template, callback )
-	}
-
-	return this;
-} );
-
-//Clear Template from Repository
-Template.add ( 'clear', function () {
-	this.Repository.clear ( 'templates' );
-	return this;
-} );
-
-//Clear Template from Repository
-Template.add ( 'remove', function () {
-	if ( this.template ) {
-		var old_templates = this.Repository.get ( 'templates' );
-		if ( old_templates ) {
-			delete old_templates[ this.template ]
-		}
-
-		this.Repository.set ( 'templates', old_templates );
-		this.template = null;
-	}
-
-	return this;
-} );
-
-//Parse the Template
-Template.add ( 'parse', function ( _template, _fields, callback ) {
-	var _self = this;
-	_self.Workers.set ( '/workers/setting/Parser', function ( worker ) {
-		_self.Workers.send ( { template: _template, fields: _fields } );
-	} ).on ( 'message', function ( e ) {
-		_.callbackAudit ( callback, e.data )
-	} );
-
-	return this;
-} );
-
 
 /**
  * Created by gmena on 07-26-14.
