@@ -6,7 +6,7 @@
 Template.add ('Hey.You', function (data, callback) {
 	var _self = this;
 	//The template as relative path of config app_path
-	_self.get ('library/bookList', function (template) {
+	_self.get ('Hey/You', function (template) {
 		if ( _.isSet (callback) ) {
 			_self.parse (template, data, callback);
 		}
