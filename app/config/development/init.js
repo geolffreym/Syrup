@@ -19,8 +19,7 @@ exports.files = {
 			'system/lib/Template',
 			// Until here needed do not change
 			// Add all the necessary modules
-			'system/lib/Map',
-			'app/modules/happyFire'
+			'system/lib/Map'
 		]
 	}
 };
