@@ -9,7 +9,6 @@ function Modules () {
 	this.scope = {};
 	this.modules = {};
 	this.onchange = {};
-	this.onstop = {};
 	this.ondrop = {};
 }
 
@@ -90,18 +89,6 @@ Modules.add ('_trigger', function (moduleId) {
 	return {}
 });
 
-/**Object UnObserver
- * @return void
- * **/
-Modules.add ('stopWatch', function () {
-	var _self = this;
-	Object.unobserve (_self.scope, function () {
-		if ( _.isSet (_self.onstop) ) {
-			_self.onstop ();
-		}
-	})
-});
-
 /** Append global service
  * @param name
  * @param callback function
@@ -135,6 +122,7 @@ Modules.add ('setScope', function (moduleId, object) {
 	if ( _.isSet (this.scope[moduleId]) ) {
 		this.scope[moduleId] = object;
 	}
+	return this;
 });
 
 /**Get Scope
@@ -155,9 +143,6 @@ Modules.add ('when', function (event, name, callback) {
 			change: function () {
 				self.onchange[name] = callback;
 			},
-			stop  : function () {
-				self.onstop[name] = callback;
-			},
 			drop  : function () {
 				self.ondrop[name] = callback;
 			}
@@ -167,31 +152,38 @@ Modules.add ('when', function (event, name, callback) {
 
 Modules.add ('_serve', function (moduleId, template) {
 	var _self = this,
-		_template = new Template,
+		_template = null,
 		_scope = _self.scope[moduleId],
 		_dom = _$ ('[sp-controller="' + moduleId + '"]');
 
 	if ( _dom.exist && _.getObjectSize (_scope) > 0 ) {
 		if ( _.isBoolean (template) ) {
-			//TODO use cache lib
-			_.include ('/app/view/' + _self.root + '/' + _.replace (moduleId, /\./g, '_'), function () {
-				_template[moduleId] (_scope, function (my_html) {
-					_dom.html (my_html);
-				})
+			Require.request ('/view/' + _.dotDirectory (moduleId), function () {
+				_template = new Template;
+				if ( moduleId in _template.__proto__ )
+					_template[moduleId] (_scope, function (my_html) {
+						_dom.html (my_html);
+					})
 			})
 		} else {
 			var _dom_template = _$ ('[sp-template="' + template + '"]'),
-				_parse = _dom_template.exist ? _dom_template.html () : _dom.html ();
+				_parse = _dom_template.exist
+					? _dom_template.html ()
+					: _dom.html ();
 
 			if ( _.isSet (_parse) ) {
+				_template = new Template;
 				_template.parse (_parse, _scope, function (result) {
 					_dom.html (result);
 				});
 			}
 		}
 	}
+
+	return this;
 });
 
+//Execute Module
 Modules.add ('_taste', function (moduleId) {
 	var _self = this;
 
@@ -207,6 +199,7 @@ Modules.add ('_taste', function (moduleId) {
 		_self.modules[moduleId].instance.setScope = function (object) {
 			if ( _.isObject (object) ) {
 				_self.setScope (moduleId, object);
+				return this;
 			}
 		};
 
@@ -219,16 +212,17 @@ Modules.add ('_taste', function (moduleId) {
 		};
 
 		_self.modules[moduleId].instance.serve = function (_template) {
-			_self._serve (moduleId, _.isSet (_template) ? _template : this.template);
+			_self._serve (moduleId, _template || true);
+			return this;
 		};
 
 		//Observe scope
 		_self._watch (moduleId);
 
 		//Init the module
-		if ( _.isSet (self.modules[moduleId].instance.init) ) {
+		if ( _.isSet (_self.modules[moduleId].instance.init) ) {
 			_self.modules[moduleId].instance.init (this.lib.get (_self.root));
-			_self._serve (moduleId, _self.modules[moduleId].instance.template);
+			//_self._serve (moduleId, _self.modules[moduleId].instance.template || true);
 		}
 	}
 

@@ -2201,6 +2201,88 @@ if ( !Object.observe ) {
 	}) (Object, this);
 }
 /**
+ * Created by gmena on 08-31-15.
+ */
+"use strict";
+
+function Require () {
+	this.scriptCalls = {};
+	this.waitingCalls = {};
+}
+
+/** Wait for a script to execute
+ * @param script
+ * @param callback
+ * @param conf
+ * */
+Require.add ('toWait', function (script, callback, conf) {
+	var _self = this;
+
+	if ( _.isSet (conf) ) {
+		if ( 'wait' in conf ) {
+			if ( _.isSet (_self.scriptCalls[conf.wait]) ) {
+
+				if ( !_.isSet (_self.waitingCalls[conf.wait]) ) {
+					_self.waitingCalls[conf.wait] = [];
+				}
+
+				if ( _self.waitingCalls[conf.wait] !== 'done' ) {
+					_self.waitingCalls[conf.wait].push (function () {
+						_self.request (script, callback)
+					});
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+});
+
+
+Require.add ('request', function (script, callback, conf) {
+	var _self = this,
+		_url = !_.isUrl (script)
+			? setting.app_path + script + '.min.js'
+			: script + '.min.js',
+		_script = script
+			.split ('/')
+			.pop ();
+
+	// Wait for a script
+	if ( _self.toWait (script, callback, conf) )
+		return false;
+
+
+	// Is the script in the list?
+	if ( _.isSet (_self.scriptCalls[_script]) ) {
+		_.callbackAudit (callback);
+		return false;
+	}
+
+	// Request the script
+	_self.scriptCalls[_script] = script;
+	_.getScript (_url, function (e) {
+		if ( _.isSet (_self.waitingCalls[_script]) ) {
+			if ( _.isArray (_self.waitingCalls[_script]) ) {
+				var i = 0,
+					max = _self.waitingCalls[_script].length;
+				for ( ; i < max; i++ ) {
+					_self.waitingCalls[_script][i] (e);
+				}
+				_self.waitingCalls[_script] = 'done';
+			}
+		}
+		_.callbackAudit (callback);
+	});
+
+	return this;
+});
+
+
+window.Require = new Require;
+
+
+/**
  * Created by gmena on 08-06-14.
  */
 
@@ -2322,7 +2404,6 @@ function Modules () {
 	this.scope = {};
 	this.modules = {};
 	this.onchange = {};
-	this.onstop = {};
 	this.ondrop = {};
 }
 
@@ -2403,18 +2484,6 @@ Modules.add ('_trigger', function (moduleId) {
 	return {}
 });
 
-/**Object UnObserver
- * @return void
- * **/
-Modules.add ('stopWatch', function () {
-	var _self = this;
-	Object.unobserve (_self.scope, function () {
-		if ( _.isSet (_self.onstop) ) {
-			_self.onstop ();
-		}
-	})
-});
-
 /** Append global service
  * @param name
  * @param callback function
@@ -2448,6 +2517,7 @@ Modules.add ('setScope', function (moduleId, object) {
 	if ( _.isSet (this.scope[moduleId]) ) {
 		this.scope[moduleId] = object;
 	}
+	return this;
 });
 
 /**Get Scope
@@ -2468,9 +2538,6 @@ Modules.add ('when', function (event, name, callback) {
 			change: function () {
 				self.onchange[name] = callback;
 			},
-			stop  : function () {
-				self.onstop[name] = callback;
-			},
 			drop  : function () {
 				self.ondrop[name] = callback;
 			}
@@ -2480,31 +2547,38 @@ Modules.add ('when', function (event, name, callback) {
 
 Modules.add ('_serve', function (moduleId, template) {
 	var _self = this,
-		_template = new Template,
+		_template = null,
 		_scope = _self.scope[moduleId],
 		_dom = _$ ('[sp-controller="' + moduleId + '"]');
 
 	if ( _dom.exist && _.getObjectSize (_scope) > 0 ) {
 		if ( _.isBoolean (template) ) {
-			//TODO use cache lib
-			_.include ('/app/view/' + _self.root + '/' + _.replace (moduleId, /\./g, '_'), function () {
-				_template[moduleId] (_scope, function (my_html) {
-					_dom.html (my_html);
-				})
+			Require.request ('/view/' + _.dotDirectory (moduleId), function () {
+				_template = new Template;
+				if ( moduleId in _template.__proto__ )
+					_template[moduleId] (_scope, function (my_html) {
+						_dom.html (my_html);
+					})
 			})
 		} else {
 			var _dom_template = _$ ('[sp-template="' + template + '"]'),
-				_parse = _dom_template.exist ? _dom_template.html () : _dom.html ();
+				_parse = _dom_template.exist
+					? _dom_template.html ()
+					: _dom.html ();
 
 			if ( _.isSet (_parse) ) {
+				_template = new Template;
 				_template.parse (_parse, _scope, function (result) {
 					_dom.html (result);
 				});
 			}
 		}
 	}
+
+	return this;
 });
 
+//Execute Module
 Modules.add ('_taste', function (moduleId) {
 	var _self = this;
 
@@ -2520,6 +2594,7 @@ Modules.add ('_taste', function (moduleId) {
 		_self.modules[moduleId].instance.setScope = function (object) {
 			if ( _.isObject (object) ) {
 				_self.setScope (moduleId, object);
+				return this;
 			}
 		};
 
@@ -2532,16 +2607,17 @@ Modules.add ('_taste', function (moduleId) {
 		};
 
 		_self.modules[moduleId].instance.serve = function (_template) {
-			_self._serve (moduleId, _.isSet (_template) ? _template : this.template);
+			_self._serve (moduleId, _template || true);
+			return this;
 		};
 
 		//Observe scope
 		_self._watch (moduleId);
 
 		//Init the module
-		if ( _.isSet (self.modules[moduleId].instance.init) ) {
+		if ( _.isSet (_self.modules[moduleId].instance.init) ) {
 			_self.modules[moduleId].instance.init (this.lib.get (_self.root));
-			_self._serve (moduleId, _self.modules[moduleId].instance.template);
+			//_self._serve (moduleId, _self.modules[moduleId].instance.template || true);
 		}
 	}
 
@@ -2573,69 +2649,6 @@ Modules.add ('dropAll', function () {
 });
 
 window.Module = new Modules;
-
-/**
- * Created by gmena on 08-31-15.
- */
-"use strict";
-
-function Require () {
-	this.url = null;
-	this.cached = false;
-	this.scriptCalls = {};
-	this.waitingCalls = {};
-}
-
-Require.add ('request', function (script, callback, conf) {
-	var _self = this,
-		_url = !_.isUrl (script)
-			? setting.app_path + script + '.min.js'
-			: script + '.min.js',
-		_script = script
-			.split ('/')
-			.pop ();
-
-
-	if ( _.isSet (conf.wait) ) {
-		if ( _.isSet (_self.scriptCalls[conf.wait]) ) {
-			if ( !_.isSet (_self.waitingCalls[conf.wait]) ) {
-				_self.waitingCalls[conf.wait] = [];
-			}
-			if ( _self.waitingCalls[conf.wait] !== 'done' ) {
-				_self.waitingCalls[conf.wait].push (function () {
-					_self.request (script, callback)
-				});
-				return false;
-			}
-		}
-	}
-
-
-	if ( _.isSet (_self.scriptCalls[_script]) ) {
-		_.callbackAudit (callback);
-		return false;
-	}
-
-	_self.scriptCalls[_script] = script;
-	_.getScript (_url, function (e) {
-		if ( _.isSet (_self.waitingCalls[_script]) ) {
-			if ( _.isArray (_self.waitingCalls[_script]) ) {
-				var i = 0,
-					max = _self.waitingCalls[_script].length;
-				for ( ; i < max; i++ ) {
-					_self.waitingCalls[_script][i] (e);
-				}
-				_self.waitingCalls[_script] = 'done';
-			}
-		}
-		_.callbackAudit (callback);
-	});
-	return this;
-});
-
-
-window.Require = new Require;
-
 
 /**
  * Created by gmena on 07-26-14.

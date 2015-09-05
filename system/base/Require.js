@@ -4,11 +4,38 @@
 "use strict";
 
 function Require () {
-	this.url = null;
-	this.cached = false;
 	this.scriptCalls = {};
 	this.waitingCalls = {};
 }
+
+/** Wait for a script to execute
+ * @param script
+ * @param callback
+ * @param conf
+ * */
+Require.add ('toWait', function (script, callback, conf) {
+	var _self = this;
+
+	if ( _.isSet (conf) ) {
+		if ( 'wait' in conf ) {
+			if ( _.isSet (_self.scriptCalls[conf.wait]) ) {
+
+				if ( !_.isSet (_self.waitingCalls[conf.wait]) ) {
+					_self.waitingCalls[conf.wait] = [];
+				}
+
+				if ( _self.waitingCalls[conf.wait] !== 'done' ) {
+					_self.waitingCalls[conf.wait].push (function () {
+						_self.request (script, callback)
+					});
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+});
+
 
 Require.add ('request', function (script, callback, conf) {
 	var _self = this,
@@ -19,27 +46,18 @@ Require.add ('request', function (script, callback, conf) {
 			.split ('/')
 			.pop ();
 
-
-	if ( _.isSet (conf.wait) ) {
-		if ( _.isSet (_self.scriptCalls[conf.wait]) ) {
-			if ( !_.isSet (_self.waitingCalls[conf.wait]) ) {
-				_self.waitingCalls[conf.wait] = [];
-			}
-			if ( _self.waitingCalls[conf.wait] !== 'done' ) {
-				_self.waitingCalls[conf.wait].push (function () {
-					_self.request (script, callback)
-				});
-				return false;
-			}
-		}
-	}
+	// Wait for a script
+	if ( _self.toWait (script, callback, conf) )
+		return false;
 
 
+	// Is the script in the list?
 	if ( _.isSet (_self.scriptCalls[_script]) ) {
 		_.callbackAudit (callback);
 		return false;
 	}
 
+	// Request the script
 	_self.scriptCalls[_script] = script;
 	_.getScript (_url, function (e) {
 		if ( _.isSet (_self.waitingCalls[_script]) ) {
@@ -54,6 +72,7 @@ Require.add ('request', function (script, callback, conf) {
 		}
 		_.callbackAudit (callback);
 	});
+
 	return this;
 });
 

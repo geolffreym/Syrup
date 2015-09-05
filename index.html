@@ -6,10 +6,29 @@
 </head>
 <body>
 <script src="app/include/init.js"></script>
-<a href="#" id="click" data-hi="1" class="a b c" data-tooltip="Hi!">
+
+
+<a href="#" id="click">
     Test
 </a>
-<a href="#" id="unclick" data-hi="1" class="a b c">UCLick</a>
+
+
+<!--The controller-->
+<div sp-controller="Hey.You">
+
+</div>
+
+<!--THe Inline template-->
+<template sp-template="Hey.You">
+    <div>
+        <ul>
+            {{#beatles}}
+            <li>{{ firstName }} {{lastName}}</li>
+            {{/beatles}}
+        </ul>
+
+    </div>
+</template>
 
 
 <script>
@@ -25,29 +44,45 @@
             console.log ('hi')
         });
 
-
         //A new recipe for Hey
         my_Lib.recipe ('Hey.You', function (_, _$, scope) {
             return {
                 init   : function (tools) {
-                    this.setScope ({ a: 2 });
+                    var _self = this;
+                    this.setScope ({
+                        'beatles': [
+                            { "firstName": "John", "lastName": "Lennon" },
+                            { "firstName": "Paul", "lastName": "McCartney" },
+                            { "firstName": "George", "lastName": "Harrison" },
+                            { "firstName": "Ringo", "lastName": "Starr" }
+                        ]
+                    });
+
 
                     //When Hey.You scope change
                     this.when ('change', function (d) {
-                        console.log (d)
+                        //Render new data
+                        _self.serve ('Hey.You');
                     })
                 },
                 destroy: function () {}
             }
         });
 
-
         //A new recipe for Hey
         my_Lib.recipe ('Hey.Do', function (_, _$, scope) {
             return {
                 init   : function (tools) {
+
                     //Trigger change in Hey.You
-                    my_Lib.setScope ('Hey.You', { a: 3 })
+                    _$ ('#click').listen ('click', function () {
+                        my_Lib.setScope ('Hey.You', {
+                            'beatles': [
+                                { "firstName": "Pedro", "lastName": "Lennon" }
+                            ]
+                        })
+                    });
+
                 },
                 destroy: function () {}
             }

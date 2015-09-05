@@ -11,9 +11,9 @@ exports.files = {
 		src   : [
 			'system/base/Syrup',
 			'system/base/Observer',
+			'system/base/Require',
 			'system/base/Lib',
 			'system/base/Module',
-			'system/base/Require',
 			'system/lib/Ajax',
 			'system/lib/Repository',
 			'system/lib/Workers',
