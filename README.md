@@ -106,7 +106,7 @@ Including Scripts
 <script src="YOUR PATH/Syrup/app/include/init.min.js"></script>
 <script src="YOUR PATH/Syrup/controller/YOUR CONTROLLER.min.js"></script>
 ```
-When you need to add libraries to your drivers that were not pre-compiled in the unification, you can call them using the _.include method, as explained later use.
+When you need to add libraries to your drivers that were not pre-compiled in the unification, you can call them using the Require class, as explained later use.
 
 DOM Tools
 =======
