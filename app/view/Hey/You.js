@@ -3,9 +3,9 @@
  */
 
 //QUOTE VIEW
-Template.add ('bookList', function ( data, callback ) {
+Template.add ('Hey.You', function (data, callback) {
 	var _self = this;
-	_self.get ('library/bookList', function ( template ) {
+	_self.get ('library/bookList', function (template) {
 		if ( _.isSet (callback) ) {
 			_self.parse (template, data, callback);
 		}

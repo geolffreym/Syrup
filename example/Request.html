@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<script src="app/include/init.js"></script>
+<a href="#" id="click" data-hi="1" class="a b c" data-tooltip="Hi!">
+    Test
+</a>
+<a href="#" id="unclick" data-hi="1" class="a b c">UCLick</a>
+
+
+<script>
+
+
+    _$ (function () {
+        Require.request ('/plugins/Tooltip', function () {
+            console.log ('read A')
+        });
+
+        Require.request ('/view/libraryStore/init', function () {
+            console.log ('read B')
+        }, { wait: 'Tooltip' });
+
+    })
+
+</script>
+</body>
+</html>

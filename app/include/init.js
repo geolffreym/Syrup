@@ -2201,6 +2201,88 @@ if ( !Object.observe ) {
 	}) (Object, this);
 }
 /**
+ * Created by gmena on 08-31-15.
+ */
+"use strict";
+
+function Require () {
+	this.scriptCalls = {};
+	this.waitingCalls = {};
+}
+
+/** Wait for a script to execute
+ * @param script
+ * @param callback
+ * @param conf
+ * */
+Require.add ('toWait', function (script, callback, conf) {
+	var _self = this;
+
+	if ( _.isSet (conf) ) {
+		if ( 'wait' in conf ) {
+			if ( _.isSet (_self.scriptCalls[conf.wait]) ) {
+
+				if ( !_.isSet (_self.waitingCalls[conf.wait]) ) {
+					_self.waitingCalls[conf.wait] = [];
+				}
+
+				if ( _self.waitingCalls[conf.wait] !== 'done' ) {
+					_self.waitingCalls[conf.wait].push (function () {
+						_self.request (script, callback)
+					});
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+});
+
+
+Require.add ('request', function (script, callback, conf) {
+	var _self = this,
+		_url = !_.isUrl (script)
+			? setting.app_path + script + '.min.js'
+			: script + '.min.js',
+		_script = script
+			.split ('/')
+			.pop ();
+
+	// Wait for a script
+	if ( _self.toWait (script, callback, conf) )
+		return false;
+
+
+	// Is the script in the list?
+	if ( _.isSet (_self.scriptCalls[_script]) ) {
+		_.callbackAudit (callback);
+		return false;
+	}
+
+	// Request the script
+	_self.scriptCalls[_script] = script;
+	_.getScript (_url, function (e) {
+		if ( _.isSet (_self.waitingCalls[_script]) ) {
+			if ( _.isArray (_self.waitingCalls[_script]) ) {
+				var i = 0,
+					max = _self.waitingCalls[_script].length;
+				for ( ; i < max; i++ ) {
+					_self.waitingCalls[_script][i] (e);
+				}
+				_self.waitingCalls[_script] = 'done';
+			}
+		}
+		_.callbackAudit (callback);
+	});
+
+	return this;
+});
+
+
+window.Require = new Require;
+
+
+/**
  * Created by gmena on 08-06-14.
  */
 
@@ -2322,7 +2404,6 @@ function Modules () {
 	this.scope = {};
 	this.modules = {};
 	this.onchange = {};
-	this.onstop = {};
 	this.ondrop = {};
 }
 
@@ -2403,18 +2484,6 @@ Modules.add ('_trigger', function (moduleId) {
 	return {}
 });
 
-/**Object UnObserver
- * @return void
- * **/
-Modules.add ('stopWatch', function () {
-	var _self = this;
-	Object.unobserve (_self.scope, function () {
-		if ( _.isSet (_self.onstop) ) {
-			_self.onstop ();
-		}
-	})
-});
-
 /** Append global service
  * @param name
  * @param callback function
@@ -2448,6 +2517,7 @@ Modules.add ('setScope', function (moduleId, object) {
 	if ( _.isSet (this.scope[moduleId]) ) {
 		this.scope[moduleId] = object;
 	}
+	return this;
 });
 
 /**Get Scope
@@ -2468,9 +2538,6 @@ Modules.add ('when', function (event, name, callback) {
 			change: function () {
 				self.onchange[name] = callback;
 			},
-			stop  : function () {
-				self.onstop[name] = callback;
-			},
 			drop  : function () {
 				self.ondrop[name] = callback;
 			}
@@ -2480,31 +2547,38 @@ Modules.add ('when', function (event, name, callback) {
 
 Modules.add ('_serve', function (moduleId, template) {
 	var _self = this,
-		_template = new Template,
+		_template = null,
 		_scope = _self.scope[moduleId],
 		_dom = _$ ('[sp-controller="' + moduleId + '"]');
 
 	if ( _dom.exist && _.getObjectSize (_scope) > 0 ) {
 		if ( _.isBoolean (template) ) {
-			//TODO use cache lib
-			_.include ('/app/view/' + _self.root + '/' + _.replace (moduleId, /\./g, '_'), function () {
-				_template[moduleId] (_scope, function (my_html) {
-					_dom.html (my_html);
-				})
+			Require.request ('/view/' + _.dotDirectory (moduleId), function () {
+				_template = new Template;
+				if ( moduleId in _template.__proto__ )
+					_template[moduleId] (_scope, function (my_html) {
+						_dom.html (my_html);
+					})
 			})
 		} else {
 			var _dom_template = _$ ('[sp-template="' + template + '"]'),
-				_parse = _dom_template.exist ? _dom_template.html () : _dom.html ();
+				_parse = _dom_template.exist
+					? _dom_template.html ()
+					: _dom.html ();
 
 			if ( _.isSet (_parse) ) {
+				_template = new Template;
 				_template.parse (_parse, _scope, function (result) {
 					_dom.html (result);
 				});
 			}
 		}
 	}
+
+	return this;
 });
 
+//Execute Module
 Modules.add ('_taste', function (moduleId) {
 	var _self = this;
 
@@ -2520,6 +2594,7 @@ Modules.add ('_taste', function (moduleId) {
 		_self.modules[moduleId].instance.setScope = function (object) {
 			if ( _.isObject (object) ) {
 				_self.setScope (moduleId, object);
+				return this;
 			}
 		};
 
@@ -2532,16 +2607,17 @@ Modules.add ('_taste', function (moduleId) {
 		};
 
 		_self.modules[moduleId].instance.serve = function (_template) {
-			_self._serve (moduleId, _.isSet (_template) ? _template : this.template);
+			_self._serve (moduleId, _template || true);
+			return this;
 		};
 
 		//Observe scope
 		_self._watch (moduleId);
 
 		//Init the module
-		if ( _.isSet (self.modules[moduleId].instance.init) ) {
+		if ( _.isSet (_self.modules[moduleId].instance.init) ) {
 			_self.modules[moduleId].instance.init (this.lib.get (_self.root));
-			_self._serve (moduleId, _self.modules[moduleId].instance.template);
+			//_self._serve (moduleId, _self.modules[moduleId].instance.template || true);
 		}
 	}
 
@@ -2575,15 +2651,9 @@ Modules.add ('dropAll', function () {
 window.Module = new Modules;
 
 /**
-<<<<<<< HEAD
  * Created by gmena on 07-26-14.
-=======
- * Created by gmena on 08-31-15.
->>>>>>> dev
  */
-"use strict";
 
-<<<<<<< HEAD
 'use strict';
 
 /**Ajax
@@ -2792,458 +2862,6 @@ Ajax.add ( 'requestHeader', function ( header, type ) {
 	this.xhr.setRequestHeader ( header, type );
 	return this;
 } );
-=======
-function Require () {
-	this.url = null;
-	this.cached = false;
-	this.scriptCalls = {};
-	this.waitingCalls = {};
-}
-
-Require.add ('request', function (script, callback, conf) {
-	var _self = this,
-		_url = !_.isUrl (script)
-			? setting.app_path + script + '.min.js'
-			: script + '.min.js',
-		_script = script
-			.split ('/')
-			.pop ();
-
-
-	if ( _.isSet (conf.wait) ) {
-		if ( _.isSet (_self.scriptCalls[conf.wait]) ) {
-			if ( !_.isSet (_self.waitingCalls[conf.wait]) ) {
-				_self.waitingCalls[conf.wait] = [];
-			}
-			if ( _self.waitingCalls[conf.wait] !== 'done' ) {
-				_self.waitingCalls[conf.wait].push (function () {
-					_self.request (script, callback)
-				});
-				return false;
-			}
-		}
-	}
-
-
-	if ( _.isSet (_self.scriptCalls[_script]) ) {
-		_.callbackAudit (callback);
-		return false;
-	}
-
-	_self.scriptCalls[_script] = script;
-	_.getScript (_url, function (e) {
-		if ( _.isSet (_self.waitingCalls[_script]) ) {
-			if ( _.isArray (_self.waitingCalls[_script]) ) {
-				var i = 0,
-					max = _self.waitingCalls[_script].length;
-				for ( ; i < max; i++ ) {
-					_self.waitingCalls[_script][i] (e);
-				}
-				_self.waitingCalls[_script] = 'done';
-			}
-		}
-		_.callbackAudit (callback);
-	});
-	return this;
-});
-
-
-window.Require = new Require;
-
-
-/**
- * Created by gmena on 07-26-14.
- */
-
-'use strict';
-
-/**Ajax
- * @constructor
- */
-
-
-function Ajax () {
-	this.xhr = new window.XMLHttpRequest
-			   || new window.ActiveXObject ( "Microsoft.XMLHTTP" );
-	this.xhr_list = [];
-	this.upload = null;
-	this.before = null;
-	this.complete = null;
-	this.progress = null;
-	this.state = null;
-	this.abort = null;
-	this.error = null;
-	this.time_out = null;
-}
-
-/*** Event handler
- * @param event
- * @param callback
- * @return void
- * */
-Ajax.add ( 'on', function ( event, callback ) {
-	var self = this;
-	return [
-		{
-			before  : function () {
-				self.before = callback;
-			},
-			complete: function () {
-				self.complete = callback;
-			},
-			error   : function () {
-				self.error = callback;
-			},
-			abort   : function () {
-				self.abort = callback;
-			},
-			state   : function () {
-				self.state = callback;
-			},
-			timeout : function () {
-				self.time_out = callback;
-			},
-			progress: function () {
-				self.progress = callback;
-			}
-		}[ event ] ()
-	]
-
-} );
-
-/** Ajax Request
- * @param config
- * @param callback
- * @return object
- *
- * Config object {
- *  url: (string) the request url
- *  type: (string) the request type GET or POST
- *	async: bool,
- *	timeout: (int) request timeout,
- *	processor: (string) ajax server side processor file extension,
- *	token: (string or bool) CSRF token needed?,
- *	contentType: (string) the content type,
- *	contentHeader: (object) the content header request,
- *	data: (object) the request data,
- *	upload: (bool) is upload process?
- *
- * }
- * **/
-Ajax.add ( 'request', function ( config, callback ) {
-	if ( !_.isObject ( config ) ) {
-		throw (WARNING_SYRUP.ERROR.NOOBJECT)
-	}
-
-	var _self = this,
-		_xhr = _self.xhr,
-		_async = true,
-		_type = config.method || 'GET',
-		_timeout = config.timeout || 4000,
-		_processor = config.processor || setting.ajax_processor || '',
-		_token = config.token || false,
-		_contentType = config.contentType || 'application/x-www-form-urlencoded;charset=utf-8',
-		_data = config.data
-			? config.data : null,
-		_contentHeader = config.contentHeader ||
-						 [
-							 {
-								 header: 'Content-Type',
-								 value : _contentType
-							 }
-						 ]
-		;
-
-	if ( !_.isSet ( config.url ) ) {
-		throw (WARNING_SYRUP.ERROR.NOURL);
-	}
-
-	if ( !_.isFormData ( _data )
-		 && _.isSet ( _data )
-		 && _contentHeader !== 'auto' ) {
-		_data = _.parseJsonUrl ( _data );
-	}
-
-	if ( _type === 'GET' && _.isSet ( _data ) ) {
-		_processor += '?' + _data;
-	}
-
-	_processor = config.url + (_processor || '');
-	_xhr.open ( _type, _processor, _async );
-	_xhr.timeout = _timeout;
-
-	//Setting Headers
-	if ( !_.isFormData ( _data ) && _contentHeader !== 'auto' ) {
-		_.each ( _contentHeader, function ( v ) {
-			_self.requestHeader ( v.header, v.value );
-		} )
-
-	}
-
-	//Using Token
-	if ( _.isSet ( _token ) )
-		_self.requestHeader ( "X-CSRFToken", _.getCookie ( _.isBoolean ( _token ) ? 'csrftoken' : _token ) );
-
-	//If upload needed
-	if ( _.isSet ( config.upload ) && _.isBoolean ( config.upload ) ) {
-		_self.upload = _self.xhr.upload;
-		_xhr = _self.upload;
-	}
-
-	//Event Listeners
-	_xhr.addEventListener ( 'load', function ( e ) {
-		if ( this.status >= 0xC8 && this.status < 0x190 ) {
-			var _response = this.response || this.responseText;
-			if ( _.isJson ( _response ) ) {
-				_response = JSON.parse ( _response );
-			}
-			_.callbackAudit ( callback, _response, e );
-
-		}
-	} );
-
-	_xhr.addEventListener ( 'progress', function ( e ) {
-		if ( _self.progress ) {
-			_self.progress ( e );
-		}
-	}, false );
-
-	_xhr.addEventListener ( 'readystatechange', function ( e ) {
-		if ( this.readyState ) {
-			if ( !!_self.state ) {
-				_self.state ( this.readyState, e );
-			}
-		}
-	} );
-
-	_xhr.addEventListener ( 'abort', function ( e ) {
-		if ( !!_self.abort ) {
-			_self.abort ( e );
-		}
-	} );
-
-	_xhr.addEventListener ( 'timeout', function ( e ) {
-		if ( !!_self.time_out ) {
-			_self.time_out ( e );
-		}
-	} );
-
-	_xhr.addEventListener ( 'loadend', function ( e ) {
-		if ( !!_self.complete ) {
-			_self.complete ( e );
-		}
-	} );
-
-	_xhr.addEventListener ( 'loadstart', function ( e ) {
-		if ( !!_self.before ) {
-			_self.before ( e );
-		}
-	} );
-
-	_xhr.addEventListener ( 'error', function ( e ) {
-		if ( !!_self.error ) {
-			_self.error ( e );
-		}
-	} );
->>>>>>> dev
-
-//Kill Ajax
-Ajax.add ( 'kill', function () {
-	var i = this.xhr_list.length;
-	while ( i-- ) {
-		if ( !!this.xhr_list[ i ] )
-			this.xhr_list[ i ].abort ();
-	}
-	this.xhr_list.length = 0;
-
-<<<<<<< HEAD
-	return this;
-} );
-
-
-
-/**
- * Created by gmena on 07-26-14.
- */
-'use strict';
-
-function Repository () {
-
-}
-
-//Set registry to bucket
-Repository.add ( 'set', function ( key, data, callback ) {
-	localStorage.setItem ( key, JSON.stringify ( data ) );
-	_.callbackAudit ( callback, data, this );
-} );
-
-
-//Get registry from bucket
-Repository.add ( 'get', function ( key ) {
-	return _.isJson ( localStorage.getItem ( key ) )
-		? JSON.parse ( localStorage.getItem ( key ) ) : null;
-} );
-
-//Append data to existing bucket
-Repository.add ( 'append', function ( key, element, callback ) {
-	var _existent = this.get ( key ),
-	    _new = _.extend ( _.isSet ( _existent ) ? _existent : {}, element );
-
-	this.set ( key, _new, false );
-	_.callbackAudit ( callback, _new );
-	return this;
-} );
-
-//Detroy all buckets
-Repository.add ( 'destroy', function () {
-	localStorage.clear ();
-} );
-
-//Clear a bucket
-Repository.add ( 'clear', function ( key ) {
-	localStorage.removeItem ( key );
-	return this;
-} );
-
-
-//Return count buckets
-Repository.add ( 'count', function () {
-	return localStorage.length;
-} );
-/**
- * Created by gmena on 07-26-14.
- */
-
-
-'use strict';
-
-function Workers () {
-	this.Worker = null;
-	this.onsuccess = null;
-}
-
-//Worker event handler
-Workers.add ( 'on', function ( event, callback ) {
-	var self = this;
-	return [
-		{
-			message: function () {
-				self.onsuccess = callback;
-			}
-		}[ event ] ()
-	]
-} );
-
-//Set new Worker
-Workers.add ( 'set', function ( url, callback ) {
-	var self = this;
-	self.Worker = (new Worker ( setting.system_path + url + '.min.js' ));
-	self.Worker.addEventListener ( 'message', function ( e ) {
-		_.callbackAudit ( self.onsuccess, e );
-	}, false );
-	_.callbackAudit ( callback, self.Worker );
-
-	return this;
-
-} );
-
-//Get Worker
-Workers.add ( 'get', function () {
-	return this.Worker;
-} );
-
-//Send Message to Worker
-Workers.add ( 'send', function ( message ) {
-	this.Worker.postMessage ( !!message ? message : '' );
-	return this;
-} );
-
-//Kill Worker
-Workers.add ( 'kill', function ( callback ) {
-	if ( _.isSet ( this.Worker ) ) {
-		this.Worker.terminate ();
-		this.Worker = null;
-		_.callbackAudit ( callback );
-	}
-
-	return this;
-} );
-
-/**
- * Created by gmena on 07-26-14.
- */
-
-'use strict';
-/**Template
- * @constructor
- */
-
-/**Dependencies
- * Ajax Lib
- * Worker Lib
- * Repository Lib
- * */
-
-function Template () {
-	this.Ajax = new Ajax;
-	this.Repository = new Repository;
-	this.Workers = new Workers;
-	this.template = null;
-}
-
-//Search for the template
-Template.add ( 'lookup', function ( template, callback ) {
-	var _conf = {
-		url      : setting.app_path + '/templates/' + template,
-		dataType : 'text/plain',
-		processor: '.html'
-	};
-
-	this.Ajax.request ( _conf, function ( response ) {
-		_.callbackAudit ( callback, response );
-	} );
-
-	return this;
-} );
-
-//Get the template
-Template.add ( 'get', function ( template, callback ) {
-	var _self = this,
-		_repo = _self.Repository,
-		_template = _repo.get ( 'templates' ),
-		_save = {};
-
-	_self.template = template;
-	if ( _.isSet ( _template ) ) {
-		if ( _.isSet ( _template[ template ] ) ) {
-			_.callbackAudit ( callback, _template[ template ] )
-		} else {
-			_self.lookup ( template, function ( temp ) {
-				_save[ template ] = temp;
-				_repo.append ( 'templates', _save );
-				_.callbackAudit ( callback, temp );
-			} )
-		}
-	} else {
-		_repo.set ( 'templates', {} );
-		this.get ( template, callback )
-=======
-	//Send
-	_self.xhr_list.push ( _self.xhr );
-	_xhr.send ( _type !== 'GET' ? _data : null );
-
-	return _self.xhr;
-} );
-
-/** Set Request Header
- * @param header
- * @param type
- * @return object
- * **/
-Ajax.add ( 'requestHeader', function ( header, type ) {
-	this.xhr.setRequestHeader ( header, type );
-	return this;
-} );
 
 //Kill Ajax
 Ajax.add ( 'kill', function () {
@@ -3361,228 +2979,10 @@ Workers.add ( 'kill', function ( callback ) {
 		this.Worker.terminate ();
 		this.Worker = null;
 		_.callbackAudit ( callback );
->>>>>>> dev
 	}
 
 	return this;
 } );
-<<<<<<< HEAD
-
-//Clear Template from Repository
-Template.add ( 'clear', function () {
-	this.Repository.clear ( 'templates' );
-	return this;
-} );
-
-//Clear Template from Repository
-Template.add ( 'remove', function () {
-	if ( this.template ) {
-		var old_templates = this.Repository.get ( 'templates' );
-		if ( old_templates ) {
-			delete old_templates[ this.template ]
-		}
-
-		this.Repository.set ( 'templates', old_templates );
-		this.template = null;
-	}
-
-	return this;
-} );
-
-//Parse the Template
-Template.add ( 'parse', function ( _template, _fields, callback ) {
-	var _self = this;
-	_self.Workers.set ( '/workers/setting/Parser', function ( worker ) {
-		_self.Workers.send ( { template: _template, fields: _fields } );
-	} ).on ( 'message', function ( e ) {
-		_.callbackAudit ( callback, e.data )
-	} );
-
-	return this;
-} );
-
-
-/**
- * Created with JetBrains PhpStorm.
- * User: Geolffrey Mena
- * Date: 18/11/13
- * Time: 12:55
- * To change this template use File | Settings | File Templates.
- */
-
-'use strict';
-var GoogleMap,
-	WARNING_GOOGLE_MAP = {
-		ERROR: {
-			NOLOCATION : 'No coordinates seted.',
-			NOMAP      : 'No map seted.',
-			NOCONTAINER: 'No map container seted.',
-			NOCONFIG   : 'The configuration object is necessary.',
-			NOROUTES   : 'No mapped routes',
-			NODISTANCE : 'You need the source and target to measure the distance.'
-
-		}
-	};
-
-GoogleMap = function () {
-	var _proto = this.__proto__ || GoogleMap.prototype,
-		_self = this || _proto;
-
-	/**Atributos*/
-	_self.markersCollection = [];
-	_self.coordsCollection = [];
-	_self.routesCollection = [];
-	_self.infoLabels = [];
-	_self.distanceCollection = {};
-	_self.container = null;
-	_self.mapa = null;
-	_self.position = null;
-	_self.mapType = 'roadmap';
-	_self.travelType = 'DRIVING';
-	_self.marker = null;
-	_self.ruta = null;
-	_self.mapObject = google.maps;
-	_self.infoWindow = null;
-	_self.animationType = _self.mapObject.Animation.DROP;
-	_self.geocoder = new _self.mapObject.Geocoder ();
-	_self.distance = new _self.mapObject.DistanceMatrixService ();
-
-	/**Map Config
-	 * @param map
-	 */
-	_proto.setMapType = function (map) {
-		var self = this;
-		self.mapType = [
-						   {
-							   road     : self.mapObject.MapTypeId.ROADMAP,
-							   satellite: self.mapObject.MapTypeId.SATELLITE,
-							   hybrid   : self.mapObject.MapTypeId.HYBRID,
-							   terrain  : self.mapObject.MapTypeId.TERRAIN
-						   }[map]
-					   ].toString () || self.mapType;
-	};
-
-	/**Set Container of Map
-	 * @param container DOM
-	 */
-	_proto.setMapContainer = function (container) {
-		if ( _.is$ (container) )
-			container = container.object ();
-		this.container = container;
-	};
-
-	//Return Map Position
-	_proto.getMapPosition = function () {
-		return this.position;
-	};
-
-	/**Parse event object google.maps.event to coordinates
-	 *  @param e object Event Class
-	 * */
-	_proto.parseLatLngEvent = function (e) {
-		if ( e.latLng ) {
-			return {
-				latitude : e.latLng.lat (),
-				longitude: e.latLng.lng ()
-			}
-		}
-		return null;
-	};
-
-	//Return Map
-	_proto.getMap = function () {
-		return this.mapa;
-	};
-
-	//Return coords Collection
-	_proto.getCoords = function () {
-		return this.coordsCollection;
-	};
-
-	//Clean Coords
-	_proto.cleanCoords = function () {
-		this.coordsCollection = [];
-	};
-
-	//Return the center point of a coords collection
-	_proto.getCoordsCenterPoint = function () {
-		var coords = this.coordsCollection,
-			x = 0.0,
-			y = 0.0,
-			z = 0.0,
-			lat = 0,
-			long = 0;
-
-		_.each (coords, function (v) {
-			lat = (
-				  v.lat () * Math.PI
-				  ) / 180;
-			long = (
-				   v.lng () * Math.PI
-				   ) / 180;
-
-			x += (
-			Math.cos (lat) * Math.cos (long)
-			);
-			y += (
-			Math.cos (lat) * Math.sin (long)
-			);
-			z += (
-				Math.sin (lat)
-			);
-
-		});
-
-		x /= coords.length;
-		y /= coords.length;
-		z /= coords.length;
-
-		long = Math.atan2 (y, x);
-		lat = Math.atan2 (z, Math.sqrt (x * x + y * y));
-
-		return {
-			latitude : lat * 180 / Math.PI,
-			longitude: long * 180 / Math.PI
-		}
-
-	};
-
-
-	/**Append a coord to collection
-	 * @param ltnLgn LatLng Class
-	 * */
-	_proto.appendCoord = function (ltnLgn) {
-		this.coordsCollection.push (ltnLgn);
-	};
-
-	/**Event Handler
-	 * @param elem Marker Class | Map Class
-	 * @param event
-	 * @param callback
-	 * */
-	_proto.on = function (elem, event, callback) {
-		if ( _.isString (elem) ) {
-			callback = event;
-			event = elem;
-			if ( _.isSet (this.mapa) )
-				elem = this.mapa;
-		}
-
-		if ( !_.isFunction (callback) )
-			_.error (WARNING_SYRUP.ERROR.NOFUNCTION);
-
-		if ( !_.isObject (elem) )
-			_.error (WARNING_GOOGLE_MAP.ERROR.NOMAP);
-
-		_self.mapObject.event.addListener (elem, event, callback);
-	};
-
-	/** Make a google map position with coords latitude, longitude
-	 * @param latLong object {latitude:int, longitude:int}
-	 * */
-	_proto.makePosition = function (latLong) {
-
-=======
 
 /**
  * Created by gmena on 07-26-14.
@@ -3861,7 +3261,6 @@ GoogleMap = function () {
 	 * */
 	_proto.makePosition = function (latLong) {
 
->>>>>>> dev
 		if ( !_.isObject (latLong) ) {
 			_.error (WARNING_GOOGLE_MAP.ERROR.NOCONFIG);
 		}

@@ -1075,37 +1075,6 @@ _.extend(my_target, _my_source); //Return {a:1,b:5,c:3} not overwrite the target
 _.extend(my_target, _my_source, TRUE); //Return {a:1,b:2,c:3}
 ```    
 
-**Method `.include(script, wait, callback)`**
-
-*(Includes scripts in a controlled environment. Using de relative directory set in config)*
-```js    
-
-//FIRST SCENARIO
-_.include('app/controller/my_script', function(){
-    //my_script ready
-})
-
-//Again the same inclusion
-//In this case the script is not obtained again only callback is executed
-_.include('app/controller/my_script', function(){
-       //my_script ready again
-  })
-  
-  
-//SECOND SCENARIO
-//If another script which depends for its execution is necessary we can use wait
-//In this case needed.js is called with wait
-
- _.include('system/lib/needed' or 'app/my_libs/lib');
-
- _.include('system/lib/i_need_needed_to_work', 'needed', function(){
-           //i_need_needed_to_work.js is ready when needed.js is ready
-            
-            //Registered module _.my_module
-                   var module = new _.my_module;
- })
-``` 
-
 
 Array Tools
 ------------
