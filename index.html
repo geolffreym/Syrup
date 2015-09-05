@@ -68,6 +68,8 @@
                     this.when ('change', function (d) {
 
                         //Render new data using the inline template
+                        //If "Hey.You" is not set, the view is needed app/view/Hey/You.js
+                        //The view's directory, respects namespace
                         _self.serve ('Hey.You');
 
                         // The global service
@@ -75,8 +77,7 @@
                     })
                 },
                 destroy: function () {
-                    // What to do?
-
+                    alert ('destroyed?')
                 }
             }
         });
@@ -94,7 +95,15 @@
                             'beatles': [
                                 { "firstName": "Pedro", "lastName": "Lennon" }
                             ]
-                        })
+                        });
+
+                        // OnDrop the recipe
+                        my_Lib.when ('drop', 'Hey.You', function () {
+                            console.log ('you are dead Hey.You');
+                        });
+
+                        // Drop the recipe
+                        my_Lib.drop ('Hey.You');
                     });
 
                 },

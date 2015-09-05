@@ -2,9 +2,10 @@
  * Created by gmena on 01-27-14.
  */
 
-//QUOTE VIEW
+//The recipe name is needed
 Template.add ('Hey.You', function (data, callback) {
 	var _self = this;
+	//The template as relative path of config app_path
 	_self.get ('library/bookList', function (template) {
 		if ( _.isSet (callback) ) {
 			_self.parse (template, data, callback);
