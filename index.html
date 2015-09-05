@@ -17,18 +17,22 @@
 
     _$ (function () {
 
+        //The Module
         var my_Lib = Module.blend ('Hey', ['Ajax']);
 
+        //A global service
         my_Lib.service ('HeyConsole', function () {
             console.log ('hi')
         });
 
 
+        //A new recipe for Hey
         my_Lib.recipe ('Hey.You', function (_, _$, scope) {
             return {
                 init   : function (tools) {
                     this.setScope ({ a: 2 });
 
+                    //When Hey.You scope change
                     this.when ('change', function (d) {
                         console.log (d)
                     })
@@ -38,9 +42,11 @@
         });
 
 
+        //A new recipe for Hey
         my_Lib.recipe ('Hey.Do', function (_, _$, scope) {
             return {
                 init   : function (tools) {
+                    //Trigger change in Hey.You
                     my_Lib.setScope ('Hey.You', { a: 3 })
                 },
                 destroy: function () {}

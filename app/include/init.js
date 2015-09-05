@@ -94,8 +94,6 @@ nativeFunction.add = function (name, fn) {
 
 function Syrup () {
 	this.recursiveStr = false;
-	this.scriptCalls = {};
-	this.waitingCalls = {};
 }
 
 /**_$_
@@ -178,7 +176,7 @@ _$_.add ('load', function (callback) {
  * @param callback
  * @return object
  */
-_$_.add ('addListener', function (event, delegate, callback) {
+_$_.add ('listen', function (event, delegate, callback) {
 	if ( _.isFunction (delegate) ) {
 		callback = delegate;
 	}
@@ -220,7 +218,7 @@ _$_.add ('addListener', function (event, delegate, callback) {
  * @param callback
  * @return object
  */
-_$_.add ('removeListener', function (event) {
+_$_.add ('unlisten', function (event) {
 	this.each (function (elem) {
 
 		if ( _.isSet (elem.listListener) ) {
@@ -1797,68 +1795,11 @@ Syrup.add ('extend', function (target, source, overwrite) {
 });
 
 
-/**Include
- * @param script
- * @param wait
- * @param callback
- * @return object
- */
-Syrup.add ('include', function (script, wait, callback) {
-	var _url = !_.isUrl (script)
-			? setting.app_path + script + '.min.js'
-			: script + '.min.js',
-		_script = script
-			.split ('/')
-			.pop ();
-	
-	if ( _.isFunction (wait) ) {
-		callback = arguments[1];
-		wait = false;
-	}
-	
-	if ( wait && _.isSet (_.scriptCalls[wait]) ) {
-		if ( !_.isSet (_.waitingCalls[wait]) ) {
-			_.waitingCalls[wait] = [];
-		}
-		if ( _.waitingCalls[wait] !== 'done' ) {
-			_.waitingCalls[wait].push (function () {
-				_.include (script, callback)
-			});
-			return false;
-		}
-	}
-	
-	
-	if ( _.isSet (_.scriptCalls[_script]) ) {
-		_.callbackAudit (callback);
-		return false;
-	}
-	
-	_.scriptCalls[_script] = script;
-	_.getScript (_url, function (e) {
-		if ( _.isSet (_.waitingCalls[_script]) ) {
-			if ( _.isArray (_.waitingCalls[_script]) ) {
-				var i = 0,
-					max = _.waitingCalls[_script].length;
-				for ( ; i < max; i++ ) {
-					_.waitingCalls[_script][i] (e);
-				}
-				_.waitingCalls[_script] = 'done';
-			}
-		}
-		_.callbackAudit (callback);
-	});
-	return this;
-	
-});
-
 
 //Super Global Object Instance
-window._ = (
-	function () {
+window._ = (function () {
 		return new Syrup ();
-	}
-) ();
+	}) ();
 
 _.VERSION = '1.1';
 _.$fn = _$_;
@@ -1878,13 +1819,11 @@ _.nav.javascript = navigator.javaEnabled ();
 _.nav.online = navigator.onLine;
 _.nav.local = navigator.userAgent.toLowerCase ();
 
-window._$ = (
-	function () {
+window._$ = (function () {
 		return (
 			new _$_ ()
 		).$;
-	}
-) ();
+	}) ();
 
 
 /*
@@ -1901,357 +1840,365 @@ window._$ = (
  TODO:
  Add support for Object.prototype.watch -> https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/watch
  */
-if(!Object.observe){
-	(function(extend, global){
+if ( !Object.observe ) {
+	(function (extend, global) {
 		"use strict";
-		var isCallable = (function(toString){
-			var s = toString.call(toString),
+		var isCallable = (function (toString) {
+			var s = toString.call (toString),
 				u = typeof u;
 			return typeof global.alert === "object" ?
-				function isCallable(f){
-					return s === toString.call(f) || (!!f && typeof f.toString == u && typeof f.valueOf == u && /^\s*\bfunction\b/.test("" + f));
-				}:
-				function isCallable(f){
-					return s === toString.call(f);
+				function isCallable (f) {
+					return s === toString.call (f) || (!!f && typeof f.toString == u && typeof f.valueOf == u && /^\s*\bfunction\b/.test ("" + f));
+				} :
+				function isCallable (f) {
+					return s === toString.call (f);
 				}
 				;
-		})(extend.prototype.toString);
-		// isNode & isElement from http://stackoverflow.com/questions/384286/javascript-isdom-how-do-you-check-if-a-javascript-object-is-a-dom-object
-		//Returns true if it is a DOM node
-		var isNode = function isNode(o){
+		}) (extend.prototype.toString);
+		// isNode & isElement from
+		// http://stackoverflow.com/questions/384286/javascript-isdom-how-do-you-check-if-a-javascript-object-is-a-dom-object
+		// Returns true if it is a DOM node
+		var isNode = function isNode (o) {
 			return (
 				typeof Node === "object" ? o instanceof Node :
-				o && typeof o === "object" && typeof o.nodeType === "number" && typeof o.nodeName==="string"
+				o && typeof o === "object" && typeof o.nodeType === "number" && typeof o.nodeName === "string"
 			);
 		};
 		//Returns true if it is a DOM element
-		var isElement = function isElement(o){
+		var isElement = function isElement (o) {
 			return (
 				typeof HTMLElement === "object" ? o instanceof HTMLElement : //DOM2
-				o && typeof o === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName==="string"
+				o && typeof o === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName === "string"
 			);
 		};
-		var _isImmediateSupported = (function(){
+		var _isImmediateSupported = (function () {
 			return !!global.setImmediate;
-		})();
-		var _doCheckCallback = (function(){
-			if(_isImmediateSupported){
-				return function _doCheckCallback(f){
-					return setImmediate(f);
+		}) ();
+		var _doCheckCallback = (function () {
+			if ( _isImmediateSupported ) {
+				return function _doCheckCallback (f) {
+					return setImmediate (f);
 				};
-			}else{
-				return function _doCheckCallback(f){
-					return setTimeout(f, 10);
-				};
-			}
-		})();
-		var _clearCheckCallback = (function(){
-			if(_isImmediateSupported){
-				return function _clearCheckCallback(id){
-					clearImmediate(id);
-				};
-			}else{
-				return function _clearCheckCallback(id){
-					clearTimeout(id);
+			} else {
+				return function _doCheckCallback (f) {
+					return setTimeout (f, 10);
 				};
 			}
-		})();
-		var isNumeric=function isNumeric(n){
-			return !isNaN(parseFloat(n)) && isFinite(n);
+		}) ();
+		var _clearCheckCallback = (function () {
+			if ( _isImmediateSupported ) {
+				return function _clearCheckCallback (id) {
+					clearImmediate (id);
+				};
+			} else {
+				return function _clearCheckCallback (id) {
+					clearTimeout (id);
+				};
+			}
+		}) ();
+		var isNumeric = function isNumeric (n) {
+			return !isNaN (parseFloat (n)) && isFinite (n);
 		};
-		var sameValue = function sameValue(x, y){
-			if(x===y){
+		var sameValue = function sameValue (x, y) {
+			if ( x === y ) {
 				return x !== 0 || 1 / x === 1 / y;
 			}
 			return x !== x && y !== y;
 		};
-		var isAccessorDescriptor = function isAccessorDescriptor(desc){
-			if (typeof(desc) === 'undefined'){
+		var isAccessorDescriptor = function isAccessorDescriptor (desc) {
+			if ( typeof(desc) === 'undefined' ) {
 				return false;
 			}
 			return ('get' in desc || 'set' in desc);
 		};
-		var isDataDescriptor = function isDataDescriptor(desc){
-			if (typeof(desc) === 'undefined'){
+		var isDataDescriptor = function isDataDescriptor (desc) {
+			if ( typeof(desc) === 'undefined' ) {
 				return false;
 			}
 			return ('value' in desc || 'writable' in desc);
 		};
 
-		var validateArguments = function validateArguments(O, callback, accept){
-			if(typeof(O)!=='object'){
+		var validateArguments = function validateArguments (O, callback, accept) {
+			if ( typeof(O) !== 'object' ) {
 				// Throw Error
-				throw new TypeError("Object.observeObject called on non-object");
+				throw new TypeError ("Object.observeObject called on non-object");
 			}
-			if(isCallable(callback)===false){
+			if ( isCallable (callback) === false ) {
 				// Throw Error
-				throw new TypeError("Object.observeObject: Expecting function");
+				throw new TypeError ("Object.observeObject: Expecting function");
 			}
-			if(Object.isFrozen(callback)===true){
+			if ( Object.isFrozen (callback) === true ) {
 				// Throw Error
-				throw new TypeError("Object.observeObject: Expecting unfrozen function");
+				throw new TypeError ("Object.observeObject: Expecting unfrozen function");
 			}
-			if (accept !== undefined) {
-				if (!Array.isArray(accept)) {
-					throw new TypeError("Object.observeObject: Expecting acceptList in the form of an array");
+			if ( accept !== undefined ) {
+				if ( !Array.isArray (accept) ) {
+					throw new TypeError ("Object.observeObject: Expecting acceptList in the form of an array");
 				}
 			}
 		};
 
-		var Observer = (function Observer(){
+		var Observer = (function Observer () {
 			var wraped = [];
-			var Observer = function Observer(O, callback, accept){
-				validateArguments(O, callback, accept);
-				if (!accept) {
+			var Observer = function Observer (O, callback, accept) {
+				validateArguments (O, callback, accept);
+				if ( !accept ) {
 					accept = ["add", "update", "delete", "reconfigure", "setPrototype", "preventExtensions"];
 				}
-				Object.getNotifier(O).addListener(callback, accept);
-				if(wraped.indexOf(O)===-1){
-					wraped.push(O);
-				}else{
-					Object.getNotifier(O)._checkPropertyListing();
+				Object.getNotifier (O).addListener (callback, accept);
+				if ( wraped.indexOf (O) === -1 ) {
+					wraped.push (O);
+				} else {
+					Object.getNotifier (O)._checkPropertyListing ();
 				}
 			};
 
-			Observer.prototype.deliverChangeRecords = function Observer_deliverChangeRecords(O){
-				Object.getNotifier(O).deliverChangeRecords();
+			Observer.prototype.deliverChangeRecords = function Observer_deliverChangeRecords (O) {
+				Object.getNotifier (O).deliverChangeRecords ();
 			};
 
 			wraped.lastScanned = 0;
-			var f = (function f(wrapped){
-				return function _f(){
-					var i = 0, l = wrapped.length, startTime = new Date(), takingTooLong=false;
-					for(i=wrapped.lastScanned; (i<l)&&(!takingTooLong); i++){
-						if(_indexes.indexOf(wrapped[i]) > -1){
-							Object.getNotifier(wrapped[i])._checkPropertyListing();
-							takingTooLong=((new Date())-startTime)>100; // make sure we don't take more than 100 milliseconds to scan all objects
-						}else{
-							wrapped.splice(i, 1);
+			var f = (function f (wrapped) {
+				return function _f () {
+					var i = 0, l = wrapped.length, startTime = new Date (), takingTooLong = false;
+					for ( i = wrapped.lastScanned; (i < l) && (!takingTooLong); i++ ) {
+						if ( _indexes.indexOf (wrapped[i]) > -1 ) {
+							Object.getNotifier (wrapped[i])._checkPropertyListing ();
+							takingTooLong = ((new Date ()) - startTime) > 100; // make sure we don't take more than 100
+																			   // milliseconds to scan all objects
+						} else {
+							wrapped.splice (i, 1);
 							i--;
 							l--;
 						}
 					}
-					wrapped.lastScanned=i<l?i:0; // reset wrapped so we can make sure that we pick things back up
-					_doCheckCallback(_f);
+					wrapped.lastScanned = i < l ? i : 0; // reset wrapped so we can make sure that we pick things back
+														 // up
+					_doCheckCallback (_f);
 				};
-			})(wraped);
-			_doCheckCallback(f);
+			}) (wraped);
+			_doCheckCallback (f);
 			return Observer;
-		})();
+		}) ();
 
-		var Notifier = function Notifier(watching){
+		var Notifier = function Notifier (watching) {
 			var _listeners = [], _acceptLists = [], _updates = [], _updater = false, properties = [], values = [];
 			var self = this;
-			Object.defineProperty(self, '_watching', {
+			Object.defineProperty (self, '_watching', {
 				enumerable: true,
-				get: (function(watched){
-					return function(){
+				get       : (function (watched) {
+					return function () {
 						return watched;
 					};
-				})(watching)
+				}) (watching)
 			});
-			var wrapProperty = function wrapProperty(object, prop){
-				var propType = typeof(object[prop]), descriptor = Object.getOwnPropertyDescriptor(object, prop);
-				if((prop==='getNotifier')||isAccessorDescriptor(descriptor)||(!descriptor.enumerable)){
+			var wrapProperty = function wrapProperty (object, prop) {
+				var propType = typeof(object[prop]), descriptor = Object.getOwnPropertyDescriptor (object, prop);
+				if ( (prop === 'getNotifier') || isAccessorDescriptor (descriptor) || (!descriptor.enumerable) ) {
 					return false;
 				}
-				if((object instanceof Array)&&isNumeric(prop)){
+				if ( (object instanceof Array) && isNumeric (prop) ) {
 					var idx = properties.length;
 					properties[idx] = prop;
 					values[idx] = object[prop];
 					return true;
 				}
-				(function(idx, prop){
+				(function (idx, prop) {
 					properties[idx] = prop;
 					values[idx] = object[prop];
-					function getter(){
+					function getter () {
 						return values[getter.info.idx];
 					}
-					function setter(value){
-						if(!sameValue(values[setter.info.idx], value)){
-							Object.getNotifier(object).queueUpdate(object, prop, 'update', values[setter.info.idx]);
+
+					function setter (value) {
+						if ( !sameValue (values[setter.info.idx], value) ) {
+							Object.getNotifier (object).queueUpdate (object, prop, 'update', values[setter.info.idx]);
 							values[setter.info.idx] = value;
 						}
 					}
+
 					getter.info = setter.info = {
 						idx: idx
 					};
-					Object.defineProperty(object, prop, {
+					Object.defineProperty (object, prop, {
 						get: getter,
 						set: setter
 					});
-				})(properties.length, prop);
+				}) (properties.length, prop);
 				return true;
 			};
-			self._checkPropertyListing = function _checkPropertyListing(dontQueueUpdates){
-				var object = self._watching, keys = Object.keys(object), i=0, l=keys.length;
-				var newKeys = [], oldKeys = properties.slice(0), updates = [];
+			self._checkPropertyListing = function _checkPropertyListing (dontQueueUpdates) {
+				var object = self._watching, keys = Object.keys (object), i = 0, l = keys.length;
+				var newKeys = [], oldKeys = properties.slice (0), updates = [];
 				var prop, queueUpdates = !dontQueueUpdates, propType, value, idx, aLength;
 
-				if(object instanceof Array){
+				if ( object instanceof Array ) {
 					aLength = self._oldLength;//object.length;
 					//aLength = object.length;
 				}
 
-				for(i=0; i<l; i++){
+				for ( i = 0; i < l; i++ ) {
 					prop = keys[i];
 					value = object[prop];
 					propType = typeof(value);
-					if((idx = properties.indexOf(prop))===-1){
-						if(wrapProperty(object, prop)&&queueUpdates){
-							self.queueUpdate(object, prop, 'add', null, object[prop]);
+					if ( (idx = properties.indexOf (prop)) === -1 ) {
+						if ( wrapProperty (object, prop) && queueUpdates ) {
+							self.queueUpdate (object, prop, 'add', null, object[prop]);
 						}
-					}else{
-						if(!(object instanceof Array)||(isNumeric(prop))){
-							if(values[idx] !== value){
-								if(queueUpdates){
-									self.queueUpdate(object, prop, 'update', values[idx], value);
+					} else {
+						if ( !(object instanceof Array) || (isNumeric (prop)) ) {
+							if ( values[idx] !== value ) {
+								if ( queueUpdates ) {
+									self.queueUpdate (object, prop, 'update', values[idx], value);
 								}
 								values[idx] = value;
 							}
 						}
-						oldKeys.splice(oldKeys.indexOf(prop), 1);
+						oldKeys.splice (oldKeys.indexOf (prop), 1);
 					}
 				}
 
-				if(object instanceof Array && object.length !== aLength){
-					if(queueUpdates){
-						self.queueUpdate(object, 'length', 'update', aLength, object);
+				if ( object instanceof Array && object.length !== aLength ) {
+					if ( queueUpdates ) {
+						self.queueUpdate (object, 'length', 'update', aLength, object);
 					}
 					self._oldLength = object.length;
 				}
 
-				if(queueUpdates){
+				if ( queueUpdates ) {
 					l = oldKeys.length;
-					for(i=0; i<l; i++){
-						idx = properties.indexOf(oldKeys[i]);
-						self.queueUpdate(object, oldKeys[i], 'delete', values[idx]);
-						properties.splice(idx,1);
-						values.splice(idx,1);
-						for(var i=idx;i<properties.length;i++){
-							if(!(properties[i] in object))
+					for ( i = 0; i < l; i++ ) {
+						idx = properties.indexOf (oldKeys[i]);
+						self.queueUpdate (object, oldKeys[i], 'delete', values[idx]);
+						properties.splice (idx, 1);
+						values.splice (idx, 1);
+						for ( var i = idx; i < properties.length; i++ ) {
+							if ( !(properties[i] in object) )
 								continue;
-							var getter = Object.getOwnPropertyDescriptor(object,properties[i]).get;
-							if(!getter)
+							var getter = Object.getOwnPropertyDescriptor (object, properties[i]).get;
+							if ( !getter )
 								continue;
 							var info = getter.info;
 							info.idx = i;
 						}
-					};
+					}
+					;
 				}
 			};
-			self.addListener = function Notifier_addListener(callback, accept){
-				var idx = _listeners.indexOf(callback);
-				if(idx===-1){
-					_listeners.push(callback);
-					_acceptLists.push(accept);
+			self.addListener = function Notifier_addListener (callback, accept) {
+				var idx = _listeners.indexOf (callback);
+				if ( idx === -1 ) {
+					_listeners.push (callback);
+					_acceptLists.push (accept);
 				}
 				else {
 					_acceptLists[idx] = accept;
 				}
 			};
-			self.removeListener = function Notifier_removeListener(callback){
-				var idx = _listeners.indexOf(callback);
-				if(idx>-1){
-					_listeners.splice(idx, 1);
-					_acceptLists.splice(idx, 1);
+			self.removeListener = function Notifier_removeListener (callback) {
+				var idx = _listeners.indexOf (callback);
+				if ( idx > -1 ) {
+					_listeners.splice (idx, 1);
+					_acceptLists.splice (idx, 1);
 				}
 			};
-			self.listeners = function Notifier_listeners(){
+			self.listeners = function Notifier_listeners () {
 				return _listeners;
 			};
-			self.queueUpdate = function Notifier_queueUpdate(what, prop, type, was){
-				this.queueUpdates([{
-					type: type,
-					object: what,
-					name: prop,
-					oldValue: was
-				}]);
+			self.queueUpdate = function Notifier_queueUpdate (what, prop, type, was) {
+				this.queueUpdates ([
+					{
+						type    : type,
+						object  : what,
+						name    : prop,
+						oldValue: was
+					}
+				]);
 			};
-			self.queueUpdates = function Notifier_queueUpdates(updates){
-				var self = this, i = 0, l = updates.length||0, update;
-				for(i=0; i<l; i++){
+			self.queueUpdates = function Notifier_queueUpdates (updates) {
+				var self = this, i = 0, l = updates.length || 0, update;
+				for ( i = 0; i < l; i++ ) {
 					update = updates[i];
-					_updates.push(update);
+					_updates.push (update);
 				}
-				if(_updater){
-					_clearCheckCallback(_updater);
+				if ( _updater ) {
+					_clearCheckCallback (_updater);
 				}
-				_updater = _doCheckCallback(function(){
+				_updater = _doCheckCallback (function () {
 					_updater = false;
-					self.deliverChangeRecords();
+					self.deliverChangeRecords ();
 				});
 			};
-			self.deliverChangeRecords = function Notifier_deliverChangeRecords(){
+			self.deliverChangeRecords = function Notifier_deliverChangeRecords () {
 				var i = 0, l = _listeners.length,
 				//keepRunning = true, removed as it seems the actual implementation doesn't do this
 				// In response to BUG #5
 					retval;
-				for(i=0; i<l; i++){
-					if(_listeners[i]){
+				for ( i = 0; i < l; i++ ) {
+					if ( _listeners[i] ) {
 						var currentUpdates;
-						if (_acceptLists[i]) {
+						if ( _acceptLists[i] ) {
 							currentUpdates = [];
-							for (var j = 0, updatesLength = _updates.length; j < updatesLength; j++) {
-								if (_acceptLists[i].indexOf(_updates[j].type) !== -1) {
-									currentUpdates.push(_updates[j]);
+							for ( var j = 0, updatesLength = _updates.length; j < updatesLength; j++ ) {
+								if ( _acceptLists[i].indexOf (_updates[j].type) !== -1 ) {
+									currentUpdates.push (_updates[j]);
 								}
 							}
 						}
 						else {
 							currentUpdates = _updates;
 						}
-						if (currentUpdates.length) {
-							if(_listeners[i]===console.log){
-								console.log(currentUpdates);
-							}else{
-								_listeners[i](currentUpdates);
+						if ( currentUpdates.length ) {
+							if ( _listeners[i] === console.log ) {
+								console.log (currentUpdates);
+							} else {
+								_listeners[i] (currentUpdates);
 							}
 						}
 					}
 				}
-				_updates=[];
+				_updates = [];
 			};
-			self.notify = function Notifier_notify(changeRecord) {
-				if (typeof changeRecord !== "object" || typeof changeRecord.type !== "string") {
-					throw new TypeError("Invalid changeRecord with non-string 'type' property");
+			self.notify = function Notifier_notify (changeRecord) {
+				if ( typeof changeRecord !== "object" || typeof changeRecord.type !== "string" ) {
+					throw new TypeError ("Invalid changeRecord with non-string 'type' property");
 				}
 				changeRecord.object = watching;
-				self.queueUpdates([changeRecord]);
+				self.queueUpdates ([changeRecord]);
 			};
-			self._checkPropertyListing(true);
+			self._checkPropertyListing (true);
 		};
 
-		var _notifiers=[], _indexes=[];
-		extend.getNotifier = function Object_getNotifier(O){
-			var idx = _indexes.indexOf(O), notifier = idx>-1?_notifiers[idx]:false;
-			if(!notifier){
+		var _notifiers = [], _indexes = [];
+		extend.getNotifier = function Object_getNotifier (O) {
+			var idx = _indexes.indexOf (O), notifier = idx > -1 ? _notifiers[idx] : false;
+			if ( !notifier ) {
 				idx = _indexes.length;
 				_indexes[idx] = O;
-				notifier = _notifiers[idx] = new Notifier(O);
+				notifier = _notifiers[idx] = new Notifier (O);
 			}
 			return notifier;
 		};
-		extend.observe = function Object_observe(O, callback, accept){
+		extend.observe = function Object_observe (O, callback, accept) {
 			// For Bug 4, can't observe DOM elements tested against canry implementation and matches
-			if(!isElement(O)){
-				return new Observer(O, callback, accept);
+			if ( !isElement (O) ) {
+				return new Observer (O, callback, accept);
 			}
 		};
-		extend.unobserve = function Object_unobserve(O, callback){
-			validateArguments(O, callback);
-			var idx = _indexes.indexOf(O),
-				notifier = idx>-1?_notifiers[idx]:false;
-			if (!notifier){
+		extend.unobserve = function Object_unobserve (O, callback) {
+			validateArguments (O, callback);
+			var idx = _indexes.indexOf (O),
+				notifier = idx > -1 ? _notifiers[idx] : false;
+			if ( !notifier ) {
 				return;
 			}
-			notifier.removeListener(callback);
-			if (notifier.listeners().length === 0){
-				_indexes.splice(idx, 1);
-				_notifiers.splice(idx, 1);
+			notifier.removeListener (callback);
+			if ( notifier.listeners ().length === 0 ) {
+				_indexes.splice (idx, 1);
+				_notifiers.splice (idx, 1);
 			}
 		};
-	})(Object, this);
+	}) (Object, this);
 }
 /**
  * Created by gmena on 08-06-14.
@@ -2626,6 +2573,500 @@ Modules.add ('dropAll', function () {
 });
 
 window.Module = new Modules;
+
+/**
+ * Created by gmena on 08-31-15.
+ */
+"use strict";
+
+function Require () {
+	this.url = null;
+	this.cached = false;
+	this.scriptCalls = {};
+	this.waitingCalls = {};
+}
+
+Require.add ('request', function (script, callback, conf) {
+	var _self = this,
+		_url = !_.isUrl (script)
+			? setting.app_path + script + '.min.js'
+			: script + '.min.js',
+		_script = script
+			.split ('/')
+			.pop ();
+
+
+	if ( _.isSet (conf.wait) ) {
+		if ( _.isSet (_self.scriptCalls[conf.wait]) ) {
+			if ( !_.isSet (_self.waitingCalls[conf.wait]) ) {
+				_self.waitingCalls[conf.wait] = [];
+			}
+			if ( _self.waitingCalls[conf.wait] !== 'done' ) {
+				_self.waitingCalls[conf.wait].push (function () {
+					_self.request (script, callback)
+				});
+				return false;
+			}
+		}
+	}
+
+
+	if ( _.isSet (_self.scriptCalls[_script]) ) {
+		_.callbackAudit (callback);
+		return false;
+	}
+
+	_self.scriptCalls[_script] = script;
+	_.getScript (_url, function (e) {
+		if ( _.isSet (_self.waitingCalls[_script]) ) {
+			if ( _.isArray (_self.waitingCalls[_script]) ) {
+				var i = 0,
+					max = _self.waitingCalls[_script].length;
+				for ( ; i < max; i++ ) {
+					_self.waitingCalls[_script][i] (e);
+				}
+				_self.waitingCalls[_script] = 'done';
+			}
+		}
+		_.callbackAudit (callback);
+	});
+	return this;
+});
+
+
+window.Require = new Require;
+
+
+/**
+ * Created by gmena on 07-26-14.
+ */
+
+'use strict';
+
+/**Ajax
+ * @constructor
+ */
+
+
+function Ajax () {
+	this.xhr = new window.XMLHttpRequest
+			   || new window.ActiveXObject ( "Microsoft.XMLHTTP" );
+	this.xhr_list = [];
+	this.upload = null;
+	this.before = null;
+	this.complete = null;
+	this.progress = null;
+	this.state = null;
+	this.abort = null;
+	this.error = null;
+	this.time_out = null;
+}
+
+/*** Event handler
+ * @param event
+ * @param callback
+ * @return void
+ * */
+Ajax.add ( 'on', function ( event, callback ) {
+	var self = this;
+	return [
+		{
+			before  : function () {
+				self.before = callback;
+			},
+			complete: function () {
+				self.complete = callback;
+			},
+			error   : function () {
+				self.error = callback;
+			},
+			abort   : function () {
+				self.abort = callback;
+			},
+			state   : function () {
+				self.state = callback;
+			},
+			timeout : function () {
+				self.time_out = callback;
+			},
+			progress: function () {
+				self.progress = callback;
+			}
+		}[ event ] ()
+	]
+
+} );
+
+/** Ajax Request
+ * @param config
+ * @param callback
+ * @return object
+ *
+ * Config object {
+ *  url: (string) the request url
+ *  type: (string) the request type GET or POST
+ *	async: bool,
+ *	timeout: (int) request timeout,
+ *	processor: (string) ajax server side processor file extension,
+ *	token: (string or bool) CSRF token needed?,
+ *	contentType: (string) the content type,
+ *	contentHeader: (object) the content header request,
+ *	data: (object) the request data,
+ *	upload: (bool) is upload process?
+ *
+ * }
+ * **/
+Ajax.add ( 'request', function ( config, callback ) {
+	if ( !_.isObject ( config ) ) {
+		throw (WARNING_SYRUP.ERROR.NOOBJECT)
+	}
+
+	var _self = this,
+		_xhr = _self.xhr,
+		_async = true,
+		_type = config.method || 'GET',
+		_timeout = config.timeout || 4000,
+		_processor = config.processor || setting.ajax_processor || '',
+		_token = config.token || false,
+		_contentType = config.contentType || 'application/x-www-form-urlencoded;charset=utf-8',
+		_data = config.data
+			? config.data : null,
+		_contentHeader = config.contentHeader ||
+						 [
+							 {
+								 header: 'Content-Type',
+								 value : _contentType
+							 }
+						 ]
+		;
+
+	if ( !_.isSet ( config.url ) ) {
+		throw (WARNING_SYRUP.ERROR.NOURL);
+	}
+
+	if ( !_.isFormData ( _data )
+		 && _.isSet ( _data )
+		 && _contentHeader !== 'auto' ) {
+		_data = _.parseJsonUrl ( _data );
+	}
+
+	if ( _type === 'GET' && _.isSet ( _data ) ) {
+		_processor += '?' + _data;
+	}
+
+	_processor = config.url + (_processor || '');
+	_xhr.open ( _type, _processor, _async );
+	_xhr.timeout = _timeout;
+
+	//Setting Headers
+	if ( !_.isFormData ( _data ) && _contentHeader !== 'auto' ) {
+		_.each ( _contentHeader, function ( v ) {
+			_self.requestHeader ( v.header, v.value );
+		} )
+
+	}
+
+	//Using Token
+	if ( _.isSet ( _token ) )
+		_self.requestHeader ( "X-CSRFToken", _.getCookie ( _.isBoolean ( _token ) ? 'csrftoken' : _token ) );
+
+	//If upload needed
+	if ( _.isSet ( config.upload ) && _.isBoolean ( config.upload ) ) {
+		_self.upload = _self.xhr.upload;
+		_xhr = _self.upload;
+	}
+
+	//Event Listeners
+	_xhr.addEventListener ( 'load', function ( e ) {
+		if ( this.status >= 0xC8 && this.status < 0x190 ) {
+			var _response = this.response || this.responseText;
+			if ( _.isJson ( _response ) ) {
+				_response = JSON.parse ( _response );
+			}
+			_.callbackAudit ( callback, _response, e );
+
+		}
+	} );
+
+	_xhr.addEventListener ( 'progress', function ( e ) {
+		if ( _self.progress ) {
+			_self.progress ( e );
+		}
+	}, false );
+
+	_xhr.addEventListener ( 'readystatechange', function ( e ) {
+		if ( this.readyState ) {
+			if ( !!_self.state ) {
+				_self.state ( this.readyState, e );
+			}
+		}
+	} );
+
+	_xhr.addEventListener ( 'abort', function ( e ) {
+		if ( !!_self.abort ) {
+			_self.abort ( e );
+		}
+	} );
+
+	_xhr.addEventListener ( 'timeout', function ( e ) {
+		if ( !!_self.time_out ) {
+			_self.time_out ( e );
+		}
+	} );
+
+	_xhr.addEventListener ( 'loadend', function ( e ) {
+		if ( !!_self.complete ) {
+			_self.complete ( e );
+		}
+	} );
+
+	_xhr.addEventListener ( 'loadstart', function ( e ) {
+		if ( !!_self.before ) {
+			_self.before ( e );
+		}
+	} );
+
+	_xhr.addEventListener ( 'error', function ( e ) {
+		if ( !!_self.error ) {
+			_self.error ( e );
+		}
+	} );
+
+
+	//Send
+	_self.xhr_list.push ( _self.xhr );
+	_xhr.send ( _type !== 'GET' ? _data : null );
+
+	return _self.xhr;
+} );
+
+/** Set Request Header
+ * @param header
+ * @param type
+ * @return object
+ * **/
+Ajax.add ( 'requestHeader', function ( header, type ) {
+	this.xhr.setRequestHeader ( header, type );
+	return this;
+} );
+
+//Kill Ajax
+Ajax.add ( 'kill', function () {
+	var i = this.xhr_list.length;
+	while ( i-- ) {
+		if ( !!this.xhr_list[ i ] )
+			this.xhr_list[ i ].abort ();
+	}
+	this.xhr_list.length = 0;
+
+	return this;
+} );
+
+
+
+/**
+ * Created by gmena on 07-26-14.
+ */
+'use strict';
+
+function Repository () {
+
+}
+
+//Set registry to bucket
+Repository.add ( 'set', function ( key, data, callback ) {
+	localStorage.setItem ( key, JSON.stringify ( data ) );
+	_.callbackAudit ( callback, data, this );
+} );
+
+
+//Get registry from bucket
+Repository.add ( 'get', function ( key ) {
+	return _.isJson ( localStorage.getItem ( key ) )
+		? JSON.parse ( localStorage.getItem ( key ) ) : null;
+} );
+
+//Append data to existing bucket
+Repository.add ( 'append', function ( key, element, callback ) {
+	var _existent = this.get ( key ),
+	    _new = _.extend ( _.isSet ( _existent ) ? _existent : {}, element );
+
+	this.set ( key, _new, false );
+	_.callbackAudit ( callback, _new );
+	return this;
+} );
+
+//Detroy all buckets
+Repository.add ( 'destroy', function () {
+	localStorage.clear ();
+} );
+
+//Clear a bucket
+Repository.add ( 'clear', function ( key ) {
+	localStorage.removeItem ( key );
+	return this;
+} );
+
+
+//Return count buckets
+Repository.add ( 'count', function () {
+	return localStorage.length;
+} );
+/**
+ * Created by gmena on 07-26-14.
+ */
+
+
+'use strict';
+
+function Workers () {
+	this.Worker = null;
+	this.onsuccess = null;
+}
+
+//Worker event handler
+Workers.add ( 'on', function ( event, callback ) {
+	var self = this;
+	return [
+		{
+			message: function () {
+				self.onsuccess = callback;
+			}
+		}[ event ] ()
+	]
+} );
+
+//Set new Worker
+Workers.add ( 'set', function ( url, callback ) {
+	var self = this;
+	self.Worker = (new Worker ( setting.system_path + url + '.min.js' ));
+	self.Worker.addEventListener ( 'message', function ( e ) {
+		_.callbackAudit ( self.onsuccess, e );
+	}, false );
+	_.callbackAudit ( callback, self.Worker );
+
+	return this;
+
+} );
+
+//Get Worker
+Workers.add ( 'get', function () {
+	return this.Worker;
+} );
+
+//Send Message to Worker
+Workers.add ( 'send', function ( message ) {
+	this.Worker.postMessage ( !!message ? message : '' );
+	return this;
+} );
+
+//Kill Worker
+Workers.add ( 'kill', function ( callback ) {
+	if ( _.isSet ( this.Worker ) ) {
+		this.Worker.terminate ();
+		this.Worker = null;
+		_.callbackAudit ( callback );
+	}
+
+	return this;
+} );
+
+/**
+ * Created by gmena on 07-26-14.
+ */
+
+'use strict';
+/**Template
+ * @constructor
+ */
+
+/**Dependencies
+ * Ajax Lib
+ * Worker Lib
+ * Repository Lib
+ * */
+
+function Template () {
+	this.Ajax = new Ajax;
+	this.Repository = new Repository;
+	this.Workers = new Workers;
+	this.template = null;
+}
+
+//Search for the template
+Template.add ( 'lookup', function ( template, callback ) {
+	var _conf = {
+		url      : setting.app_path + '/templates/' + template,
+		dataType : 'text/plain',
+		processor: '.html'
+	};
+
+	this.Ajax.request ( _conf, function ( response ) {
+		_.callbackAudit ( callback, response );
+	} );
+
+	return this;
+} );
+
+//Get the template
+Template.add ( 'get', function ( template, callback ) {
+	var _self = this,
+		_repo = _self.Repository,
+		_template = _repo.get ( 'templates' ),
+		_save = {};
+
+	_self.template = template;
+	if ( _.isSet ( _template ) ) {
+		if ( _.isSet ( _template[ template ] ) ) {
+			_.callbackAudit ( callback, _template[ template ] )
+		} else {
+			_self.lookup ( template, function ( temp ) {
+				_save[ template ] = temp;
+				_repo.append ( 'templates', _save );
+				_.callbackAudit ( callback, temp );
+			} )
+		}
+	} else {
+		_repo.set ( 'templates', {} );
+		this.get ( template, callback )
+	}
+
+	return this;
+} );
+
+//Clear Template from Repository
+Template.add ( 'clear', function () {
+	this.Repository.clear ( 'templates' );
+	return this;
+} );
+
+//Clear Template from Repository
+Template.add ( 'remove', function () {
+	if ( this.template ) {
+		var old_templates = this.Repository.get ( 'templates' );
+		if ( old_templates ) {
+			delete old_templates[ this.template ]
+		}
+
+		this.Repository.set ( 'templates', old_templates );
+		this.template = null;
+	}
+
+	return this;
+} );
+
+//Parse the Template
+Template.add ( 'parse', function ( _template, _fields, callback ) {
+	var _self = this;
+	_self.Workers.set ( '/workers/setting/Parser', function ( worker ) {
+		_self.Workers.send ( { template: _template, fields: _fields } );
+	} ).on ( 'message', function ( e ) {
+		_.callbackAudit ( callback, e.data )
+	} );
+
+	return this;
+} );
+
 
 /**
  * Created with JetBrains PhpStorm.
@@ -3167,437 +3608,6 @@ GoogleMap = function () {
 	}
 
 };
-
-/**
- * Created by gmena on 07-26-14.
- */
-
-'use strict';
-
-/**Ajax
- * @constructor
- */
-
-
-function Ajax () {
-	this.xhr = new window.XMLHttpRequest
-			   || new window.ActiveXObject ( "Microsoft.XMLHTTP" );
-	this.xhr_list = [];
-	this.upload = null;
-	this.before = null;
-	this.complete = null;
-	this.progress = null;
-	this.state = null;
-	this.abort = null;
-	this.error = null;
-	this.time_out = null;
-}
-
-/*** Event handler
- * @param event
- * @param callback
- * @return void
- * */
-Ajax.add ( 'on', function ( event, callback ) {
-	var self = this;
-	return [
-		{
-			before  : function () {
-				self.before = callback;
-			},
-			complete: function () {
-				self.complete = callback;
-			},
-			error   : function () {
-				self.error = callback;
-			},
-			abort   : function () {
-				self.abort = callback;
-			},
-			state   : function () {
-				self.state = callback;
-			},
-			timeout : function () {
-				self.time_out = callback;
-			},
-			progress: function () {
-				self.progress = callback;
-			}
-		}[ event ] ()
-	]
-
-} );
-
-/** Ajax Request
- * @param config
- * @param callback
- * @return object
- *
- * Config object {
- *  url: (string) the request url
- *  type: (string) the request type GET or POST
- *	async: bool,
- *	timeout: (int) request timeout,
- *	processor: (string) ajax server side processor file extension,
- *	token: (string or bool) CSRF token needed?,
- *	contentType: (string) the content type,
- *	contentHeader: (object) the content header request,
- *	data: (object) the request data,
- *	upload: (bool) is upload process?
- *
- * }
- * **/
-Ajax.add ( 'request', function ( config, callback ) {
-	if ( !_.isObject ( config ) ) {
-		throw (WARNING_SYRUP.ERROR.NOOBJECT)
-	}
-
-	var _self = this,
-		_xhr = _self.xhr,
-		_async = true,
-		_type = config.method || 'GET',
-		_timeout = config.timeout || 4000,
-		_processor = config.processor || setting.ajax_processor || '',
-		_token = config.token || false,
-		_contentType = config.contentType || 'application/x-www-form-urlencoded;charset=utf-8',
-		_data = config.data
-			? config.data : null,
-		_contentHeader = config.contentHeader ||
-						 [
-							 {
-								 header: 'Content-Type',
-								 value : _contentType
-							 }
-						 ]
-		;
-
-	if ( !_.isSet ( config.url ) ) {
-		throw (WARNING_SYRUP.ERROR.NOURL);
-	}
-
-	if ( !_.isFormData ( _data )
-		 && _.isSet ( _data )
-		 && _contentHeader !== 'auto' ) {
-		_data = _.parseJsonUrl ( _data );
-	}
-
-	if ( _type === 'GET' && _.isSet ( _data ) ) {
-		_processor += '?' + _data;
-	}
-
-	_processor = config.url + (_processor || '');
-	_xhr.open ( _type, _processor, _async );
-	_xhr.timeout = _timeout;
-
-	//Setting Headers
-	if ( !_.isFormData ( _data ) && _contentHeader !== 'auto' ) {
-		_.each ( _contentHeader, function ( v ) {
-			_self.requestHeader ( v.header, v.value );
-		} )
-
-	}
-
-	//Using Token
-	if ( _.isSet ( _token ) )
-		_self.requestHeader ( "X-CSRFToken", _.getCookie ( _.isBoolean ( _token ) ? 'csrftoken' : _token ) );
-
-	//If upload needed
-	if ( _.isSet ( config.upload ) && _.isBoolean ( config.upload ) ) {
-		_self.upload = _self.xhr.upload;
-		_xhr = _self.upload;
-	}
-
-	//Event Listeners
-	_xhr.addEventListener ( 'load', function ( e ) {
-		if ( this.status >= 0xC8 && this.status < 0x190 ) {
-			var _response = this.response || this.responseText;
-			if ( _.isJson ( _response ) ) {
-				_response = JSON.parse ( _response );
-			}
-			_.callbackAudit ( callback, _response, e );
-
-		}
-	} );
-
-	_xhr.addEventListener ( 'progress', function ( e ) {
-		if ( _self.progress ) {
-			_self.progress ( e );
-		}
-	}, false );
-
-	_xhr.addEventListener ( 'readystatechange', function ( e ) {
-		if ( this.readyState ) {
-			if ( !!_self.state ) {
-				_self.state ( this.readyState, e );
-			}
-		}
-	} );
-
-	_xhr.addEventListener ( 'abort', function ( e ) {
-		if ( !!_self.abort ) {
-			_self.abort ( e );
-		}
-	} );
-
-	_xhr.addEventListener ( 'timeout', function ( e ) {
-		if ( !!_self.time_out ) {
-			_self.time_out ( e );
-		}
-	} );
-
-	_xhr.addEventListener ( 'loadend', function ( e ) {
-		if ( !!_self.complete ) {
-			_self.complete ( e );
-		}
-	} );
-
-	_xhr.addEventListener ( 'loadstart', function ( e ) {
-		if ( !!_self.before ) {
-			_self.before ( e );
-		}
-	} );
-
-	_xhr.addEventListener ( 'error', function ( e ) {
-		if ( !!_self.error ) {
-			_self.error ( e );
-		}
-	} );
-
-
-	//Send
-	_self.xhr_list.push ( _self.xhr );
-	_xhr.send ( _type !== 'GET' ? _data : null );
-
-	return _self.xhr;
-} );
-
-/** Set Request Header
- * @param header
- * @param type
- * @return object
- * **/
-Ajax.add ( 'requestHeader', function ( header, type ) {
-	this.xhr.setRequestHeader ( header, type );
-	return this;
-} );
-
-//Kill Ajax
-Ajax.add ( 'kill', function () {
-	var i = this.xhr_list.length;
-	while ( i-- ) {
-		if ( !!this.xhr_list[ i ] )
-			this.xhr_list[ i ].abort ();
-	}
-	this.xhr_list.length = 0;
-
-	return this;
-} );
-
-
-
-/**
- * Created by gmena on 07-26-14.
- */
-'use strict';
-
-function Repository () {
-
-}
-
-//Set registry to bucket
-Repository.add ( 'set', function ( key, data, callback ) {
-	localStorage.setItem ( key, JSON.stringify ( data ) );
-	_.callbackAudit ( callback, data, this );
-} );
-
-
-//Get registry from bucket
-Repository.add ( 'get', function ( key ) {
-	return _.isJson ( localStorage.getItem ( key ) )
-		? JSON.parse ( localStorage.getItem ( key ) ) : null;
-} );
-
-//Append data to existing bucket
-Repository.add ( 'append', function ( key, element, callback ) {
-	var _existent = this.get ( key ),
-	    _new = _.extend ( _.isSet ( _existent ) ? _existent : {}, element );
-
-	this.set ( key, _new, false );
-	_.callbackAudit ( callback, _new );
-	return this;
-} );
-
-//Detroy all buckets
-Repository.add ( 'destroy', function () {
-	localStorage.clear ();
-} );
-
-//Clear a bucket
-Repository.add ( 'clear', function ( key ) {
-	localStorage.removeItem ( key );
-	return this;
-} );
-
-
-//Return count buckets
-Repository.add ( 'count', function () {
-	return localStorage.length;
-} );
-/**
- * Created by gmena on 07-26-14.
- */
-
-
-'use strict';
-
-function Workers () {
-	this.Worker = null;
-	this.onsuccess = null;
-}
-
-//Worker event handler
-Workers.add ( 'on', function ( event, callback ) {
-	var self = this;
-	return [
-		{
-			message: function () {
-				self.onsuccess = callback;
-			}
-		}[ event ] ()
-	]
-} );
-
-//Set new Worker
-Workers.add ( 'set', function ( url, callback ) {
-	var self = this;
-	self.Worker = (new Worker ( setting.system_path + url + '.min.js' ));
-	self.Worker.addEventListener ( 'message', function ( e ) {
-		_.callbackAudit ( self.onsuccess, e );
-	}, false );
-	_.callbackAudit ( callback, self.Worker );
-
-	return this;
-
-} );
-
-//Get Worker
-Workers.add ( 'get', function () {
-	return this.Worker;
-} );
-
-//Send Message to Worker
-Workers.add ( 'send', function ( message ) {
-	this.Worker.postMessage ( !!message ? message : '' );
-	return this;
-} );
-
-//Kill Worker
-Workers.add ( 'kill', function ( callback ) {
-	if ( _.isSet ( this.Worker ) ) {
-		this.Worker.terminate ();
-		this.Worker = null;
-		_.callbackAudit ( callback );
-	}
-
-	return this;
-} );
-
-/**
- * Created by gmena on 07-26-14.
- */
-
-'use strict';
-/**Template
- * @constructor
- */
-
-/**Dependencies
- * Ajax Lib
- * Worker Lib
- * Repository Lib
- * */
-
-function Template () {
-	this.Ajax = new Ajax;
-	this.Repository = new Repository;
-	this.Workers = new Workers;
-	this.template = null;
-}
-
-//Search for the template
-Template.add ( 'lookup', function ( template, callback ) {
-	var _conf = {
-		url      : setting.app_path + '/templates/' + template,
-		dataType : 'text/plain',
-		processor: '.html'
-	};
-
-	this.Ajax.request ( _conf, function ( response ) {
-		_.callbackAudit ( callback, response );
-	} );
-
-	return this;
-} );
-
-//Get the template
-Template.add ( 'get', function ( template, callback ) {
-	var _self = this,
-		_repo = _self.Repository,
-		_template = _repo.get ( 'templates' ),
-		_save = {};
-
-	_self.template = template;
-	if ( _.isSet ( _template ) ) {
-		if ( _.isSet ( _template[ template ] ) ) {
-			_.callbackAudit ( callback, _template[ template ] )
-		} else {
-			_self.lookup ( template, function ( temp ) {
-				_save[ template ] = temp;
-				_repo.append ( 'templates', _save );
-				_.callbackAudit ( callback, temp );
-			} )
-		}
-	} else {
-		_repo.set ( 'templates', {} );
-		this.get ( template, callback )
-	}
-
-	return this;
-} );
-
-//Clear Template from Repository
-Template.add ( 'clear', function () {
-	this.Repository.clear ( 'templates' );
-	return this;
-} );
-
-//Clear Template from Repository
-Template.add ( 'remove', function () {
-	if ( this.template ) {
-		var old_templates = this.Repository.get ( 'templates' );
-		if ( old_templates ) {
-			delete old_templates[ this.template ]
-		}
-
-		this.Repository.set ( 'templates', old_templates );
-		this.template = null;
-	}
-
-	return this;
-} );
-
-//Parse the Template
-Template.add ( 'parse', function ( _template, _fields, callback ) {
-	var _self = this;
-	_self.Workers.set ( '/workers/setting/Parser', function ( worker ) {
-		_self.Workers.send ( { template: _template, fields: _fields } );
-	} ).on ( 'message', function ( e ) {
-		_.callbackAudit ( callback, e.data )
-	} );
-
-	return this;
-} );
-
 
 /**
  * Created by gmena on 07-26-14.
