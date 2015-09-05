@@ -13,6 +13,11 @@
 </a>
 
 
+<a href="#" sp-listen="Hey.You">
+    Iam Hey You
+</a>
+
+
 <!--The controller-->
 <div sp-controller="Hey.You">
 
@@ -63,6 +68,11 @@
                         ]
                     });
 
+                    //Dom traversing, find sp-listen
+                    this.listen ('click', function (e) {
+                        e.preventDefault ();
+                        //On click Hey.You listener what to do?
+                    });
 
                     //When Hey.You scope change
                     this.when ('change', function (d) {
