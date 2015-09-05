@@ -6,7 +6,7 @@
 
 //Development
 exports.files = {
-	core: {
+	js: {
 		output: 'app/include/init',
 		src   : [
 			'system/base/Syrup',
@@ -19,7 +19,8 @@ exports.files = {
 			'system/lib/Template',
 			// Until here needed do not change
 			// Add all the necessary modules
-			'system/lib/Map'
+			'system/lib/Map',
+			'app/modules/happyFire'
 		]
 	}
 };

@@ -3596,6 +3596,60 @@ GoogleMap = function () {
 };
 
 /**
+ * Created by gmena on 08-06-14.
+ */
+
+
+Module.blend ( 'happyFire', [] ).service ( 'log', function ( string ) {
+	_.warning ( string );
+} );
+/**
+ * Created by gmena on 08-06-14.
+ */
+
+//Module name -> Controller and Event Syrup
+Module.recipe ( 'happyFire.messageBox', function ( _, _$, globalScope ) {
+	var self;
+	return {
+		init:     function ( tools ) {
+			self = this;
+			self.on ( 'change', this.manage );
+		},
+		box_type: function ( style ) {
+			return {
+				'error':   'message-box-error',
+				'info':    'message-box-alert',
+				'success': 'message-box-success',
+				'default': 'message-box-default'
+			}[style];
+		},
+		manage:   function ( object ) {
+			var _style = _.isSet ( object.object.style ) ? object.object.style : 'default',
+			    _delay = _.isSet ( object.object.delay ) ? object.object.delay : 2000;
+			_style = self.box_type ( _style );
+
+			self.setScope ( {'message': _.isSet ( object.object.content ) ? object.object.content : ''} );
+			self.serve ();
+			self.dom
+				.addClass ( _style )
+				.animate ( [
+					           {left: '-30%'},
+					           {left: '3%'}
+				           ], {duration: Math.round ( _delay / 2 )}, function ( elem ) {
+					           elem.css ( {left: "3%"} );
+					           elem.animate ( [
+						                          {left: '3%'},
+						                          {left: '-30%'}
+					                          ], {delay: _delay}, function ( elem ) {
+						           elem.css ( {left: "-30%"} );
+					           } );
+				           } )
+
+
+		}
+	}
+} );
+/**
  * Created by gmena on 07-26-14.
  */
 
