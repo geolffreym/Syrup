@@ -2580,7 +2580,8 @@ Modules.add ('_serve', function (moduleId, template) {
 
 //Execute Module
 Modules.add ('_taste', function (moduleId) {
-	var _self = this;
+	var _self = this,
+		_body = _$('body');
 
 	if ( _.isSet (_self.modules[moduleId]) && _.isSet (_self.root) ) {
 
@@ -2608,6 +2609,11 @@ Modules.add ('_taste', function (moduleId) {
 
 		_self.modules[moduleId].instance.serve = function (_template) {
 			_self._serve (moduleId, _template || true);
+			return this;
+		};
+
+		_self.modules[moduleId].instance.listen = function (event, callback) {
+			_body.listen (event, '[sp-listen="' + moduleId + '"]', callback);
 			return this;
 		};
 

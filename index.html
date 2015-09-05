@@ -12,6 +12,8 @@
     Test
 </a>
 
+<a href="#" sp-listen="Hey.You">Aqui</a>
+
 
 <!--The controller-->
 <div sp-controller="Hey.You">
@@ -58,11 +60,15 @@
                         ]
                     });
 
+                    this.listen ('click', function (e) {
+                        e.preventDefault ();
+                        alert ('yeah')
+                    });
 
                     //When Hey.You scope change
                     this.when ('change', function (d) {
                         //Render new data
-                        _self.serve ();
+                        _self.serve ('Hey.You');
                     })
                 },
                 destroy: function (e) {
