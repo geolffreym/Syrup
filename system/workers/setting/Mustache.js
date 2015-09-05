@@ -4,23 +4,23 @@
  */
 
 /*global define: false Mustache: true*/
-(function defineMustache ( global, factory ) {
+(function defineMustache (global, factory) {
 	if ( typeof exports === 'object' && exports && typeof exports.nodeName !== 'string' ) {
-		factory ( exports ); // CommonJS
+		factory (exports); // CommonJS
 	} else if ( typeof define === 'function' && define.amd ) {
-		define ( [ 'exports' ], factory ); // AMD
+		define (['exports'], factory); // AMD
 	} else {
 		global.Mustache = {};
-		factory ( Mustache ); // script, wsh, asp
+		factory (Mustache); // script, wsh, asp
 	}
-} ( this, function mustacheFactory ( mustache ) {
+} (this, function mustacheFactory (mustache) {
 
 	var objectToString = Object.prototype.toString;
-	var isArray = Array.isArray || function isArrayPolyfill ( object ) {
-			return objectToString.call ( object ) === '[object Array]';
+	var isArray = Array.isArray || function isArrayPolyfill (object) {
+			return objectToString.call (object) === '[object Array]';
 		};
 
-	function isFunction ( object ) {
+	function isFunction (object) {
 		return typeof object === 'function';
 	}
 
@@ -28,19 +28,19 @@
 	 * More correct typeof string handling array
 	 * which normally returns typeof 'object'
 	 */
-	function typeStr ( obj ) {
-		return isArray ( obj ) ? 'array' : typeof obj;
+	function typeStr (obj) {
+		return isArray (obj) ? 'array' : typeof obj;
 	}
 
-	function escapeRegExp ( string ) {
-		return string.replace ( /[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&' );
+	function escapeRegExp (string) {
+		return string.replace (/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&');
 	}
 
 	/**
 	 * Null safe way of checking whether or not an object,
 	 * including its prototype, has a given property
 	 */
-	function hasProperty ( obj, propName ) {
+	function hasProperty (obj, propName) {
 		return obj != null && typeof obj === 'object' && (propName in obj);
 	}
 
@@ -48,14 +48,14 @@
 	// See https://github.com/janl/mustache.js/issues/189
 	var regExpTest = RegExp.prototype.test;
 
-	function testRegExp ( re, string ) {
-		return regExpTest.call ( re, string );
+	function testRegExp (re, string) {
+		return regExpTest.call (re, string);
 	}
 
 	var nonSpaceRe = /\S/;
 
-	function isWhitespace ( string ) {
-		return !testRegExp ( nonSpaceRe, string );
+	function isWhitespace (string) {
+		return !testRegExp (nonSpaceRe, string);
 	}
 
 	var entityMap = {
@@ -67,10 +67,10 @@
 		'/': '&#x2F;'
 	};
 
-	function escapeHtml ( string ) {
-		return String ( string ).replace ( /[&<>"'\/]/g, function fromEntityMap ( s ) {
-			return entityMap[ s ];
-		} );
+	function escapeHtml (string) {
+		return String (string).replace (/[&<>"'\/]/g, function fromEntityMap (s) {
+			return entityMap[s];
+		});
 	}
 
 	var whiteRe = /\s*/;
@@ -101,7 +101,7 @@
 	 * array of tokens in the subtree and 2) the index in the original template at
 	 * which the closing tag for that section begins.
 	 */
-	function parseTemplate ( template, tags ) {
+	function parseTemplate (template, tags) {
 		if ( !template )
 			return [];
 
@@ -116,7 +116,7 @@
 		function stripSpace () {
 			if ( hasTag && !nonSpace ) {
 				while ( spaces.length )
-					delete tokens[ spaces.pop () ];
+					delete tokens[spaces.pop ()];
 			} else {
 				spaces = [];
 			}
@@ -127,40 +127,40 @@
 
 		var openingTagRe, closingTagRe, closingCurlyRe;
 
-		function compileTags ( tagsToCompile ) {
+		function compileTags (tagsToCompile) {
 			if ( typeof tagsToCompile === 'string' )
-				tagsToCompile = tagsToCompile.split ( spaceRe, 2 );
+				tagsToCompile = tagsToCompile.split (spaceRe, 2);
 
-			if ( !isArray ( tagsToCompile ) || tagsToCompile.length !== 2 )
-				throw new Error ( 'Invalid tags: ' + tagsToCompile );
+			if ( !isArray (tagsToCompile) || tagsToCompile.length !== 2 )
+				throw new Error ('Invalid tags: ' + tagsToCompile);
 
-			openingTagRe = new RegExp ( escapeRegExp ( tagsToCompile[ 0 ] ) + '\\s*' );
-			closingTagRe = new RegExp ( '\\s*' + escapeRegExp ( tagsToCompile[ 1 ] ) );
-			closingCurlyRe = new RegExp ( '\\s*' + escapeRegExp ( '}' + tagsToCompile[ 1 ] ) );
+			openingTagRe = new RegExp (escapeRegExp (tagsToCompile[0]) + '\\s*');
+			closingTagRe = new RegExp ('\\s*' + escapeRegExp (tagsToCompile[1]));
+			closingCurlyRe = new RegExp ('\\s*' + escapeRegExp ('}' + tagsToCompile[1]));
 		}
 
-		compileTags ( tags || mustache.tags );
+		compileTags (tags || mustache.tags);
 
-		var scanner = new Scanner ( template );
+		var scanner = new Scanner (template);
 
 		var start, type, value, chr, token, openSection;
 		while ( !scanner.eos () ) {
 			start = scanner.pos;
 
 			// Match any text between tags.
-			value = scanner.scanUntil ( openingTagRe );
+			value = scanner.scanUntil (openingTagRe);
 
 			if ( value ) {
 				for ( var i = 0, valueLength = value.length; i < valueLength; ++i ) {
-					chr = value.charAt ( i );
+					chr = value.charAt (i);
 
-					if ( isWhitespace ( chr ) ) {
-						spaces.push ( tokens.length );
+					if ( isWhitespace (chr) ) {
+						spaces.push (tokens.length);
 					} else {
 						nonSpace = true;
 					}
 
-					tokens.push ( [ 'text', chr, start, start + 1 ] );
+					tokens.push (['text', chr, start, start + 1]);
 					start += 1;
 
 					// Check for whitespace on the current line.
@@ -170,52 +170,52 @@
 			}
 
 			// Match the opening tag.
-			if ( !scanner.scan ( openingTagRe ) )
+			if ( !scanner.scan (openingTagRe) )
 				break;
 
 			hasTag = true;
 
 			// Get the tag type.
-			type = scanner.scan ( tagRe ) || 'name';
-			scanner.scan ( whiteRe );
+			type = scanner.scan (tagRe) || 'name';
+			scanner.scan (whiteRe);
 
 			// Get the tag value.
 			if ( type === '=' ) {
-				value = scanner.scanUntil ( equalsRe );
-				scanner.scan ( equalsRe );
-				scanner.scanUntil ( closingTagRe );
+				value = scanner.scanUntil (equalsRe);
+				scanner.scan (equalsRe);
+				scanner.scanUntil (closingTagRe);
 			} else if ( type === '{' ) {
-				value = scanner.scanUntil ( closingCurlyRe );
-				scanner.scan ( curlyRe );
-				scanner.scanUntil ( closingTagRe );
+				value = scanner.scanUntil (closingCurlyRe);
+				scanner.scan (curlyRe);
+				scanner.scanUntil (closingTagRe);
 				type = '&';
 			} else {
-				value = scanner.scanUntil ( closingTagRe );
+				value = scanner.scanUntil (closingTagRe);
 			}
 
 			// Match the closing tag.
-			if ( !scanner.scan ( closingTagRe ) )
-				throw new Error ( 'Unclosed tag at ' + scanner.pos );
+			if ( !scanner.scan (closingTagRe) )
+				throw new Error ('Unclosed tag at ' + scanner.pos);
 
-			token = [ type, value, start, scanner.pos ];
-			tokens.push ( token );
+			token = [type, value, start, scanner.pos];
+			tokens.push (token);
 
 			if ( type === '#' || type === '^' ) {
-				sections.push ( token );
+				sections.push (token);
 			} else if ( type === '/' ) {
 				// Check section nesting.
 				openSection = sections.pop ();
 
 				if ( !openSection )
-					throw new Error ( 'Unopened section "' + value + '" at ' + start );
+					throw new Error ('Unopened section "' + value + '" at ' + start);
 
-				if ( openSection[ 1 ] !== value )
-					throw new Error ( 'Unclosed section "' + openSection[ 1 ] + '" at ' + start );
+				if ( openSection[1] !== value )
+					throw new Error ('Unclosed section "' + openSection[1] + '" at ' + start);
 			} else if ( type === 'name' || type === '{' || type === '&' ) {
 				nonSpace = true;
 			} else if ( type === '=' ) {
 				// Set the tags for the next time around.
-				compileTags ( value );
+				compileTags (value);
 			}
 		}
 
@@ -223,28 +223,28 @@
 		openSection = sections.pop ();
 
 		if ( openSection )
-			throw new Error ( 'Unclosed section "' + openSection[ 1 ] + '" at ' + scanner.pos );
+			throw new Error ('Unclosed section "' + openSection[1] + '" at ' + scanner.pos);
 
-		return nestTokens ( squashTokens ( tokens ) );
+		return nestTokens (squashTokens (tokens));
 	}
 
 	/**
 	 * Combines the values of consecutive text tokens in the given `tokens` array
 	 * to a single token.
 	 */
-	function squashTokens ( tokens ) {
+	function squashTokens (tokens) {
 		var squashedTokens = [];
 
 		var token, lastToken;
 		for ( var i = 0, numTokens = tokens.length; i < numTokens; ++i ) {
-			token = tokens[ i ];
+			token = tokens[i];
 
 			if ( token ) {
-				if ( token[ 0 ] === 'text' && lastToken && lastToken[ 0 ] === 'text' ) {
-					lastToken[ 1 ] += token[ 1 ];
-					lastToken[ 3 ] = token[ 3 ];
+				if ( token[0] === 'text' && lastToken && lastToken[0] === 'text' ) {
+					lastToken[1] += token[1];
+					lastToken[3] = token[3];
 				} else {
-					squashedTokens.push ( token );
+					squashedTokens.push (token);
 					lastToken = token;
 				}
 			}
@@ -259,29 +259,29 @@
 	 * all tokens that appear in that section and 2) the index in the original
 	 * template that represents the end of that section.
 	 */
-	function nestTokens ( tokens ) {
+	function nestTokens (tokens) {
 		var nestedTokens = [];
 		var collector = nestedTokens;
 		var sections = [];
 
 		var token, section;
 		for ( var i = 0, numTokens = tokens.length; i < numTokens; ++i ) {
-			token = tokens[ i ];
+			token = tokens[i];
 
-			switch ( token[ 0 ] ) {
+			switch ( token[0] ) {
 				case '#':
 				case '^':
-					collector.push ( token );
-					sections.push ( token );
-					collector = token[ 4 ] = [];
+					collector.push (token);
+					sections.push (token);
+					collector = token[4] = [];
 					break;
 				case '/':
 					section = sections.pop ();
-					section[ 5 ] = token[ 2 ];
-					collector = sections.length > 0 ? sections[ sections.length - 1 ][ 4 ] : nestedTokens;
+					section[5] = token[2];
+					collector = sections.length > 0 ? sections[sections.length - 1][4] : nestedTokens;
 					break;
 				default:
-					collector.push ( token );
+					collector.push (token);
 			}
 		}
 
@@ -292,7 +292,7 @@
 	 * A simple string scanner that is used by the template parser to find
 	 * tokens in template strings.
 	 */
-	function Scanner ( string ) {
+	function Scanner (string) {
 		this.string = string;
 		this.tail = string;
 		this.pos = 0;
@@ -309,15 +309,15 @@
 	 * Tries to match the given regular expression at the current position.
 	 * Returns the matched text if it can match, the empty string otherwise.
 	 */
-	Scanner.prototype.scan = function scan ( re ) {
-		var match = this.tail.match ( re );
+	Scanner.prototype.scan = function scan (re) {
+		var match = this.tail.match (re);
 
 		if ( !match || match.index !== 0 )
 			return '';
 
-		var string = match[ 0 ];
+		var string = match[0];
 
-		this.tail = this.tail.substring ( string.length );
+		this.tail = this.tail.substring (string.length);
 		this.pos += string.length;
 
 		return string;
@@ -327,8 +327,8 @@
 	 * Skips all text until the given regular expression can be matched. Returns
 	 * the skipped string, which is the entire tail if no match can be made.
 	 */
-	Scanner.prototype.scanUntil = function scanUntil ( re ) {
-		var index = this.tail.search ( re ), match;
+	Scanner.prototype.scanUntil = function scanUntil (re) {
+		var index = this.tail.search (re), match;
 
 		switch ( index ) {
 			case -1:
@@ -339,8 +339,8 @@
 				match = '';
 				break;
 			default:
-				match = this.tail.substring ( 0, index );
-				this.tail = this.tail.substring ( index );
+				match = this.tail.substring (0, index);
+				this.tail = this.tail.substring (index);
 		}
 
 		this.pos += match.length;
@@ -352,7 +352,7 @@
 	 * Represents a rendering context by wrapping a view object and
 	 * maintaining a reference to the parent context.
 	 */
-	function Context ( view, parentContext ) {
+	function Context (view, parentContext) {
 		this.view = view;
 		this.cache = { '.': this.view };
 		this.parent = parentContext;
@@ -362,27 +362,27 @@
 	 * Creates a new context using the given view with this context
 	 * as the parent.
 	 */
-	Context.prototype.push = function push ( view ) {
-		return new Context ( view, this );
+	Context.prototype.push = function push (view) {
+		return new Context (view, this);
 	};
 
 	/**
 	 * Returns the value of the given name in this context, traversing
 	 * up the context hierarchy if the value is absent in this context's view.
 	 */
-	Context.prototype.lookup = function lookup ( name ) {
+	Context.prototype.lookup = function lookup (name) {
 		var cache = this.cache;
 
 		var value;
-		if ( cache.hasOwnProperty ( name ) ) {
-			value = cache[ name ];
+		if ( cache.hasOwnProperty (name) ) {
+			value = cache[name];
 		} else {
 			var context = this, names, index, lookupHit = false;
 
 			while ( context ) {
-				if ( name.indexOf ( '.' ) > 0 ) {
+				if ( name.indexOf ('.') > 0 ) {
 					value = context.view;
-					names = name.split ( '.' );
+					names = name.split ('.');
 					index = 0;
 
 					/**
@@ -398,13 +398,13 @@
 					 **/
 					while ( value != null && index < names.length ) {
 						if ( index === names.length - 1 )
-							lookupHit = hasProperty ( value, names[ index ] );
+							lookupHit = hasProperty (value, names[index]);
 
-						value = value[ names[ index++ ] ];
+						value = value[names[index++]];
 					}
 				} else {
-					value = context.view[ name ];
-					lookupHit = hasProperty ( context.view, name );
+					value = context.view[name];
+					lookupHit = hasProperty (context.view, name);
 				}
 
 				if ( lookupHit )
@@ -413,11 +413,11 @@
 				context = context.parent;
 			}
 
-			cache[ name ] = value;
+			cache[name] = value;
 		}
 
-		if ( isFunction ( value ) )
-			value = value.call ( this.view );
+		if ( isFunction (value) )
+			value = value.call (this.view);
 
 		return value;
 	};
@@ -442,12 +442,12 @@
 	 * Parses and caches the given `template` and returns the array of tokens
 	 * that is generated from the parse.
 	 */
-	Writer.prototype.parse = function parse ( template, tags ) {
+	Writer.prototype.parse = function parse (template, tags) {
 		var cache = this.cache;
-		var tokens = cache[ template ];
+		var tokens = cache[template];
 
 		if ( tokens == null )
-			tokens = cache[ template ] = parseTemplate ( template, tags );
+			tokens = cache[template] = parseTemplate (template, tags);
 
 		return tokens;
 	};
@@ -461,10 +461,10 @@
 	 * also be a function that is used to load partial templates on the fly
 	 * that takes a single argument: the name of the partial.
 	 */
-	Writer.prototype.render = function render ( template, view, partials ) {
-		var tokens = this.parse ( template );
-		var context = (view instanceof Context) ? view : new Context ( view );
-		return this.renderTokens ( tokens, context, partials, template );
+	Writer.prototype.render = function render (template, view, partials) {
+		var tokens = this.parse (template);
+		var context = (view instanceof Context) ? view : new Context (view);
+		return this.renderTokens (tokens, context, partials, template);
 	};
 
 	/**
@@ -476,21 +476,21 @@
 	 * If the template doesn't use higher-order sections, this argument may
 	 * be omitted.
 	 */
-	Writer.prototype.renderTokens = function renderTokens ( tokens, context, partials, originalTemplate ) {
+	Writer.prototype.renderTokens = function renderTokens (tokens, context, partials, originalTemplate) {
 		var buffer = '';
 
 		var token, symbol, value;
 		for ( var i = 0, numTokens = tokens.length; i < numTokens; ++i ) {
 			value = undefined;
-			token = tokens[ i ];
-			symbol = token[ 0 ];
+			token = tokens[i];
+			symbol = token[0];
 
-			if ( symbol === '#' ) value = this.renderSection ( token, context, partials, originalTemplate );
-			else if ( symbol === '^' ) value = this.renderInverted ( token, context, partials, originalTemplate );
-			else if ( symbol === '>' ) value = this.renderPartial ( token, context, partials, originalTemplate );
-			else if ( symbol === '&' ) value = this.unescapedValue ( token, context );
-			else if ( symbol === 'name' ) value = this.escapedValue ( token, context );
-			else if ( symbol === 'text' ) value = this.rawValue ( token );
+			if ( symbol === '#' ) value = this.renderSection (token, context, partials, originalTemplate);
+			else if ( symbol === '^' ) value = this.renderInverted (token, context, partials, originalTemplate);
+			else if ( symbol === '>' ) value = this.renderPartial (token, context, partials, originalTemplate);
+			else if ( symbol === '&' ) value = this.unescapedValue (token, context);
+			else if ( symbol === 'name' ) value = this.escapedValue (token, context);
+			else if ( symbol === 'text' ) value = this.rawValue (token);
 
 			if ( value !== undefined )
 				buffer += value;
@@ -499,76 +499,76 @@
 		return buffer;
 	};
 
-	Writer.prototype.renderSection = function renderSection ( token, context, partials, originalTemplate ) {
+	Writer.prototype.renderSection = function renderSection (token, context, partials, originalTemplate) {
 		var self = this;
 		var buffer = '';
-		var value = context.lookup ( token[ 1 ] );
+		var value = context.lookup (token[1]);
 
 		// This function is used to render an arbitrary template
 		// in the current context by higher-order sections.
-		function subRender ( template ) {
-			return self.render ( template, context, partials );
+		function subRender (template) {
+			return self.render (template, context, partials);
 		}
 
 		if ( !value ) return;
 
-		if ( isArray ( value ) ) {
+		if ( isArray (value) ) {
 			for ( var j = 0, valueLength = value.length; j < valueLength; ++j ) {
-				buffer += this.renderTokens ( token[ 4 ], context.push ( value[ j ] ), partials, originalTemplate );
+				buffer += this.renderTokens (token[4], context.push (value[j]), partials, originalTemplate);
 			}
 		} else if ( typeof value === 'object' || typeof value === 'string' || typeof value === 'number' ) {
-			buffer += this.renderTokens ( token[ 4 ], context.push ( value ), partials, originalTemplate );
-		} else if ( isFunction ( value ) ) {
+			buffer += this.renderTokens (token[4], context.push (value), partials, originalTemplate);
+		} else if ( isFunction (value) ) {
 			if ( typeof originalTemplate !== 'string' )
-				throw new Error ( 'Cannot use higher-order sections without the original template' );
+				throw new Error ('Cannot use higher-order sections without the original template');
 
 			// Extract the portion of the original template that the section contains.
-			value = value.call ( context.view, originalTemplate.slice ( token[ 3 ], token[ 5 ] ), subRender );
+			value = value.call (context.view, originalTemplate.slice (token[3], token[5]), subRender);
 
 			if ( value != null )
 				buffer += value;
 		} else {
-			buffer += this.renderTokens ( token[ 4 ], context, partials, originalTemplate );
+			buffer += this.renderTokens (token[4], context, partials, originalTemplate);
 		}
 		return buffer;
 	};
 
-	Writer.prototype.renderInverted = function renderInverted ( token, context, partials, originalTemplate ) {
-		var value = context.lookup ( token[ 1 ] );
+	Writer.prototype.renderInverted = function renderInverted (token, context, partials, originalTemplate) {
+		var value = context.lookup (token[1]);
 
 		// Use JavaScript's definition of falsy. Include empty arrays.
 		// See https://github.com/janl/mustache.js/issues/186
-		if ( !value || (isArray ( value ) && value.length === 0) )
-			return this.renderTokens ( token[ 4 ], context, partials, originalTemplate );
+		if ( !value || (isArray (value) && value.length === 0) )
+			return this.renderTokens (token[4], context, partials, originalTemplate);
 	};
 
-	Writer.prototype.renderPartial = function renderPartial ( token, context, partials ) {
+	Writer.prototype.renderPartial = function renderPartial (token, context, partials) {
 		if ( !partials ) return;
 
-		var value = isFunction ( partials ) ? partials ( token[ 1 ] ) : partials[ token[ 1 ] ];
+		var value = isFunction (partials) ? partials (token[1]) : partials[token[1]];
 		if ( value != null )
-			return this.renderTokens ( this.parse ( value ), context, partials, value );
+			return this.renderTokens (this.parse (value), context, partials, value);
 	};
 
-	Writer.prototype.unescapedValue = function unescapedValue ( token, context ) {
-		var value = context.lookup ( token[ 1 ] );
+	Writer.prototype.unescapedValue = function unescapedValue (token, context) {
+		var value = context.lookup (token[1]);
 		if ( value != null )
 			return value;
 	};
 
-	Writer.prototype.escapedValue = function escapedValue ( token, context ) {
-		var value = context.lookup ( token[ 1 ] );
+	Writer.prototype.escapedValue = function escapedValue (token, context) {
+		var value = context.lookup (token[1]);
 		if ( value != null )
-			return mustache.escape ( value );
+			return mustache.escape (value);
 	};
 
-	Writer.prototype.rawValue = function rawValue ( token ) {
-		return token[ 1 ];
+	Writer.prototype.rawValue = function rawValue (token) {
+		return token[1];
 	};
 
 	mustache.name = 'mustache.js';
 	mustache.version = '2.1.3';
-	mustache.tags = [ '{{', '}}' ];
+	mustache.tags = ['{{', '}}'];
 
 	// All high-level mustache.* functions use this writer.
 	var defaultWriter = new Writer ();
@@ -585,33 +585,33 @@
 	 * array of tokens it contains. Doing this ahead of time avoids the need to
 	 * parse templates on the fly as they are rendered.
 	 */
-	mustache.parse = function parse ( template, tags ) {
-		return defaultWriter.parse ( template, tags );
+	mustache.parse = function parse (template, tags) {
+		return defaultWriter.parse (template, tags);
 	};
 
 	/**
 	 * Renders the `template` with the given `view` and `partials` using the
 	 * default writer.
 	 */
-	mustache.render = function render ( template, view, partials ) {
+	mustache.render = function render (template, view, partials) {
 		if ( typeof template !== 'string' ) {
-			throw new TypeError ( 'Invalid template! Template should be a "string" ' +
-								  'but "' + typeStr ( template ) + '" was given as the first ' +
-								  'argument for mustache#render(template, view, partials)' );
+			throw new TypeError ('Invalid template! Template should be a "string" ' +
+								 'but "' + typeStr (template) + '" was given as the first ' +
+								 'argument for mustache#render(template, view, partials)');
 		}
 
-		return defaultWriter.render ( template, view, partials );
+		return defaultWriter.render (template, view, partials);
 	};
 
 	// This is here for backwards compatibility with 0.4.x.,
 	/*eslint-disable */ // eslint wants camel cased function name
-	mustache.to_html = function to_html ( template, view, partials, send ) {
+	mustache.to_html = function to_html (template, view, partials, send) {
 		/*eslint-enable*/
 
-		var result = mustache.render ( template, view, partials );
+		var result = mustache.render (template, view, partials);
 
-		if ( isFunction ( send ) ) {
-			send ( result );
+		if ( isFunction (send) ) {
+			send (result);
 		} else {
 			return result;
 		}
@@ -626,4 +626,4 @@
 	mustache.Context = Context;
 	mustache.Writer = Writer;
 
-} ));
+}));
