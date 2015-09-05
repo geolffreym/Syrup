@@ -21,6 +21,5 @@ exports.files = {
 			// Add all the necessary modules
 			'system/lib/Map'
 		]
-
 	}
 };
