@@ -82,6 +82,6 @@ Require.add ('request', function (script, callback, conf) {
 	return this;
 });
 
-
+//The object
 window.Require = new Require;
 

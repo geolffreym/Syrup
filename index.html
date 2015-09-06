@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" sp-app="Hey">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<script src="app/include/init.js"></script>
+
+
+<div sp-recipe="Hey.You">
+
+    <!-- The event-->
+    <a href="#" sp-click>
+        Aqui
+    </a>
+
+    <!--The view-->
+    <div sp-view>
+
+    </div>
+
+    <!--The Inline template-->
+    <template sp-tpl>
+        <div>
+            <ul>
+                {{#beatles}}
+                <li>{{ firstName }} {{lastName}}</li>
+                {{/beatles}}
+            </ul>
+
+        </div>
+    </template>
+</div>
+
+
+<div sp-recipe="Hey.Do">
+    <!-- The event-->
+    <a href="#" sp-click>
+        Change You
+    </a>
+
+
+</div>
+
+
+<script>
+
+
+    _$ (function () {
+
+        //The Module
+        var my_Lib = App.blend ('Hey', ['Ajax']);
+
+        //A global service
+        my_Lib.service ('HeyConsole', function () {
+            console.log ('hi')
+        });
+
+        //A new recipe for Hey
+        my_Lib.recipe ('Hey.You', function (_, _$, scope) {
+            return {
+                init   : function (tools) {
+                    var _self = this;
+                    this.setScope ({
+                        'beatles': [
+                            { "firstName": "John", "lastName": "Lennon" },
+                            { "firstName": "Paul", "lastName": "McCartney" },
+                            { "firstName": "George", "lastName": "Harrison" },
+                            { "firstName": "Ringo", "lastName": "Starr" }
+                        ]
+                    });
+
+                    this.listen ('click', function (e) {
+                        e.preventDefault ();
+                        alert ('yeah')
+                    });
+
+                    //When Hey.You scope change
+                    this.when ('change', function (d) {
+                        //Render new data
+                        _self.serve ();
+                    })
+                },
+                destroy: function (e) {
+                    alert ('destroyed?')
+                }
+            }
+        });
+
+        //A new recipe for Hey
+        my_Lib.recipe ('Hey.Do', function (_, _$, scope) {
+            return {
+                init   : function (tools) {
+
+                    //Trigger change in Hey.You
+                    this.listen ('click', function () {
+                        my_Lib.setScope ('Hey.You', {
+                            'beatles': [
+                                { "firstName": "Pedro", "lastName": "Lennon" }
+                            ]
+                        });
+
+                        my_Lib.when ('drop', 'Hey.You', function () {
+                            console.log ('you are dead Hey.You');
+                        });
+
+                        // my_Lib.drop ('Hey.You');
+                    });
+
+                },
+                destroy: function () {}
+            }
+        });
+
+
+    })
+
+</script>
+</body>
+</html>
