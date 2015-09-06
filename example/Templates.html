@@ -57,6 +57,9 @@
             console.log (msg)
         });
 
+        //The modules, templates, events, view are encapsulated in recipes
+        //Recipes are declared as sp-recipe and is associated with the recipe's name
+
         //A new recipe for Hey
         my_Lib.recipe ('Hey.You', function (_, _$, scope) {
             return {
@@ -76,7 +79,7 @@
                         ]
                     });
 
-                    //Dom traversing, find sp-listen
+                    //Dom traversing, find sp-"event"
                     this.listen ('click', function (e) {
                         e.preventDefault ();
                         alert ('clicked');
