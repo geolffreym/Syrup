@@ -1,16 +1,16 @@
-/**
- * Created by Geolffrey on 31/12/13.
- */
-
+//The controller
 _$ (function () {
 
 	//The Module with Ajax dependencie
-	var my_Lib = Module.blend ('Hey', ['Ajax']);
+	var my_Lib = App.blend ('Hey', ['Ajax']);
 
 	//A global service
 	my_Lib.service ('myConsole', function (msg) {
 		console.log (msg)
 	});
+
+	//The modules, templates, events, view are encapsulated in recipes
+	//Recipes are declared as sp-recipe and is associated with the recipe's name
 
 	//A new recipe for Hey
 	my_Lib.recipe ('Hey.You', function (_, _$, scope) {
@@ -31,17 +31,24 @@ _$ (function () {
 					]
 				});
 
+				//Dom traversing, find sp-"event"
+				this.listen ('click', function (e) {
+					e.preventDefault ();
+					alert ('clicked');
+					//On click Hey.You listener what to do?
+				});
 
 				//When Hey.You scope change
 				this.when ('change', function (d) {
 
 					//Render new data using the inline template
-					//If "Hey.You" is not set, the view is needed app/view/Hey/You.js
-					//The view's directory, respects namespace
-					_self.serve ('Hey.You');
+					//If not serve param is set, template inline is used
+					//Else if you set "Hey/You" "/app/view/Hey/You.js" view is used
+					//_self.serve ('Hey/You');
+					_self.serve ();
 
-					// The global service
-					_self.myConsole ('Done');
+					// The global service in tools
+					tools.myConsole ('Done');
 				})
 			},
 			destroy: function () {
@@ -55,10 +62,8 @@ _$ (function () {
 		return {
 			init   : function (tools) {
 
-				_$ ('#click').listen ('click', function () {
-
-					//Trigger change in Hey.You
-					//Set scope to Hey.You
+				//Trigger change in Hey.You
+				this.listen ('click', function () {
 					my_Lib.setScope ('Hey.You', {
 						'beatles': [
 							{ "firstName": "Pedro", "lastName": "Lennon" }
