@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" sp-app="Hey">
 <head>
     <meta charset="UTF-8">
     <title></title>
@@ -8,29 +8,40 @@
 <script src="app/include/init.js"></script>
 
 
-<a href="#" id="click">
-    Test
-</a>
+<div sp-recipe="Hey.You">
 
-<a href="#" sp-listen="Hey.You">Aqui</a>
+    <!-- The event-->
+    <a href="#" sp-click>
+        Aqui
+    </a>
 
-
-<!--The controller-->
-<div sp-controller="Hey.You">
-
-</div>
-
-<!--THe Inline template-->
-<template sp-template="Hey.You">
-    <div>
-        <ul>
-            {{#beatles}}
-            <li>{{ firstName }} {{lastName}}</li>
-            {{/beatles}}
-        </ul>
+    <!--The view-->
+    <div sp-view>
 
     </div>
-</template>
+
+    <!--The Inline template-->
+    <template sp-tpl>
+        <div>
+            <ul>
+                {{#beatles}}
+                <li>{{ firstName }} {{lastName}}</li>
+                {{/beatles}}
+            </ul>
+
+        </div>
+    </template>
+</div>
+
+
+<div sp-recipe="Hey.Do">
+    <!-- The event-->
+    <a href="#" sp-click>
+        Change You
+    </a>
+
+
+</div>
 
 
 <script>
@@ -39,7 +50,7 @@
     _$ (function () {
 
         //The Module
-        var my_Lib = Module.blend ('Hey', ['Ajax']);
+        var my_Lib = App.blend ('Hey', ['Ajax']);
 
         //A global service
         my_Lib.service ('HeyConsole', function () {
@@ -68,7 +79,7 @@
                     //When Hey.You scope change
                     this.when ('change', function (d) {
                         //Render new data
-                        _self.serve ('Hey.You');
+                        _self.serve ();
                     })
                 },
                 destroy: function (e) {
@@ -83,7 +94,7 @@
                 init   : function (tools) {
 
                     //Trigger change in Hey.You
-                    _$ ('#click').listen ('click', function () {
+                    this.listen ('click', function () {
                         my_Lib.setScope ('Hey.You', {
                             'beatles': [
                                 { "firstName": "Pedro", "lastName": "Lennon" }
@@ -94,7 +105,7 @@
                             console.log ('you are dead Hey.You');
                         });
 
-                        my_Lib.drop ('Hey.You');
+                        // my_Lib.drop ('Hey.You');
                     });
 
                 },

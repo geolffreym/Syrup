@@ -3,9 +3,10 @@
  */
 "use strict";
 
-function Modules () {
+function Apps () {
 	this.root = null;
 	this.lib = null;
+	this.app = null;
 	this.scope = {};
 	this.modules = {};
 	this.onchange = {};
@@ -17,11 +18,12 @@ function Modules () {
  * @param dependencies []
  * @return object
  * **/
-Modules.add ('blend', function (name, dependencies) {
-	var _self = new Modules;
+Apps.add ('blend', function (name, dependencies) {
+	var _self = new Apps;
 	_self.lib = new Libs;
 	_self.root = name;
 	_self.scope = {};
+	_self.app = _$ ('[sp-app="' + name + '"]');
 	_self.lib.blend (name, dependencies);
 
 	return _self;
@@ -32,7 +34,7 @@ Modules.add ('blend', function (name, dependencies) {
  *  @param module function
  *  @return object
  * */
-Modules.add ('recipe', function (moduleId, module) {
+Apps.add ('recipe', function (moduleId, module) {
 	if ( _.isSet (this.root) ) {
 		if ( _.isSet (module) ) {
 			this.temp = moduleId;
@@ -49,7 +51,7 @@ Modules.add ('recipe', function (moduleId, module) {
 /**Object Observer
  * @param moduleId
  * **/
-Modules.add ('_watch', function (moduleId) {
+Apps.add ('_watch', function (moduleId) {
 	var _self = this;
 	Object.observe (_self.scope, function (change) {
 		_.each (change, function (v) {
@@ -74,7 +76,7 @@ Modules.add ('_watch', function (moduleId) {
  * @param moduleId
  * @return void
  * **/
-Modules.add ('_add', function (moduleId) {
+Apps.add ('_add', function (moduleId) {
 	if ( !_.isObject (this.scope[moduleId]) )
 		this.scope[moduleId] = {};
 });
@@ -83,7 +85,7 @@ Modules.add ('_add', function (moduleId) {
  * @param moduleId
  * @return void
  * **/
-Modules.add ('_trigger', function (moduleId) {
+Apps.add ('_trigger', function (moduleId) {
 	if ( _.isSet (this.modules[moduleId]) )
 		return this.modules[moduleId].creator (_, _$, this.scope);
 	return {}
@@ -95,7 +97,7 @@ Modules.add ('_trigger', function (moduleId) {
  * @return void
  *
  * */
-Modules.add ('service', function (name, callback) {
+Apps.add ('service', function (name, callback) {
 	this.lib.cook (name, callback);
 });
 
@@ -104,12 +106,12 @@ Modules.add ('service', function (name, callback) {
  * @return void
  *
  * */
-Modules.add ('services', function (object) {
+Apps.add ('services', function (object) {
 	this.lib.supply (object);
 });
 
 
-Modules.add ('value', function () {
+Apps.add ('value', function () {
 
 });
 
@@ -118,7 +120,7 @@ Modules.add ('value', function () {
  * @param object
  * @return void
  * **/
-Modules.add ('setScope', function (moduleId, object) {
+Apps.add ('setScope', function (moduleId, object) {
 	if ( _.isSet (this.scope[moduleId]) ) {
 		this.scope[moduleId] = object;
 	}
@@ -129,14 +131,14 @@ Modules.add ('setScope', function (moduleId, object) {
  * @param moduleId
  * @return object
  * **/
-Modules.add ('getScope', function (moduleId) {
+Apps.add ('getScope', function (moduleId) {
 	if ( _.isSet (this.scope[moduleId]) ) {
 		return this.scope[moduleId];
 	}
 	return {};
 });
 
-Modules.add ('when', function (event, name, callback) {
+Apps.add ('when', function (event, name, callback) {
 	var self = this;
 	return [
 		{
@@ -150,43 +152,52 @@ Modules.add ('when', function (event, name, callback) {
 	]
 });
 
-Modules.add ('_serve', function (moduleId, template) {
+/** Render the View
+ * @param moduleId
+ * @param template
+ * @return object
+ */
+Apps.add ('_serve', function (moduleId, template) {
 	var _self = this,
 		_template = null,
-		_scope = _self.scope[moduleId],
-		_dom = _$ ('[sp-controller="' + moduleId + '"]');
+		_scope = _self.scope[moduleId];
 
-	if ( _dom.exist && _.getObjectSize (_scope) > 0 ) {
-		if ( _.isBoolean (template) ) {
-			Require.request ('/view/' + _.dotDirectory (moduleId), function () {
-				_template = new Template;
-				if ( moduleId in _template.__proto__ )
-					_template[moduleId] (_scope, function (my_html) {
-						_dom.html (my_html);
-					})
-			})
-		} else {
-			var _dom_template = _$ ('[sp-template="' + template + '"]'),
-				_parse = _dom_template.exist
-					? _dom_template.html ()
-					: _dom.html ();
+	//Is set the appundefine
+	if ( _self.app.exist ) {
+		_self.app.find ('[sp-recipe="' + moduleId + '"]', function (mod) {
+			mod.find ('[sp-view]', function (_dom) {
+				if ( _.getObjectSize (_scope) > 0 ) {
+					if ( _.isSet (template) && _.isString (template) ) {
+						Require.request ('/view/' + template, function () {
+							_template = new Template;
+							if ( moduleId in _template.__proto__ )
+								_template[moduleId] (_scope, function (my_html) {
+									_dom.html (my_html);
+								})
+						})
+					} else {
+						mod.find ('[sp-tpl]', function (_dom_template) {
+							var _parse = _dom_template.html ();
+							if ( _.isSet (_parse) ) {
+								_template = new Template;
+								_template.parse (_parse, _scope, function (result) {
+									_dom.html (result);
+								});
+							}
+						});
 
-			if ( _.isSet (_parse) ) {
-				_template = new Template;
-				_template.parse (_parse, _scope, function (result) {
-					_dom.html (result);
-				});
-			}
-		}
+					}
+				}
+			});
+		})
 	}
 
 	return this;
 });
 
 //Execute Module
-Modules.add ('_taste', function (moduleId) {
-	var _self = this,
-		_body = _$('body');
+Apps.add ('_taste', function (moduleId) {
+	var _self = this;
 
 	if ( _.isSet (_self.modules[moduleId]) && _.isSet (_self.root) ) {
 
@@ -213,12 +224,16 @@ Modules.add ('_taste', function (moduleId) {
 		};
 
 		_self.modules[moduleId].instance.serve = function (_template) {
-			_self._serve (moduleId, _template || true);
+			_self._serve (moduleId, _template || null);
 			return this;
 		};
 
 		_self.modules[moduleId].instance.listen = function (event, callback) {
-			_body.listen (event, '[sp-listen="' + moduleId + '"]', callback);
+			if ( _self.app.exist )
+				_self.app.find ('[sp-recipe="' + moduleId + '"]', function (mod) {
+					mod.listen (event, '[sp-' + event + ']', callback);
+				});
+
 			return this;
 		};
 
@@ -235,7 +250,7 @@ Modules.add ('_taste', function (moduleId) {
 	return this;
 });
 
-Modules.add ('drop', function (moduleId) {
+Apps.add ('drop', function (moduleId) {
 	if ( _.isSet (this.modules[moduleId]) ) {
 		if ( this.modules[moduleId].instance ) {
 			if ( this.modules[moduleId].instance.destroy )
@@ -251,7 +266,7 @@ Modules.add ('drop', function (moduleId) {
 });
 
 
-Modules.add ('dropAll', function () {
+Apps.add ('dropAll', function () {
 	var _self = this;
 	_.each (this.modules, function (module, id) {
 		_self.drop (id);
@@ -259,4 +274,4 @@ Modules.add ('dropAll', function () {
 	return this;
 });
 
-window.Module = new Modules;
+window.App = new Apps;
