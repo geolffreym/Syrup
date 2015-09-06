@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" sp-app="Hey">
 <head>
     <meta charset="UTF-8">
     <title></title>
@@ -8,32 +8,40 @@
 <script src="../app/include/init.js"></script>
 
 
-<a href="#" id="click">
-    Test
-</a>
+<div sp-recipe="Hey.You">
 
-<!--The event listener-->
-<a href="#" sp-listen="Hey.You">
-    Iam Hey You
-</a>
+    <!-- The event-->
+    <a href="#" sp-click>
+        Aqui
+    </a>
 
-
-<!--The controller-->
-<div sp-controller="Hey.You">
-
-</div>
-
-<!--THe Inline template-->
-<template sp-template="Hey.You">
-    <div>
-        <ul>
-            {{#beatles}}
-            <li>{{ firstName }} {{lastName}}</li>
-            {{/beatles}}
-        </ul>
+    <!--The view-->
+    <div sp-view>
 
     </div>
-</template>
+
+    <!--The Inline template-->
+    <template sp-tpl>
+        <div>
+            <ul>
+                {{#beatles}}
+                <li>{{ firstName }} {{lastName}}</li>
+                {{/beatles}}
+            </ul>
+
+        </div>
+    </template>
+</div>
+
+
+<div sp-recipe="Hey.Do">
+    <!-- The event-->
+    <a href="#" sp-click>
+        Change You
+    </a>
+
+
+</div>
 
 
 <script>
@@ -79,9 +87,9 @@
                     this.when ('change', function (d) {
 
                         //Render new data using the inline template
-                        //If "Hey.You" is not set, the view is needed app/view/Hey/You.js
-                        //The view's directory, respects namespace
-                        _self.serve ('Hey.You');
+                        //If not serve param is set, template inline is used
+                        //Else if you set "Hey/You" "/app/view/Hey/You.js" view is used
+                        _self.serve ();
 
                         // The global service in tools
                         tools.myConsole ('Done');
@@ -98,10 +106,8 @@
             return {
                 init   : function (tools) {
 
-                    _$ ('#click').listen ('click', function () {
-
-                        //Trigger change in Hey.You
-                        //Set scope to Hey.You
+                    //Trigger change in Hey.You
+                    this.listen ('click', function () {
                         my_Lib.setScope ('Hey.You', {
                             'beatles': [
                                 { "firstName": "Pedro", "lastName": "Lennon" }
