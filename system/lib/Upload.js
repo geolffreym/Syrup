@@ -16,7 +16,7 @@ var Upload,
 	};
 
 Upload = function () {
-	var _ajax = new _.Ajax,
+	var _ajax = new Ajax,
 		_proto = this.__proto__;
 
 

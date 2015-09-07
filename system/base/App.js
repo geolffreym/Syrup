@@ -138,6 +138,12 @@ Apps.add ('getScope', function (moduleId) {
 	return {};
 });
 
+/**Event handler
+ * @param event
+ * @param name
+ * @param callback
+ * @return object
+ */
 Apps.add ('when', function (event, name, callback) {
 	var self = this;
 	return [
@@ -152,6 +158,26 @@ Apps.add ('when', function (event, name, callback) {
 	]
 });
 
+Apps.add ('_bindListener', function (moduleId) {
+	var enabled_events = [
+		'[sp-click], ', 'submit], ',
+		'change], ', 'dblclick], ',
+		'mousedown], ', 'mouseenter], ',
+		'mouseleave], ', 'mousemove], ',
+		'mouseover], ', 'mouseout], ', 'mouseup], ',
+		'keydown], ', 'keypress], ', 'keyup], ', 'blur], ',
+		'focus], ', 'input], ', 'select], ', 'reset]'
+	];
+
+	console.log (enabled_events.join (' [sp-'))
+
+	this.app.find ('[sp-recipe="' + moduleId + '"]', function (mod) {
+		mod.find (enabled_events.join (' [sp-'), function (e) {
+			console.log (e)
+		})
+	})
+});
+
 /** Render the View
  * @param moduleId
  * @param template
@@ -162,7 +188,7 @@ Apps.add ('_serve', function (moduleId, template) {
 		_template = null,
 		_scope = _self.scope[moduleId];
 
-	//Is set the appundefine
+	//Is set the app
 	if ( _self.app.exist ) {
 		_self.app.find ('[sp-recipe="' + moduleId + '"]', function (mod) {
 			mod.find ('[sp-view]', function (_dom) {
@@ -195,7 +221,11 @@ Apps.add ('_serve', function (moduleId, template) {
 	return this;
 });
 
-//Execute Module
+/** Execute Module
+ *@param moduleId
+ * @return object
+ */
+
 Apps.add ('_taste', function (moduleId) {
 	var _self = this;
 
@@ -231,12 +261,14 @@ Apps.add ('_taste', function (moduleId) {
 		_self.modules[moduleId].instance.listen = function (event, callback) {
 			if ( _self.app.exist )
 				_self.app.find ('[sp-recipe="' + moduleId + '"]', function (mod) {
-					mod.listen (event, '[sp-' + event + ']', callback);
+					mod.find ('[sp-' + event + ']', function (e) {
+						mod.listen (event, '[sp-' + event + ']', callback);
+					})
 				});
-
-			return this;
 		};
 
+
+		_self._bindListener (moduleId);
 		//Observe scope
 		_self._watch (moduleId);
 
@@ -250,6 +282,11 @@ Apps.add ('_taste', function (moduleId) {
 	return this;
 });
 
+
+/**Drop a Module
+ * @param moduleId
+ * @return object
+ * */
 Apps.add ('drop', function (moduleId) {
 	if ( _.isSet (this.modules[moduleId]) ) {
 		if ( this.modules[moduleId].instance ) {
@@ -266,6 +303,9 @@ Apps.add ('drop', function (moduleId) {
 });
 
 
+/**Drop all Modules
+ * @return object
+ * */
 Apps.add ('dropAll', function () {
 	var _self = this;
 	_.each (this.modules, function (module, id) {
