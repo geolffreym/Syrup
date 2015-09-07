@@ -267,10 +267,7 @@ Apps.add ('_taste', function (moduleId) {
 		};
 
 		_self.modules[moduleId].instance.listen = function (event, callback) {
-			if ( _self.app.exist )
-				_self.app.find ('[sp-recipe="' + moduleId + '"]', function (mod) {
-					mod.listen (event, '[sp-' + event + ']', callback);
-				});
+			_$ ('[sp-recipe="' + moduleId + '"]').listen (event, '[sp-' + event + ']', callback)
 		};
 
 

@@ -2576,8 +2576,6 @@ Apps.add ('_bindListener', function (moduleId) {
 					if ( /sp-[a-z]+/.test (v.localName) ) {
 						var _event = _.replace (v.localName, 'sp-', ''),
 							_attr = _$ (i).attr (v.localName);
-						console.log (_attr);
-						console.log (_event)
 						if ( _attr in _self )
 							mod.listen (_event, '[' + v.localName + '="' + _attr + '"]', _self[_attr])
 					}
@@ -2669,10 +2667,7 @@ Apps.add ('_taste', function (moduleId) {
 		};
 
 		_self.modules[moduleId].instance.listen = function (event, callback) {
-			if ( _self.app.exist )
-				_self.app.find ('[sp-recipe="' + moduleId + '"]', function (mod) {
-					mod.listen (event, '[sp-' + event + ']', callback);
-				});
+			_$ ('[sp-recipe="' + moduleId + '"]').listen (event, '[sp-' + event + ']', callback)
 		};
 
 
