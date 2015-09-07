@@ -168,15 +168,21 @@ Apps.add ('_bindListener', function (moduleId) {
 		'keydown], ', 'keypress], ', 'keyup], ', 'blur], ',
 		'focus], ', 'input], ', 'select], ', 'reset]'
 	];
-
+	var _self = this.modules[moduleId].instance;
 	this.app.find ('[sp-recipe="' + moduleId + '"]', function (mod) {
 		mod.find (enabled_events.join (' [sp-'), function (e) {
 			e.each (function (i) {
-				if ( _$(i).is ('[sp-click]') ) {
-					console.log(e)
-				}
+				_.each (i.attributes, function (v) {
+					if ( /sp-[a-z]+/.test (v.localName) ) {
+						var _event = _.replace (v.localName, 'sp-', ''),
+							_attr = _$ (i).attr (v.localName);
+						if ( _attr in _self )
+							mod.listen (_event, '[' + v.localName + '="' + _attr + '"]', _self[_attr])
+					}
+				});
 			})
 		})
+
 	})
 });
 
@@ -268,15 +274,15 @@ Apps.add ('_taste', function (moduleId) {
 		};
 
 
-		_self._bindListener (moduleId);
-		//Observe scope
-		_self._watch (moduleId);
-
 		//Init the module
 		if ( _.isSet (_self.modules[moduleId].instance.init) ) {
 			_self.modules[moduleId].instance.init (this.lib.get (_self.root));
-			//_self._serve (moduleId, _self.modules[moduleId].instance.template || true);
+			_self._bindListener (moduleId);
 		}
+
+
+		//Observe scope
+		_self._watch (moduleId);
 	}
 
 	return this;

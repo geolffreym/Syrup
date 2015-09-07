@@ -11,7 +11,7 @@
 <div sp-recipe="Hey.You">
 
     <!-- The event-->
-    <a href="#" sp-click>
+    <a href="#" sp-click="the_method">
         yes
     </a>
 
@@ -66,6 +66,7 @@
             return {
                 init      : function ($) {
                     var _self = this;
+
                     this.setScope ({
                         'beatles': [
                             { "firstName": "John", "lastName": "Lennon" },
@@ -73,7 +74,7 @@
                             { "firstName": "George", "lastName": "Harrison" },
                             { "firstName": "Ringo", "lastName": "Starr" }
                         ]
-                    });
+                    }).serve();
 
                     //When Hey.You scope change
                     this.when ('change', function (d) {
@@ -82,7 +83,7 @@
                     })
                 },
                 the_method: function () {
-
+alert('yeah')
                 },
                 destroy   : function ($) {
                     alert ('destroyed?')
