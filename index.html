@@ -95,20 +95,20 @@
             return {
                 init   : function (tools) {
 
-//                    //Trigger change in Hey.You
-//                    this.listen ('click', function () {
-//                        my_Lib.setScope ('Hey.You', {
-//                            'beatles': [
-//                                { "firstName": "Pedro", "lastName": "Lennon" }
-//                            ]
-//                        });
-//
-//                        my_Lib.when ('drop', 'Hey.You', function () {
-//                            console.log ('you are dead Hey.You');
-//                        });
-//
-//                        // my_Lib.drop ('Hey.You');
-//                    });
+                    //Trigger change in Hey.You
+                    this.listen ('click', function () {
+                        my_Lib.setScope ('Hey.You', {
+                            'beatles': [
+                                { "firstName": "Pedro", "lastName": "Lennon" }
+                            ]
+                        });
+
+                        my_Lib.when ('drop', 'Hey.You', function () {
+                            console.log ('you are dead Hey.You');
+                        });
+
+                        // my_Lib.drop ('Hey.You');
+                    });
 
                 },
                 destroy: function () {}

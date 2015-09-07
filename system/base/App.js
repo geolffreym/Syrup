@@ -169,11 +169,13 @@ Apps.add ('_bindListener', function (moduleId) {
 		'focus], ', 'input], ', 'select], ', 'reset]'
 	];
 
-	console.log (enabled_events.join (' [sp-'))
-
 	this.app.find ('[sp-recipe="' + moduleId + '"]', function (mod) {
 		mod.find (enabled_events.join (' [sp-'), function (e) {
-			console.log (e)
+			e.each (function (i) {
+				if ( _$(i).is ('[sp-click]') ) {
+					console.log(e)
+				}
+			})
 		})
 	})
 });
@@ -261,9 +263,7 @@ Apps.add ('_taste', function (moduleId) {
 		_self.modules[moduleId].instance.listen = function (event, callback) {
 			if ( _self.app.exist )
 				_self.app.find ('[sp-recipe="' + moduleId + '"]', function (mod) {
-					mod.find ('[sp-' + event + ']', function (e) {
-						mod.listen (event, '[sp-' + event + ']', callback);
-					})
+					mod.listen (event, '[sp-' + event + ']', callback);
 				});
 		};
 

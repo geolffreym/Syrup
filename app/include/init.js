@@ -594,7 +594,7 @@ _$_.add ('trigger', function (event, callback) {
 _$_.add ('find', function (filter, callback) {
 	this.children (function (elem) {
 		elem.filter (filter, function (e) {
-			_.callbackAudit (callback, e);
+			_.callbackAudit (callback, e, filter);
 		}, function () {
 			elem.find (filter, callback);
 		})
@@ -1795,11 +1795,10 @@ Syrup.add ('extend', function (target, source, overwrite) {
 });
 
 
-
 //Super Global Object Instance
 window._ = (function () {
-		return new Syrup ();
-	}) ();
+	return new Syrup ();
+}) ();
 
 _.VERSION = '1.1';
 _.$fn = _$_;
@@ -1820,10 +1819,10 @@ _.nav.online = navigator.onLine;
 _.nav.local = navigator.userAgent.toLowerCase ();
 
 window._$ = (function () {
-		return (
-			new _$_ ()
-		).$;
-	}) ();
+	return (
+		new _$_ ()
+	).$;
+}) ();
 
 
 /*
@@ -2570,11 +2569,13 @@ Apps.add ('_bindListener', function (moduleId) {
 		'focus], ', 'input], ', 'select], ', 'reset]'
 	];
 
-	console.log(enabled_events.join (' [sp-'))
-
 	this.app.find ('[sp-recipe="' + moduleId + '"]', function (mod) {
 		mod.find (enabled_events.join (' [sp-'), function (e) {
-			console.log (e)
+			e.each (function (i) {
+				if ( _$(i).is ('[sp-click]') ) {
+					console.log(e)
+				}
+			})
 		})
 	})
 });
@@ -2657,6 +2658,13 @@ Apps.add ('_taste', function (moduleId) {
 		_self.modules[moduleId].instance.serve = function (_template) {
 			_self._serve (moduleId, _template || null);
 			return this;
+		};
+
+		_self.modules[moduleId].instance.listen = function (event, callback) {
+			if ( _self.app.exist )
+				_self.app.find ('[sp-recipe="' + moduleId + '"]', function (mod) {
+					mod.listen (event, '[sp-' + event + ']', callback);
+				});
 		};
 
 
