@@ -11,8 +11,8 @@
 <div sp-recipe="Hey.You">
 
     <!-- The event-->
-    <a href="#" sp-click>
-        Aqui
+    <a href="#" sp-click="the_method">
+        yes
     </a>
 
     <!--The view-->
@@ -35,8 +35,8 @@
 
 
 <div sp-recipe="Hey.Do">
-    <!-- The event-->
-    <a href="#" sp-click>
+    <!-- The method "jaja" in module Hey.Do-->
+    <a href="#" sp-click="method">
         Change You
     </a>
 
@@ -63,7 +63,7 @@
         //A new recipe for Hey
         my_Lib.recipe ('Hey.You', function (_, _$, scope) {
             return {
-                init   : function (tools) {
+                init   : function ($) {
                     var _self = this;
 
                     //tools has dependencies object
@@ -77,17 +77,10 @@
                             { "firstName": "George", "lastName": "Harrison" },
                             { "firstName": "Ringo", "lastName": "Starr" }
                         ]
-                    });
-
-                    //Dom traversing, find sp-"event"
-                    this.listen ('click', function (e) {
-                        e.preventDefault ();
-                        alert ('clicked');
-                        //On click Hey.You listener what to do?
-                    });
+                    }).serve ();
 
                     //When Hey.You scope change
-                    this.when ('change', function (d) {
+                    this.when ('change', function (changes) {
 
                         //Render new data using the inline template
                         //If not serve param is set, template inline is used
@@ -99,7 +92,10 @@
                         tools.myConsole ('Done');
                     })
                 },
-                destroy: function () {
+                the_method: function (e) {
+                    console.log(e)
+                },
+                destroy   : function ($) {
                     alert ('destroyed?')
                 }
             }
@@ -110,23 +106,19 @@
             return {
                 init   : function (tools) {
 
-                    //Trigger change in Hey.You
-                    this.listen ('click', function () {
-                        my_Lib.setScope ('Hey.You', {
-                            'beatles': [
-                                { "firstName": "Pedro", "lastName": "Lennon" }
-                            ]
-                        });
-
-                        // OnDrop the recipe
-                        my_Lib.when ('drop', 'Hey.You', function () {
-                            console.log ('you are dead Hey.You');
-                        });
-
-                        // Drop the recipe
-                        my_Lib.drop ('Hey.You');
+                },
+                method  : function () {
+                    my_Lib.setScope ('Hey.You', {
+                        'beatles': [
+                            { "firstName": "Pedro", "lastName": "Lennon" }
+                        ]
                     });
 
+                    my_Lib.when ('drop', 'Hey.You', function () {
+                        console.log ('you are dead Hey.You');
+                    });
+
+                    // my_Lib.drop ('Hey.You');
                 },
                 destroy: function () {}
             }
