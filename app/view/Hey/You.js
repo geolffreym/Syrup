@@ -3,13 +3,12 @@
  */
 
 //The recipe name is needed
-Template.add ('Hey.You', function (data, callback) {
-	var _self = this;
+View.add ('Hey.You', function (data, callback) {
 	//The template as relative path of config app_path
 	//Hey/You in app/templates respects namespace
-	_self.get ('Hey/You', function (template) {
+	this.getTpl ('Hey/You').then (function (view) {
 		if ( _.isSet (callback) ) {
-			_self.parse (template, data, callback);
+			view.parse (view.tpl, data).then (callback);
 		}
 	});
 });

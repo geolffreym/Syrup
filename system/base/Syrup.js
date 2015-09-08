@@ -21,6 +21,7 @@ var
 	WARNING_SYRUP = {
 		ERROR: {
 			NOPARAM              : 'Param needed',
+			NONETWORK            : 'Network Error',
 			NOOBJECT             : 'An object param is necessary.',
 			NOARRAY              : 'An array necessary.',
 			NOFUNCTION           : 'An function necessary.',
@@ -1386,13 +1387,12 @@ Syrup.add ('objectWatch', function (obj, callback, conf) {
  */
 Syrup.add ('interval', function (callback, conf) {
 	var _worker = new Workers;
-
-	_worker.set ('/workers/setting/Interval', function () {
+	_worker.set ('/workers/setting/Interval').then (function (_worker) {
 		_worker.send (conf);
-	}).on ('message', function (e) {
-		_.callbackAudit (callback, e.data);
+		_worker.on ('message', function (e) {
+			_.callbackAudit (callback, e.data);
+		})
 	});
-	
 	return _worker;
 });
 
@@ -1460,7 +1460,7 @@ Syrup.add ('jsonToQueryString', function (_object) {
 			: 0;
 	
 	_.each (_object, function (value, key) {
-		_return += key + '=' + value;
+		_return += encodeURI (key + '=' + value);
 		if ( _size > 1 ) {
 			_return += '&';
 		}
@@ -1591,7 +1591,7 @@ Syrup.add ('callbackAudit', function (callback) {
 		
 	}
 	catch ( e ) {
-		_.error (WARNING_SYRUP.ERROR.NOCALLBACK);
+		_.error (e);
 	}
 	return true;
 });

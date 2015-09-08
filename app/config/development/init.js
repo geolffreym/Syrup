@@ -17,7 +17,7 @@ exports.files = {
 			'system/lib/Http',
 			'system/lib/Repository',
 			'system/lib/Workers',
-			'system/lib/Template',
+			'system/lib/View',
 			// Until here needed do not change
 			// Add all the necessary modules
 			'system/lib/Map',

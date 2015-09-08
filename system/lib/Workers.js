@@ -11,48 +11,46 @@ function Workers () {
 }
 
 //Worker event handler
-Workers.add ( 'on', function ( event, callback ) {
+Workers.add ('on', function (event, callback) {
 	var self = this;
 	return [
 		{
 			message: function () {
 				self.onsuccess = callback;
 			}
-		}[ event ] ()
+		}[event] ()
 	]
-} );
+});
 
 //Set new Worker
-Workers.add ( 'set', function ( url, callback ) {
+Workers.add ('set', function (url) {
 	var self = this;
-	self.Worker = (new Worker ( setting.system_path + url + '.min.js' ));
-	self.Worker.addEventListener ( 'message', function ( e ) {
-		_.callbackAudit ( self.onsuccess, e );
-	}, false );
-	_.callbackAudit ( callback, self.Worker );
-
-	return this;
-
-} );
+	return (new Promise (function (resolve, reject) {
+		self.Worker = (new Worker (setting.system_path + url + '.min.js'));
+		self.Worker.addEventListener ('message', function (e) {
+			_.callbackAudit(self.onsuccess,e);
+		}, false);
+		resolve (self);
+	}))
+});
 
 //Get Worker
-Workers.add ( 'get', function () {
+Workers.add ('get', function () {
 	return this.Worker;
-} );
+});
 
 //Send Message to Worker
-Workers.add ( 'send', function ( message ) {
-	this.Worker.postMessage ( !!message ? message : '' );
+Workers.add ('send', function (message) {
+	this.Worker.postMessage (!!message ? message : '');
 	return this;
-} );
+});
 
 //Kill Worker
-Workers.add ( 'kill', function ( callback ) {
-	if ( _.isSet ( this.Worker ) ) {
+Workers.add ('kill', function () {
+	if ( _.isSet (this.Worker) ) {
 		this.Worker.terminate ();
 		this.Worker = null;
-		_.callbackAudit ( callback );
 	}
 
 	return this;
-} );
+});

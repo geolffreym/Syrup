@@ -12,7 +12,7 @@
 
 var WARNING_SYRUP_FORM = {
 	ERROR: {
-		NOPACK: 'Error pack model'
+		NOPACK: 'Error packing model'
 	}
 };
 
@@ -22,7 +22,7 @@ function Model () {
 	this.modelData = null;
 	this.object = {};
 	this.url = '/';
-	this.type = 'GET';
+	this.type = 'POST';
 	this.onbefore = null;
 	this.oncomplete = null;
 	this.onerror = null;
@@ -156,7 +156,7 @@ Model.add ('send', function (event) {
 		if ( self.oncomplete ) {
 			self.oncomplete (response);
 		}
-	})
+	});
 
 	return this;
 });

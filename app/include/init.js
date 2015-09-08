@@ -21,6 +21,7 @@ var
 	WARNING_SYRUP = {
 		ERROR: {
 			NOPARAM              : 'Param needed',
+			NONETWORK            : 'Network Error',
 			NOOBJECT             : 'An object param is necessary.',
 			NOARRAY              : 'An array necessary.',
 			NOFUNCTION           : 'An function necessary.',
@@ -1386,13 +1387,12 @@ Syrup.add ('objectWatch', function (obj, callback, conf) {
  */
 Syrup.add ('interval', function (callback, conf) {
 	var _worker = new Workers;
-
-	_worker.set ('/workers/setting/Interval', function () {
+	_worker.set ('/workers/setting/Interval').then (function (_worker) {
 		_worker.send (conf);
-	}).on ('message', function (e) {
-		_.callbackAudit (callback, e.data);
+		_worker.on ('message', function (e) {
+			_.callbackAudit (callback, e.data);
+		})
 	});
-	
 	return _worker;
 });
 
@@ -1460,7 +1460,7 @@ Syrup.add ('jsonToQueryString', function (_object) {
 			: 0;
 	
 	_.each (_object, function (value, key) {
-		_return += key + '=' + value;
+		_return += encodeURI (key + '=' + value);
 		if ( _size > 1 ) {
 			_return += '&';
 		}
@@ -1591,7 +1591,7 @@ Syrup.add ('callbackAudit', function (callback) {
 		
 	}
 	catch ( e ) {
-		_.error (WARNING_SYRUP.ERROR.NOCALLBACK);
+		_.error (e);
 	}
 	return true;
 });
@@ -2613,11 +2613,10 @@ Apps.add ('_serve', function (moduleId, template) {
 
 		if ( _dom.exist ) { //Exist?
 			if ( _.getObjectSize (_scope) > 0 ) {
-
 				//A view?
+				_template = new View;
 				if ( _.isSet (template) && _.isString (template) ) {
 					Require.request ('/view/' + template, function () {
-						_template = new Template;
 						if ( moduleId in _template.__proto__ )
 							_template[moduleId] (_scope, function (my_html) {
 								_dom.html (my_html);
@@ -2626,8 +2625,7 @@ Apps.add ('_serve', function (moduleId, template) {
 				} else if ( _dom_template.exist ) { //Exist inline tpl?
 					var _parse = _dom_template.html ();
 					if ( _.isSet (_parse) ) {
-						_template = new Template;
-						_template.parse (_parse, _scope, function (result) {
+						_template.parse (_parse, _scope).then (function (result) {
 							_dom.html (result);
 						});
 					}
@@ -2770,9 +2768,6 @@ Http.add ('on', function (event, callback) {
 			complete: function () {
 				self.complete = callback;
 			},
-			error   : function () {
-				self.error = callback;
-			},
 			abort   : function () {
 				self.abort = callback;
 			},
@@ -2803,135 +2798,134 @@ Http.add ('on', function (event, callback) {
  *	processor: (string) ajax server side processor file extension,
  *	token: (string or bool) CSRF token needed?,
  *	contentType: (string) the content type,
- *	contentHeader: (object) the content header request,
  *	data: (object) the request data,
  *	upload: (bool) is upload process?
  *
  * }
  * **/
-Http.add ('request', function (config, callback) {
+Http.add ('request', function (config) {
 	if ( !_.isObject (config) ) {
 		throw (WARNING_SYRUP.ERROR.NOOBJECT)
 	}
 
 	var _self = this,
 		_xhr = _self.xhr,
-		_async = true,
+		_async = config.async || true,
 		_type = (config.method || 'GET').toUpperCase (),
-		_timeout = config.timeout || 4000,
-		_processor = config.processor || setting.processor || '',
-		_token = config.token || false,
+		_timeout = config.timeout || 0xFA0,
+		_cors = config.cors || false,
+		_processor = config.processor || setting.processor,
+		_token = config.token || null,
 		_contentType = config.contentType || 'application/x-www-form-urlencoded;charset=utf-8',
-		_data = config.data
-			? config.data : null,
-		_contentHeader = config.contentHeader ||
-						 [
-							 {
-								 header: 'Content-Type',
-								 value : _contentType
-							 }
-						 ]
-		;
+		_data = config.data || null,
+		_contentHeader = {
+			header: 'Content-Type',
+			value : _contentType
+		};
 
-	if ( !_.isSet (config.url) ) {
-		throw (WARNING_SYRUP.ERROR.NOURL);
-	}
 
-	if ( !_.isFormData (_data)
-		 && _.isSet (_data)
-		 && _contentHeader !== 'auto'
-	) {
-		_data = _.parseJsonUrl (_data);
-	}
+	return (new Promise (function (resolve, reject) {
 
-	if ( _type === 'GET' && _.isSet (_data) ) {
-		_processor += '?' + _data;
-	}
+		if ( !_.isSet (config.url) )
+			reject (WARNING_SYRUP.ERROR.NOURL);
 
-	_processor = config.url + (_processor || '');
-	_xhr.open (_type, _processor, _async);
-	_xhr.timeout = _timeout;
+		if ( !_.isFormData (_data)
+			 && _.isSet (_data)
+			 && _contentType !== 'auto'
+		) {
+			_data = _.jsonToQueryString (_data);
+		}
 
-	//Setting Headers
-	if ( !_.isFormData (_data) && _contentHeader !== 'auto' ) {
-		_.each (_contentHeader, function (v) {
-			_self.requestHeader (v.header, v.value);
-		})
+		if ( _type === 'GET' && _.isSet (_data) ) {
+			_processor += '?' + _data;
+		}
 
-	}
+		//Process url
+		_processor = config.url + (_processor || '');
+		_xhr.open (_type, _processor, _async);
+		_xhr.timeout = _timeout;
 
-	//Using Token
-	if ( _.isSet (_token) )
-		_self.requestHeader ("X-CSRFToken", _.getCookie (_.isBoolean (_token) ? 'csrftoken' : _token));
+		//Setting Headers
+		if ( !_.isFormData (_data) && _contentType !== 'auto' ) {
+			_self.requestHeader (
+				_contentHeader.header,
+				_contentHeader.value
+			);
+		}
 
-	//If upload needed
-	if ( _.isSet (config.upload) && _.isBoolean (config.upload) ) {
-		_self.upload = _self.xhr.upload;
-		_xhr = _self.upload;
-	}
+		//Cors?
+		if ( _.isSet (_cors) )
+			_xhr.withCredentials = true;
 
-	//Event Listeners
-	_xhr.addEventListener ('load', function (e) {
-		if ( this.status >= 0xC8 && this.status < 0x190 ) {
-			var _response = this.response || this.responseText;
-			if ( _.isJson (_response) ) {
-				_response = JSON.parse (_response);
+		//Using Token
+		if ( _.isSet (_token) )
+			_self.requestHeader ("X-CSRFToken", _token);
+
+		//If upload needed
+		if ( _.isSet (config.upload) && _.isBoolean (config.upload) ) {
+			_self.upload = _self.xhr.upload;
+			_xhr = _self.upload;
+		}
+
+		//Event Listeners
+		_xhr.addEventListener ('load', function (e) {
+			if ( this.status >= 0xC8 && this.status < 0x190 ) {
+				var _response = this.response || this.responseText;
+				if ( _.isJson (_response) ) {
+					_response = JSON.parse (_response);
+				}
+				resolve (_response);
 			}
-			_.callbackAudit (callback, _response, e);
+		});
 
-		}
-	});
-
-	_xhr.addEventListener ('progress', function (e) {
-		if ( _self.progress ) {
-			_self.progress (e);
-		}
-	}, false);
-
-	_xhr.addEventListener ('readystatechange', function (e) {
-		if ( this.readyState ) {
-			if ( !!_self.state ) {
-				_self.state (this.readyState, e);
+		_xhr.addEventListener ('progress', function (e) {
+			if ( _self.progress ) {
+				_self.progress (e);
 			}
-		}
-	});
+		}, false);
 
-	_xhr.addEventListener ('abort', function (e) {
-		if ( !!_self.abort ) {
-			_self.abort (e);
-		}
-	});
+		_xhr.addEventListener ('readystatechange', function (e) {
+			if ( this.readyState ) {
+				if ( !!_self.state ) {
+					_self.state (this.readyState, e);
+				}
+			}
+		});
 
-	_xhr.addEventListener ('timeout', function (e) {
-		if ( !!_self.time_out ) {
-			_self.time_out (e);
-		}
-	});
+		_xhr.addEventListener ('abort', function (e) {
+			if ( !!_self.abort ) {
+				_self.abort (e);
+			}
+		});
 
-	_xhr.addEventListener ('loadend', function (e) {
-		if ( !!_self.complete ) {
-			_self.complete (e);
-		}
-	});
+		_xhr.addEventListener ('timeout', function (e) {
+			if ( !!_self.time_out ) {
+				_self.time_out (e);
+			}
+		});
 
-	_xhr.addEventListener ('loadstart', function (e) {
-		if ( !!_self.before ) {
-			_self.before (e);
-		}
-	});
+		_xhr.addEventListener ('loadend', function (e) {
+			if ( !!_self.complete ) {
+				_self.complete (e);
+			}
+		});
 
-	_xhr.addEventListener ('error', function (e) {
-		if ( !!_self.error ) {
-			_self.error (e);
-		}
-	});
+		_xhr.addEventListener ('loadstart', function (e) {
+			if ( !!_self.before ) {
+				_self.before (e);
+			}
+		});
+
+		_xhr.addEventListener ('error', function (e) {
+			reject (e);
+		});
 
 
-	//Send
-	_self.xhr_list.push (_self.xhr);
-	_xhr.send (_type !== 'GET' ? _data : null);
+		//Send
+		_self.xhr_list.push (_self.xhr);
+		_xhr.send (_type !== 'GET' ? _data : null);
+	}));
 
-	return _self.xhr;
 });
 
 
@@ -2940,16 +2934,14 @@ Http.add ('request', function (config, callback) {
  * @param data
  * @param callback
  * */
-Http.add ('get', function (url, data, callback) {
+Http.add ('get', function (url, data) {
 	var _conf = {
-		url        : url || '#',
-		processData: true,
-		data       : data || {}
+		url : url || location.href,
+		data: data || {}
 	};
 
 	this.kill ();
-	this.request (_conf, callback);
-	return this;
+	return this.request (_conf);
 });
 
 
@@ -2958,17 +2950,15 @@ Http.add ('get', function (url, data, callback) {
  * @param data
  * @param callback
  * */
-Http.add ('post', function (url, data, callback) {
+Http.add ('post', function (url, data) {
 	var _conf = {
-		processData: true,
-		method     : 'POST',
-		url        : url || '#',
-		data       : data || {}
+		method: 'POST',
+		url   : url || location.href,
+		data  : data || {}
 	};
 
 	this.kill ();
-	this.request (_conf, callback);
-	return this;
+	return this.request (_conf);
 });
 
 
@@ -3057,58 +3047,56 @@ function Workers () {
 }
 
 //Worker event handler
-Workers.add ( 'on', function ( event, callback ) {
+Workers.add ('on', function (event, callback) {
 	var self = this;
 	return [
 		{
 			message: function () {
 				self.onsuccess = callback;
 			}
-		}[ event ] ()
+		}[event] ()
 	]
-} );
+});
 
 //Set new Worker
-Workers.add ( 'set', function ( url, callback ) {
+Workers.add ('set', function (url) {
 	var self = this;
-	self.Worker = (new Worker ( setting.system_path + url + '.min.js' ));
-	self.Worker.addEventListener ( 'message', function ( e ) {
-		_.callbackAudit ( self.onsuccess, e );
-	}, false );
-	_.callbackAudit ( callback, self.Worker );
-
-	return this;
-
-} );
+	return (new Promise (function (resolve, reject) {
+		self.Worker = (new Worker (setting.system_path + url + '.min.js'));
+		self.Worker.addEventListener ('message', function (e) {
+			_.callbackAudit(self.onsuccess,e);
+		}, false);
+		resolve (self);
+	}))
+});
 
 //Get Worker
-Workers.add ( 'get', function () {
+Workers.add ('get', function () {
 	return this.Worker;
-} );
+});
 
 //Send Message to Worker
-Workers.add ( 'send', function ( message ) {
-	this.Worker.postMessage ( !!message ? message : '' );
+Workers.add ('send', function (message) {
+	this.Worker.postMessage (!!message ? message : '');
 	return this;
-} );
+});
 
 //Kill Worker
-Workers.add ( 'kill', function ( callback ) {
-	if ( _.isSet ( this.Worker ) ) {
+Workers.add ('kill', function () {
+	if ( _.isSet (this.Worker) ) {
 		this.Worker.terminate ();
 		this.Worker = null;
-		_.callbackAudit ( callback );
 	}
 
 	return this;
-} );
+});
 
 /**
  * Created by gmena on 07-26-14.
  */
 
 'use strict';
-/**Template
+/**View
  * @constructor
  */
 
@@ -3118,86 +3106,93 @@ Workers.add ( 'kill', function ( callback ) {
  * Repository Lib
  * */
 
-function Template () {
+function View () {
 	this.Http = new Http;
 	this.Repository = new Repository;
-	this.Workers = new Workers;
-	this.template = null;
+	this.dir = null;
+	this.tpl = null;
 }
 
 //Search for the template
-Template.add ( 'lookup', function ( template, callback ) {
+View.add ('lookup', function (template) {
 	var _conf = {
-		url      : setting.app_path + '/templates/' + template,
-		dataType : 'text/plain',
-		processor: '.html'
+		url        : setting.app_path + '/templates/' + template,
+		contentType: 'text/plain',
+		processor  : '.html'
 	};
 
-	this.Http.request ( _conf, function ( response ) {
-		_.callbackAudit ( callback, response );
-	} );
-
-	return this;
-} );
+	return this.Http.request (_conf);
+});
 
 //Get the template
-Template.add ( 'get', function ( template, callback ) {
+View.add ('getTpl', function (template) {
 	var _self = this,
 		_repo = _self.Repository,
-		_template = _repo.get ( 'templates' ),
-		_save = {};
+		_template = null, _save = {};
 
-	_self.template = template;
-	if ( _.isSet ( _template ) ) {
-		if ( _.isSet ( _template[ template ] ) ) {
-			_.callbackAudit ( callback, _template[ template ] )
+	if ( !_.isSet (_repo.get ('templates')) ) {
+		_repo.set ('templates', {});
+	}
+
+	_template = _repo.get ('templates');
+	_self.dir = template;
+
+	return (new Promise (function (resolve, reject) {
+		if ( _.isSet (_template[template]) ) {
+			_self.tpl = _template[template];
+			resolve (_self)
 		} else {
-			_self.lookup ( template, function ( temp ) {
-				_save[ template ] = temp;
-				_repo.append ( 'templates', _save );
-				_.callbackAudit ( callback, temp );
-			} )
+			//Get the template
+			_self.lookup (template).then (function (temp) {
+				_save[template] = temp;
+				_repo.append ('templates', _save);
+				_self.tpl = temp;
+				resolve (_self);
+			}).catch (function () {
+				reject (WARNING_SYRUP.ERROR.NONETWORK);
+			});
 		}
-	} else {
-		_repo.set ( 'templates', {} );
-		this.get ( template, callback )
-	}
+	}));
 
+});
+
+//Return to render html
+View.add ('get', function () {
+	return this.tpl;
+});
+
+//Clear View from Repository
+View.add ('clear', function () {
+	this.Repository.clear ('templates');
 	return this;
-} );
+});
 
-//Clear Template from Repository
-Template.add ( 'clear', function () {
-	this.Repository.clear ( 'templates' );
-	return this;
-} );
-
-//Clear Template from Repository
-Template.add ( 'remove', function () {
-	if ( this.template ) {
-		var old_templates = this.Repository.get ( 'templates' );
+//Clear View from Repository
+View.add ('remove', function () {
+	if ( this.dir ) {
+		var old_templates = this.Repository.get ('templates');
 		if ( old_templates ) {
-			delete old_templates[ this.template ]
+			delete old_templates[this.dir]
 		}
 
-		this.Repository.set ( 'templates', old_templates );
-		this.template = null;
+		this.Repository.set ('templates', old_templates);
+		this.dir = null;
 	}
 
 	return this;
-} );
+});
 
-//Parse the Template
-Template.add ( 'parse', function ( _template, _fields, callback ) {
-	var _self = this;
-	_self.Workers.set ( '/workers/setting/Parser', function ( worker ) {
-		_self.Workers.send ( { template: _template, fields: _fields } );
-	} ).on ( 'message', function ( e ) {
-		_.callbackAudit ( callback, e.data )
-	} );
-
-	return this;
-} );
+//Parse the View
+View.add ('parse', function (_template, _fields) {
+	return (new Promise (function (resolve, reject) {
+		(new Workers).set ('/workers/setting/Parser').then (function (worker) {
+			worker.send ({ template: _template, fields: _fields });
+			worker.on ('message', function (e) {
+				resolve (e.data)
+			})
+		});
+	}));
+});
 
 
 /**
@@ -3755,7 +3750,7 @@ GoogleMap = function () {
 
 var WARNING_SYRUP_FORM = {
 	ERROR: {
-		NOPACK: 'Error pack model'
+		NOPACK: 'Error packing model'
 	}
 };
 
@@ -3765,7 +3760,7 @@ function Model () {
 	this.modelData = null;
 	this.object = {};
 	this.url = '/';
-	this.type = 'GET';
+	this.type = 'POST';
 	this.onbefore = null;
 	this.oncomplete = null;
 	this.onerror = null;
@@ -3899,7 +3894,7 @@ Model.add ('send', function (event) {
 		if ( self.oncomplete ) {
 			self.oncomplete (response);
 		}
-	})
+	});
 
 	return this;
 });

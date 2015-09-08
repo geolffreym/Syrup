@@ -38,9 +38,6 @@ Http.add ('on', function (event, callback) {
 			complete: function () {
 				self.complete = callback;
 			},
-			error   : function () {
-				self.error = callback;
-			},
 			abort   : function () {
 				self.abort = callback;
 			},
@@ -71,135 +68,134 @@ Http.add ('on', function (event, callback) {
  *	processor: (string) ajax server side processor file extension,
  *	token: (string or bool) CSRF token needed?,
  *	contentType: (string) the content type,
- *	contentHeader: (object) the content header request,
  *	data: (object) the request data,
  *	upload: (bool) is upload process?
  *
  * }
  * **/
-Http.add ('request', function (config, callback) {
+Http.add ('request', function (config) {
 	if ( !_.isObject (config) ) {
 		throw (WARNING_SYRUP.ERROR.NOOBJECT)
 	}
 
 	var _self = this,
 		_xhr = _self.xhr,
-		_async = true,
+		_async = config.async || true,
 		_type = (config.method || 'GET').toUpperCase (),
-		_timeout = config.timeout || 4000,
-		_processor = config.processor || setting.processor || '',
-		_token = config.token || false,
+		_timeout = config.timeout || 0xFA0,
+		_cors = config.cors || false,
+		_processor = config.processor || setting.processor,
+		_token = config.token || null,
 		_contentType = config.contentType || 'application/x-www-form-urlencoded;charset=utf-8',
-		_data = config.data
-			? config.data : null,
-		_contentHeader = config.contentHeader ||
-						 [
-							 {
-								 header: 'Content-Type',
-								 value : _contentType
-							 }
-						 ]
-		;
+		_data = config.data || null,
+		_contentHeader = {
+			header: 'Content-Type',
+			value : _contentType
+		};
 
-	if ( !_.isSet (config.url) ) {
-		throw (WARNING_SYRUP.ERROR.NOURL);
-	}
 
-	if ( !_.isFormData (_data)
-		 && _.isSet (_data)
-		 && _contentHeader !== 'auto'
-	) {
-		_data = _.parseJsonUrl (_data);
-	}
+	return (new Promise (function (resolve, reject) {
 
-	if ( _type === 'GET' && _.isSet (_data) ) {
-		_processor += '?' + _data;
-	}
+		if ( !_.isSet (config.url) )
+			reject (WARNING_SYRUP.ERROR.NOURL);
 
-	_processor = config.url + (_processor || '');
-	_xhr.open (_type, _processor, _async);
-	_xhr.timeout = _timeout;
+		if ( !_.isFormData (_data)
+			 && _.isSet (_data)
+			 && _contentType !== 'auto'
+		) {
+			_data = _.jsonToQueryString (_data);
+		}
 
-	//Setting Headers
-	if ( !_.isFormData (_data) && _contentHeader !== 'auto' ) {
-		_.each (_contentHeader, function (v) {
-			_self.requestHeader (v.header, v.value);
-		})
+		if ( _type === 'GET' && _.isSet (_data) ) {
+			_processor += '?' + _data;
+		}
 
-	}
+		//Process url
+		_processor = config.url + (_processor || '');
+		_xhr.open (_type, _processor, _async);
+		_xhr.timeout = _timeout;
 
-	//Using Token
-	if ( _.isSet (_token) )
-		_self.requestHeader ("X-CSRFToken", _.getCookie (_.isBoolean (_token) ? 'csrftoken' : _token));
+		//Setting Headers
+		if ( !_.isFormData (_data) && _contentType !== 'auto' ) {
+			_self.requestHeader (
+				_contentHeader.header,
+				_contentHeader.value
+			);
+		}
 
-	//If upload needed
-	if ( _.isSet (config.upload) && _.isBoolean (config.upload) ) {
-		_self.upload = _self.xhr.upload;
-		_xhr = _self.upload;
-	}
+		//Cors?
+		if ( _.isSet (_cors) )
+			_xhr.withCredentials = true;
 
-	//Event Listeners
-	_xhr.addEventListener ('load', function (e) {
-		if ( this.status >= 0xC8 && this.status < 0x190 ) {
-			var _response = this.response || this.responseText;
-			if ( _.isJson (_response) ) {
-				_response = JSON.parse (_response);
+		//Using Token
+		if ( _.isSet (_token) )
+			_self.requestHeader ("X-CSRFToken", _token);
+
+		//If upload needed
+		if ( _.isSet (config.upload) && _.isBoolean (config.upload) ) {
+			_self.upload = _self.xhr.upload;
+			_xhr = _self.upload;
+		}
+
+		//Event Listeners
+		_xhr.addEventListener ('load', function (e) {
+			if ( this.status >= 0xC8 && this.status < 0x190 ) {
+				var _response = this.response || this.responseText;
+				if ( _.isJson (_response) ) {
+					_response = JSON.parse (_response);
+				}
+				resolve (_response);
 			}
-			_.callbackAudit (callback, _response, e);
+		});
 
-		}
-	});
-
-	_xhr.addEventListener ('progress', function (e) {
-		if ( _self.progress ) {
-			_self.progress (e);
-		}
-	}, false);
-
-	_xhr.addEventListener ('readystatechange', function (e) {
-		if ( this.readyState ) {
-			if ( !!_self.state ) {
-				_self.state (this.readyState, e);
+		_xhr.addEventListener ('progress', function (e) {
+			if ( _self.progress ) {
+				_self.progress (e);
 			}
-		}
-	});
+		}, false);
 
-	_xhr.addEventListener ('abort', function (e) {
-		if ( !!_self.abort ) {
-			_self.abort (e);
-		}
-	});
+		_xhr.addEventListener ('readystatechange', function (e) {
+			if ( this.readyState ) {
+				if ( !!_self.state ) {
+					_self.state (this.readyState, e);
+				}
+			}
+		});
 
-	_xhr.addEventListener ('timeout', function (e) {
-		if ( !!_self.time_out ) {
-			_self.time_out (e);
-		}
-	});
+		_xhr.addEventListener ('abort', function (e) {
+			if ( !!_self.abort ) {
+				_self.abort (e);
+			}
+		});
 
-	_xhr.addEventListener ('loadend', function (e) {
-		if ( !!_self.complete ) {
-			_self.complete (e);
-		}
-	});
+		_xhr.addEventListener ('timeout', function (e) {
+			if ( !!_self.time_out ) {
+				_self.time_out (e);
+			}
+		});
 
-	_xhr.addEventListener ('loadstart', function (e) {
-		if ( !!_self.before ) {
-			_self.before (e);
-		}
-	});
+		_xhr.addEventListener ('loadend', function (e) {
+			if ( !!_self.complete ) {
+				_self.complete (e);
+			}
+		});
 
-	_xhr.addEventListener ('error', function (e) {
-		if ( !!_self.error ) {
-			_self.error (e);
-		}
-	});
+		_xhr.addEventListener ('loadstart', function (e) {
+			if ( !!_self.before ) {
+				_self.before (e);
+			}
+		});
+
+		_xhr.addEventListener ('error', function (e) {
+			reject (e);
+		});
 
 
-	//Send
-	_self.xhr_list.push (_self.xhr);
-	_xhr.send (_type !== 'GET' ? _data : null);
+		//Send
+		_self.xhr_list.push (_self.xhr);
+		_xhr.send (_type !== 'GET' ? _data : null);
+	}));
 
-	return _self.xhr;
 });
 
 
@@ -208,16 +204,14 @@ Http.add ('request', function (config, callback) {
  * @param data
  * @param callback
  * */
-Http.add ('get', function (url, data, callback) {
+Http.add ('get', function (url, data) {
 	var _conf = {
-		url        : url || '#',
-		processData: true,
-		data       : data || {}
+		url : url || location.href,
+		data: data || {}
 	};
 
 	this.kill ();
-	this.request (_conf, callback);
-	return this;
+	return this.request (_conf);
 });
 
 
@@ -226,17 +220,15 @@ Http.add ('get', function (url, data, callback) {
  * @param data
  * @param callback
  * */
-Http.add ('post', function (url, data, callback) {
+Http.add ('post', function (url, data) {
 	var _conf = {
-		processData: true,
-		method     : 'POST',
-		url        : url || '#',
-		data       : data || {}
+		method: 'POST',
+		url   : url || location.href,
+		data  : data || {}
 	};
 
 	this.kill ();
-	this.request (_conf, callback);
-	return this;
+	return this.request (_conf);
 });
 
 

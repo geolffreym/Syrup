@@ -28,53 +28,53 @@ Upload = function () {
 	this.abort = null;
 
 
-	_proto.action = function ( url ) {
+	_proto.action = function (url) {
 		this.url = url;
 	};
 
-	_proto.pack = function ( file, callback ) {
+	_proto.pack = function (file, callback) {
 		var self = this,
 			_formData = new FormData (),
 			_files = [],
-			_campo = !!_.isString ( file )
-				? document.querySelector ( file ) : file;
+			_campo = !!_.isString (file)
+				? document.querySelector (file) : file;
 
 		if ( _campo.type === "file" ) {
 			var _temp = _campo.files,
 				x = _temp.length;
 
 			while ( x-- ) {
-				_files[ x ] = _temp[ x ];
-				_formData.append ( _campo.name, _temp[ x ] );
+				_files[x] = _temp[x];
+				_formData.append (_campo.name, _temp[x]);
 			}
 		}
 
 		self.formData = _formData;
 		if ( callback ) {
-			callback ( _formData );
+			callback (_formData);
 		}
 		return _files;
 	};
 
-	_proto.packAll = function ( form ) {
+	_proto.packAll = function (form) {
 		var self = this,
 			_formData = new FormData (),
 			_files = {}, _temp,
-			_form = !!_.isObject ( form ) ? form : document,
-			_campos = _form.querySelectorAll ( 'input[type="file"]' ),
+			_form = !!_.isObject (form) ? form : document,
+			_campos = _form.querySelectorAll ('input[type="file"]'),
 			z = _campos.length;
 
 		while ( z-- ) {
-			_temp = self.pack ( _campos[ z ] );
-			_files[ _campos[ z ].name ] = _temp;
-			_formData.append ( _campos[ z ].name, _temp );
+			_temp = self.pack (_campos[z]);
+			_files[_campos[z].name] = _temp;
+			_formData.append (_campos[z].name, _temp);
 		}
 
 		self.formData = _formData;
 		return _files;
 	};
 
-	_proto.on = function ( event, callback ) {
+	_proto.on = function (event, callback) {
 		var self = this;
 		if ( !callback ) {
 			return false;
@@ -83,7 +83,7 @@ Upload = function () {
 		return [
 			{
 				start   : function () {
-					_http.on ( 'before', callback );
+					_http.on ('before', callback);
 				},
 				complete: function () {
 					self.complete = callback;
@@ -94,18 +94,18 @@ Upload = function () {
 				error   : function () {
 					self.error = callback;
 				}
-			}[ event ] ()
+			}[event] ()
 		]
 	};
 
-	_proto.upload = function ( _files ) {
+	_proto.upload = function (_files) {
 		var self = this;
 		if ( !_files ) {
-			self.error ( WARNING_UPLOAD_FILE.ERROR.NOPACK );
+			self.error (WARNING_UPLOAD_FILE.ERROR.NOPACK);
 		}
 
 		if ( !self.url ) {
-			self.error ( WARNING_UPLOAD_FILE.ERROR.NOURL );
+			self.error (WARNING_UPLOAD_FILE.ERROR.NOURL);
 		}
 
 
@@ -118,21 +118,21 @@ Upload = function () {
 		};
 
 		_http.kill ();
-		_http.on ( 'progress', function ( progress ) {
+		_http.on ('progress', function (progress) {
 			if ( progress.lengthComputable && self.progress ) {
-				var pct = Math.round ( (progress.loaded / progress.total) * 100 );
-				self.progress ( pct );
+				var pct = Math.round ((progress.loaded / progress.total) * 100);
+				self.progress (pct);
 			}
-		} );
+		});
 
-		_http.on ( 'abort', self.abort );
-		_http.on ( 'error', self.error );
+		_http.on ('abort', self.abort);
+		_http.on ('error', self.error);
 
-		_http.request ( _request, function ( response ) {
+		_http.request (_request).then (function (response) {
 			if ( self.complete ) {
-				self.complete ( response );
+				self.complete (response);
 			}
-		} )
+		})
 	}
 
 

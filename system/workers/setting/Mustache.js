@@ -595,7 +595,7 @@
 	 */
 	mustache.render = function render (template, view, partials) {
 		if ( typeof template !== 'string' ) {
-			throw new TypeError ('Invalid template! Template should be a "string" ' +
+			throw new TypeError ('Invalid template! View should be a "string" ' +
 								 'but "' + typeStr (template) + '" was given as the first ' +
 								 'argument for mustache#render(template, view, partials)');
 		}
