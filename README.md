@@ -23,9 +23,9 @@ Compatibility with browsers
     
     -IE > 10
     -Chrome > 32
-    -Firefox > 28
-    -Opera 23 >
-    -Safari 6 >
+    -Firefox > 29
+    -Opera > 23 
+    -Safari >  7 
 
 
 Controlling browsers support.

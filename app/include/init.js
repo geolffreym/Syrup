@@ -3124,8 +3124,8 @@ View.add ('lookup', function (template) {
 	return this.Http.request (_conf);
 });
 
-//Get the template
-View.add ('getTpl', function (template) {
+//Set the template
+View.add ('set', function (template) {
 	var _self = this,
 		_repo = _self.Repository,
 		_template = null, _save = {};
@@ -3890,7 +3890,7 @@ Model.add ('send', function (event) {
 	self.Http.kill ();
 	self.Http.on ('error', self.onerror);
 	self.Http.on ('before', self.onbefore);
-	self.Http.request (conf, function (response) {
+	self.Http.request (conf).then (function (response) {
 		if ( self.oncomplete ) {
 			self.oncomplete (response);
 		}

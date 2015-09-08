@@ -31,8 +31,8 @@ View.add ('lookup', function (template) {
 	return this.Http.request (_conf);
 });
 
-//Get the template
-View.add ('getTpl', function (template) {
+//Set the template
+View.add ('set', function (template) {
 	var _self = this,
 		_repo = _self.Repository,
 		_template = null, _save = {};

@@ -152,7 +152,7 @@ Model.add ('send', function (event) {
 	self.Http.kill ();
 	self.Http.on ('error', self.onerror);
 	self.Http.on ('before', self.onbefore);
-	self.Http.request (conf, function (response) {
+	self.Http.request (conf).then (function (response) {
 		if ( self.oncomplete ) {
 			self.oncomplete (response);
 		}
