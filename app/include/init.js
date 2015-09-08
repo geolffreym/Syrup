@@ -3746,7 +3746,7 @@ GoogleMap = function () {
  * Http Lib
  * */
 
-var WARNING_SYRUP_FORM = {
+var WARNING_SYRUP_MODEL = {
 	ERROR: {
 		NOPACK: 'Error packing model'
 	}
@@ -3757,23 +3757,11 @@ function Model () {
 	this.Http = new Http;
 	this.modelData = null;
 	this.object = {};
-	this.url = '/';
 	this.type = 'POST';
-	this.onbefore = null;
-	this.oncomplete = null;
-	this.onerror = null;
 	this.model = null;
 	this.failed = null;
 }
 
-/**Set url to request
- * @param action
- * @return object
- */
-Model.add ('action', function (action) {
-	this.url = action;
-	return this;
-});
 
 /**Set method request
  * @param method
@@ -3823,85 +3811,52 @@ Model.add ('multiple', function (name) {
  *
  */
 Model.add ('fail', function (field, error) {
-	var self = this,
-		_notify = {
-			field : field,
-			error : error,
-			coords: _.cartesianPlane (field)
-		};
-
-	self.failed = true;
-	if ( self.onerror ) {
-		self.onerror (_notify);
-	}
-
-});
-
-/**Model event handler
- * @param event
- * @param callback
- */
-Model.add ('on', function (event, callback) {
-	var self = this;
-
-	return [
-		{
-			before  : function () {
-				if ( callback ) {
-					self.onbefore = callback;
-				}
-			},
-			error   : function () {
-				if ( callback ) {
-					self.onerror = callback;
-				}
-			},
-			complete: function () {
-				if ( callback ) {
-					self.oncomplete = callback;
-				}
-			}
-		}[event] ()
-	]
+	this.failed = true;
+	return {
+		field : field,
+		error : error,
+		coords: _.cartesianPlane (field)
+	};
 });
 
 /**Submit action
  * @param event*/
-Model.add ('send', function (event) {
+Model.add ('send', function (url, data) {
 	var self = this;
-
-	if ( event ) {
-		event.preventDefault ();
-	}
-	_.assert (self.modelData, WARNING_SYRUP.ERROR.NOPACK);
-
-	if ( self.failed ) {
-		return false;
-	}
+	_.assert (data, WARNING_SYRUP_MODEL.ERROR.NOPACK);
 
 	var conf = {
-		url   : self.url,
-		method: self.type,
-		data  : self.modelData
+		url   : url,
+		data  : data,
+		method: self.type
 	};
 
-	self.Http.kill ();
-	self.Http.on ('error', self.onerror);
-	self.Http.on ('before', self.onbefore);
-	self.Http.request (conf).then (function (response) {
-		if ( self.oncomplete ) {
-			self.oncomplete (response);
-		}
-	});
+	return (new Promise (function (resolve, reject) {
+		if ( self.failed )
+			reject (data);
 
-	return this;
+		self.Http.kill ();
+		self.Http.request (conf).then (function (response) {
+			resolve (response)
+		}).catch (reject);
+	}))
+});
+
+//Return object
+Model.add ('getObject', function () {
+	return this.object;
+});
+
+//Return formdata
+Model.add ('getModelData', function () {
+	return this.modelData;
 });
 
 /**Pack the inputs in ModelData Object
  * @param model
  * @return object
  */
-Model.add ('get', function (model) {
+Model.add ('pack', function (model) {
 	var self = this;
 	self.model = _$ (model);
 
@@ -3913,67 +3868,72 @@ Model.add ('get', function (model) {
 
 	self.failed = false;
 
-	while ( x-- ) {
+	return (new Promise (function (resolve, reject) {
+		//Run over inputs
+		while ( x-- ) {
 
-		if ( _fields[x].type === 'file' || !_fields[x] ) {
-			continue;
-		}
-
-		if ( _fields[x].type === 'checkbox' || _fields[x].type === 'radio' ) {
-			if ( !_fields[x].checked ) {
+			if ( _fields[x].type === 'file' || !_fields[x] ) {
 				continue;
 			}
-		}
 
-		var field = _fields[x],
-			fieldValue = field.value;
-
-		//Skip?
-		if ( !( _$ (field).data ('skip')) && _.isEmpty (fieldValue) ) {
-			self.fail (field, 'empty');
-			break;
-			//isMail?
-		} else if ( _$ (field).data ('mail') && !_.isMail (fieldValue) ) {
-			self.fail (field, 'invalid_mail');
-			break;
-			//Overflow down?
-		} else if ( _$ (field).data ('min') && (
-				+_$ (field).data ('min') > fieldValue.length
-			) ) {
-			self.fail (field, 'minim_chars');
-			break;
-			//Overflow?
-		} else if ( _$ (field).data ('max') && (
-				+_$ (field).data ('max') < fieldValue.length
-			) ) {
-			self.fail (field, 'overflow_chars');
-			break;
-		} else {
-			//Custom validation
-			if ( _$ (field).data ('custom') ) {
-				var Regex = new RegExp (_$ (field).data ('custom'), "g");
-				if ( !Regex.test (fieldValue) ) {
-					self.fail (field, 'invalid_custom');
-					break;
+			if ( _fields[x].type === 'checkbox' || _fields[x].type === 'radio' ) {
+				if ( !_fields[x].checked ) {
+					continue;
 				}
 			}
 
-			if ( !!(
-					_field_array = self.multiple (field.name)
+			var field = _fields[x],
+				fieldValue = field.value;
+
+			//Skip?
+			if ( !( _$ (field).data ('skip')) && _.isEmpty (fieldValue) ) {
+				reject (self.fail (field, 'empty'));
+				break;
+				//isMail?
+			} else if ( _$ (field).data ('mail') && !_.isMail (fieldValue) ) {
+				reject (self.fail (field, 'invalid_mail'));
+				break;
+				//Overflow down?
+			} else if ( _$ (field).data ('min') && (
+					+_$ (field).data ('min') > fieldValue.length
 				) ) {
-				fieldValue = _field_array
-			}
+				reject (self.fail (field, 'minim_chars'));
+				break;
+				//Overflow?
+			} else if ( _$ (field).data ('max') && (
+					+_$ (field).data ('max') < fieldValue.length
+				) ) {
+				reject (self.fail (field, 'overflow_chars'));
+				break;
+			} else {
+				//Custom validation
+				if ( _$ (field).data ('custom') ) {
+					var Regex = new RegExp (_$ (field).data ('custom'), "g");
+					if ( !Regex.test (fieldValue) ) {
+						reject (self.fail (field, 'invalid_custom'));
+						break;
+					}
+				}
 
-			if ( _.isSet (field.name) ) {
-				_modelData.append (field.name, fieldValue);
-				self.object[field.name] = fieldValue;
-			}
+				//Has multiple?
+				if ( !!(
+						_field_array = self.multiple (field.name)
+					) ) {
+					fieldValue = _field_array
+				}
 
+				if ( _.isSet (field.name) ) {
+					_modelData.append (field.name, fieldValue);
+					self.object[field.name] = fieldValue;
+				}
+
+			}
 		}
-	}
 
-	self.modelData = _modelData;
-	return self.object;
+		//The model data
+		self.modelData = _modelData;
+		resolve (self);
+	}));
 
 });
 

@@ -100,8 +100,14 @@
                 },
                 process_form: function (e, $) {
                     e.preventDefault ();
-                   // $.Form.on('error', function(r){console.log(r)})
-                    this.setScope({'beatles':[$.Model.get(e.target)]});
+                    var _self = this;
+                    // $.Form.on('error', function(r){console.log(r)})
+                    $.Model.pack (e.target).then (function (model) {
+                        _self.setScope ({ 'beatles': [model.getObject()] });
+                        //console.log(model.getModelData())
+                        model.send('hi', model.getModelData())
+                    });
+
 
                 },
                 destroy     : function ($) {
