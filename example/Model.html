@@ -5,7 +5,7 @@
     <title></title>
 </head>
 <body>
-<script src="../app/include/init.min.js"></script>
+<script src="../app/include/init.js"></script>
 
 
 <div sp-recipe="Hey.You">
@@ -54,7 +54,7 @@
     _$ (function () {
 
         //The Module with Http dependencie
-        var my_Lib = App.blend ('Hey', ['Http', 'Form']);
+        var my_Lib = App.blend ('Hey', ['Http', 'Model']);
 
         //A global service
         my_Lib.service ('myConsole', function (msg) {
@@ -99,9 +99,9 @@
                     })
                 },
                 process_form: function (e, $) {
-                    e.preventDefault ()
+                    e.preventDefault ();
                    // $.Form.on('error', function(r){console.log(r)})
-                    this.setScope({'beatles':[$.Form.pack(e.target)]});
+                    this.setScope({'beatles':[$.Model.get(e.target)]});
 
                 },
                 destroy     : function ($) {

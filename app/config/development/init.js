@@ -21,7 +21,7 @@ exports.files = {
 			// Until here needed do not change
 			// Add all the necessary modules
 			'system/lib/Map',
-			'system/lib/Form'
+			'system/lib/Model'
 		]
 	}
 };

@@ -3755,21 +3755,21 @@ GoogleMap = function () {
 
 var WARNING_SYRUP_FORM = {
 	ERROR: {
-		NOPACK: 'Error pack form'
+		NOPACK: 'Error pack model'
 	}
 };
 
 "use strict";
-function Form () {
+function Model () {
 	this.Http = new Http;
-	this.formData = null;
+	this.modelData = null;
 	this.object = {};
 	this.url = '/';
 	this.type = 'GET';
 	this.onbefore = null;
 	this.oncomplete = null;
 	this.onerror = null;
-	this.form = null;
+	this.model = null;
 	this.failed = null;
 }
 
@@ -3777,7 +3777,7 @@ function Form () {
  * @param action
  * @return object
  */
-Form.add ('action', function (action) {
+Model.add ('action', function (action) {
 	this.url = action;
 	return this;
 });
@@ -3786,7 +3786,7 @@ Form.add ('action', function (action) {
  * @param method
  * @return object
  */
-Form.add ('method', function (method) {
+Model.add ('method', function (method) {
 	this.type = method.toUpperCase ();
 	return this;
 });
@@ -3796,40 +3796,40 @@ Form.add ('method', function (method) {
  * @param attach
  * @return object
  */
-Form.add ('attach', function (name, attach) {
+Model.add ('attach', function (name, attach) {
 	var self = this;
-	_.assert (self.formData, WARNING_SYRUP_FORM.ERROR.NOPACK);
-	self.formData.append (name, attach);
+	_.assert (self.modelData, WARNING_SYRUP_FORM.ERROR.NOPACK);
+	self.modelData.append (name, attach);
 });
 
 /**Getting a array of values name="input[]"
  * @param name
  * @return array
  */
-Form.add ('multiple', function (name) {
+Model.add ('multiple', function (name) {
 	var _top = 0, _input_array,
 		_return = [],
-		_form_obj = this.form.object ();
+		_model_obj = this.model.object ();
 
 
-	if ( _.isSet (_form_obj.elements[name]) ) {
+	if ( _.isSet (_model_obj.elements[name]) ) {
 		if ( (
-				_input_array = _form_obj.elements[name].length
+				_input_array = _model_obj.elements[name].length
 			) ) {
 			for ( ; _top < _input_array; _top++ ) {
-				_return.push (_form_obj.elements[name][_top].value)
+				_return.push (_model_obj.elements[name][_top].value)
 			}
 		}
 	}
 	return _return.length > 0 ? _return : false;
 });
 
-/**Form fail what to do?
+/**Model fail what to do?
  * @param field
  * @param error
  *
  */
-Form.add ('fail', function (field, error) {
+Model.add ('fail', function (field, error) {
 	var self = this,
 		_notify = {
 			field : field,
@@ -3844,11 +3844,11 @@ Form.add ('fail', function (field, error) {
 
 });
 
-/**Form event handler
+/**Model event handler
  * @param event
  * @param callback
  */
-Form.add ('on', function (event, callback) {
+Model.add ('on', function (event, callback) {
 	var self = this;
 
 	return [
@@ -3874,13 +3874,13 @@ Form.add ('on', function (event, callback) {
 
 /**Submit action
  * @param event*/
-Form.add ('submit', function (event) {
+Model.add ('send', function (event) {
 	var self = this;
 
 	if ( event ) {
 		event.preventDefault ();
 	}
-	_.assert (self.formData, WARNING_SYRUP.ERROR.NOPACK);
+	_.assert (self.modelData, WARNING_SYRUP.ERROR.NOPACK);
 
 	if ( self.failed ) {
 		return false;
@@ -3889,7 +3889,7 @@ Form.add ('submit', function (event) {
 	var conf = {
 		url   : self.url,
 		method: self.type,
-		data  : self.formData
+		data  : self.modelData
 	};
 
 	self.Http.kill ();
@@ -3901,21 +3901,21 @@ Form.add ('submit', function (event) {
 		}
 	})
 
-
+	return this;
 });
 
-/**Pack the inputs in FormData Object
- * @param form
+/**Pack the inputs in ModelData Object
+ * @param model
  * @return object
  */
-Form.add ('pack', function (form) {
+Model.add ('get', function (model) {
 	var self = this;
-	self.form = _$ (form);
+	self.model = _$ (model);
 
-	var _formData = new FormData,
+	var _modelData = new FormData,
 		_field_array,
-		_form_obj = self.form.object (),
-		_fields = _form_obj.querySelectorAll ('input, textarea, select'),
+		_model_obj = self.model.object (),
+		_fields = _model_obj.querySelectorAll ('input, textarea, select'),
 		x = _fields.length;
 
 	self.failed = false;
@@ -3972,14 +3972,14 @@ Form.add ('pack', function (form) {
 			}
 
 			if ( _.isSet (field.name) ) {
-				_formData.append (field.name, fieldValue);
+				_modelData.append (field.name, fieldValue);
 				self.object[field.name] = fieldValue;
 			}
 
 		}
 	}
 
-	self.formData = _formData;
+	self.modelData = _modelData;
 	return self.object;
 
 });
