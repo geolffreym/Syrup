@@ -592,7 +592,6 @@ _$_.add ('trigger', function (event, callback) {
  * @return object
  */
 _$_.add ('find', function (filter, callback) {
-
 	this.children (function (elem) {
 		elem.filter (filter, function (e) {
 			_.callbackAudit (callback, e, filter);

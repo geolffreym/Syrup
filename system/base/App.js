@@ -174,18 +174,17 @@ Apps.add ('_bindListener', function (moduleId) {
 			_the_filter = enabled_events.join (' [sp-'),
 			_mod = _$ ('[sp-recipe="' + moduleId + '"]');
 
-		_$ ('[sp-recipe="' + moduleId + '"] ' + _the_filter).each (function (i) {
-			console.log(i.getAttr)
+		_mod.find (_the_filter, function (i) {
 			_.each (i.attributes, function (v) {
-				console.log(v)
 				if ( /sp-[a-z]+/.test (v.localName) ) {
 					var _event = _.replace (v.localName, 'sp-', ''),
 						_attr = _$ (i).attr (v.localName);
-					//if ( _attr in _self )
-					//	mod.listen (_event, '[' + v.localName + '="' + _attr + '"]', _self[_attr])
+
+					if ( _attr in _self )
+						_mod.listen (_event, '[' + v.localName + '="' + _attr + '"]', _self[_attr])
 				}
 			});
-		})
+		});
 	}
 });
 
