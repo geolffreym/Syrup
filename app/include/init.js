@@ -2991,47 +2991,45 @@ Http.add ('kill', function () {
  */
 'use strict';
 
-function Repository () {
+function Storage () {
 
 }
 
 //Set registry to bucket
-Repository.add ( 'set', function ( key, data, callback ) {
+Storage.add ( 'set', function ( key, data) {
 	localStorage.setItem ( key, JSON.stringify ( data ) );
-	_.callbackAudit ( callback, data, this );
 } );
 
 
 //Get registry from bucket
-Repository.add ( 'get', function ( key ) {
+Storage.add ( 'get', function ( key ) {
 	return _.isJson ( localStorage.getItem ( key ) )
 		? JSON.parse ( localStorage.getItem ( key ) ) : null;
 } );
 
 //Append data to existing bucket
-Repository.add ( 'append', function ( key, element, callback ) {
+Storage.add ( 'append', function ( key, element) {
 	var _existent = this.get ( key ),
 	    _new = _.extend ( _.isSet ( _existent ) ? _existent : {}, element );
 
 	this.set ( key, _new, false );
-	_.callbackAudit ( callback, _new );
 	return this;
 } );
 
 //Detroy all buckets
-Repository.add ( 'destroy', function () {
+Storage.add ( 'destroy', function () {
 	localStorage.clear ();
 } );
 
 //Clear a bucket
-Repository.add ( 'clear', function ( key ) {
+Storage.add ( 'clear', function ( key ) {
 	localStorage.removeItem ( key );
 	return this;
 } );
 
 
 //Return count buckets
-Repository.add ( 'count', function () {
+Storage.add ( 'count', function () {
 	return localStorage.length;
 } );
 /**
@@ -3103,12 +3101,12 @@ Workers.add ('kill', function () {
 /**Dependencies
  * Http Lib
  * Worker Lib
- * Repository Lib
+ * Storage Lib
  * */
 
 function View () {
 	this.Http = new Http;
-	this.Repository = new Repository;
+	this.Storage = new Storage;
 	this.dir = null;
 	this.tpl = null;
 }
@@ -3127,7 +3125,7 @@ View.add ('lookup', function (template) {
 //Set the template
 View.add ('set', function (template) {
 	var _self = this,
-		_repo = _self.Repository,
+		_repo = _self.Storage,
 		_template = null, _save = {};
 
 	if ( !_.isSet (_repo.get ('templates')) ) {
@@ -3161,21 +3159,21 @@ View.add ('get', function () {
 	return this.tpl;
 });
 
-//Clear View from Repository
+//Clear View from Storage
 View.add ('clear', function () {
-	this.Repository.clear ('templates');
+	this.Storage.clear ('templates');
 	return this;
 });
 
-//Clear View from Repository
+//Clear View from Storage
 View.add ('remove', function () {
 	if ( this.dir ) {
-		var old_templates = this.Repository.get ('templates');
+		var old_templates = this.Storage.get ('templates');
 		if ( old_templates ) {
 			delete old_templates[this.dir]
 		}
 
-		this.Repository.set ('templates', old_templates);
+		this.Storage.set ('templates', old_templates);
 		this.dir = null;
 	}
 

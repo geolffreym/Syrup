@@ -3,46 +3,44 @@
  */
 'use strict';
 
-function Repository () {
+function Storage () {
 
 }
 
 //Set registry to bucket
-Repository.add ( 'set', function ( key, data, callback ) {
+Storage.add ( 'set', function ( key, data) {
 	localStorage.setItem ( key, JSON.stringify ( data ) );
-	_.callbackAudit ( callback, data, this );
 } );
 
 
 //Get registry from bucket
-Repository.add ( 'get', function ( key ) {
+Storage.add ( 'get', function ( key ) {
 	return _.isJson ( localStorage.getItem ( key ) )
 		? JSON.parse ( localStorage.getItem ( key ) ) : null;
 } );
 
 //Append data to existing bucket
-Repository.add ( 'append', function ( key, element, callback ) {
+Storage.add ( 'append', function ( key, element) {
 	var _existent = this.get ( key ),
 	    _new = _.extend ( _.isSet ( _existent ) ? _existent : {}, element );
 
 	this.set ( key, _new, false );
-	_.callbackAudit ( callback, _new );
 	return this;
 } );
 
 //Detroy all buckets
-Repository.add ( 'destroy', function () {
+Storage.add ( 'destroy', function () {
 	localStorage.clear ();
 } );
 
 //Clear a bucket
-Repository.add ( 'clear', function ( key ) {
+Storage.add ( 'clear', function ( key ) {
 	localStorage.removeItem ( key );
 	return this;
 } );
 
 
 //Return count buckets
-Repository.add ( 'count', function () {
+Storage.add ( 'count', function () {
 	return localStorage.length;
 } );

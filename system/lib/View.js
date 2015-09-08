@@ -10,12 +10,12 @@
 /**Dependencies
  * Http Lib
  * Worker Lib
- * Repository Lib
+ * Storage Lib
  * */
 
 function View () {
 	this.Http = new Http;
-	this.Repository = new Repository;
+	this.Storage = new Storage;
 	this.dir = null;
 	this.tpl = null;
 }
@@ -34,7 +34,7 @@ View.add ('lookup', function (template) {
 //Set the template
 View.add ('set', function (template) {
 	var _self = this,
-		_repo = _self.Repository,
+		_repo = _self.Storage,
 		_template = null, _save = {};
 
 	if ( !_.isSet (_repo.get ('templates')) ) {
@@ -68,21 +68,21 @@ View.add ('get', function () {
 	return this.tpl;
 });
 
-//Clear View from Repository
+//Clear View from Storage
 View.add ('clear', function () {
-	this.Repository.clear ('templates');
+	this.Storage.clear ('templates');
 	return this;
 });
 
-//Clear View from Repository
+//Clear View from Storage
 View.add ('remove', function () {
 	if ( this.dir ) {
-		var old_templates = this.Repository.get ('templates');
+		var old_templates = this.Storage.get ('templates');
 		if ( old_templates ) {
 			delete old_templates[this.dir]
 		}
 
-		this.Repository.set ('templates', old_templates);
+		this.Storage.set ('templates', old_templates);
 		this.dir = null;
 	}
 

@@ -15,7 +15,7 @@ exports.files = {
 			'system/base/Lib',
 			'system/base/App',
 			'system/lib/Http',
-			'system/lib/Repository',
+			'system/lib/Storage',
 			'system/lib/Workers',
 			'system/lib/View',
 			// Until here needed do not change
