@@ -5,7 +5,7 @@
     <title></title>
 </head>
 <body>
-<script src="app/include/init.js"></script>
+<script src="../app/include/init.js"></script>
 <a href="#" id="click" data-hi="1" class="a b c" data-tooltip="Hi!">
     Test
 </a>
@@ -20,7 +20,7 @@
             console.log ('read A')
         });
 
-        Require.request ('/view/libraryStore/init', function () {
+        Require.request ('/view/Hey/You', function () {
             console.log ('read B')
         }, { wait: 'Tooltip' });
 

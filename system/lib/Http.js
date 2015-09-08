@@ -11,7 +11,7 @@
 
 function Http () {
 	this.xhr = new window.XMLHttpRequest
-			   || new window.ActiveXObject ( "Microsoft.XMLHTTP" );
+			   || new window.ActiveXObject ("Microsoft.XMLHTTP");
 	this.xhr_list = [];
 	this.upload = null;
 	this.before = null;
@@ -28,7 +28,7 @@ function Http () {
  * @param callback
  * @return void
  * */
-Http.add ( 'on', function ( event, callback ) {
+Http.add ('on', function (event, callback) {
 	var self = this;
 	return [
 		{
@@ -53,10 +53,10 @@ Http.add ( 'on', function ( event, callback ) {
 			progress: function () {
 				self.progress = callback;
 			}
-		}[ event ] ()
+		}[event] ()
 	]
 
-} );
+});
 
 /** Http Request
  * @param config
@@ -77,8 +77,8 @@ Http.add ( 'on', function ( event, callback ) {
  *
  * }
  * **/
-Http.add ( 'request', function ( config, callback ) {
-	if ( !_.isObject ( config ) ) {
+Http.add ('request', function (config, callback) {
+	if ( !_.isObject (config) ) {
 		throw (WARNING_SYRUP.ERROR.NOOBJECT)
 	}
 
@@ -87,7 +87,7 @@ Http.add ( 'request', function ( config, callback ) {
 		_async = true,
 		_type = config.method || 'GET',
 		_timeout = config.timeout || 4000,
-		_processor = config.processor || setting.ajax_processor || '',
+		_processor = config.processor || setting.processor || '',
 		_token = config.token || false,
 		_contentType = config.contentType || 'application/x-www-form-urlencoded;charset=utf-8',
 		_data = config.data
@@ -101,126 +101,165 @@ Http.add ( 'request', function ( config, callback ) {
 						 ]
 		;
 
-	if ( !_.isSet ( config.url ) ) {
+	if ( !_.isSet (config.url) ) {
 		throw (WARNING_SYRUP.ERROR.NOURL);
 	}
 
-	if ( !_.isFormData ( _data )
-		 && _.isSet ( _data )
-		 && _contentHeader !== 'auto' ) {
-		_data = _.parseJsonUrl ( _data );
+	if ( !_.isFormData (_data)
+		 && _.isSet (_data)
+		 && _contentHeader !== 'auto'
+	) {
+		_data = _.parseJsonUrl (_data);
 	}
 
-	if ( _type === 'GET' && _.isSet ( _data ) ) {
+	if ( _type === 'GET' && _.isSet (_data) ) {
 		_processor += '?' + _data;
 	}
 
 	_processor = config.url + (_processor || '');
-	_xhr.open ( _type, _processor, _async );
+	_xhr.open (_type, _processor, _async);
 	_xhr.timeout = _timeout;
 
 	//Setting Headers
-	if ( !_.isFormData ( _data ) && _contentHeader !== 'auto' ) {
-		_.each ( _contentHeader, function ( v ) {
-			_self.requestHeader ( v.header, v.value );
-		} )
+	if ( !_.isFormData (_data) && _contentHeader !== 'auto' ) {
+		_.each (_contentHeader, function (v) {
+			_self.requestHeader (v.header, v.value);
+		})
 
 	}
 
 	//Using Token
-	if ( _.isSet ( _token ) )
-		_self.requestHeader ( "X-CSRFToken", _.getCookie ( _.isBoolean ( _token ) ? 'csrftoken' : _token ) );
+	if ( _.isSet (_token) )
+		_self.requestHeader ("X-CSRFToken", _.getCookie (_.isBoolean (_token) ? 'csrftoken' : _token));
 
 	//If upload needed
-	if ( _.isSet ( config.upload ) && _.isBoolean ( config.upload ) ) {
+	if ( _.isSet (config.upload) && _.isBoolean (config.upload) ) {
 		_self.upload = _self.xhr.upload;
 		_xhr = _self.upload;
 	}
 
 	//Event Listeners
-	_xhr.addEventListener ( 'load', function ( e ) {
+	_xhr.addEventListener ('load', function (e) {
 		if ( this.status >= 0xC8 && this.status < 0x190 ) {
 			var _response = this.response || this.responseText;
-			if ( _.isJson ( _response ) ) {
-				_response = JSON.parse ( _response );
+			if ( _.isJson (_response) ) {
+				_response = JSON.parse (_response);
 			}
-			_.callbackAudit ( callback, _response, e );
+			_.callbackAudit (callback, _response, e);
 
 		}
-	} );
+	});
 
-	_xhr.addEventListener ( 'progress', function ( e ) {
+	_xhr.addEventListener ('progress', function (e) {
 		if ( _self.progress ) {
-			_self.progress ( e );
+			_self.progress (e);
 		}
-	}, false );
+	}, false);
 
-	_xhr.addEventListener ( 'readystatechange', function ( e ) {
+	_xhr.addEventListener ('readystatechange', function (e) {
 		if ( this.readyState ) {
 			if ( !!_self.state ) {
-				_self.state ( this.readyState, e );
+				_self.state (this.readyState, e);
 			}
 		}
-	} );
+	});
 
-	_xhr.addEventListener ( 'abort', function ( e ) {
+	_xhr.addEventListener ('abort', function (e) {
 		if ( !!_self.abort ) {
-			_self.abort ( e );
+			_self.abort (e);
 		}
-	} );
+	});
 
-	_xhr.addEventListener ( 'timeout', function ( e ) {
+	_xhr.addEventListener ('timeout', function (e) {
 		if ( !!_self.time_out ) {
-			_self.time_out ( e );
+			_self.time_out (e);
 		}
-	} );
+	});
 
-	_xhr.addEventListener ( 'loadend', function ( e ) {
+	_xhr.addEventListener ('loadend', function (e) {
 		if ( !!_self.complete ) {
-			_self.complete ( e );
+			_self.complete (e);
 		}
-	} );
+	});
 
-	_xhr.addEventListener ( 'loadstart', function ( e ) {
+	_xhr.addEventListener ('loadstart', function (e) {
 		if ( !!_self.before ) {
-			_self.before ( e );
+			_self.before (e);
 		}
-	} );
+	});
 
-	_xhr.addEventListener ( 'error', function ( e ) {
+	_xhr.addEventListener ('error', function (e) {
 		if ( !!_self.error ) {
-			_self.error ( e );
+			_self.error (e);
 		}
-	} );
+	});
 
 
 	//Send
-	_self.xhr_list.push ( _self.xhr );
-	_xhr.send ( _type !== 'GET' ? _data : null );
+	_self.xhr_list.push (_self.xhr);
+	_xhr.send (_type !== 'GET' ? _data : null);
 
 	return _self.xhr;
-} );
+});
+
+
+/**Get request
+ * @param url
+ * @param data
+ * @param callback
+ * */
+Http.add ('get', function (url, data, callback) {
+	var _conf = {
+		url        : url || '#',
+		processData: true,
+		data       : data || {}
+	};
+
+	this.kill ();
+	this.request (_conf, callback);
+	return this;
+});
+
+
+/**Post request
+ * @param url
+ * @param data
+ * @param callback
+ * */
+Http.add ('post', function (url, data, callback) {
+	var _conf = {
+		processData: true,
+		method     : 'POST',
+		url        : url || '#',
+		data       : data || {}
+	};
+
+	this.kill ();
+	this.request (_conf, callback);
+	return this;
+});
+
 
 /** Set Request Header
  * @param header
  * @param type
  * @return object
  * **/
-Http.add ( 'requestHeader', function ( header, type ) {
-	this.xhr.setRequestHeader ( header, type );
+Http.add ('requestHeader', function (header, type) {
+	this.xhr.setRequestHeader (header, type);
 	return this;
-} );
+});
 
 //Kill Http
-Http.add ( 'kill', function () {
+Http.add ('kill', function () {
 	var i = this.xhr_list.length;
 	while ( i-- ) {
-		if ( !!this.xhr_list[ i ] )
-			this.xhr_list[ i ].abort ();
+		if ( !!this.xhr_list[i] )
+			this.xhr_list[i].abort ();
 	}
 	this.xhr_list.length = 0;
 
 	return this;
-} );
+});
 
 
