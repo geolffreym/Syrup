@@ -85,7 +85,7 @@ Http.add ('request', function (config, callback) {
 	var _self = this,
 		_xhr = _self.xhr,
 		_async = true,
-		_type = config.method || 'GET',
+		_type = (config.method || 'GET').toUpperCase (),
 		_timeout = config.timeout || 4000,
 		_processor = config.processor || setting.processor || '',
 		_token = config.token || false,

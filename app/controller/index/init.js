@@ -2,7 +2,7 @@
 _$ (function () {
 
 	//The Module with Http dependencie
-	var my_Lib = App.blend ('Hey', ['Http']);
+	var my_Lib = App.blend ('Hey', ['Http', 'Form']);
 
 	//A global service
 	my_Lib.service ('myConsole', function (msg) {
@@ -15,11 +15,12 @@ _$ (function () {
 	//A new recipe for Hey
 	my_Lib.recipe ('Hey.You', function (_, _$, scope) {
 		return {
-			init   : function (tools) {
+			init        : function ($) {
 				var _self = this;
 
-				//tools has dependencies object
-				// tools = {Http: AjaxObject}
+
+				//$ has dependencies object
+				// $ = {Http: AjaxObject}
 
 				//The context in template as scope
 				this.setScope ({
@@ -29,17 +30,11 @@ _$ (function () {
 						{ "firstName": "George", "lastName": "Harrison" },
 						{ "firstName": "Ringo", "lastName": "Starr" }
 					]
-				});
+				}).serve ();
 
-				//Dom traversing, find sp-"event"
-				this.listen ('click', function (e) {
-					e.preventDefault ();
-					alert ('clicked');
-					//On click Hey.You listener what to do?
-				});
 
 				//When Hey.You scope change
-				this.when ('change', function (d) {
+				this.when ('change', function (changes) {
 
 					//Render new data using the inline template
 					//If not serve param is set, template inline is used
@@ -48,10 +43,14 @@ _$ (function () {
 					_self.serve ();
 
 					// The global service in tools
-					tools.myConsole ('Done');
+					$.myConsole ('Done');
 				})
 			},
-			destroy: function () {
+			process_form: function (e, $) {
+				e.preventDefault ();
+				console.log ($.Form)
+			},
+			destroy     : function ($) {
 				alert ('destroyed?')
 			}
 		}
@@ -62,23 +61,19 @@ _$ (function () {
 		return {
 			init   : function (tools) {
 
-				//Trigger change in Hey.You
-				this.listen ('click', function () {
-					my_Lib.setScope ('Hey.You', {
-						'beatles': [
-							{ "firstName": "Pedro", "lastName": "Lennon" }
-						]
-					});
-
-					// OnDrop the recipe
-					my_Lib.when ('drop', 'Hey.You', function () {
-						console.log ('you are dead Hey.You');
-					});
-
-					// Drop the recipe
-					my_Lib.drop ('Hey.You');
+			},
+			method : function (e, $) {
+				my_Lib.setScope ('Hey.You', {
+					'beatles': [
+						{ "firstName": "John", "lastName": "Lennon" },
+					]
 				});
+//
+//                    my_Lib.when ('drop', 'Hey.You', function () {
+//                        console.log ('you are dead Hey.You');
+//                    });
 
+				// my_Lib.drop ('Hey.You');
 			},
 			destroy: function () {}
 		}

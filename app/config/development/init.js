@@ -20,7 +20,8 @@ exports.files = {
 			'system/lib/Template',
 			// Until here needed do not change
 			// Add all the necessary modules
-			'system/lib/Map'
+			'system/lib/Map',
+			'system/lib/Form'
 		]
 	}
 };

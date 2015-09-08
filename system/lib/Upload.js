@@ -16,7 +16,7 @@ var Upload,
 	};
 
 Upload = function () {
-	var _ajax = new Http,
+	var _http = new Http,
 		_proto = this.__proto__;
 
 
@@ -83,7 +83,7 @@ Upload = function () {
 		return [
 			{
 				start   : function () {
-					_ajax.on ( 'before', callback );
+					_http.on ( 'before', callback );
 				},
 				complete: function () {
 					self.complete = callback;
@@ -117,18 +117,18 @@ Upload = function () {
 			contentType: 'auto'
 		};
 
-		_ajax.kill ();
-		_ajax.on ( 'progress', function ( progress ) {
+		_http.kill ();
+		_http.on ( 'progress', function ( progress ) {
 			if ( progress.lengthComputable && self.progress ) {
 				var pct = Math.round ( (progress.loaded / progress.total) * 100 );
 				self.progress ( pct );
 			}
 		} );
 
-		_ajax.on ( 'abort', self.abort );
-		_ajax.on ( 'error', self.error );
+		_http.on ( 'abort', self.abort );
+		_http.on ( 'error', self.error );
 
-		_ajax.request ( _request, function ( response ) {
+		_http.request ( _request, function ( response ) {
 			if ( self.complete ) {
 				self.complete ( response );
 			}

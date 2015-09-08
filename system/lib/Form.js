@@ -18,7 +18,7 @@ var WARNING_SYRUP_FORM = {
 
 "use strict";
 function Form () {
-	this.Ajax = new Http;
+	this.Http = new Http;
 	this.formData = null;
 	this.object = {};
 	this.url = '/';
@@ -30,24 +30,39 @@ function Form () {
 	this.failed = null;
 }
 
-//Set url to request
+/**Set url to request
+ * @param action
+ * @return object
+ */
 Form.add ('action', function (action) {
 	this.url = action;
+	return this;
 });
 
-//Set method request
+/**Set method request
+ * @param method
+ * @return object
+ */
 Form.add ('method', function (method) {
 	this.type = method.toUpperCase ();
+	return this;
 });
 
-//Attach additional data to request
+/**Attach additional data to request
+ * @param name
+ * @param attach
+ * @return object
+ */
 Form.add ('attach', function (name, attach) {
 	var self = this;
 	_.assert (self.formData, WARNING_SYRUP_FORM.ERROR.NOPACK);
 	self.formData.append (name, attach);
 });
 
-//Getting a array of values name="input[]"
+/**Getting a array of values name="input[]"
+ * @param name
+ * @return array
+ */
 Form.add ('multiple', function (name) {
 	var _top = 0, _input_array,
 		_return = [],
@@ -66,7 +81,11 @@ Form.add ('multiple', function (name) {
 	return _return.length > 0 ? _return : false;
 });
 
-//Form fail what to do?
+/**Form fail what to do?
+ * @param field
+ * @param error
+ *
+ */
 Form.add ('fail', function (field, error) {
 	var self = this,
 		_notify = {
@@ -82,7 +101,10 @@ Form.add ('fail', function (field, error) {
 
 });
 
-//Form event handler
+/**Form event handler
+ * @param event
+ * @param callback
+ */
 Form.add ('on', function (event, callback) {
 	var self = this;
 
@@ -107,6 +129,8 @@ Form.add ('on', function (event, callback) {
 	]
 });
 
+/**Submit action
+ * @param event*/
 Form.add ('submit', function (event) {
 	var self = this;
 
@@ -119,16 +143,16 @@ Form.add ('submit', function (event) {
 		return false;
 	}
 
-	var Ajax = {
+	var conf = {
 		url   : self.url,
 		method: self.type,
 		data  : self.formData
 	};
 
-	self.Ajax.kill ();
-	self.Ajax.on ('error', self.onerror);
-	self.Ajax.on ('before', self.onbefore);
-	self.Ajax.request (Ajax, function (response) {
+	self.Http.kill ();
+	self.Http.on ('error', self.onerror);
+	self.Http.on ('before', self.onbefore);
+	self.Http.request (conf, function (response) {
 		if ( self.oncomplete ) {
 			self.oncomplete (response);
 		}
@@ -137,7 +161,10 @@ Form.add ('submit', function (event) {
 
 });
 
-//Pack the inputs in FormData Object
+/**Pack the inputs in FormData Object
+ * @param form
+ * @return object
+ */
 Form.add ('pack', function (form) {
 	var self = this;
 	self.form = _$ (form);
@@ -165,51 +192,47 @@ Form.add ('pack', function (form) {
 		var field = _fields[x],
 			fieldValue = field.value;
 
-
-		if ( !(
-				_$ (field).data ('skip')
-			) && _.isEmpty (fieldValue) ) {
+		//Skip?
+		if ( !( _$ (field).data ('skip')) && _.isEmpty (fieldValue) ) {
 			self.fail (field, 'empty');
 			break;
+			//isMail?
+		} else if ( _$ (field).data ('mail') && !_.isMail (fieldValue) ) {
+			self.fail (field, 'invalid_mail');
+			break;
+			//Overflow down?
+		} else if ( _$ (field).data ('min') && (
+				+_$ (field).data ('min') > fieldValue.length
+			) ) {
+			self.fail (field, 'minim_chars');
+			break;
+			//Overflow?
+		} else if ( _$ (field).data ('max') && (
+				+_$ (field).data ('max') < fieldValue.length
+			) ) {
+			self.fail (field, 'overflow_chars');
+			break;
 		} else {
-			if ( _$ (field).data ('mail') && !_.isMail (fieldValue) ) {
-				self.fail (field, 'invalid_mail');
-				break
-			} else {
-				if ( _$ (field).data ('min') && (
-						+_$ (field).data ('min') > fieldValue.length
-					) ) {
-					self.fail (field, 'minim_chars');
+			//Custom validation
+			if ( _$ (field).data ('custom') ) {
+				var Regex = new RegExp (_$ (field).data ('custom'), "g");
+				if ( !Regex.test (fieldValue) ) {
+					self.fail (field, 'invalid_custom');
 					break;
-				} else {
-					if ( _$ (field).data ('max') && (
-							+_$ (field).data ('max') < fieldValue.length
-						) ) {
-						self.fail (field, 'overflow_chars');
-						break;
-					} else {
-						if ( _$ (field).data ('custom') ) {
-							var Regex = new RegExp (_$ (field).data ('custom'), "g");
-							if ( !Regex.test (fieldValue) ) {
-								self.fail (field, 'invalid_custom');
-								break;
-							}
-						}
-
-						if ( !!(
-								_field_array = self.multiple (field.name)
-							) ) {
-							fieldValue = _field_array
-						}
-
-						_formData.append (field.name, fieldValue);
-						self.object[field.name] = fieldValue;
-
-
-					}
 				}
-
 			}
+
+			if ( !!(
+					_field_array = self.multiple (field.name)
+				) ) {
+				fieldValue = _field_array
+			}
+
+			if ( _.isSet (field.name) ) {
+				_formData.append (field.name, fieldValue);
+				self.object[field.name] = fieldValue;
+			}
+
 		}
 	}
 

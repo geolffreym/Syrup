@@ -170,19 +170,31 @@ Apps.add ('_bindListener', function (moduleId) {
 	];
 
 	if ( this.app.exist ) {
-		var _self = this.modules[moduleId].instance,
+		var _this = this,
+			_self = this.modules[moduleId].instance,
 			_the_filter = enabled_events.join (' [sp-'),
 			_mod = _$ ('[sp-recipe="' + moduleId + '"]');
 
+		//Find events listeners
 		_mod.find (_the_filter, function (dom_list) {
 			dom_list.each (function (i) {
+
+				//Fint the listener in attributes
 				_.each (i.attributes, function (v) {
 					if ( /sp-[a-z]+/.test (v.localName) ) {
 						var _event = _.replace (v.localName, 'sp-', ''),
 							_attr = i.getAttribute (v.localName);
 
-						if ( _attr in _self )
-							_mod.listen (_event, '[' + v.localName + '="' + _attr + '"]', _self[_attr])
+						//Is the attr value in module?
+						if ( _attr in _self ) {
+							//is Function the attr value?
+							if ( _.isFunction (_self[_attr]) )
+								_mod.listen (_event, '[' + v.localName + '="' + _attr + '"]', function (e) {
+									//Param event and dependencies
+									_self[_attr] (e, _this.lib.get (_self.parent));
+								});
+						}
+
 					}
 				});
 			})

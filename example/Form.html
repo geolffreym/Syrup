@@ -15,6 +15,11 @@
         yes
     </a>
 
+    <form action="" sp-submit="process_form">
+        <input type="text" name="firstName" data-min="2"/>
+        <input type="text" name="lastName"/>
+        <input type="submit" data-skip="true"/>
+    </form>
     <!--The view-->
     <div sp-view>
 
@@ -49,7 +54,7 @@
     _$ (function () {
 
         //The Module with Http dependencie
-        var my_Lib = App.blend ('Hey', ['Http']);
+        var my_Lib = App.blend ('Hey', ['Http', 'Form']);
 
         //A global service
         my_Lib.service ('myConsole', function (msg) {
@@ -93,6 +98,12 @@
                         $.myConsole ('Done');
                     })
                 },
+                process_form: function (e, $) {
+                    e.preventDefault ()
+                   // $.Form.on('error', function(r){console.log(r)})
+                    this.setScope({'beatles':[$.Form.pack(e.target)]});
+
+                },
                 destroy     : function ($) {
                     alert ('destroyed?')
                 }
@@ -111,12 +122,7 @@
                             { "firstName": "John", "lastName": "Lennon" },
                         ]
                     });
-//
-//                    my_Lib.when ('drop', 'Hey.You', function () {
-//                        console.log ('you are dead Hey.You');
-//                    });
 
-                    // my_Lib.drop ('Hey.You');
                 },
                 destroy: function () {}
             }
