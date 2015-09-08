@@ -2315,20 +2315,13 @@ Libs.add ('blend', function (name, dependencies) {
 		Function.factory (name)
 	) ();
 
-
-	if ( !_.isSet (this.breadcrumb[name]) ) {
+	if ( !(name in this.breadcrumb) ) {
 		Syrup.blend (_anonymous);
 		this.name = name;
 		this.object = _[name];
 		this.breadcrumb[name] = this.object;
-	} else if ( !_.isSet (_[this.name][name]) ) {
-		name = _split.pop ();
-		_[this.name][name] = {};
-		this.object = _[this.name][name];
-		this.breadcrumb[name] = this.object;
+		this._dependencies (dependencies);
 	}
-
-	this._dependencies (dependencies);
 
 	return this;
 
@@ -2487,7 +2480,7 @@ Apps.add ('_add', function (moduleId) {
  * @return void
  * **/
 Apps.add ('_trigger', function (moduleId) {
-	if ( _.isSet (this.modules[moduleId]) )
+	if ( moduleId in this.modules )
 		return this.modules[moduleId].creator (_, _$, this.scope);
 	return {}
 });
@@ -2522,7 +2515,7 @@ Apps.add ('value', function () {
  * @return void
  * **/
 Apps.add ('setScope', function (moduleId, object) {
-	if ( _.isSet (this.scope[moduleId]) ) {
+	if ( moduleId in this.scope ) {
 		this.scope[moduleId] = object;
 	}
 	return this;
@@ -2533,7 +2526,7 @@ Apps.add ('setScope', function (moduleId, object) {
  * @return object
  * **/
 Apps.add ('getScope', function (moduleId) {
-	if ( _.isSet (this.scope[moduleId]) ) {
+	if ( moduleId in this.scope ) {
 		return this.scope[moduleId];
 	}
 	return {};
@@ -2642,7 +2635,7 @@ Apps.add ('_serve', function (moduleId, template) {
 Apps.add ('_taste', function (moduleId) {
 	var _self = this;
 
-	if ( _.isSet (_self.modules[moduleId]) && _.isSet (_self.root) ) {
+	if ( moduleId in _self.modules && _.isSet (_self.root) ) {
 
 		//Initialize module
 		_self._add (moduleId);
@@ -2678,7 +2671,7 @@ Apps.add ('_taste', function (moduleId) {
 
 
 		//Init the module
-		if ( _.isSet (_self.modules[moduleId].instance.init) ) {
+		if ( 'init' in _self.modules[moduleId].instance ) {
 			_self.modules[moduleId].instance.init (this.lib.get (_self.root));
 			_self._bindListener (moduleId);
 		}
@@ -2697,7 +2690,7 @@ Apps.add ('_taste', function (moduleId) {
  * @return object
  * */
 Apps.add ('drop', function (moduleId) {
-	if ( _.isSet (this.modules[moduleId]) ) {
+	if ( moduleId in this.modules ) {
 		if ( this.modules[moduleId].instance ) {
 			if ( this.modules[moduleId].instance.destroy )
 				this.modules[moduleId].instance.destroy (this.lib.get (this.root));
@@ -2731,12 +2724,12 @@ window.App = new Apps;
 
 'use strict';
 
-/**Ajax
+/**Http
  * @constructor
  */
 
 
-function Ajax () {
+function Http () {
 	this.xhr = new window.XMLHttpRequest
 			   || new window.ActiveXObject ( "Microsoft.XMLHTTP" );
 	this.xhr_list = [];
@@ -2755,7 +2748,7 @@ function Ajax () {
  * @param callback
  * @return void
  * */
-Ajax.add ( 'on', function ( event, callback ) {
+Http.add ( 'on', function ( event, callback ) {
 	var self = this;
 	return [
 		{
@@ -2785,7 +2778,7 @@ Ajax.add ( 'on', function ( event, callback ) {
 
 } );
 
-/** Ajax Request
+/** Http Request
  * @param config
  * @param callback
  * @return object
@@ -2804,7 +2797,7 @@ Ajax.add ( 'on', function ( event, callback ) {
  *
  * }
  * **/
-Ajax.add ( 'request', function ( config, callback ) {
+Http.add ( 'request', function ( config, callback ) {
 	if ( !_.isObject ( config ) ) {
 		throw (WARNING_SYRUP.ERROR.NOOBJECT)
 	}
@@ -2933,13 +2926,13 @@ Ajax.add ( 'request', function ( config, callback ) {
  * @param type
  * @return object
  * **/
-Ajax.add ( 'requestHeader', function ( header, type ) {
+Http.add ( 'requestHeader', function ( header, type ) {
 	this.xhr.setRequestHeader ( header, type );
 	return this;
 } );
 
-//Kill Ajax
-Ajax.add ( 'kill', function () {
+//Kill Http
+Http.add ( 'kill', function () {
 	var i = this.xhr_list.length;
 	while ( i-- ) {
 		if ( !!this.xhr_list[ i ] )
@@ -3069,13 +3062,13 @@ Workers.add ( 'kill', function ( callback ) {
  */
 
 /**Dependencies
- * Ajax Lib
+ * Http Lib
  * Worker Lib
  * Repository Lib
  * */
 
 function Template () {
-	this.Ajax = new Ajax;
+	this.Http = new Http;
 	this.Repository = new Repository;
 	this.Workers = new Workers;
 	this.template = null;
@@ -3089,7 +3082,7 @@ Template.add ( 'lookup', function ( template, callback ) {
 		processor: '.html'
 	};
 
-	this.Ajax.request ( _conf, function ( response ) {
+	this.Http.request ( _conf, function ( response ) {
 		_.callbackAudit ( callback, response );
 	} );
 
@@ -3704,7 +3697,7 @@ GoogleMap = function () {
 //Basic Config
 
 var setting = {
-	ajax_processor: '',
+	processor: '',
 	app_path      : '/Syrup/app',
 	system_path   : '/Syrup/system',
 	env: 'development'

@@ -18,7 +18,7 @@
     _$ (function () {
 
         //Blend a Lib to Syrup
-        var my_Lib = Lib.blend ('Hey', ['Ajax']);
+        var my_Lib = Lib.blend ('Hey', ['Http']);
 
         //Constructor
         my_Lib.make ({ user: 'Pedro' });
@@ -28,8 +28,8 @@
             sayHi: function () {
                 console.log('Hey i\'m ' + this.user);
 
-                //Ajax in dependencies
-                console.log(this.Ajax);
+                //Http in dependencies
+                console.log(this.Http);
             }
         });
 

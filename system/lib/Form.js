@@ -7,7 +7,7 @@
  */
 
 /**Dependencies
- * Ajax Lib
+ * Http Lib
  * */
 
 var WARNING_SYRUP_FORM = {
@@ -18,7 +18,7 @@ var WARNING_SYRUP_FORM = {
 
 "use strict";
 function Form () {
-	this.Ajax = new Ajax;
+	this.Ajax = new Http;
 	this.formData = null;
 	this.object = {};
 	this.url = '/';

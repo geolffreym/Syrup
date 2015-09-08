@@ -1,8 +1,8 @@
 //The controller
 _$ (function () {
 
-	//The Module with Ajax dependencie
-	var my_Lib = App.blend ('Hey', ['Ajax']);
+	//The Module with Http dependencie
+	var my_Lib = App.blend ('Hey', ['Http']);
 
 	//A global service
 	my_Lib.service ('myConsole', function (msg) {
@@ -19,7 +19,7 @@ _$ (function () {
 				var _self = this;
 
 				//tools has dependencies object
-				// tools = {Ajax: AjaxObject}
+				// tools = {Http: AjaxObject}
 
 				//The context in template as scope
 				this.setScope ({

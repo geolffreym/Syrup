@@ -8,13 +8,13 @@
  */
 
 /**Dependencies
- * Ajax Lib
+ * Http Lib
  * Worker Lib
  * Repository Lib
  * */
 
 function Template () {
-	this.Ajax = new Ajax;
+	this.Http = new Http;
 	this.Repository = new Repository;
 	this.Workers = new Workers;
 	this.template = null;
@@ -28,7 +28,7 @@ Template.add ( 'lookup', function ( template, callback ) {
 		processor: '.html'
 	};
 
-	this.Ajax.request ( _conf, function ( response ) {
+	this.Http.request ( _conf, function ( response ) {
 		_.callbackAudit ( callback, response );
 	} );
 

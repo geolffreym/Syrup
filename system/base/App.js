@@ -86,7 +86,7 @@ Apps.add ('_add', function (moduleId) {
  * @return void
  * **/
 Apps.add ('_trigger', function (moduleId) {
-	if ( _.isSet (this.modules[moduleId]) )
+	if ( moduleId in this.modules )
 		return this.modules[moduleId].creator (_, _$, this.scope);
 	return {}
 });
@@ -121,7 +121,7 @@ Apps.add ('value', function () {
  * @return void
  * **/
 Apps.add ('setScope', function (moduleId, object) {
-	if ( _.isSet (this.scope[moduleId]) ) {
+	if ( moduleId in this.scope ) {
 		this.scope[moduleId] = object;
 	}
 	return this;
@@ -132,7 +132,7 @@ Apps.add ('setScope', function (moduleId, object) {
  * @return object
  * **/
 Apps.add ('getScope', function (moduleId) {
-	if ( _.isSet (this.scope[moduleId]) ) {
+	if ( moduleId in this.scope ) {
 		return this.scope[moduleId];
 	}
 	return {};
@@ -241,7 +241,7 @@ Apps.add ('_serve', function (moduleId, template) {
 Apps.add ('_taste', function (moduleId) {
 	var _self = this;
 
-	if ( _.isSet (_self.modules[moduleId]) && _.isSet (_self.root) ) {
+	if ( moduleId in _self.modules && _.isSet (_self.root) ) {
 
 		//Initialize module
 		_self._add (moduleId);
@@ -277,7 +277,7 @@ Apps.add ('_taste', function (moduleId) {
 
 
 		//Init the module
-		if ( _.isSet (_self.modules[moduleId].instance.init) ) {
+		if ( 'init' in _self.modules[moduleId].instance ) {
 			_self.modules[moduleId].instance.init (this.lib.get (_self.root));
 			_self._bindListener (moduleId);
 		}
@@ -296,7 +296,7 @@ Apps.add ('_taste', function (moduleId) {
  * @return object
  * */
 Apps.add ('drop', function (moduleId) {
-	if ( _.isSet (this.modules[moduleId]) ) {
+	if ( moduleId in this.modules ) {
 		if ( this.modules[moduleId].instance ) {
 			if ( this.modules[moduleId].instance.destroy )
 				this.modules[moduleId].instance.destroy (this.lib.get (this.root));

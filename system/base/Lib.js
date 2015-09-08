@@ -25,20 +25,13 @@ Libs.add ('blend', function (name, dependencies) {
 		Function.factory (name)
 	) ();
 
-
-	if ( !_.isSet (this.breadcrumb[name]) ) {
+	if ( !(name in this.breadcrumb) ) {
 		Syrup.blend (_anonymous);
 		this.name = name;
 		this.object = _[name];
 		this.breadcrumb[name] = this.object;
-	} else if ( !_.isSet (_[this.name][name]) ) {
-		name = _split.pop ();
-		_[this.name][name] = {};
-		this.object = _[this.name][name];
-		this.breadcrumb[name] = this.object;
+		this._dependencies (dependencies);
 	}
-
-	this._dependencies (dependencies);
 
 	return this;
 

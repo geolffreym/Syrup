@@ -14,7 +14,7 @@ exports.files = {
 			'system/base/Require',
 			'system/base/Lib',
 			'system/base/App',
-			'system/lib/Ajax',
+			'system/lib/Http',
 			'system/lib/Repository',
 			'system/lib/Workers',
 			'system/lib/Template',

@@ -6,17 +6,17 @@
 "use strict";
 
 /**Dependencies
- * Ajax Lib
+ * Http Lib
  * SocketLib
  * */
 
 
 function Shortcuts () {
-	this.Ajax = new Ajax;
+	this.Ajax = new Http;
 	this.Socket = new Socket;
 }
 
-//Simple Ajax Get
+//Simple Http Get
 Shortcuts.add ( 'ajaxGet', function ( url, data, callback ) {
 	var _conf = {
 		url: !!url ? url : '#',
@@ -24,11 +24,11 @@ Shortcuts.add ( 'ajaxGet', function ( url, data, callback ) {
 		data: !!data ? data : null
 	};
 
-	this.Ajax.kill ();
-	this.Ajax.request ( _conf, callback );
+	this.Http.kill ();
+	this.Http.request ( _conf, callback );
 } );
 
-//Simple Ajax Post
+//Simple Http Post
 Shortcuts.add ( 'ajaxPost', function ( url, data, callback ) {
 	var _conf = {
 		url: !!url ? url : '#',
@@ -36,8 +36,8 @@ Shortcuts.add ( 'ajaxPost', function ( url, data, callback ) {
 		method: 'POST'
 	};
 
-	this.Ajax.kill ();
-	this.Ajax.request ( _conf, callback );
+	this.Http.kill ();
+	this.Http.request ( _conf, callback );
 } );
 
 //Simple Socket Send
