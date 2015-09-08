@@ -592,6 +592,7 @@ _$_.add ('trigger', function (event, callback) {
  * @return object
  */
 _$_.add ('find', function (filter, callback) {
+
 	this.children (function (elem) {
 		elem.filter (filter, function (e) {
 			_.callbackAudit (callback, e, filter);
@@ -599,7 +600,7 @@ _$_.add ('find', function (filter, callback) {
 			elem.find (filter, callback);
 		})
 	});
-	
+
 	return this;
 });
 
@@ -784,14 +785,15 @@ _$_.add ('is', function (context) {
  * @return array
  * */
 _$_.add ('get', function (find) {
-	var _return = [];
-	
-	this.children (function (node) {
-		if ( node.is (find) )
-			_return.push (node);
-	});
-	
-	return _.specArray (_return);
+	if (
+		_.objectAsString (this.collection) == '[object NodeList]'
+		&& _.isNumber (find)
+	) {
+		if ( _.isSet (this.collection[find]) )
+			return this.collection[find];
+	}
+
+	return this.collection
 });
 
 /***Remove Element*/

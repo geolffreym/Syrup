@@ -592,6 +592,7 @@ _$_.add ('trigger', function (event, callback) {
  * @return object
  */
 _$_.add ('find', function (filter, callback) {
+
 	this.children (function (elem) {
 		elem.filter (filter, function (e) {
 			_.callbackAudit (callback, e, filter);
@@ -599,7 +600,7 @@ _$_.add ('find', function (filter, callback) {
 			elem.find (filter, callback);
 		})
 	});
-	
+
 	return this;
 });
 
@@ -784,14 +785,15 @@ _$_.add ('is', function (context) {
  * @return array
  * */
 _$_.add ('get', function (find) {
-	var _return = [];
-	
-	this.children (function (node) {
-		if ( node.is (find) )
-			_return.push (node);
-	});
-	
-	return _.specArray (_return);
+	if (
+		_.objectAsString (this.collection) == '[object NodeList]'
+		&& _.isNumber (find)
+	) {
+		if ( _.isSet (this.collection[find]) )
+			return this.collection[find];
+	}
+
+	return this.collection
 });
 
 /***Remove Element*/
@@ -2568,22 +2570,25 @@ Apps.add ('_bindListener', function (moduleId) {
 		'keydown], ', 'keypress], ', 'keyup], ', 'blur], ',
 		'focus], ', 'input], ', 'select], ', 'reset]'
 	];
-	var _self = this.modules[moduleId].instance;
-	this.app.find ('[sp-recipe="' + moduleId + '"]', function (mod) {
-		mod.find (enabled_events.join (' [sp-'), function (e) {
-			e.each (function (i) {
-				_.each (i.attributes, function (v) {
-					if ( /sp-[a-z]+/.test (v.localName) ) {
-						var _event = _.replace (v.localName, 'sp-', ''),
-							_attr = _$ (i).attr (v.localName);
-						if ( _attr in _self )
-							mod.listen (_event, '[' + v.localName + '="' + _attr + '"]', _self[_attr])
-					}
-				});
-			})
-		})
 
-	})
+	if ( this.app.exist ) {
+		var _self = this.modules[moduleId].instance,
+			_the_filter = enabled_events.join (' [sp-'),
+			_mod = _$ ('[sp-recipe="' + moduleId + '"]');
+
+		_$ ('[sp-recipe="' + moduleId + '"] ' + _the_filter).each (function (i) {
+			console.log(i.getAttr)
+			_.each (i.attributes, function (v) {
+				console.log(v)
+				if ( /sp-[a-z]+/.test (v.localName) ) {
+					var _event = _.replace (v.localName, 'sp-', ''),
+						_attr = _$ (i).attr (v.localName);
+					//if ( _attr in _self )
+					//	mod.listen (_event, '[' + v.localName + '="' + _attr + '"]', _self[_attr])
+				}
+			});
+		})
+	}
 });
 
 /** Render the View
@@ -2592,38 +2597,37 @@ Apps.add ('_bindListener', function (moduleId) {
  * @return object
  */
 Apps.add ('_serve', function (moduleId, template) {
-	var _self = this,
-		_template = null,
-		_scope = _self.scope[moduleId];
+	var _template = null,
+		_scope = this.scope[moduleId];
 
 	//Is set the app
-	if ( _self.app.exist ) {
-		_self.app.find ('[sp-recipe="' + moduleId + '"]', function (mod) {
-			mod.find ('[sp-view]', function (_dom) {
-				if ( _.getObjectSize (_scope) > 0 ) {
-					if ( _.isSet (template) && _.isString (template) ) {
-						Require.request ('/view/' + template, function () {
+	if ( this.app.exist ) {
+		//Find the recipe
+		var _dom = _$ ('[sp-recipe="' + moduleId + '"] [sp-view]');
+		if ( _dom.exist ) {
+			if ( _.getObjectSize (_scope) > 0 ) {
+				if ( _.isSet (template) && _.isString (template) ) {
+					Require.request ('/view/' + template, function () {
+						_template = new Template;
+						if ( moduleId in _template.__proto__ )
+							_template[moduleId] (_scope, function (my_html) {
+								_dom.html (my_html);
+							})
+					})
+				} else {
+					var _dom_template = _$ ('[sp-recipe="' + moduleId + '"] [sp-tpl]');
+					if ( _dom_template.exist ) {
+						var _parse = _dom_template.html ();
+						if ( _.isSet (_parse) ) {
 							_template = new Template;
-							if ( moduleId in _template.__proto__ )
-								_template[moduleId] (_scope, function (my_html) {
-									_dom.html (my_html);
-								})
-						})
-					} else {
-						mod.find ('[sp-tpl]', function (_dom_template) {
-							var _parse = _dom_template.html ();
-							if ( _.isSet (_parse) ) {
-								_template = new Template;
-								_template.parse (_parse, _scope, function (result) {
-									_dom.html (result);
-								});
-							}
-						});
-
+							_template.parse (_parse, _scope, function (result) {
+								_dom.html (result);
+							});
+						}
 					}
 				}
-			});
-		})
+			}
+		}
 	}
 
 	return this;
