@@ -594,12 +594,12 @@ _$_.add ('trigger', function (event, callback) {
 _$_.add ('find', function (filter, callback) {
 	this.children (function (elem) {
 		elem.filter (filter, function (e) {
-			_.callbackAudit (callback, e);
+			_.callbackAudit (callback, e, filter);
 		}, function () {
 			elem.find (filter, callback);
 		})
 	});
-	
+
 	return this;
 });
 
@@ -784,14 +784,15 @@ _$_.add ('is', function (context) {
  * @return array
  * */
 _$_.add ('get', function (find) {
-	var _return = [];
-	
-	this.children (function (node) {
-		if ( node.is (find) )
-			_return.push (node);
-	});
-	
-	return _.specArray (_return);
+	if (
+		_.objectAsString (this.collection) == '[object NodeList]'
+		&& _.isNumber (find)
+	) {
+		if ( _.isSet (this.collection[find]) )
+			return this.collection[find];
+	}
+
+	return this.collection
 });
 
 /***Remove Element*/
@@ -1795,11 +1796,10 @@ Syrup.add ('extend', function (target, source, overwrite) {
 });
 
 
-
 //Super Global Object Instance
 window._ = (function () {
-		return new Syrup ();
-	}) ();
+	return new Syrup ();
+}) ();
 
 _.VERSION = '1.1';
 _.$fn = _$_;
@@ -1820,8 +1820,8 @@ _.nav.online = navigator.onLine;
 _.nav.local = navigator.userAgent.toLowerCase ();
 
 window._$ = (function () {
-		return (
-			new _$_ ()
-		).$;
-	}) ();
+	return (
+		new _$_ ()
+	).$;
+}) ();
 

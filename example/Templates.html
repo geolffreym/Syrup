@@ -63,8 +63,9 @@
         //A new recipe for Hey
         my_Lib.recipe ('Hey.You', function (_, _$, scope) {
             return {
-                init   : function ($) {
+                init      : function ($) {
                     var _self = this;
+
 
                     //tools has dependencies object
                     // tools = {Ajax: AjaxObject}
@@ -78,6 +79,7 @@
                             { "firstName": "Ringo", "lastName": "Starr" }
                         ]
                     }).serve ();
+                    
 
                     //When Hey.You scope change
                     this.when ('change', function (changes) {

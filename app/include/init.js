@@ -594,12 +594,12 @@ _$_.add ('trigger', function (event, callback) {
 _$_.add ('find', function (filter, callback) {
 	this.children (function (elem) {
 		elem.filter (filter, function (e) {
-			_.callbackAudit (callback, e);
+			_.callbackAudit (callback, e, filter);
 		}, function () {
 			elem.find (filter, callback);
 		})
 	});
-	
+
 	return this;
 });
 
@@ -784,14 +784,15 @@ _$_.add ('is', function (context) {
  * @return array
  * */
 _$_.add ('get', function (find) {
-	var _return = [];
-	
-	this.children (function (node) {
-		if ( node.is (find) )
-			_return.push (node);
-	});
-	
-	return _.specArray (_return);
+	if (
+		_.objectAsString (this.collection) == '[object NodeList]'
+		&& _.isNumber (find)
+	) {
+		if ( _.isSet (this.collection[find]) )
+			return this.collection[find];
+	}
+
+	return this.collection
 });
 
 /***Remove Element*/
@@ -1795,11 +1796,10 @@ Syrup.add ('extend', function (target, source, overwrite) {
 });
 
 
-
 //Super Global Object Instance
 window._ = (function () {
-		return new Syrup ();
-	}) ();
+	return new Syrup ();
+}) ();
 
 _.VERSION = '1.1';
 _.$fn = _$_;
@@ -1820,10 +1820,10 @@ _.nav.online = navigator.onLine;
 _.nav.local = navigator.userAgent.toLowerCase ();
 
 window._$ = (function () {
-		return (
-			new _$_ ()
-		).$;
-	}) ();
+	return (
+		new _$_ ()
+	).$;
+}) ();
 
 
 /*
@@ -2539,6 +2539,12 @@ Apps.add ('getScope', function (moduleId) {
 	return {};
 });
 
+/**Event handler
+ * @param event
+ * @param name
+ * @param callback
+ * @return object
+ */
 Apps.add ('when', function (event, name, callback) {
 	var self = this;
 	return [
@@ -2553,50 +2559,86 @@ Apps.add ('when', function (event, name, callback) {
 	]
 });
 
+Apps.add ('_bindListener', function (moduleId) {
+	var enabled_events = [
+		'[sp-click], ', 'submit], ',
+		'change], ', 'dblclick], ',
+		'mousedown], ', 'mouseenter], ',
+		'mouseleave], ', 'mousemove], ',
+		'mouseover], ', 'mouseout], ', 'mouseup], ',
+		'keydown], ', 'keypress], ', 'keyup], ', 'blur], ',
+		'focus], ', 'input], ', 'select], ', 'reset]'
+	];
+
+	if ( this.app.exist ) {
+		var _self = this.modules[moduleId].instance,
+			_the_filter = enabled_events.join (' [sp-'),
+			_mod = _$ ('[sp-recipe="' + moduleId + '"]');
+
+		_mod.find (_the_filter, function (dom_list) {
+			dom_list.each (function (i) {
+				_.each (i.attributes, function (v) {
+					if ( /sp-[a-z]+/.test (v.localName) ) {
+						var _event = _.replace (v.localName, 'sp-', ''),
+							_attr = i.getAttribute (v.localName);
+
+						if ( _attr in _self )
+							_mod.listen (_event, '[' + v.localName + '="' + _attr + '"]', _self[_attr])
+					}
+				});
+			})
+		});
+	}
+});
+
 /** Render the View
  * @param moduleId
  * @param template
  * @return object
  */
 Apps.add ('_serve', function (moduleId, template) {
-	var _self = this,
-		_template = null,
-		_scope = _self.scope[moduleId];
+	var _template = null,
+		_scope = this.scope[moduleId];
 
-	//Is set the appundefine
-	if ( _self.app.exist ) {
-		_self.app.find ('[sp-recipe="' + moduleId + '"]', function (mod) {
-			mod.find ('[sp-view]', function (_dom) {
-				if ( _.getObjectSize (_scope) > 0 ) {
-					if ( _.isSet (template) && _.isString (template) ) {
-						Require.request ('/view/' + template, function () {
-							_template = new Template;
-							if ( moduleId in _template.__proto__ )
-								_template[moduleId] (_scope, function (my_html) {
-									_dom.html (my_html);
-								})
-						})
-					} else {
-						mod.find ('[sp-tpl]', function (_dom_template) {
-							var _parse = _dom_template.html ();
-							if ( _.isSet (_parse) ) {
-								_template = new Template;
-								_template.parse (_parse, _scope, function (result) {
-									_dom.html (result);
-								});
-							}
+	//Is set the app
+	if ( this.app.exist ) {
+		//Find the recipe
+		var _dom = _$ ('[sp-recipe="' + moduleId + '"] [sp-view]'),
+			_dom_template = _$ ('[sp-recipe="' + moduleId + '"] [sp-tpl]');
+
+		if ( _dom.exist ) { //Exist?
+			if ( _.getObjectSize (_scope) > 0 ) {
+
+				//A view?
+				if ( _.isSet (template) && _.isString (template) ) {
+					Require.request ('/view/' + template, function () {
+						_template = new Template;
+						if ( moduleId in _template.__proto__ )
+							_template[moduleId] (_scope, function (my_html) {
+								_dom.html (my_html);
+							})
+					})
+				} else if ( _dom_template.exist ) { //Exist inline tpl?
+					var _parse = _dom_template.html ();
+					if ( _.isSet (_parse) ) {
+						_template = new Template;
+						_template.parse (_parse, _scope, function (result) {
+							_dom.html (result);
 						});
-
 					}
 				}
-			});
-		})
+			}
+		}
 	}
 
 	return this;
 });
 
-//Execute Module
+/** Execute Module
+ *@param moduleId
+ * @return object
+ */
+
 Apps.add ('_taste', function (moduleId) {
 	var _self = this;
 
@@ -2607,6 +2649,7 @@ Apps.add ('_taste', function (moduleId) {
 		_self.modules[moduleId].instance = _self._trigger (moduleId);
 		_self.modules[moduleId].instance.name = moduleId;
 		_self.modules[moduleId].instance.parent = _self.root;
+		//_self.modules[moduleId].instance.dom = _$ ('[sp-recipe="' + moduleId + '"]');
 
 		//Binding Methods
 		_self.modules[moduleId].instance.setScope = function (object) {
@@ -2630,27 +2673,29 @@ Apps.add ('_taste', function (moduleId) {
 		};
 
 		_self.modules[moduleId].instance.listen = function (event, callback) {
-			if ( _self.app.exist )
-				_self.app.find ('[sp-recipe="' + moduleId + '"]', function (mod) {
-					mod.listen (event, '[sp-' + event + ']', callback);
-				});
-
-			return this;
+			_$ ('[sp-recipe="' + moduleId + '"]').listen (event, '[sp-' + event + ']', callback)
 		};
 
-		//Observe scope
-		_self._watch (moduleId);
 
 		//Init the module
 		if ( _.isSet (_self.modules[moduleId].instance.init) ) {
 			_self.modules[moduleId].instance.init (this.lib.get (_self.root));
-			//_self._serve (moduleId, _self.modules[moduleId].instance.template || true);
+			_self._bindListener (moduleId);
 		}
+
+
+		//Observe scope
+		_self._watch (moduleId);
 	}
 
 	return this;
 });
 
+
+/**Drop a Module
+ * @param moduleId
+ * @return object
+ * */
 Apps.add ('drop', function (moduleId) {
 	if ( _.isSet (this.modules[moduleId]) ) {
 		if ( this.modules[moduleId].instance ) {
@@ -2667,6 +2712,9 @@ Apps.add ('drop', function (moduleId) {
 });
 
 
+/**Drop all Modules
+ * @return object
+ * */
 Apps.add ('dropAll', function () {
 	var _self = this;
 	_.each (this.modules, function (module, id) {

@@ -636,16 +636,17 @@ if(my_selector.is('.div')){
 *(Return child element. Param element needed)*
     
 ```html
-<div class="parent">
-        <div class="child">
-            <div class="grandson"></div>
-        </div>
-</div>
+<ul>
+        <li>A</li>
+        <li>B</li>
+        <li>C</li>
+</ul>
 ```
 ```js
-var my_selector = _$('.parent');
+var my_selector = _$('li+');
 
-my_selector.get('.child') // Return .child
+my_selector.get(0) // Return <li>A</li>
+my_selectot.get() // [<li>A</li>, <li>B</li>, <li>C</li>]
 ```
 
 **Method `.each(callback)`**

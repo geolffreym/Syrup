@@ -11,10 +11,14 @@
 <div sp-recipe="Hey.You">
 
     <!-- The event-->
-    <a href="#" sp-click>
-        Aqui
+    <a href="#" sp-click="the_method">
+        yes
     </a>
 
+    <!-- The event-->
+    <a href="#" sp-dblclick>
+        otro
+    </a>
     <!--The view-->
     <div sp-view>
 
@@ -35,8 +39,8 @@
 
 
 <div sp-recipe="Hey.Do">
-    <!-- The event-->
-    <a href="#" sp-click>
+    <!-- The method "jaja" in module Hey.Do-->
+    <a href="#" sp-click="jaja">
         Change You
     </a>
 
@@ -60,8 +64,9 @@
         //A new recipe for Hey
         my_Lib.recipe ('Hey.You', function (_, _$, scope) {
             return {
-                init   : function (tools) {
+                init      : function ($) {
                     var _self = this;
+
                     this.setScope ({
                         'beatles': [
                             { "firstName": "John", "lastName": "Lennon" },
@@ -69,12 +74,7 @@
                             { "firstName": "George", "lastName": "Harrison" },
                             { "firstName": "Ringo", "lastName": "Starr" }
                         ]
-                    });
-
-                    this.listen ('click', function (e) {
-                        e.preventDefault ();
-                        alert ('yeah')
-                    });
+                    }).serve ();
 
                     //When Hey.You scope change
                     this.when ('change', function (d) {
@@ -82,7 +82,10 @@
                         _self.serve ();
                     })
                 },
-                destroy: function (e) {
+                the_method: function () {
+                    alert ('yeah')
+                },
+                destroy   : function ($) {
                     alert ('destroyed?')
                 }
             }
@@ -93,21 +96,19 @@
             return {
                 init   : function (tools) {
 
-                    //Trigger change in Hey.You
-                    this.listen ('click', function () {
-                        my_Lib.setScope ('Hey.You', {
-                            'beatles': [
-                                { "firstName": "Pedro", "lastName": "Lennon" }
-                            ]
-                        });
-
-                        my_Lib.when ('drop', 'Hey.You', function () {
-                            console.log ('you are dead Hey.You');
-                        });
-
-                        // my_Lib.drop ('Hey.You');
+                },
+                jaja   : function () {
+                    my_Lib.setScope ('Hey.You', {
+                        'beatles': [
+                            { "firstName": "Pedro", "lastName": "Lennon" }
+                        ]
                     });
 
+                    my_Lib.when ('drop', 'Hey.You', function () {
+                        console.log ('you are dead Hey.You');
+                    });
+
+                    // my_Lib.drop ('Hey.You');
                 },
                 destroy: function () {}
             }

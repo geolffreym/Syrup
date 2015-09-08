@@ -4,12 +4,12 @@
 
 'use strict';
 
-/**Ajax
+/**Http
  * @constructor
  */
 
 
-function Ajax () {
+function Http () {
 	this.xhr = new window.XMLHttpRequest
 			   || new window.ActiveXObject ( "Microsoft.XMLHTTP" );
 	this.xhr_list = [];
@@ -28,7 +28,7 @@ function Ajax () {
  * @param callback
  * @return void
  * */
-Ajax.add ( 'on', function ( event, callback ) {
+Http.add ( 'on', function ( event, callback ) {
 	var self = this;
 	return [
 		{
@@ -58,7 +58,7 @@ Ajax.add ( 'on', function ( event, callback ) {
 
 } );
 
-/** Ajax Request
+/** Http Request
  * @param config
  * @param callback
  * @return object
@@ -77,7 +77,7 @@ Ajax.add ( 'on', function ( event, callback ) {
  *
  * }
  * **/
-Ajax.add ( 'request', function ( config, callback ) {
+Http.add ( 'request', function ( config, callback ) {
 	if ( !_.isObject ( config ) ) {
 		throw (WARNING_SYRUP.ERROR.NOOBJECT)
 	}
@@ -206,13 +206,13 @@ Ajax.add ( 'request', function ( config, callback ) {
  * @param type
  * @return object
  * **/
-Ajax.add ( 'requestHeader', function ( header, type ) {
+Http.add ( 'requestHeader', function ( header, type ) {
 	this.xhr.setRequestHeader ( header, type );
 	return this;
 } );
 
-//Kill Ajax
-Ajax.add ( 'kill', function () {
+//Kill Http
+Http.add ( 'kill', function () {
 	var i = this.xhr_list.length;
 	while ( i-- ) {
 		if ( !!this.xhr_list[ i ] )
