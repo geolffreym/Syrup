@@ -174,16 +174,18 @@ Apps.add ('_bindListener', function (moduleId) {
 			_the_filter = enabled_events.join (' [sp-'),
 			_mod = _$ ('[sp-recipe="' + moduleId + '"]');
 
-		_mod.find (_the_filter, function (i) {
-			_.each (i.attributes, function (v) {
-				if ( /sp-[a-z]+/.test (v.localName) ) {
-					var _event = _.replace (v.localName, 'sp-', ''),
-						_attr = _$ (i).attr (v.localName);
+		_mod.find (_the_filter, function (dom_list) {
+			dom_list.each (function (i) {
+				_.each (i.attributes, function (v) {
+					if ( /sp-[a-z]+/.test (v.localName) ) {
+						var _event = _.replace (v.localName, 'sp-', ''),
+							_attr = i.getAttribute (v.localName);
 
-					if ( _attr in _self )
-						_mod.listen (_event, '[' + v.localName + '="' + _attr + '"]', _self[_attr])
-				}
-			});
+						if ( _attr in _self )
+							_mod.listen (_event, '[' + v.localName + '="' + _attr + '"]', _self[_attr])
+					}
+				});
+			})
 		});
 	}
 });
@@ -200,9 +202,13 @@ Apps.add ('_serve', function (moduleId, template) {
 	//Is set the app
 	if ( this.app.exist ) {
 		//Find the recipe
-		var _dom = _$ ('[sp-recipe="' + moduleId + '"] [sp-view]');
-		if ( _dom.exist ) {
+		var _dom = _$ ('[sp-recipe="' + moduleId + '"] [sp-view]'),
+			_dom_template = _$ ('[sp-recipe="' + moduleId + '"] [sp-tpl]');
+
+		if ( _dom.exist ) { //Exist?
 			if ( _.getObjectSize (_scope) > 0 ) {
+
+				//A view?
 				if ( _.isSet (template) && _.isString (template) ) {
 					Require.request ('/view/' + template, function () {
 						_template = new Template;
@@ -211,16 +217,13 @@ Apps.add ('_serve', function (moduleId, template) {
 								_dom.html (my_html);
 							})
 					})
-				} else {
-					var _dom_template = _$ ('[sp-recipe="' + moduleId + '"] [sp-tpl]');
-					if ( _dom_template.exist ) {
-						var _parse = _dom_template.html ();
-						if ( _.isSet (_parse) ) {
-							_template = new Template;
-							_template.parse (_parse, _scope, function (result) {
-								_dom.html (result);
-							});
-						}
+				} else if ( _dom_template.exist ) { //Exist inline tpl?
+					var _parse = _dom_template.html ();
+					if ( _.isSet (_parse) ) {
+						_template = new Template;
+						_template.parse (_parse, _scope, function (result) {
+							_dom.html (result);
+						});
 					}
 				}
 			}
