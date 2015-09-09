@@ -14,19 +14,19 @@
     <a href="#" sp-click="the_method">
         yes
     </a>
-    
+
     <!-- The model -->
     <form action="" sp-submit="process_form">
         <input type="text" name="firstName" data-min="2"/>
         <input type="text" name="lastName"/>
         <input type="submit" data-skip="true"/>
     </form>
-    
+
     <!-- The view -->
     <div sp-view>
 
     </div>
-    
+
     <!-- The Inline template -->
     <template sp-tpl>
         <div>
@@ -106,9 +106,10 @@
                     var _self = this;
                     //Pack the model, from source
                     $.Model.pack (e.target).then (function (model) {
-                        _self.setScope ({ 'beatles': [model.getObject()] });
+                        _self.setScope ({ 'beatles': [model.getObject ()] });
                         //Send to server
-                        model.send('/miapp/myServerSideScript', model.getModelData())
+                        model.send ('/miapp/myServerSideScript', model.getData ())
+                                .then (function (result) {})
                     });
 
 

@@ -219,8 +219,11 @@ Apps.add ('_serve', function (moduleId, template) {
 
 		if ( _dom.exist ) { //Exist?
 			if ( _.getObjectSize (_scope) > 0 ) {
-				//A view?
+
+				//The view object
 				_template = new View;
+
+				//A view?
 				if ( _.isSet (template) && _.isString (template) ) {
 					Require.request ('/view/' + template, function () {
 						if ( moduleId in _template.__proto__ )
@@ -228,10 +231,11 @@ Apps.add ('_serve', function (moduleId, template) {
 								_dom.html (my_html);
 							})
 					})
-				} else if ( _dom_template.exist ) { //Exist inline tpl?
+				} else if ( _dom_template.exist ) {
+					//Exist inline tpl?
 					var _parse = _dom_template.html ();
 					if ( _.isSet (_parse) ) {
-						_template.parse (_parse, _scope).then (function (result) {
+						_template.render (_parse, _scope).then (function (result) {
 							_dom.html (result);
 						});
 					}

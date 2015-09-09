@@ -21,7 +21,7 @@
             console.log ('read A')
         });
         
-        //Require Hey/You and wait for Tooltip's ready
+        //Require Hey/You and wait for Tooltip
         Require.request ('/view/Hey/You', function () {
             console.log ('read B')
         }, { wait: 'Tooltip' });

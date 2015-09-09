@@ -2613,8 +2613,11 @@ Apps.add ('_serve', function (moduleId, template) {
 
 		if ( _dom.exist ) { //Exist?
 			if ( _.getObjectSize (_scope) > 0 ) {
-				//A view?
+
+				//The view object
 				_template = new View;
+
+				//A view?
 				if ( _.isSet (template) && _.isString (template) ) {
 					Require.request ('/view/' + template, function () {
 						if ( moduleId in _template.__proto__ )
@@ -2622,10 +2625,11 @@ Apps.add ('_serve', function (moduleId, template) {
 								_dom.html (my_html);
 							})
 					})
-				} else if ( _dom_template.exist ) { //Exist inline tpl?
+				} else if ( _dom_template.exist ) {
+					//Exist inline tpl?
 					var _parse = _dom_template.html ();
 					if ( _.isSet (_parse) ) {
-						_template.parse (_parse, _scope).then (function (result) {
+						_template.render (_parse, _scope).then (function (result) {
 							_dom.html (result);
 						});
 					}
@@ -2974,13 +2978,11 @@ Http.add ('requestHeader', function (header, type) {
 
 //Kill Http
 Http.add ('kill', function () {
-	var i = this.xhr_list.length;
-	while ( i-- ) {
-		if ( !!this.xhr_list[i] )
-			this.xhr_list[i].abort ();
-	}
-	this.xhr_list.length = 0;
+	_.each (this.xhr_list, function (xhr) {
+		xhr.abort ();
+	});
 
+	this.xhr_list.length = 0;
 	return this;
 });
 
@@ -3123,7 +3125,7 @@ View.add ('lookup', function (template) {
 });
 
 //Set the template
-View.add ('set', function (template) {
+View.add ('seekTpl', function (template) {
 	var _self = this,
 		_repo = _self.Storage,
 		_template = null, _save = {};
@@ -3155,7 +3157,7 @@ View.add ('set', function (template) {
 });
 
 //Return to render html
-View.add ('get', function () {
+View.add ('getTpl', function () {
 	return this.tpl;
 });
 
@@ -3181,7 +3183,7 @@ View.add ('remove', function () {
 });
 
 //Parse the View
-View.add ('parse', function (_template, _fields) {
+View.add ('render', function (_template, _fields) {
 	return (new Promise (function (resolve, reject) {
 		(new Workers).set ('/workers/setting/Parser').then (function (worker) {
 			worker.send ({ template: _template, fields: _fields });
@@ -3848,7 +3850,7 @@ Model.add ('getObject', function () {
 });
 
 //Return formdata
-Model.add ('getModelData', function () {
+Model.add ('getData', function () {
 	return this.modelData;
 });
 
@@ -3872,10 +3874,12 @@ Model.add ('pack', function (model) {
 		//Run over inputs
 		while ( x-- ) {
 
+			//Skip file type
 			if ( _fields[x].type === 'file' || !_fields[x] ) {
 				continue;
 			}
 
+			//Checked?
 			if ( _fields[x].type === 'checkbox' || _fields[x].type === 'radio' ) {
 				if ( !_fields[x].checked ) {
 					continue;
@@ -3922,6 +3926,7 @@ Model.add ('pack', function (model) {
 					fieldValue = _field_array
 				}
 
+				//The field has name?
 				if ( _.isSet (field.name) ) {
 					_modelData.append (field.name, fieldValue);
 					self.object[field.name] = fieldValue;

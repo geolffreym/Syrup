@@ -244,13 +244,11 @@ Http.add ('requestHeader', function (header, type) {
 
 //Kill Http
 Http.add ('kill', function () {
-	var i = this.xhr_list.length;
-	while ( i-- ) {
-		if ( !!this.xhr_list[i] )
-			this.xhr_list[i].abort ();
-	}
-	this.xhr_list.length = 0;
+	_.each (this.xhr_list, function (xhr) {
+		xhr.abort ();
+	});
 
+	this.xhr_list.length = 0;
 	return this;
 });
 

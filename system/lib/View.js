@@ -32,7 +32,7 @@ View.add ('lookup', function (template) {
 });
 
 //Set the template
-View.add ('set', function (template) {
+View.add ('seekTpl', function (template) {
 	var _self = this,
 		_repo = _self.Storage,
 		_template = null, _save = {};
@@ -64,7 +64,7 @@ View.add ('set', function (template) {
 });
 
 //Return to render html
-View.add ('get', function () {
+View.add ('getTpl', function () {
 	return this.tpl;
 });
 
@@ -90,7 +90,7 @@ View.add ('remove', function () {
 });
 
 //Parse the View
-View.add ('parse', function (_template, _fields) {
+View.add ('render', function (_template, _fields) {
 	return (new Promise (function (resolve, reject) {
 		(new Workers).set ('/workers/setting/Parser').then (function (worker) {
 			worker.send ({ template: _template, fields: _fields });

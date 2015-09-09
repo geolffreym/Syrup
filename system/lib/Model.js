@@ -112,7 +112,7 @@ Model.add ('getObject', function () {
 });
 
 //Return formdata
-Model.add ('getModelData', function () {
+Model.add ('getData', function () {
 	return this.modelData;
 });
 
@@ -136,10 +136,12 @@ Model.add ('pack', function (model) {
 		//Run over inputs
 		while ( x-- ) {
 
+			//Skip file type
 			if ( _fields[x].type === 'file' || !_fields[x] ) {
 				continue;
 			}
 
+			//Checked?
 			if ( _fields[x].type === 'checkbox' || _fields[x].type === 'radio' ) {
 				if ( !_fields[x].checked ) {
 					continue;
@@ -186,6 +188,7 @@ Model.add ('pack', function (model) {
 					fieldValue = _field_array
 				}
 
+				//The field has name?
 				if ( _.isSet (field.name) ) {
 					_modelData.append (field.name, fieldValue);
 					self.object[field.name] = fieldValue;

@@ -6,9 +6,9 @@
 View.add ('Hey.You', function (data, callback) {
 	//The template as relative path of config app_path
 	//Hey/You in app/templates respects namespace
-	this.set ('Hey/You').then (function (view) {
+	this.seekTpl ('Hey/You').then (function (view) {
 		if ( _.isSet (callback) ) {
-			view.parse (view.get(), data).then (callback);
+			view.render (view.getTpl (), data).then (callback);
 		}
 	});
 });
