@@ -2,7 +2,7 @@
  * Created by gmena on 01-27-14.
  */
 
-//The recipe name is needed
+//The view name
 View.add ('myView', function (data, callback) {
 	//The template as relative path of config app_path
 	//Hey/You in app/templates respects namespace
