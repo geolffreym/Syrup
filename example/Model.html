@@ -91,10 +91,10 @@
                     //When Hey.You scope change
                     this.when ('change', function (changes) {
 
-                        //Render new data using the inline template
-                        //If not serve param is set, template inline is used
-                        //Else if you set "Hey/You" "/app/view/Hey/You.js" view is used
-                        // Lousing Coupling
+                        // Render new data using the inline template
+                        // If not serve param is set, template inline is used
+                        // If you set "Hey/You" "/app/view/Hey/You.js" view is used
+                        // Lousing Coupling( The main dir -> "Hey" , The File -> "You", The view name -> "myView")
                         //_self.serve ('Hey/You/myView');
                         _self.serve ();
 
