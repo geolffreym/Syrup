@@ -92,7 +92,7 @@ Syrup is modular so you can create your own libraries and integrate the autoload
 //Development
  exports.files = {
         js: {
-            output: 'app/include/init', //The output default base/include/init
+            output: 'dist/init', //The output
             src: [
                 'app/config/init', // Needed do not change
                 'system/base/init', // Needed do not change
@@ -104,9 +104,9 @@ Syrup is modular so you can create your own libraries and integrate the autoload
     }
 ```
 
-Then you must get packages with `npm install` and finally run `npm start` and you'll have a unified library and .min in folder /app/include/
+Then you must get packages with `npm install` and finally run `npm start` and you'll have a unified library and .min in folder /dist/
 
-*If you do not have the option of using node, you must manually change the settings in the /app/include/init.js and include libs separately*
+*If you do not have the option of using node, you must manually change the settings in the /dist/init.js and include libs separately*
 
 
 Including Scripts
@@ -115,7 +115,7 @@ Including Scripts
 *You should not use the controllers on the unification of files, it is necessary to have separate it for each application*
 
 ```html    
-<script src="YOUR PATH/Syrup/app/include/init.min.js"></script>
+<script src="YOUR PATH/Syrup/dist/init.min.js"></script>
 <script src="YOUR PATH/Syrup/controller/YOUR CONTROLLER.min.js"></script>
 ```
 When you need to add libraries to your drivers that were not pre-compiled in the unification, you can call them using the Require class, as explained later use.
@@ -1404,7 +1404,7 @@ they both update the view when the model changes and update the model when the u
 
 *In this case the module name is index and contact respectively*
 ```html
-<script src="YOUR PATH/Syrup/app/include/init.min.js"></script>
+<script src="YOUR PATH/Syrup/dist/init.min.js"></script>
 <script src="YOUR PATH/Syrup/app/controller/index/init.js"></script>
                               **OR IN CASE**
 <script src="YOUR PATH/Syrup/app/controller/contact/init.js"></script>
