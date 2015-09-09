@@ -1,7 +1,6 @@
 {
   "name": "Syrup",
   "description": "App with sweet flavor. Simple MVC | MTV frameworks",
-  "version": "1.1",
   "main": [
     "app/include/init.min.js"
   ],
