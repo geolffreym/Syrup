@@ -14,11 +14,12 @@ exports.files = {
 			'system/base/Require',
 			'system/base/Lib',
 			'system/base/App',
+			// Until here the core
 			'system/lib/Http',
 			'system/lib/Storage',
 			'system/lib/Workers',
 			'system/lib/View',
-			// Until here needed do not change
+			// Until here libs needed do not change
 			// Add all the necessary modules
 			'system/lib/Map',
 			'system/lib/Model'
