@@ -46,11 +46,12 @@ Require.add ('toWait', function (script, callback, conf) {
 Require.add ('request', function (script, callback, conf) {
 	var _self = this,
 		_url = !_.isUrl (script)
-			? setting.app_path + script + '.min.js'
-			: script + '.min.js',
+			? setting.app_path + script + (setting.include_min ? '.min.js' : '.js')
+			: script,
 		_script = script
 			.split ('/')
 			.pop ();
+
 
 	// Wait for a script
 	if ( _self.toWait (script, callback, conf) )

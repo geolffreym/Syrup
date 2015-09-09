@@ -2248,11 +2248,12 @@ Require.add ('toWait', function (script, callback, conf) {
 Require.add ('request', function (script, callback, conf) {
 	var _self = this,
 		_url = !_.isUrl (script)
-			? setting.app_path + script + '.min.js'
-			: script + '.min.js',
+			? setting.app_path + script + (setting.include_min ? '.min.js' : '.js')
+			: script,
 		_script = script
 			.split ('/')
 			.pop ();
+
 
 	// Wait for a script
 	if ( _self.toWait (script, callback, conf) )
@@ -3065,9 +3066,9 @@ Workers.add ('on', function (event, callback) {
 Workers.add ('set', function (url) {
 	var self = this;
 	return (new Promise (function (resolve, reject) {
-		self.Worker = (new Worker (setting.system_path + url + '.min.js'));
+		self.Worker = (new Worker (setting.system_path + url + (setting.include_min ? '.min.js' : '.js')));
 		self.Worker.addEventListener ('message', function (e) {
-			_.callbackAudit(self.onsuccess,e);
+			_.callbackAudit (self.onsuccess, e);
 		}, false);
 		resolve (self);
 	}))
@@ -3952,10 +3953,11 @@ Model.add ('pack', function (model) {
 //Basic Config
 
 var setting = {
-	processor: '',
-	app_path      : '/Syrup/app',
-	system_path   : '/Syrup/system',
-	env: 'development'
+	processor  : '',
+	include_min: true,
+	app_path   : '/Syrup/app',
+	system_path: '/Syrup/system',
+	env        : 'development'
 };
 
 

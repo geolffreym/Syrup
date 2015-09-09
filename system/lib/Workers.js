@@ -26,9 +26,9 @@ Workers.add ('on', function (event, callback) {
 Workers.add ('set', function (url) {
 	var self = this;
 	return (new Promise (function (resolve, reject) {
-		self.Worker = (new Worker (setting.system_path + url + '.min.js'));
+		self.Worker = (new Worker (setting.system_path + url + (setting.include_min ? '.min.js' : '.js')));
 		self.Worker.addEventListener ('message', function (e) {
-			_.callbackAudit(self.onsuccess,e);
+			_.callbackAudit (self.onsuccess, e);
 		}, false);
 		resolve (self);
 	}))
