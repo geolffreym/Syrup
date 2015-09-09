@@ -5,7 +5,7 @@
     <title></title>
 </head>
 <body>
-<script src="../app/include/init.js"></script>
+<script src="../Syrup/app/include/init.js"></script>
 
 
 <div sp-recipe="Hey.You">
@@ -85,7 +85,7 @@
                             { "firstName": "George", "lastName": "Harrison" },
                             { "firstName": "Ringo", "lastName": "Starr" }
                         ]
-                    }).serve ();
+                    }).serve ('Hey/You/myView');
 
 
                     //When Hey.You scope change
@@ -94,7 +94,8 @@
                         //Render new data using the inline template
                         //If not serve param is set, template inline is used
                         //Else if you set "Hey/You" "/app/view/Hey/You.js" view is used
-                        //_self.serve ('Hey/You');
+                        // Lousing Coupling
+                        //_self.serve ('Hey/You/myView');
                         _self.serve ();
 
                         // The global service in tools

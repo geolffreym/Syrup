@@ -1,7 +1,7 @@
 {
   "name": "Syrup",
-  "version": "0.1.",
-  "description": "Give your JS App MVC | MTV pattern with Models, Views, Controllers, Templates, Events and Connections.",
+  "version": "1.1",
+  "description": "App with sweet flavor. Simple MVC | MTV framework.",
   "keywords": [
     "model",
     "view",
@@ -11,7 +11,7 @@
     "client",
     "browser"
   ],
-  "repo": "https://github.com/geolffreym/Syrup",
+  "repo": "http://geolffreym.github.io/Syrup/",
   "dependencies": {},
   "main": "Syrup.js",
   "scripts": [

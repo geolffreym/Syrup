@@ -1,0 +1,36 @@
+{
+  "name": "Syrup",
+  "description": "App with sweet flavor. Simple MVC | MTV frameworks",
+  "version": "1.1",
+  "main": [
+    "app/include/init.min.js"
+  ],
+  "dependencies": {},
+  "devDependencies": {},
+  "moduleType": [
+    "globals",
+    "node"
+  ],
+  "homepage":"http://geolffreym.github.io/Syrup/",
+  "repository":{
+    "type":"git",
+    "url":"https://github.com/geolffreym/Syrup"
+  },
+  "keywords": [
+    "framework",
+    "mvc",
+    "mvt",
+    "sweet",
+    "syrup"
+  ],
+  "authors": [
+    "Geolffrey Mena <gmjun2000@gmail.com>"
+  ],
+  "license": "GNU/GPL",
+  "ignore": [
+    "node_modules",
+    "example",
+    "test",
+    "tests"
+  ]
+}

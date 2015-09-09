@@ -2576,7 +2576,7 @@ Apps.add ('_bindListener', function (moduleId) {
 				//Fint the listener in attributes
 				_.each (i.attributes, function (v) {
 					if ( /sp-[a-z]+/.test (v.localName) ) {
-						var _event = _.replace (v.localName, 'sp-', ''),
+						var _event = _.replace (v.localName, 'sp-', _.emptyStr),
 							_attr = i.getAttribute (v.localName);
 
 						//Is the attr value in module?
@@ -2602,7 +2602,7 @@ Apps.add ('_bindListener', function (moduleId) {
  * @return object
  */
 Apps.add ('_serve', function (moduleId, template) {
-	var _template = null,
+	var _view = null,
 		_scope = this.scope[moduleId];
 
 	//Is set the app
@@ -2615,13 +2615,16 @@ Apps.add ('_serve', function (moduleId, template) {
 			if ( _.getObjectSize (_scope) > 0 ) {
 
 				//The view object
-				_template = new View;
+				_view = new View;
 
 				//A view?
 				if ( _.isSet (template) && _.isString (template) ) {
-					Require.request ('/view/' + template, function () {
-						if ( moduleId in _template.__proto__ )
-							_template[moduleId] (_scope, function (my_html) {
+					var view_name = template.split ('/').pop (),
+						view_dir = _.replace (template, '/' + view_name, _.emptyStr);
+
+					Require.request ('/view/' + view_dir, function () {
+						if ( view_name in _view.__proto__ )
+							_view[view_name] (_scope, function (my_html) {
 								_dom.html (my_html);
 							})
 					})
@@ -2629,7 +2632,7 @@ Apps.add ('_serve', function (moduleId, template) {
 					//Exist inline tpl?
 					var _parse = _dom_template.html ();
 					if ( _.isSet (_parse) ) {
-						_template.render (_parse, _scope).then (function (result) {
+						_view.render (_parse, _scope).then (function (result) {
 							_dom.html (result);
 						});
 					}

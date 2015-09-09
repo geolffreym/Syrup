@@ -3,7 +3,7 @@
  */
 
 //The recipe name is needed
-View.add ('Hey.You', function (data, callback) {
+View.add ('myView', function (data, callback) {
 	//The template as relative path of config app_path
 	//Hey/You in app/templates respects namespace
 	this.seekTpl ('Hey/You').then (function (view) {
