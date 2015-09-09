@@ -101,11 +101,11 @@
                 process_form: function (e, $) {
                     e.preventDefault ();
                     var _self = this;
-                    // $.Form.on('error', function(r){console.log(r)})
+                    //Pack the model, from source
                     $.Model.pack (e.target).then (function (model) {
                         _self.setScope ({ 'beatles': [model.getObject()] });
-                        //console.log(model.getModelData())
-                        model.send('hi', model.getModelData())
+                        //Send to server
+                        model.send('/miapp/myServerSideScript', model.getModelData())
                     });
 
 
