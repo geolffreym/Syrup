@@ -8,10 +8,12 @@
     "globals",
     "node"
   ],
-  "homepage":"http://geolffreym.github.io/Syrup/",
-  "repository":{
-    "type":"git",
-    "url":"https://github.com/geolffreym/Syrup"
+  "devDependencies": {},
+  "dependencies": {},
+  "homepage": "http://geolffreym.github.io/Syrup/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/geolffreym/Syrup"
   },
   "keywords": [
     "framework",
