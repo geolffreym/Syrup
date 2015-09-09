@@ -5,7 +5,7 @@
     "dist/init.min.js"
   ],
   "dependencies": {},
-  "devDependencies": {},
+  "devDependencies":
   "moduleType": [
     "globals",
     "node"
