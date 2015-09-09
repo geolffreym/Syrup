@@ -2,7 +2,7 @@
   "name": "Syrup",
   "description": "App with sweet flavor. Simple MVC | MTV frameworks",
   "main": [
-    "app/include/init.min.js"
+    "dist/init.min.js"
   ],
   "dependencies": {},
   "devDependencies": {},

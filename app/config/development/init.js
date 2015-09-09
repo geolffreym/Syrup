@@ -7,7 +7,7 @@
 //Development
 exports.files = {
 	js: {
-		output: 'app/include/init',
+		output: 'dist/init',
 		src   : [
 			'system/base/Syrup',
 			'system/base/Observer',

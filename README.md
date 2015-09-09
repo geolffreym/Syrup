@@ -2,7 +2,7 @@ Syrup
 =======
 [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/geolffreym/Syrup?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-Give your JS App MVC | MTV pattern with Models, Views, Controllers, Templates, Events, Connections, Real Time Communications, etc...
+App with sweet flavor. Simple MVC | MTV framework
 
 
 Description
@@ -40,6 +40,18 @@ if(_.nav.unsupported){
 
 Basic Config
 =======
+
+Installation
+-----------
+
+Using [Bower](http://bower.io/):
+
+`bower install Syrup`
+
+Using [Git](http://git-scm.com/docs/git-clone):
+
+`git clone https://github.com/geolffreym/Syrup.git` 
+
 
 Nav Status
 ----------
