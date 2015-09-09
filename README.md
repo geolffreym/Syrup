@@ -46,7 +46,7 @@ Installation
 
 Using [Bower](http://bower.io/):
 
-`bower install Syrup`
+`bower install syrup`
 
 Using [Git](http://git-scm.com/docs/git-clone):
 
