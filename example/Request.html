@@ -16,10 +16,12 @@
 
 
     _$ (function () {
+        //Request for Tooltip
         Require.request ('/plugins/Tooltip', function () {
             console.log ('read A')
         });
-
+        
+        //Require Hey/You and wait for Tooltip's ready
         Require.request ('/view/Hey/You', function () {
             console.log ('read B')
         }, { wait: 'Tooltip' });
