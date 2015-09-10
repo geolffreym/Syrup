@@ -19,10 +19,10 @@ exports.files = {
 			'system/lib/Storage',
 			'system/lib/Workers',
 			'system/lib/View',
+			'system/lib/Model',
 			// Until here libs needed do not change
 			// Add all the necessary modules
-			'system/lib/Map',
-			'system/lib/Model'
+			'system/lib/Map'
 		]
 	}
 };
