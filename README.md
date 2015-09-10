@@ -10,6 +10,7 @@ App with sweet flavor. Simple MVC | MTV framework
 **With the help of**
 
 Templating [Mustache](https://github.com/janl/mustache.js)
+
 Require Help [Requirejs](http://requirejs.org/docs/api.html)
 
 
