@@ -5,20 +5,11 @@
     <title></title>
 </head>
 <body>
-<script src="../Syrup/app/include/init.js"></script>
+<script src="../dist/init.js"></script>
 <script>
 
 
     _$ (function () {
-        //Request for Tooltip
-        Require.request ('/plugins/Tooltip', function () {
-            console.log ('read A')
-        });
-        
-        //Require Hey/You and wait for Tooltip
-        Require.request ('/view/Hey/You', function () {
-            console.log ('read B')
-        }, { wait: 'Tooltip' });
 
     })
 
