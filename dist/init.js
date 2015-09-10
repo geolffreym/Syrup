@@ -2229,7 +2229,7 @@ if ( !Object.observe ) {
 /*jslint regexp: true, nomen: true, sloppy: true */
 /*global window, navigator, document, importScripts, setTimeout, opera */
 
-
+//http://requirejs.org/docs/api.html
 //Fallback
 function Required () {
 	var requirejs, require, define;
