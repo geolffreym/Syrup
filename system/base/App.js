@@ -228,7 +228,7 @@ Apps.add ('_serve', function (moduleId, template) {
 					var view_name = template.split ('/').pop (),
 						view_dir = _.replace (template, '/' + view_name, _.emptyStr);
 
-					Require.request ('/view/' + view_dir, function () {
+					Require.lookup (['view/' + view_dir]).then (function () {
 						if ( view_name in _view.__proto__ )
 							_view[view_name] (_scope, function (my_html) {
 								_dom.html (my_html);

@@ -5,12 +5,29 @@
     <title></title>
 </head>
 <body>
-<script src="../dist/init.js"></script>
+<script src="/syrup/dist/init.js"></script>
 <script>
 
 
     _$ (function () {
 
+        //Require use requirejs
+        //http://requirejs.org/docs/api.html#config
+        //Require.setConf ({
+        //  baseUrl:'hi'
+        //});
+
+        //Get the requirejs object
+        //http://requirejs.org/docs/api.html#jsfiles
+        //Require.getRequire();
+
+        //Get define method
+        //http://requirejs.org/docs/api.html#define
+        //Require.getDefine();
+
+        Require.lookup (['view/Hey/You', 'system/lib/Geolocation']).then (function () {
+            console.log ('ready')
+        });
     })
 
 </script>

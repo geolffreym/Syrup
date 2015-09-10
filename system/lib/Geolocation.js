@@ -123,5 +123,3 @@ Geolocation = function (config) {
 	};
 
 };
-
-Syrup.blend (Geolocation);

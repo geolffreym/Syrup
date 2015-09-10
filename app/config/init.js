@@ -6,9 +6,8 @@
 
 var setting = {
 	processor  : '',
-	include_min: true,
-	app_path   : '/Syrup/app',
-	system_path: '/Syrup/system',
+	app_path   : '/syrup/app',
+	system_path: '/syrup/system',
 	env        : 'development'
 };
 

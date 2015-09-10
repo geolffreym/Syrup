@@ -5,7 +5,7 @@
     <title></title>
 </head>
 <body>
-<script src="../dist/init.min.js"></script>
+<script src="/syrup/dist/init.js"></script>
 
 
 <div sp-recipe="Hey.You">
@@ -96,7 +96,7 @@
                         // If you set "Hey/You" "/app/view/Hey/You.js" view is used
                         // Lousing Coupling( The main dir -> "Hey" , The File -> "You", The view name -> "myView")
                         //_self.serve ('Hey/You/myView');
-                        _self.serve ();
+                        _self.serve ('Hey/You/myView');
 
                         // The global service in tools
                         $.myConsole ('Done');
@@ -109,8 +109,8 @@
                     $.Model.pack (e.target).then (function (model) {
                         _self.setScope ({ 'beatles': [model.getObject ()] });
                         //Send to server
-                        model.send ('/miapp/myServerSideScript', model.getData ())
-                                .then (function (result) {})
+//                        model.send ('/miapp/myServerSideScript', model.getData ())
+//                                .then (function (result) {})
                     });
 
 
@@ -130,7 +130,7 @@
                 method : function (e, $) {
                     my_Lib.setScope ('Hey.You', {
                         'beatles': [
-                            { "firstName": "John", "lastName": "Lennon" },
+                            { "firstName": "John", "lastName": "Pasa" }
                         ]
                     });
 
