@@ -91,9 +91,6 @@ Libs.add ('supply', function (supplier) {
 });
 
 
-Libs.add ('extend', function (extend_to) {
-	console.log (this)
-});
 /**Append methods
  * @param name
  * @param callback
