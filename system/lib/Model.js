@@ -175,6 +175,7 @@ Model.add ('pack', function (model) {
 						break;
 					}
 				}
+
 				//The field has name?
 				if ( _.isSet (field.name) ) {
 

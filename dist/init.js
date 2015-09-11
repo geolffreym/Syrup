@@ -5467,6 +5467,7 @@ Model.add ('pack', function (model) {
 						break;
 					}
 				}
+
 				//The field has name?
 				if ( _.isSet (field.name) ) {
 
@@ -5474,7 +5475,7 @@ Model.add ('pack', function (model) {
 					if ( !!(_field_array = self.multiple (field.name)) )
 						fieldValue = _field_array;
 
-
+					//Append Data
 					_modelData.append (field.name, fieldValue);
 					self.object[field.name] = fieldValue;
 				}
