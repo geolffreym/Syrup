@@ -27,20 +27,26 @@ Router.add ('setRoutes', function (routes) {
  * @param callback
  * @returns {boolean}
  */
-Router.add ('route', function (path, callback) {
+Router.add ('route', function (path) {
 	_.assert (path, WARNING_SYRUP.ERROR.NOPARAM);
-	var _location = window.location.pathname,
-		_result = _.isArray (path)
-			? _.matchInArray (_location, path)
-			: new RegExp (path, 'g').test (_location);
 
-	if ( !_result ) {
-		return false;
-	}
+	return (new Promise (function (resolve, reject) {
 
-	_.callbackAudit (callback, path);
+		var _location = window.location.pathname,
+			_result = _.isArray (path)
+				? _.matchInArray (_location, path)
+				: new RegExp (path, 'g').test (_location);
+
+		if ( !_result ) {
+			reject (false);
+			return;
+		}
+
+		resolve (_result);
+	}));
+
 });
 
-Router.add ('parse_query_string', function () {
+Router.add ('parseQueryString', function () {
 
 });
