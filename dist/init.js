@@ -4627,6 +4627,9 @@ Apps.add ('when', function (event, name, callback) {
 	]
 });
 
+/**Bind Listeners
+ * @param moduleId
+ * */
 Apps.add ('_bindListener', function (moduleId) {
 	var enabled_events = [
 		'[sp-click], ', 'submit], ',
@@ -4646,6 +4649,8 @@ Apps.add ('_bindListener', function (moduleId) {
 
 		//Find events listeners
 		_mod.find (_the_filter, function (dom_list) {
+
+			//The dom object
 			dom_list.each (function (i) {
 
 				//Fint the listener in attributes
@@ -4657,13 +4662,13 @@ Apps.add ('_bindListener', function (moduleId) {
 						//Is the attr value in module?
 						if ( _attr in _self ) {
 							//is Function the attr value?
-							if ( _.isFunction (_self[_attr]) )
+							if ( _.isFunction (_self[_attr]) ) {
 								_mod.listen (_event, '[' + v.localName + '="' + _attr + '"]', function (e) {
 									//Param event and dependencies
 									_self[_attr] (e, _this.lib.get (_self.parent));
 								});
+							}
 						}
-
 					}
 				});
 			})
@@ -4697,6 +4702,7 @@ Apps.add ('_serve', function (moduleId, template) {
 					var view_name = template.split ('/').pop (),
 						view_dir = _.replace (template, '/' + view_name, _.emptyStr);
 
+					//Require th view if needed
 					Require.lookup (['view/' + view_dir]).then (function () {
 						if ( view_name in _view.__proto__ )
 							_view[view_name] (_scope, function (my_html) {
