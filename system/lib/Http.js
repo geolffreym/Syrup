@@ -232,6 +232,41 @@ Http.add ('post', function (url, data) {
 });
 
 
+/**Put request
+ * @param url
+ * @param data
+ * @param callback
+ * */
+Http.add ('put', function (url, data) {
+	var _conf = {
+		method: 'PUT',
+		url   : url || location.href,
+		data  : data || {}
+	};
+
+	this.kill ();
+	return this.request (_conf);
+});
+
+
+/**Delete request
+ * @param url
+ * @param data
+ * @param callback
+ * */
+Http.add ('delete', function (url, data) {
+	var _conf = {
+		method: 'DELETE',
+		url   : url || location.href,
+		data  : data || {}
+	};
+
+	this.kill ();
+	return this.request (_conf);
+});
+
+
+
 /** Set Request Header
  * @param header
  * @param type

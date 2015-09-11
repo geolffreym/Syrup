@@ -118,8 +118,8 @@
                     $.Model.pack (e.target).then (function (model) {
                         _self.setScope ({ 'beatles': [model.getObject ()] });
                         //Send to server
-//                        model.send ('/miapp/myServerSideScript', model.getData ())
-//                                .then (function (result) {})
+                        model.send ('/miapp/myServerSideScript', model.getObject ())
+                                .then (function (result) {})
                     });
 
 
