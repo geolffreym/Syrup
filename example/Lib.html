@@ -5,7 +5,7 @@
     <title></title>
 </head>
 <body>
-<script src="../dist/init.js"></script>
+<script src="../syrup/dist/init.js"></script>
 <a href="#" id="click" data-hi="1" class="a b c" data-tooltip="Hi!">
     Test
 </a>
@@ -17,23 +17,30 @@
 
     _$ (function () {
 
-        //Blend a Lib to Syrup
-        var my_Lib = Lib.blend ('Hey', ['Http']);
+        Require.lookup (['lib/myTestLib']).then (function () {
 
-        //Constructor
-        my_Lib.make ({ user: 'Pedro' });
+            //Blend a Lib to Syrup
+            var my_Lib = Lib.blend ('Hey', ['Http', 'myTestLib']);
 
-        //Methods
-        my_Lib.supply ({
-            sayHi: function () {
-                console.log('Hey i\'m ' + this.user);
+            //Constructor
+            my_Lib.make ({ user: 'Pedro' });
 
-                //Http in dependencies
-                console.log(this.Http);
-            }
+            //Methods
+            my_Lib.supply ({
+                sayHi: function () {
+                    console.log ('Hey i\'m ' + this.user);
+
+                    //Http in dependencies
+                    console.log (this.Http);
+                    console.log (this.myTestLib.myFunc());
+                }
+            });
+
+            //my_Lib.extend ();
+
+            _.Hey.sayHi ();
         });
 
-        _.Hey.sayHi();
     })
 
 </script>

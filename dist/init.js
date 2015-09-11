@@ -34,6 +34,7 @@ if ( typeof exports !== 'undefined' )
 var
 	nativeFunction = Function.prototype,
 	nativeObject = Object.prototype,
+	//nativeArray = Array.prototype,
 	regexConstructor = /(([^function])([a-zA-z])+(?=\())/g,
 	regexUrl = /^(https?|ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i,
 	regexMail = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/,
@@ -53,6 +54,14 @@ var
 			NOOBJECTREPLACEREGEXP: 'A object replace param is needed to replace a regexp ex: {match:replace}'
 		}
 	};
+
+
+/**Clone a object
+ * @return object
+ * */
+nativeObject.clone = function () {
+	return _.extend ({}, this);
+};
 
 /** Extend a function
  *  @param child
@@ -4390,6 +4399,7 @@ Libs.add ('blend', function (name, dependencies) {
 		Function.factory (name)
 	) ();
 
+
 	if ( !(name in this.breadcrumb) ) {
 		Syrup.blend (_anonymous);
 		this.name = name;
@@ -4419,7 +4429,7 @@ Libs.add ('_dependencies', function (dependencies) {
 	if ( _.isArray (dependencies) && _.isSet (_self.object) ) {
 		_.each (dependencies, function (v) {
 			_self.object.__proto__[v] = !_.isSet (_self.object[v])
-				? new window[v] : _self.object[v];
+				? ( _[v] || new window[v]) : _self.object[v];
 		})
 	}
 });
@@ -4454,6 +4464,10 @@ Libs.add ('supply', function (supplier) {
 	return this;
 });
 
+
+Libs.add ('extend', function (extend_to) {
+	console.log (this)
+});
 /**Append methods
  * @param name
  * @param callback

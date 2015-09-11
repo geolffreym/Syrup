@@ -25,6 +25,7 @@ Libs.add ('blend', function (name, dependencies) {
 		Function.factory (name)
 	) ();
 
+
 	if ( !(name in this.breadcrumb) ) {
 		Syrup.blend (_anonymous);
 		this.name = name;
@@ -54,7 +55,7 @@ Libs.add ('_dependencies', function (dependencies) {
 	if ( _.isArray (dependencies) && _.isSet (_self.object) ) {
 		_.each (dependencies, function (v) {
 			_self.object.__proto__[v] = !_.isSet (_self.object[v])
-				? new window[v] : _self.object[v];
+				? ( _[v] || new window[v]) : _self.object[v];
 		})
 	}
 });
@@ -89,6 +90,10 @@ Libs.add ('supply', function (supplier) {
 	return this;
 });
 
+
+Libs.add ('extend', function (extend_to) {
+	console.log (this)
+});
 /**Append methods
  * @param name
  * @param callback
