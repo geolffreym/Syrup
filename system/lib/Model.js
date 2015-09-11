@@ -52,20 +52,15 @@ Model.add ('attach', function (name, attach) {
  * @return array
  */
 Model.add ('multiple', function (name) {
-	var _top = 0, _input_array,
-		_return = [],
+	var _return = [],
 		_model_obj = this.model.object ();
 
-
 	if ( _.isSet (_model_obj.elements[name]) ) {
-		if ( (
-				_input_array = _model_obj.elements[name].length
-			) ) {
-			for ( ; _top < _input_array; _top++ ) {
-				_return.push (_model_obj.elements[name][_top].value)
-			}
-		}
+		_.each (_model_obj.elements[name], function (v, i) {
+			_return.push (v.value);
+		});
 	}
+
 	return _return.length > 0 ? _return : false;
 });
 
@@ -180,16 +175,14 @@ Model.add ('pack', function (model) {
 						break;
 					}
 				}
-
-				//Has multiple?
-				if ( !!(
-						_field_array = self.multiple (field.name)
-					) ) {
-					fieldValue = _field_array
-				}
-
 				//The field has name?
 				if ( _.isSet (field.name) ) {
+
+					//Has multiple?
+					if ( !!(_field_array = self.multiple (field.name)) )
+						fieldValue = _field_array;
+
+					//Append Data
 					_modelData.append (field.name, fieldValue);
 					self.object[field.name] = fieldValue;
 				}
