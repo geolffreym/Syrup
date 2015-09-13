@@ -19,12 +19,12 @@
 			ERROR: {
 				NOPARAM              : 'Param needed',
 				NONETWORK            : 'Network Error',
-				NOOBJECT             : 'An object param is necessary.',
+				NOOBJECT             : 'An object param is needed.',
 				NOARRAY              : 'An array necessary.',
-				NOFUNCTION           : 'An function necessary.',
+				NOFUNCTION           : 'An function needed.',
 				NODATE               : 'Invalid Date',
 				NOSTRING             : 'String is required',
-				NODOM                : ' not exist in the DOM document',
+				NOPACK               : 'Error packing model',
 				NOCALLBACK           : 'Callback error on execution time.',
 				NOURL                : 'URL is required for the request.',
 				NOHTML               : 'Html string is required',
@@ -346,7 +346,7 @@
 			}
 		});
 		return _.isString (attr)
-			? _.specArray (_attr): this;
+			? _.specArray (_attr) : this;
 	});
 
 	/***Remove Atributes
@@ -864,8 +864,8 @@
 
 
 		return _.toArray (this.collection).sort (function (a, b) {
-			var _a = _$(a).attr(_prop) || _$(a).prop(_prop),
-				_b = _$(b).attr(_prop) || _$(b).prop(_prop);
+			var _a = _$ (a).attr (_prop) || _$ (a).prop (_prop),
+				_b = _$ (b).attr (_prop) || _$ (b).prop (_prop);
 
 			if ( _.isSet (_a) && _.isSet (_b) ) {
 				a = !isNaN (+_a) ? +_a : _a.toLowerCase ();
@@ -1782,6 +1782,7 @@
 	_.$fn = _$_;
 	_.emptyStr = '';
 	_.Syrup = Syrup;
+	_.WARNING_SYRUP = WARNING_SYRUP;
 
 	_.nav = {};
 	_.nav.unsupported =

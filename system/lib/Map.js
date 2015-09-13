@@ -111,17 +111,17 @@ GoogleMap = function () {
 
 		_.each (coords, function (v) {
 			lat = (
-				  v.lat () * Math.PI
+					  v.lat () * Math.PI
 				  ) / 180;
 			long = (
-				   v.lng () * Math.PI
+					   v.lng () * Math.PI
 				   ) / 180;
 
 			x += (
-			Math.cos (lat) * Math.cos (long)
+				Math.cos (lat) * Math.cos (long)
 			);
 			y += (
-			Math.cos (lat) * Math.sin (long)
+				Math.cos (lat) * Math.sin (long)
 			);
 			z += (
 				Math.sin (lat)
@@ -165,7 +165,7 @@ GoogleMap = function () {
 		}
 
 		if ( !_.isFunction (callback) )
-			_.error (WARNING_SYRUP.ERROR.NOFUNCTION);
+			_.error (_.WARNING_SYRUP.ERROR.NOFUNCTION);
 
 		if ( !_.isObject (elem) )
 			_.error (WARNING_GOOGLE_MAP.ERROR.NOMAP);

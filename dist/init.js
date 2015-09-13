@@ -38,12 +38,12 @@ if ( typeof exports !== 'undefined' )
 			ERROR: {
 				NOPARAM              : 'Param needed',
 				NONETWORK            : 'Network Error',
-				NOOBJECT             : 'An object param is necessary.',
+				NOOBJECT             : 'An object param is needed.',
 				NOARRAY              : 'An array necessary.',
-				NOFUNCTION           : 'An function necessary.',
+				NOFUNCTION           : 'An function needed.',
 				NODATE               : 'Invalid Date',
 				NOSTRING             : 'String is required',
-				NODOM                : ' not exist in the DOM document',
+				NOPACK               : 'Error packing model',
 				NOCALLBACK           : 'Callback error on execution time.',
 				NOURL                : 'URL is required for the request.',
 				NOHTML               : 'Html string is required',
@@ -365,7 +365,7 @@ if ( typeof exports !== 'undefined' )
 			}
 		});
 		return _.isString (attr)
-			? _.specArray (_attr): this;
+			? _.specArray (_attr) : this;
 	});
 
 	/***Remove Atributes
@@ -883,8 +883,8 @@ if ( typeof exports !== 'undefined' )
 
 
 		return _.toArray (this.collection).sort (function (a, b) {
-			var _a = _$(a).attr(_prop) || _$(a).prop(_prop),
-				_b = _$(b).attr(_prop) || _$(b).prop(_prop);
+			var _a = _$ (a).attr (_prop) || _$ (a).prop (_prop),
+				_b = _$ (b).attr (_prop) || _$ (b).prop (_prop);
 
 			if ( _.isSet (_a) && _.isSet (_b) ) {
 				a = !isNaN (+_a) ? +_a : _a.toLowerCase ();
@@ -1801,6 +1801,7 @@ if ( typeof exports !== 'undefined' )
 	_.$fn = _$_;
 	_.emptyStr = '';
 	_.Syrup = Syrup;
+	_.WARNING_SYRUP = WARNING_SYRUP;
 
 	_.nav = {};
 	_.nav.unsupported =
@@ -4755,7 +4756,6 @@ Apps.add ('_taste', function (moduleId) {
 			_self._bindListener (moduleId);
 		}
 
-
 		//Observe scope
 		_self._watch (moduleId);
 	}
@@ -4771,7 +4771,7 @@ Apps.add ('_taste', function (moduleId) {
 Apps.add ('drop', function (moduleId) {
 	if ( moduleId in this.modules ) {
 		if ( this.modules[moduleId].instance ) {
-			if ( this.modules[moduleId].instance.destroy )
+			if ( 'destroy' in this.modules[moduleId].instance )
 				this.modules[moduleId].instance.destroy (this.lib.get (this.root));
 
 			if ( this.ondrop[moduleId] )
@@ -4875,7 +4875,7 @@ Http.add ('on', function (event, callback) {
  * **/
 Http.add ('request', function (config) {
 	if ( !_.isObject (config) ) {
-		throw (WARNING_SYRUP.ERROR.NOOBJECT)
+		throw (_.WARNING_SYRUP.ERROR.NOOBJECT)
 	}
 
 	var _self = this,
@@ -4897,7 +4897,7 @@ Http.add ('request', function (config) {
 	return (new Promise (function (resolve, reject) {
 
 		if ( !_.isSet (config.url) )
-			reject (WARNING_SYRUP.ERROR.NOURL);
+			reject (_.WARNING_SYRUP.ERROR.NOURL);
 
 		if ( !_.isFormData (_data)
 			 && _.isSet (_data)
@@ -5119,8 +5119,8 @@ Router.add ('setRoutes', function (routes) {
  * @param callback
  * @returns {boolean}
  */
-Router.add ('route', function (route_name) {
-	_.assert (route_name, WARNING_SYRUP.ERROR.NOPARAM);
+Router.add ('when', function (route_name) {
+	_.assert (route_name, _.WARNING_SYRUP.ERROR.NOPARAM);
 	var _self = this;
 	return (new Promise (function (resolve, reject) {
 
@@ -5128,6 +5128,13 @@ Router.add ('route', function (route_name) {
 		if ( !(route_name in _self.routes) )
 			reject (route_name);
 
+		var _the_regexp = _self.routes[route_name],
+			_to_route = window.location.pathname,
+			_result = _to_route.match ((new RegExp (_the_regexp, 'g')));
+
+
+		if ( _result )
+			resolve (_result)
 
 	}));
 
@@ -5297,7 +5304,7 @@ View.add ('seekTpl', function (template) {
 				_self.tpl = temp;
 				resolve (_self);
 			}).catch (function () {
-				reject (WARNING_SYRUP.ERROR.NONETWORK);
+				reject (_.WARNING_SYRUP.ERROR.NONETWORK);
 			});
 		}
 	}));
@@ -5355,12 +5362,6 @@ View.add ('render', function (_template, _fields) {
  * Http Lib
  * */
 
-var WARNING_SYRUP_MODEL = {
-	ERROR: {
-		NOPACK: 'Error packing model'
-	}
-};
-
 "use strict";
 function Model () {
 	this.Http = new Http;
@@ -5388,7 +5389,7 @@ Model.add ('method', function (method) {
  */
 Model.add ('attach', function (name, attach) {
 	var self = this;
-	_.assert (self.modelData, WARNING_SYRUP_FORM.ERROR.NOPACK);
+	_.assert (self.modelData, _.WARNING_SYRUP.ERROR.NOPACK);
 	self.modelData.append (name, attach);
 });
 
@@ -5427,7 +5428,7 @@ Model.add ('fail', function (field, error) {
  * @param event*/
 Model.add ('send', function (url, data) {
 	var self = this;
-	_.assert (data, WARNING_SYRUP_MODEL.ERROR.NOPACK);
+	_.assert (data, _.WARNING_SYRUP.ERROR.NOPACK);
 
 	var conf = {
 		url   : url,
@@ -5656,17 +5657,17 @@ GoogleMap = function () {
 
 		_.each (coords, function (v) {
 			lat = (
-				  v.lat () * Math.PI
+					  v.lat () * Math.PI
 				  ) / 180;
 			long = (
-				   v.lng () * Math.PI
+					   v.lng () * Math.PI
 				   ) / 180;
 
 			x += (
-			Math.cos (lat) * Math.cos (long)
+				Math.cos (lat) * Math.cos (long)
 			);
 			y += (
-			Math.cos (lat) * Math.sin (long)
+				Math.cos (lat) * Math.sin (long)
 			);
 			z += (
 				Math.sin (lat)
@@ -5710,7 +5711,7 @@ GoogleMap = function () {
 		}
 
 		if ( !_.isFunction (callback) )
-			_.error (WARNING_SYRUP.ERROR.NOFUNCTION);
+			_.error (_.WARNING_SYRUP.ERROR.NOFUNCTION);
 
 		if ( !_.isObject (elem) )
 			_.error (WARNING_GOOGLE_MAP.ERROR.NOMAP);

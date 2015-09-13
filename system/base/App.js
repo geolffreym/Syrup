@@ -305,7 +305,6 @@ Apps.add ('_taste', function (moduleId) {
 			_self._bindListener (moduleId);
 		}
 
-
 		//Observe scope
 		_self._watch (moduleId);
 	}
@@ -321,7 +320,7 @@ Apps.add ('_taste', function (moduleId) {
 Apps.add ('drop', function (moduleId) {
 	if ( moduleId in this.modules ) {
 		if ( this.modules[moduleId].instance ) {
-			if ( this.modules[moduleId].instance.destroy )
+			if ( 'destroy' in this.modules[moduleId].instance )
 				this.modules[moduleId].instance.destroy (this.lib.get (this.root));
 
 			if ( this.ondrop[moduleId] )

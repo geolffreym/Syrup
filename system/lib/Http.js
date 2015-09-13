@@ -75,7 +75,7 @@ Http.add ('on', function (event, callback) {
  * **/
 Http.add ('request', function (config) {
 	if ( !_.isObject (config) ) {
-		throw (WARNING_SYRUP.ERROR.NOOBJECT)
+		throw (_.WARNING_SYRUP.ERROR.NOOBJECT)
 	}
 
 	var _self = this,
@@ -97,7 +97,7 @@ Http.add ('request', function (config) {
 	return (new Promise (function (resolve, reject) {
 
 		if ( !_.isSet (config.url) )
-			reject (WARNING_SYRUP.ERROR.NOURL);
+			reject (_.WARNING_SYRUP.ERROR.NOURL);
 
 		if ( !_.isFormData (_data)
 			 && _.isSet (_data)

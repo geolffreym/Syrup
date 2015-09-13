@@ -18,9 +18,10 @@
     <!-- The model -->
     <form action="" sp-submit="process_form">
         <input type="text" name="firstName" placeholder="Name" data-min="2"/> <br/>
+        <input type="text" name="firstName" placeholder="Name" data-min="2"/> <br/>
         <input type="text" name="lastName" placeholder="Last Name" data-min="2"/><br/>
         <input type="text" name="phone" placeholder="Phone Number"/><br/>
-        <input type="text" name="id" placeholder="Id" data-custom="[0-9]{3}-[0-9]{6}-[0-9]{4}[a-zA-Z]{1}"/><br/>
+        <input type="text" name="id" placeholder="Id" /><br/>
         <input type="submit" data-skip="true"/>
     </form>
 
@@ -116,6 +117,7 @@
                     var _self = this;
                     //Pack the model, from source
                     $.Model.pack (e.target).then (function (model) {
+                        console.log(model.getObject())
                         _self.setScope ({ 'beatles': [model.getObject ()] });
                         //Send to server
 //                        model.send ('/miapp/myServerSideScript', model.getObject ())

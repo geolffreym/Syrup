@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" sp-app="Hey">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<script src="/syrup/dist/init.js"></script>
+
+
+<div sp-recipe="Hey.You">
+
+</div>
+
+
+<div sp-recipe="Hey.Do">
+    <!-- The method "method" in module Hey.Do-->
+    <a href="#" sp-click="method">
+        Change You
+    </a>
+
+
+</div>
+
+
+<script>
+
+    //The controller
+    _$ (function () {
+
+        //The Module with Http dependencie
+        var my_Lib = App.blend ('Hey', ['Http', 'Model', 'Router']);
+
+        //A global service
+        my_Lib.service ('setRoutes', function (msg) {
+            this.Router.setRoutes ({
+                'myLocalRoute': 'Routes.html'
+            });
+        });
+
+        //A new recipe for Hey
+        my_Lib.recipe ('Hey.You', function (_, _$, scope) {
+            return {
+                init   : function ($) {
+                    $.setRoutes ('s');
+                    $.Router.when ('myLocalRoute').then (function (r) {
+                        console.log(r)
+                    })
+
+                },
+                destroy: function ($) {
+                    alert ('destroyed?')
+                }
+            }
+        });
+
+        //A new recipe for Hey
+        my_Lib.recipe ('Hey.Do', function (_, _$, scope) {
+            return {
+                init   : function (tools) {
+
+                },
+                method : function (e, $) {
+                    my_Lib.setScope ('Hey.You', {
+                        'beatles': [
+                            { "firstName": "John", "lastName": "Pasa" }
+                        ]
+                    });
+
+                },
+                destroy: function () {}
+            }
+        });
+
+
+    })
+
+</script>
+</body>
+</html>

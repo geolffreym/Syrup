@@ -10,12 +10,6 @@
  * Http Lib
  * */
 
-var WARNING_SYRUP_MODEL = {
-	ERROR: {
-		NOPACK: 'Error packing model'
-	}
-};
-
 "use strict";
 function Model () {
 	this.Http = new Http;
@@ -43,7 +37,7 @@ Model.add ('method', function (method) {
  */
 Model.add ('attach', function (name, attach) {
 	var self = this;
-	_.assert (self.modelData, WARNING_SYRUP_FORM.ERROR.NOPACK);
+	_.assert (self.modelData, _.WARNING_SYRUP.ERROR.NOPACK);
 	self.modelData.append (name, attach);
 });
 
@@ -82,7 +76,7 @@ Model.add ('fail', function (field, error) {
  * @param event*/
 Model.add ('send', function (url, data) {
 	var self = this;
-	_.assert (data, WARNING_SYRUP_MODEL.ERROR.NOPACK);
+	_.assert (data, _.WARNING_SYRUP.ERROR.NOPACK);
 
 	var conf = {
 		url   : url,
