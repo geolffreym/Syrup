@@ -655,7 +655,7 @@ if(my_selector.is('.div')){
  
 **Method `.get(element)`**
 
-*(Return child element. Param element needed)*
+*(Return elemnt in position "element")*
     
 ```html
 <ul>
