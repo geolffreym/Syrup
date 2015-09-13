@@ -4597,7 +4597,7 @@ Apps.add ('services', function (object) {
 });
 
 
-/**Return a recipe by param given
+/**Return a recipe by name
  * @param moduleId
  * @return object
  * */
@@ -4804,6 +4804,7 @@ Apps.add ('_taste', function (moduleId) {
 			if ( moduleId in this.triggerBefore )
 				_self.triggerBefore[moduleId] (moduleId, this.lib.get (_self.root));
 
+			//Execution
 			_self.modules[moduleId].instance.init (this.lib.get (_self.root));
 			_self._bindListener (moduleId);
 

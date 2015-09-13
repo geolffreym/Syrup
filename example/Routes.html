@@ -56,7 +56,9 @@
         my_Lib.recipe ('Hey.You', function (_, _$, scope) {
             return {
                 init   : function ($) {
-                    console.log(this.getRecipe());
+
+                    //console.log(this.getRecipe());
+
                     $.Router.when ('myLocalRoute').then (function (r) {
                         console.log (r)
                     }).catch (function () {
