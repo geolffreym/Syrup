@@ -12,7 +12,6 @@ function Apps () {
 	this.scope = {};
 	this.modules = {};
 	this.onchange = {};
-	this.ondrop = {};
 }
 
 /** Blend a method in global Syrup object
@@ -112,7 +111,7 @@ Apps.add ('_triggerOn', function (moduleList, callback, toList) {
 /**Add a custom trigger to execute before the given modules
  * @param moduleList
  * @callback*/
-Apps.add ('beforeServe', function (moduleList, callback) {
+Apps.add ('beforeInit', function (moduleList, callback) {
 	return this._triggerOn (moduleList, callback, this.triggerBefore);
 });
 
@@ -120,7 +119,7 @@ Apps.add ('beforeServe', function (moduleList, callback) {
 /**Add a custom trigger to execute after the given modules
  * @param moduleList
  * @callback*/
-Apps.add ('afterServe', function (moduleList, callback) {
+Apps.add ('afterInit', function (moduleList, callback) {
 	return this._triggerOn (moduleList, callback, this.triggerAfter);
 });
 
@@ -191,9 +190,6 @@ Apps.add ('when', function (event, name, callback) {
 		{
 			change: function () {
 				self.onchange[name] = callback;
-			},
-			drop  : function () {
-				self.ondrop[name] = callback;
 			}
 		}[event] ()
 	]
@@ -379,10 +375,6 @@ Apps.add ('drop', function (moduleId) {
 		if ( this.modules[moduleId].instance ) {
 			if ( 'destroy' in this.modules[moduleId].instance )
 				this.modules[moduleId].instance.destroy (this.lib.get (this.root));
-
-			if ( this.ondrop[moduleId] )
-				this.ondrop[moduleId] (moduleId);
-
 			this.modules[moduleId] = null;
 		}
 	}
