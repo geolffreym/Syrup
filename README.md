@@ -721,6 +721,14 @@ my_selector.offset() // return {top:int,left:int,bottom:int,right:int}
    <li>D</li>
    <li>C</li>
  </ul>
+ 
+ <ul>
+     <li sortby="4">A</li>
+     <li sortby="2">D</li>
+     <li sortby="1">B</li>
+     <li sortby="3">C</li>
+ </ul>
+ 
 ```
 ```js
 var my_selector = _$('.parent li+'); //All li
@@ -744,10 +752,10 @@ my_selector.sort('sortby')
 
 <!--Using custom attribute-->
 <ul>
-    <li sortby="4">A</li>
-    <li sortby="2">D</li>
     <li sortby="1">B</li>
+    <li sortby="2">D</li>
     <li sortby="3">C</li>
+    <li sortby="4">A</li>
 </ul>
 
 ```
