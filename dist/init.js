@@ -218,6 +218,7 @@ if ( typeof exports !== 'undefined' )
 				} else { _.callbackAudit (callback, e); }
 			};
 
+		// For each element
 		_self.each (function (elem) {
 
 			if ( elem.addEventListener ) {
@@ -243,7 +244,7 @@ if ( typeof exports !== 'undefined' )
 	 * @return object
 	 */
 	_$_.add ('unlisten', function (event) {
-		this.each (function (elem) {
+		return this.each (function (elem) {
 
 			if ( _.isSet (elem.listListener) ) {
 
@@ -266,7 +267,7 @@ if ( typeof exports !== 'undefined' )
 	 *@return Object
 	 */
 	_$_.add ('filter', function (filter, callback, e_handler) {
-		this.each (function (elem) {
+		return this.each (function (elem) {
 			var match = elem.matchesSelector ||
 						elem.webkitMatchesSelector ||
 						elem.mozMatchesSelector ||
@@ -276,21 +277,18 @@ if ( typeof exports !== 'undefined' )
 			if ( match.call (elem, filter) ) {
 				_.callbackAudit (callback, _$ (elem));
 			} else if ( _.isFunction (e_handler) ) {
-				_.callbackAudit (e_handler, elem);
+				_.callbackAudit (e_handler, _$ (elem));
 			}
 		});
-
-		return this;
 	});
 
 	/**Empty Dom
 	 * @return void
 	 * */
 	_$_.add ('empty', function () {
-		this.each (function (v) {
+		return this.each (function (v) {
 			v.innerHTML = _.emptyStr;
 		});
-		return this;
 	});
 
 	/**Clone Objects
@@ -347,7 +345,8 @@ if ( typeof exports !== 'undefined' )
 			}
 		});
 
-		return _.specArray (_props);
+		return _.isString (_prop)
+			? _.specArray (_props) : this;
 	});
 
 	/***Assign Atributes
@@ -365,7 +364,8 @@ if ( typeof exports !== 'undefined' )
 				});
 			}
 		});
-		return _.specArray (_attr);
+		return _.isString (attr)
+			? _.specArray (_attr): this;
 	});
 
 	/***Remove Atributes
@@ -373,14 +373,13 @@ if ( typeof exports !== 'undefined' )
 	 * @return object
 	 */
 	_$_.add ('removeAttr', function (attr) {
-		this.each (function (v) {
+		return this.each (function (v) {
 			if ( v[attr] ) {
 				v[attr] = false;
 			} else {
 				v.removeAttr (attr);
 			}
 		});
-		return this;
 	});
 
 	/**CSS
@@ -402,7 +401,8 @@ if ( typeof exports !== 'undefined' )
 			}
 		});
 
-		return _.specArray (_css);
+		return _.isString (css)
+			? _.specArray (_css) : this;
 	});
 
 	/***Insert After
@@ -414,12 +414,11 @@ if ( typeof exports !== 'undefined' )
 			elem = _$ (elem);
 		}
 
-		this.each (function (obj) {
+		return this.each (function (obj) {
 			elem.each (function (v) {
 				obj.parentNode.insertBefore (v, obj.nextSibling)
 			})
 		});
-		return this;
 	});
 
 	/***Insert Before
@@ -432,14 +431,13 @@ if ( typeof exports !== 'undefined' )
 			elem = _$ (elem);
 		}
 
-		this.each (function (obj) {
+		return this.each (function (obj) {
 			elem.each (function (v) {
 				obj.parentNode.insertBefore (v, obj)
 			})
 		});
-
-		return this;
 	});
+
 	/**Append Element or Html
 	 * @param childs
 	 * @return object
@@ -449,13 +447,12 @@ if ( typeof exports !== 'undefined' )
 			childs = _$ (childs);
 		}
 
-		this.each (function (p) {
+		return this.each (function (p) {
 			childs.each (function (elm) {
 				p.appendChild (elm)
 			});
 		});
 
-		return this;
 	});
 
 	/**Prepend Element or Html
@@ -467,13 +464,12 @@ if ( typeof exports !== 'undefined' )
 			childs = _$ (childs);
 		}
 
-		this.each (function (p) {
+		return this.each (function (p) {
 			childs.each (function (elm) {
 				p.insertBefore (elm, p.firstChild)
 			});
 		});
 
-		return this;
 	});
 
 	/**Inner HTML
@@ -509,38 +505,35 @@ if ( typeof exports !== 'undefined' )
 		return this;
 	});
 
-//Hide Element
+	/**Hide Element**/
 	_$_.add ('hide', function () {
-		this.each (function (_elem) {
+		return this.each (function (_elem) {
 			_elem.style.display = 'none';
 		});
-		return this;
 	});
 
-//Show Element
+	/**Show Element**/
 	_$_.add ('show', function () {
-		this.each (function (_elem) {
+		return this.each (function (_elem) {
 			_elem.style.display = 'block';
 		});
-		return this;
 	});
 
 	/**Parent Node
 	 * @param callback
 	 */
 	_$_.add ('parent', function (callback) {
-		this.each (function (_elem) {
+		return this.each (function (_elem) {
 			if ( _elem.parentNode )
 				_.callbackAudit (callback, _$ (_elem.parentNode))
 		});
-		return this;
 	});
 
 	/**Childs Nodes
 	 * @param callback
 	 */
 	_$_.add ('children', function (callback) {
-		this.each (function (_elem) {
+		return this.each (function (_elem) {
 			if ( _elem.children.length > 0 ) {
 				_.each (_elem.children, function (v, i) {
 					if ( _.isNumber (i) )
@@ -548,18 +541,16 @@ if ( typeof exports !== 'undefined' )
 				})
 			}
 		});
-		return this;
 	});
 
 	/**Next Node
 	 * @param callback
 	 */
 	_$_.add ('next', function (callback) {
-		this.each (function (_elem) {
+		return this.each (function (_elem) {
 			_.callbackAudit (callback, _$ (_elem.nextElementSibling));
 		});
 
-		return this;
 	});
 
 	/**Nexts Node
@@ -570,7 +561,7 @@ if ( typeof exports !== 'undefined' )
 		callback = _.isFunction (filter)
 			? filter : callback;
 
-		this.next (function (elem) {
+		return this.next (function (elem) {
 			_sibling = elem;
 			do {
 				if ( _.isSet (filter) && !_.isFunction (filter) ) {
@@ -579,11 +570,9 @@ if ( typeof exports !== 'undefined' )
 					})
 				} else { _.callbackAudit (callback, _sibling); }
 			} while ( (
-				_sibling = _$ (_sibling.collection.nextElementSibling)
+				_sibling = _$ (_sibling.get (0).nextElementSibling)
 			).exist )
 		});
-
-		return this;
 	});
 
 	/**Trigger
@@ -616,15 +605,13 @@ if ( typeof exports !== 'undefined' )
 	 * @return object
 	 */
 	_$_.add ('find', function (filter, callback) {
-		this.children (function (elem) {
+		return this.children (function (elem) {
 			elem.filter (filter, function (e) {
 				_.callbackAudit (callback, e, filter);
 			}, function () {
 				elem.find (filter, callback);
 			})
 		});
-
-		return this;
 	});
 
 	/**Full Parent
@@ -634,7 +621,7 @@ if ( typeof exports !== 'undefined' )
 	 */
 	_$_.add ('parents', function (parent_class, callback) {
 
-		this.each (function (_elem) {
+		return this.each (function (_elem) {
 			_$ (_elem).parent (function (_parent) {
 				_parent.filter (parent_class, function (parent) {
 					_.callbackAudit (callback, parent);
@@ -644,17 +631,21 @@ if ( typeof exports !== 'undefined' )
 			});
 		});
 
-		return this;
 	});
 
 	/***Veriy Class
 	 * @param elem
 	 * @param cls
 	 */
-	_$_.add ('hasClass', function (elem, cls) {
-		return (
-			new RegExp ('(\\s|^)' + cls + '(\\s|$)')
-		).test (elem.className);
+	_$_.add ('hasClass', function (cls) {
+		_.assert (cls, WARNING_SYRUP.ERROR.NOPARAM);
+		var elem = this.get (0);
+		if ( _.isSet (elem.classList) ) {
+			if ( Array.prototype.indexOf.call (elem.classList, cls) > -1 ) {
+				return true;
+			}
+		}
+		return false;
 	});
 
 	/**AddClass Element
@@ -662,15 +653,13 @@ if ( typeof exports !== 'undefined' )
 	 * @param cls
 	 */
 	_$_.add ('addClass', function (cls) {
-		var _self = this;
-		_self.each (function (elem) {
-			if ( !_self.hasClass (elem, cls) ) {
+		return this.each (function (elem) {
+			if ( !_$ (elem).hasClass (cls) ) {
 				if ( elem.classList ) {
 					elem.classList.add (cls)
 				} else { elem.className += ' ' + cls; }
 			}
 		});
-		return this;
 	});
 
 	/**ToggleClass Element
@@ -678,22 +667,17 @@ if ( typeof exports !== 'undefined' )
 	 * @param cls
 	 */
 	_$_.add ('toggleClass', function (cls) {
-		var _self = this;
-		_self.each (function (elem) {
-			if ( _self.hasClass (elem, cls) )
-				elem.classList.toggle (cls)
-
+		return this.each (function (elem) {
+			elem.classList.toggle (cls);
 		});
-		return this;
 	});
 
 	/**Remove Class
 	 * @param cls
 	 */
 	_$_.add ('removeClass', function (cls) {
-		var _self = this;
-		_self.each (function (elem) {
-			if ( _self.hasClass (elem, cls) ) {
+		return this.each (function (elem) {
+			if ( _$ (elem).hasClass (cls) ) {
 				if ( elem.classList ) {
 					elem.classList.remove (cls)
 				} else {
@@ -703,7 +687,6 @@ if ( typeof exports !== 'undefined' )
 				}
 			}
 		});
-		return this;
 	});
 
 	/**Fade Out
@@ -744,11 +727,10 @@ if ( typeof exports !== 'undefined' )
 	 */
 	_$_.add ('height', function (height) {
 		if ( _.isSet (height) ) {
-			this.css ({
+			return this.css ({
 				'height': _.isNumber (height)
 					? height + 'px' : height
 			});
-			return this;
 		}
 
 		var _height = [];
@@ -766,11 +748,10 @@ if ( typeof exports !== 'undefined' )
 	 */
 	_$_.add ('width', function (width) {
 		if ( _.isSet (width) ) {
-			this.css ({
+			return this.css ({
 				'width': _.isNumber (width)
 					? width + 'px' : width
 			});
-			return this;
 		}
 		var _width = [];
 		this.each (function (elem) {
@@ -788,16 +769,13 @@ if ( typeof exports !== 'undefined' )
 	 * */
 	_$_.add ('is', function (context) {
 		_.assert (context, WARNING_SYRUP.ERROR.NOPARAM);
-		var _return = false;
-		this.each (function (v) {
-			_$ (v).filter (context, function () {
-				_return = true;
-			}, function () {
-				_return = v[context] || v['type'] === context;
-			});
+		var v = this.get (0),
+			_return = false;
 
-			if ( _return )
-				return false;
+		_$ (v).filter (context, function () {
+			_return = true;
+		}, function () {
+			_return = v[context] || v['type'] === context;
 		});
 
 		return _return;
@@ -821,7 +799,7 @@ if ( typeof exports !== 'undefined' )
 
 	/***Remove Element*/
 	_$_.add ('remove', function () {
-		this.each (function (v) {
+		return this.each (function (v) {
 			if ( v.remove ) {
 				v.remove ();
 			} else { v.parentNode.removeChild (v); }
@@ -896,7 +874,7 @@ if ( typeof exports !== 'undefined' )
 	 * @param _object
 	 * @returns {*|Array}
 	 */
-	_$_.add ('sort', function (_prop, _desc, _object) {
+	_$_.add ('sort', function (_prop, _desc) {
 		if ( _.isBoolean (_prop) ) {
 			_desc = arguments[0];
 			_prop = false;
@@ -904,10 +882,9 @@ if ( typeof exports !== 'undefined' )
 
 		_desc = !_desc ? 1 : -1;
 		_prop = _prop ? _prop : 'innerHTML';
-		_object = _.isObject (_object) ? _object : this.collection;
-		_object = _.toArray (_object);
 
-		return _object.sort (function (a, b) {
+
+		return _.toArray (this.collection).sort (function (a, b) {
 
 			var _a = a[_prop],
 				_b = b[_prop];

@@ -153,6 +153,7 @@ var S = _.noConflict(),
 
 ```js
 var my_selector = _$('<div>');
+var my_selector = _$('*+'); // All the dom nodes ^_^
 var my_selector = _$('.selector');
 var my_selector = _$('.selector:pseudo'); //Pseudo codes must follow the CSS syntax
 var my_selector = _$('.selector_parent .selector_child');
@@ -559,12 +560,12 @@ my_selector.find('.need_be_found', function(found){
 });
 ```
     
-**Method `.hasClass(elem, class)`**
+**Method `.hasClass(class)`**
 
 *(Verify Class in element. Return true if the class is founded in element else return false)*
 ```js
 var my_selector = _$('.div');
-if(_.hasClass(my_selector,'class2')){
+if(my_selector.hasClass('class2')){
     //TRUE IF .div has the class2
 }
 ```
@@ -705,7 +706,7 @@ my_selector.each(function(v,i,p){
 ```js
 var my_selector = _$('.div');
 
-my_selector.offset({x:10,y:10}) // Assign position x and y to element
+my_selector.offset({top:10,;left:10}) // Assign position left and top to element
 my_selector.offset() // return {top:int,left:int,bottom:int,right:int}
 ```
  
@@ -722,7 +723,7 @@ my_selector.offset() // return {top:int,left:int,bottom:int,right:int}
  </ul>
 ```
 ```js
-var my_selector = _$('.parent li');
+var my_selector = _$('.parent li+'); //All li
 
 my_selector.sort() 
 // Sort Element by default innerHtml prop, order asc and 
