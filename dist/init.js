@@ -4458,6 +4458,8 @@ function Apps () {
 	this.root = null;
 	this.lib = null;
 	this.app = null;
+	this.triggerAfter = {};
+	this.triggerBefore = {};
 	this.scope = {};
 	this.modules = {};
 	this.onchange = {};
@@ -4542,6 +4544,37 @@ Apps.add ('_trigger', function (moduleId) {
 	return {}
 });
 
+/**Trigger Helper
+ * @param moduleList
+ * @param callback
+ * @param toList**/
+Apps.add ('_triggerOn', function (moduleList, callback, toList) {
+	if ( _.isArray (moduleList) ) {
+		_.each (moduleList, function (moduleId) {
+			if ( !(moduleId in toList) )
+				toList[moduleId] = callback;
+		});
+
+	}
+	return this;
+});
+
+
+/**Add a custom trigger to execute before the given modules
+ * @param moduleList
+ * @callback*/
+Apps.add ('beforeServe', function (moduleList, callback) {
+	return this._triggerOn (moduleList, callback, this.triggerBefore);
+});
+
+
+/**Add a custom trigger to execute after the given modules
+ * @param moduleList
+ * @callback*/
+Apps.add ('afterServe', function (moduleList, callback) {
+	return this._triggerOn (moduleList, callback, this.triggerAfter);
+});
+
 /** Append global service
  * @param name
  * @param callback function
@@ -4550,6 +4583,7 @@ Apps.add ('_trigger', function (moduleId) {
  * */
 Apps.add ('service', function (name, callback) {
 	this.lib.cook (name, callback);
+	return this;
 });
 
 /** Append global services
@@ -4559,11 +4593,18 @@ Apps.add ('service', function (name, callback) {
  * */
 Apps.add ('services', function (object) {
 	this.lib.supply (object);
+	return this;
 });
 
 
-Apps.add ('value', function () {
-
+/**Return a recipe by param given
+ * @param moduleId
+ * @return object
+ * */
+Apps.add ('getRecipe', function (moduleId) {
+	if ( moduleId in this.modules && _.isSet (this.root) )
+		return this.modules[moduleId].instance;
+	return null;
 });
 
 /**Set Scope
@@ -4738,6 +4779,11 @@ Apps.add ('_taste', function (moduleId) {
 
 		_self.modules[moduleId].instance.when = function (event, callback) {
 			_self.when (event, moduleId, callback);
+			return this;
+		};
+
+		_self.modules[moduleId].instance.getRecipe = function () {
+			return _self.getRecipe (moduleId);
 		};
 
 		_self.modules[moduleId].instance.serve = function (_template) {
@@ -4746,14 +4792,24 @@ Apps.add ('_taste', function (moduleId) {
 		};
 
 		_self.modules[moduleId].instance.listen = function (event, callback) {
-			_$ ('[sp-recipe="' + moduleId + '"]').listen (event, '[sp-' + event + ']', callback)
+			_$ ('[sp-recipe="' + moduleId + '"]').listen (event, '[sp-' + event + ']', callback);
+			return this;
 		};
 
 
 		//Init the module
 		if ( 'init' in _self.modules[moduleId].instance ) {
+
+			//Before execute
+			if ( moduleId in this.triggerBefore )
+				_self.triggerBefore[moduleId] (moduleId, this.lib.get (_self.root));
+
 			_self.modules[moduleId].instance.init (this.lib.get (_self.root));
 			_self._bindListener (moduleId);
+
+			//After execute
+			if ( moduleId in _self.triggerAfter )
+				_self.triggerAfter[moduleId] (moduleId, this.lib.get (_self.root));
 		}
 
 		//Observe scope
@@ -5132,7 +5188,7 @@ Router.add ('when', function (route_name) {
 			_to_route = window.location.pathname,
 			_result = _to_route.match ((new RegExp (_the_regexp, 'g')));
 
-
+		//Improve router result params
 		if ( _result )
 			resolve (_result)
 

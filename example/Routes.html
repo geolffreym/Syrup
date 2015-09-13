@@ -31,21 +31,37 @@
         //The Module with Http dependencie
         var my_Lib = App.blend ('Hey', ['Http', 'Model', 'Router']);
 
-        //A global service
-        my_Lib.service ('setRoutes', function (msg) {
-            this.Router.setRoutes ({
-                'myLocalRoute': 'Routes.html'
+        //Providing features to App
+        my_Lib.service ('HeyConsole', function () {
+            //A global service
+            console.log ('hi')
+
+        }).beforeServe (['Hey.You'], function (moduleId, $) {
+
+           // console.log(my_Lib.getRecipe(moduleId));
+
+            //Before execution of recipes, what to do?
+            $.Router.setRoutes ({
+                'myLocalRoute': '/Routes.html'
             });
+
+        }).afterServe (['Hey.You'], function (moduleId, $) {
+
+            //After execution of recipes, what to do?
+            console.log ('I\m served: ' + moduleId)
         });
+
 
         //A new recipe for Hey
         my_Lib.recipe ('Hey.You', function (_, _$, scope) {
             return {
                 init   : function ($) {
-                    $.setRoutes ('s');
+                    console.log(this.getRecipe());
                     $.Router.when ('myLocalRoute').then (function (r) {
-                        console.log(r)
-                    })
+                        console.log (r)
+                    }).catch (function () {
+                        console.log ('noohh!!')
+                    });
 
                 },
                 destroy: function ($) {
