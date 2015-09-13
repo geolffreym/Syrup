@@ -5,7 +5,7 @@
     <title></title>
 </head>
 <body>
-<script src="app/include/init.js"></script>
+<script src="/syrup/dist/init.js"></script>
 <a href="#" id="click" data-hi="1" class="a b c" data-tooltip="Hi!">
     Test
 </a>
@@ -18,7 +18,7 @@
     _$ (function () {
 
         //The Module
-        var my_Lib = Module.blend ('Hey', ['Http']);
+        var my_Lib = App.blend ('Hey', ['Http']);
 
         //A global service
         my_Lib.service ('HeyConsole', function () {

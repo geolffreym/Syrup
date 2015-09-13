@@ -301,5 +301,3 @@ RTCConnection = function (config) {
 	}
 
 };
-
-Syrup.blend (RTCConnection);

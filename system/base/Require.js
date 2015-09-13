@@ -2138,6 +2138,7 @@ Required.add ('lookup', function (dependencies) {
 	}));
 });
 
-var Require = new Required;
+//The global object Require
+window.Require = new Required;
 Require.setConf ();
 

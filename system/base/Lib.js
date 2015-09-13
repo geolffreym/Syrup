@@ -27,7 +27,7 @@ Libs.add ('blend', function (name, dependencies) {
 
 
 	if ( !(name in this.breadcrumb) ) {
-		Syrup.blend (_anonymous);
+		_.Syrup.blend (_anonymous);
 		this.name = name;
 		this.object = _[name];
 		this.breadcrumb[name] = this.object;
@@ -101,5 +101,5 @@ Libs.add ('cook', function (name, callback) {
 	return this;
 });
 
-
+//The global object Lib
 window.Lib = new Libs;

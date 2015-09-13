@@ -345,4 +345,5 @@ Apps.add ('dropAll', function () {
 	return this;
 });
 
+//The global object App
 window.App = new Apps;
