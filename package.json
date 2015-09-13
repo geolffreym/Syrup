@@ -19,8 +19,7 @@
   "version": "0.1.1",
   "license": "GNU GPL",
   "scripts": {
-    "start": "node node_modules/b_combiner-js/index.js",
-    "test": "nodemon --delay 10 node_modules/b_combiner-js/index.js"
+    "start": "node node_modules/b_combiner-js/index.js"
   },
   "repository": {
     "type": "git",
