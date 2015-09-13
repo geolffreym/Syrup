@@ -28,7 +28,7 @@
     //The controller
     _$ (function () {
 
-        //The Module with Http dependencie
+        //The App with dependencies
         var my_Lib = App.blend ('Hey', ['Http', 'Model', 'Router']);
 
         //Providing features to App
@@ -38,7 +38,7 @@
 
         }).beforeInit (['Hey.You'], function (moduleId, $) {
 
-            //Before execution of recipes, what to do?
+            //Before execution of recipes list, what to do?
             $.Router.setRoutes ({
                 'myLocalRoute': '/Routes.html'
             });
@@ -47,7 +47,7 @@
 
         }).afterInit (['Hey.You', 'Hey.Do'], function (moduleId, $) {
 
-            //After execution of recipes, what to do?
+            //After execution of recipes list, what to do?
             console.log ('I\m served: ' + moduleId)
         });
 
