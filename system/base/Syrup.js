@@ -389,7 +389,6 @@
 	/***Insert After
 	 * @param elem
 	 */
-
 	_$_.add ('after', function (elem) {
 		if ( _.isHtml (elem) || !_.is$ (elem) ) {
 			elem = _$ (elem);
@@ -406,7 +405,6 @@
 	 * @param elem
 	 * @return object
 	 */
-
 	_$_.add ('before', function (elem) {
 		if ( _.isHtml (elem) || !_.is$ (elem) ) {
 			elem = _$ (elem);

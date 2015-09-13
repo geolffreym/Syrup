@@ -408,7 +408,6 @@ if ( typeof exports !== 'undefined' )
 	/***Insert After
 	 * @param elem
 	 */
-
 	_$_.add ('after', function (elem) {
 		if ( _.isHtml (elem) || !_.is$ (elem) ) {
 			elem = _$ (elem);
@@ -425,7 +424,6 @@ if ( typeof exports !== 'undefined' )
 	 * @param elem
 	 * @return object
 	 */
-
 	_$_.add ('before', function (elem) {
 		if ( _.isHtml (elem) || !_.is$ (elem) ) {
 			elem = _$ (elem);
