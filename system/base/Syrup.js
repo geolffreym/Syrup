@@ -866,9 +866,8 @@
 
 
 		return _.toArray (this.collection).sort (function (a, b) {
-
-			var _a = a[_prop],
-				_b = b[_prop];
+			var _a = _$(a).attr(_prop) || _$(a).prop(_prop),
+				_b = _$(b).attr(_prop) || _$(b).prop(_prop);
 
 			if ( _.isSet (_a) && _.isSet (_b) ) {
 				a = !isNaN (+_a) ? +_a : _a.toLowerCase ();
@@ -893,7 +892,7 @@
 	 */
 	_$_.add ('animate', function (prop, conf, callback) {
 
-		this.each (function (elem) {
+		return this.each (function (elem) {
 			if ( _.isSet (elem.animate) ) {
 
 				if ( _.isFunction (conf) )
@@ -921,7 +920,6 @@
 				})
 			}
 		});
-		return this;
 	});
 
 	/**Return object

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+
+
+<ul>
+    <li sort="4">A</li>
+    <li sort="2">D</li>
+    <li sort="1">B</li>
+    <li sort="3">C</li>
+</ul>
+
+<button id="sort">Sort</button>
+
+<script src="/syrup/dist/init.js"></script>
+<script>
+    _$ (function () {
+
+        _$ ('#sort').listen ('click', function () {
+            _$ ('ul').append (_$ ('ul li+').sort ('sort'));
+        });
+
+    });
+</script>
+
+</body>
+</html>

@@ -728,14 +728,28 @@ var my_selector = _$('.parent li+'); //All li
 my_selector.sort() 
 // Sort Element by default innerHtml prop, order asc and 
 // return and array with ordered elements
+
+//Using custom sort
+my_selector.sort('sortby')
 ```
 ```html
+
+<!--Using innerHtml prop-->
 <ul class="parent">
    <li>A</li>
    <li>B</li>
    <li>C</li>
    <li>D</li>
 </ul>
+
+<!--Using custom attribute-->
+<ul>
+    <li sortby="4">A</li>
+    <li sortby="2">D</li>
+    <li sortby="1">B</li>
+    <li sortby="3">C</li>
+</ul>
+
 ```
 **Method `.trigger(event, callback)`**
 
