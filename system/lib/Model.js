@@ -55,7 +55,7 @@ Model.add ('multiple', function (name) {
 	var _return = [],
 		_model_obj = this.model.object ();
 
-	if ( _.isSet (_model_obj.elements[name]) ) {
+	if ( name in _model_obj.elements ) {
 		_.each (_model_obj.elements[name], function (v, i) {
 			_return.push (v.value);
 		});

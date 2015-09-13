@@ -45,7 +45,7 @@ View.add ('seekTpl', function (template) {
 	_self.dir = template;
 
 	return (new Promise (function (resolve, reject) {
-		if ( _.isSet (_template[template]) ) {
+		if ( template in _template ) {
 			_self.tpl = _template[template];
 			resolve (_self)
 		} else {

@@ -55,7 +55,7 @@ Apps.add ('_watch', function (moduleId) {
 	var _self = this;
 	Object.observe (_self.scope, function (change) {
 		_.each (change, function (v) {
-			if ( _.isSet (_self.onchange[v.name])
+			if ( (v.name in _self.onchange)
 				 && _.getObjectSize (v.object) > 0
 				 && moduleId === v.name
 			) {

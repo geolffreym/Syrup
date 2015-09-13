@@ -43,7 +43,7 @@ Libs.add ('blend', function (name, dependencies) {
  * @return object
  * **/
 Libs.add ('get', function (name) {
-	return _.isSet (this.breadcrumb[name]) && this.breadcrumb[name];
+	return (name in this.breadcrumb) && this.breadcrumb[name];
 });
 
 /**Dependencies gestor
@@ -54,7 +54,7 @@ Libs.add ('_dependencies', function (dependencies) {
 	var _self = this;
 	if ( _.isArray (dependencies) && _.isSet (_self.object) ) {
 		_.each (dependencies, function (v) {
-			_self.object.__proto__[v] = !_.isSet (_self.object[v])
+			_self.object.__proto__[v] = !(v in _self.object)
 				? ( _[v] || new window[v]) : _self.object[v];
 		})
 	}

@@ -4387,7 +4387,7 @@ Libs.add ('blend', function (name, dependencies) {
  * @return object
  * **/
 Libs.add ('get', function (name) {
-	return _.isSet (this.breadcrumb[name]) && this.breadcrumb[name];
+	return (name in this.breadcrumb) && this.breadcrumb[name];
 });
 
 /**Dependencies gestor
@@ -4398,7 +4398,7 @@ Libs.add ('_dependencies', function (dependencies) {
 	var _self = this;
 	if ( _.isArray (dependencies) && _.isSet (_self.object) ) {
 		_.each (dependencies, function (v) {
-			_self.object.__proto__[v] = !_.isSet (_self.object[v])
+			_self.object.__proto__[v] = !(v in _self.object)
 				? ( _[v] || new window[v]) : _self.object[v];
 		})
 	}
@@ -4505,7 +4505,7 @@ Apps.add ('_watch', function (moduleId) {
 	var _self = this;
 	Object.observe (_self.scope, function (change) {
 		_.each (change, function (v) {
-			if ( _.isSet (_self.onchange[v.name])
+			if ( (v.name in _self.onchange)
 				 && _.getObjectSize (v.object) > 0
 				 && moduleId === v.name
 			) {
@@ -5092,6 +5092,53 @@ Http.add ('kill', function () {
 /**
  * Created by gmena on 07-26-14.
  */
+
+'use strict';
+/**Router
+ * @constructor
+ */
+function Router () {
+	this.routes = {}
+}
+
+
+/**Set the routes
+ * @param routes
+ * @return object
+ * */
+Router.add ('setRoutes', function (routes) {
+	var _self = this;
+	return (new Promise (function (resolve, reject) {
+		_self.routes = _.extend (_self.routes, routes);
+		resolve (_self.routes);
+	}))
+});
+
+/**Delega rutas
+ * @param path
+ * @param callback
+ * @returns {boolean}
+ */
+Router.add ('route', function (route_name) {
+	_.assert (route_name, WARNING_SYRUP.ERROR.NOPARAM);
+	var _self = this;
+	return (new Promise (function (resolve, reject) {
+
+		//Not routing
+		if ( !(route_name in _self.routes) )
+			reject (route_name);
+
+
+	}));
+
+});
+
+Router.add ('parseQueryString', function () {
+
+});
+/**
+ * Created by gmena on 07-26-14.
+ */
 'use strict';
 
 function Storage () {
@@ -5239,7 +5286,7 @@ View.add ('seekTpl', function (template) {
 	_self.dir = template;
 
 	return (new Promise (function (resolve, reject) {
-		if ( _.isSet (_template[template]) ) {
+		if ( template in _template ) {
 			_self.tpl = _template[template];
 			resolve (_self)
 		} else {
@@ -5353,7 +5400,7 @@ Model.add ('multiple', function (name) {
 	var _return = [],
 		_model_obj = this.model.object ();
 
-	if ( _.isSet (_model_obj.elements[name]) ) {
+	if ( name in _model_obj.elements ) {
 		_.each (_model_obj.elements[name], function (v, i) {
 			_return.push (v.value);
 		});

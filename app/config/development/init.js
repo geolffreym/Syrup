@@ -16,6 +16,7 @@ exports.files = {
 			'system/base/App',
 			// Until here the core
 			'system/lib/Http',
+			'system/lib/Router',
 			'system/lib/Storage',
 			'system/lib/Workers',
 			'system/lib/View',

@@ -18,7 +18,8 @@ function Router () {
 Router.add ('setRoutes', function (routes) {
 	var _self = this;
 	return (new Promise (function (resolve, reject) {
-		_self.routes = routes;
+		_self.routes = _.extend (_self.routes, routes);
+		resolve (_self.routes);
 	}))
 });
 
@@ -27,22 +28,16 @@ Router.add ('setRoutes', function (routes) {
  * @param callback
  * @returns {boolean}
  */
-Router.add ('route', function (path) {
-	_.assert (path, WARNING_SYRUP.ERROR.NOPARAM);
-
+Router.add ('route', function (route_name) {
+	_.assert (route_name, WARNING_SYRUP.ERROR.NOPARAM);
+	var _self = this;
 	return (new Promise (function (resolve, reject) {
 
-		var _location = window.location.pathname,
-			_result = _.isArray (path)
-				? _.matchInArray (_location, path)
-				: new RegExp (path, 'g').test (_location);
+		//Not routing
+		if ( !(route_name in _self.routes) )
+			reject (route_name);
 
-		if ( !_result ) {
-			reject (false);
-			return;
-		}
 
-		resolve (_result);
 	}));
 
 });
