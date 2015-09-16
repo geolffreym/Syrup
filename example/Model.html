@@ -34,14 +34,16 @@
         <div>
             <ul>
                 {{#beatles}}
-                <li>{{ firstName }} {{lastName}}</li>
-                {{#phone}}
-                <li>{{ phone }}</li>
-                {{/phone}}
+                    <li>{{ firstName }} {{lastName}}</li>
 
-                {{#id}}
-                <li>{{ id }}</li>
-                {{/id}}
+                    {{#phone}}
+                        <li>{{ phone }}</li>
+                    {{/phone}}
+
+                    {{#id}}
+                        <li>{{ id }}</li>
+                    {{/id}}
+
                 {{/beatles}}
             </ul>
 
