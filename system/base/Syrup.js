@@ -39,6 +39,14 @@
 		return _.extend ({}, this);
 	};
 
+	/**Get a index
+	 * @param index
+	 * @return null|string|int
+	 * */
+	nativeObject.getIndex = function (index) {
+		return index in this ? this[index] : null;
+	};
+
 	/** Extend a function
 	 *  @param child
 	 *  @return void

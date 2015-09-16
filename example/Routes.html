@@ -27,7 +27,7 @@
             //A global service
             console.log ('hi')
 
-        }).spice (['Hey.You','Hey.Do'], function (moduleId, $) {
+        }).spice (['Hey.You'], function (moduleId, $) {
 
             //Before execution of recipes list, what to do?
             $.Router.setRoutes ({
@@ -43,8 +43,8 @@
         my_Lib.recipe ('Hey.You', function (_, _$, scope) {
             return {
                 init   : function ($) {
-                    $.Router.when ('theNewRoute').then (function (e) {
-                        console.log (e);
+                    $.Router.when ('theNewRoute').then (function (params) {
+                        console.log (params.getIndex (':page'));
                     })
 
                 },
@@ -58,8 +58,13 @@
         //A new recipe for Hey
         my_Lib.recipe ('Hey.Do', function (_, _$, scope) {
             return {
-                init    : function ($) {},
+                init    : function ($) {
+                    $.Router.when('theNewRoute').then(function(params){
+                        console.log('I will do something too.')
+                    });
+                },
                 redirect: function (e, $) {
+
                     $.Router.redirect ('theNewRoute', { ':page': '3' })
                             .then (function () { });
                 }

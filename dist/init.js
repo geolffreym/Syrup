@@ -57,6 +57,14 @@ if ( typeof exports !== 'undefined' )
 		return _.extend ({}, this);
 	};
 
+	/**Get a index
+	 * @param index
+	 * @return null|string|int
+	 * */
+	nativeObject.getIndex = function (index) {
+		return index in this ? this[index] : null;
+	};
+
 	/** Extend a function
 	 *  @param child
 	 *  @return void
@@ -5240,6 +5248,11 @@ Router.add ('redirect', function (route_name, params) {
 });
 
 
+/** Trigger the pop state
+ * @param _params
+ * @param route_name
+ * @param _the_new_route
+ * */
 Router.add ('_triggerPopState', function (_params, route_name, _the_new_route) {
 	//Set state in history
 	//Two times, for execution in "popstate"

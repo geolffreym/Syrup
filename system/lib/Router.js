@@ -101,6 +101,11 @@ Router.add ('redirect', function (route_name, params) {
 });
 
 
+/** Trigger the pop state
+ * @param _params
+ * @param route_name
+ * @param _the_new_route
+ * */
 Router.add ('_triggerPopState', function (_params, route_name, _the_new_route) {
 	//Set state in history
 	//Two times, for execution in "popstate"
