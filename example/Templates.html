@@ -63,7 +63,7 @@
         //A new recipe for Hey
         my_Lib.recipe ('Hey.You', function (_, _$, scope) {
             return {
-                init        : function ($) {
+                init   : function ($) {
                     var _self = this;
 
 
@@ -82,7 +82,7 @@
 
 
                     //When Hey.You scope change
-                    this.when ('change', function (changes) {
+                    this.when ('change').then (function (changes) {
 
                         /// Render new data using the inline template
                         // If not serve param is set, template inline is used
@@ -95,7 +95,7 @@
                         $.myConsole ('Done');
                     })
                 },
-                destroy     : function ($) {
+                destroy: function ($) {
                     alert ('destroyed?')
                 }
             }

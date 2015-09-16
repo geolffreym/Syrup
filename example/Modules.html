@@ -33,7 +33,7 @@
                     this.setScope ({ a: 2 });
 
                     //When Hey.You scope change
-                    this.when ('change', function (d) {
+                    this.when ('change').then (function (d) {
                         console.log (d)
                     })
                 },

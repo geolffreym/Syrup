@@ -4517,7 +4517,6 @@ Apps.add ('_watch', function (moduleId) {
 					type  : v.type,
 					object: v.object[v.name]
 				});
-
 			}
 		});
 	});
@@ -4635,15 +4634,15 @@ Apps.add ('getScope', function (moduleId) {
  * @param callback
  * @return object
  */
-Apps.add ('when', function (event, name, callback) {
+Apps.add ('when', function (event, name) {
 	var self = this;
-	return [
-		{
-			change: function () {
-				self.onchange[name] = callback;
-			}
-		}[event] ()
-	]
+	return {
+		change: ({
+			then: (function (resolve) {
+				self.onchange[name] = resolve;
+			})
+		})
+	}[event]
 });
 
 /**Bind Listeners
@@ -4773,9 +4772,8 @@ Apps.add ('_taste', function (moduleId) {
 			return _self.getScope (moduleId);
 		};
 
-		_self.modules[moduleId].instance.when = function (event, callback) {
-			_self.when (event, moduleId, callback);
-			return this;
+		_self.modules[moduleId].instance.when = function (event) {
+			return _self.when (event, moduleId);
 		};
 
 		_self.modules[moduleId].instance.getRecipe = function () {

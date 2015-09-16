@@ -21,7 +21,7 @@
         <input type="text" name="firstName" placeholder="Name" data-min="2"/> <br/>
         <input type="text" name="lastName" placeholder="Last Name" data-min="2"/><br/>
         <input type="text" name="phone" placeholder="Phone Number"/><br/>
-        <input type="text" name="id" placeholder="Id" /><br/>
+        <input type="text" name="id" placeholder="Id"/><br/>
         <input type="submit" data-skip="true"/>
     </form>
 
@@ -36,13 +36,13 @@
             <ul>
                 {{#beatles}}
                 <li>{{ firstName }} {{lastName}}</li>
-                    {{#phone}}
-                        <li>{{ phone }}</li>
-                    {{/phone}}
+                {{#phone}}
+                <li>{{ phone }}</li>
+                {{/phone}}
 
-                    {{#id}}
-                        <li>{{ id }}</li>
-                    {{/id}}
+                {{#id}}
+                <li>{{ id }}</li>
+                {{/id}}
                 {{/beatles}}
             </ul>
 
@@ -99,9 +99,8 @@
 
 
                     //When Hey.You scope change
-                    this.when ('change', function (changes) {
-
-                        // Render new data using the inline template
+                   this.when ('change').then (function (changes) {
+                       // Render new data using the inline template
                         // If not serve param is set, template inline is used
                         // If you set "Hey/You" "/app/view/Hey/You.js" view is used
                         // Lousing Coupling( The main dir -> "Hey" , The File -> "You", The view name -> "myView")
@@ -117,7 +116,6 @@
                     var _self = this;
                     //Pack the model, from source
                     $.Model.pack (e.target).then (function (model) {
-                        console.log(model.getObject())
                         _self.setScope ({ 'beatles': [model.getObject ()] });
                         //Send to server
 //                        model.send ('/miapp/myServerSideScript', model.getObject ())
