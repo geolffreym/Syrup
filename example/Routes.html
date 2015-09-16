@@ -17,7 +17,6 @@
     <!-- Hey.Do recipe -->
     <!-- Event callback in recipe Hey.Do -->
     <button sp-click="redirect">Redirect</button>
-    <button sp-click="replace"> Replace</button>
 </div>
 
 <script>
@@ -66,11 +65,6 @@
         my_Lib.recipe ('Hey.Do', function (_, _$, scope) {
             return {
                 init    : function ($) {},
-                replace : function (e, $) {
-                    //Redirect to "theNewRoute" with params { ':page': '3', ':user':'2' } and replace history
-                    $.Router.redirect ('theNewRoute', { ':page': '4', ':user': '6' }, { replace: true })
-                            .then (function () { });
-                },
                 redirect: function (e, $) {
 
                     //Redirect to "theNewRoute" with params { ':page': '3', ':user':'2' }

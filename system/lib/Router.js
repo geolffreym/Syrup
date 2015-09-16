@@ -69,8 +69,7 @@ Router.add ('redirect', function (route_name, params, config) {
 	var _self = this,
 		_the_new_route = null,
 		_params = null, _config = {
-			trigger: true,
-			replace: false
+			trigger: true
 		};
 
 	return (new Promise (function (resolve, reject) {
@@ -116,13 +115,10 @@ Router.add ('_triggerPopState', function (_params, route_name, _the_new_route, _
 	//Set state in history
 	//Two times, for trigger "popstate"
 
-	if ( _config.trigger && !_config.replace ) {
+	if ( _config.trigger ) {
 		this.history.pushState (_params, route_name, _the_new_route);
 		this.history.pushState (_params, route_name, _the_new_route);
 		this.history.back ();
 	}
 
-	if ( _config.replace ) {
-		this.history.replaceState (_params, route_name, _the_new_route);
-	}
 });
