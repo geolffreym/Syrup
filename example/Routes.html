@@ -15,6 +15,7 @@
 
 <div sp-recipe="Hey.Do">
     <!--Hey.Do recipe -->
+    <!--Event callback in recipe Hey.Do--->
     <button sp-click="redirect">Redirect</button>
 </div>
 
@@ -26,7 +27,7 @@
         //The App with dependencies
         var my_Lib = App.blend ('Hey', ['Http', 'Model', 'Router']);
 
-        //Providing features to App
+        //A trigger for given recipes before execution
         my_Lib.spice (['Hey.You'], function (moduleId, $) {
 
             //Before execution of recipes list, what to do?
@@ -48,6 +49,7 @@
                     //When the "theNewRoute" match. What to do?
                     $.Router.when ('theNewRoute').then (function (params, event) {
                         console.log (params.getIndex (':page'));
+                        console.log (params.getIndex (':user'));
                     })
 
                 },
@@ -64,7 +66,8 @@
             return {
                 init    : function ($) {},
                 redirect: function (e, $) {
-                    //Redirect to "theNewRoute" with params { ':page': '3' }
+
+                    //Redirect to "theNewRoute" with params { ':page': '3', ':user':'2' }
                     $.Router.redirect ('theNewRoute', { ':page': '3', ':user': '2' })
                             .then (function () { });
                 }
