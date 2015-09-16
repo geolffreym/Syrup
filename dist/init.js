@@ -5213,12 +5213,15 @@ Router.add ('when', function (route_name) {
 /**Redirect to route
  * @param route_name
  * */
-Router.add ('redirect', function (route_name, params) {
+Router.add ('redirect', function (route_name, params, config) {
 	_.assert (route_name, _.WARNING_SYRUP.ERROR.NOPARAM, '(Router Redirect)');
 
 	var _self = this,
 		_the_new_route = null,
-		_params = null;
+		_params = null, _config = {
+			trigger: true,
+			replace: false
+		};
 
 	return (new Promise (function (resolve, reject) {
 
@@ -5228,8 +5231,11 @@ Router.add ('redirect', function (route_name, params) {
 			return;
 		}
 
+		//Params and config
 		_params = _.isObject (params)
 			? params : {};
+
+		_config = _.extend (_config, config || {}, true);
 
 		//Set old regex in state object
 		_params['route_name'] = route_name;
@@ -5241,7 +5247,7 @@ Router.add ('redirect', function (route_name, params) {
 			: _the_new_route;
 
 		//Set state in history
-		_self._triggerPopState (_params, route_name, _the_new_route);
+		_self._triggerPopState (_params, route_name, _the_new_route, _config);
 
 		//Resolve Promise
 		resolve (_the_new_route);
@@ -5256,12 +5262,19 @@ Router.add ('redirect', function (route_name, params) {
  * @param route_name
  * @param _the_new_route
  * */
-Router.add ('_triggerPopState', function (_params, route_name, _the_new_route) {
+Router.add ('_triggerPopState', function (_params, route_name, _the_new_route, _config) {
 	//Set state in history
-	//Two times, for execution in "popstate"
-	this.history.pushState (_params, route_name, _the_new_route);
-	this.history.pushState (_params, route_name, _the_new_route);
-	this.history.back ();
+	//Two times, for trigger "popstate"
+
+	if ( _config.trigger && !_config.replace ) {
+		this.history.pushState (_params, route_name, _the_new_route);
+		this.history.pushState (_params, route_name, _the_new_route);
+		this.history.back ();
+	}
+
+	if ( _config.replace ) {
+		this.history.replaceState (_params, route_name, _the_new_route);
+	}
 });
 
 /**
