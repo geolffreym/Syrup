@@ -82,7 +82,6 @@ Config
 ------
 Configuration is very simple, you just have to access the folder /config/ and edit the file init.js 
 
-In init.js need to set the processor ajax either PHP or whatever fence to process your request, if your system does not need a format, just leave it blank. 
 You need to set the APP_PATH, is who is responsible for setting the relative directory of your application, the default is '/' and finally the environment, which can be either development or production.
 
 *Example APP_PATH: (/assets/)*  

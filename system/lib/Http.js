@@ -62,9 +62,7 @@ Http.add ('on', function (event, callback) {
  * Config object {
  *  url: (string) the request url
  *  type: (string) the request type GET or POST
- *	async: bool,
  *	timeout: (int) request timeout,
- *	processor: (string) ajax server side processor file extension,
  *	token: (string or bool) CSRF token needed?,
  *	contentType: (string) the content type,
  *	data: (object) the request data,
