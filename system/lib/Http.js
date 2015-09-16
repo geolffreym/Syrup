@@ -19,7 +19,6 @@ function Http () {
 	this.progress = null;
 	this.state = null;
 	this.abort = null;
-	this.error = null;
 	this.time_out = null;
 }
 
@@ -75,19 +74,18 @@ Http.add ('on', function (event, callback) {
  * **/
 Http.add ('request', function (config) {
 	if ( !_.isObject (config) ) {
-		throw (_.WARNING_SYRUP.ERROR.NOOBJECT)
+		_.error (_.WARNING_SYRUP.ERROR.NOOBJECT, '(Http Request)')
 	}
 
 	var _self = this,
 		_xhr = _self.xhr,
-		_async = config.async || true,
+		_query = _.emptyStr,
 		_type = (config.method || 'GET').toUpperCase (),
 		_timeout = config.timeout || 0xFA0,
 		_cors = config.cors || false,
-		_processor = config.processor || setting.processor,
-		_token = config.token || null,
+		_token = config.token || false,
 		_contentType = config.contentType || 'application/x-www-form-urlencoded;charset=utf-8',
-		_data = config.data || null,
+		_data = config.data || false,
 		_contentHeader = {
 			header: 'Content-Type',
 			value : _contentType
@@ -97,7 +95,7 @@ Http.add ('request', function (config) {
 	return (new Promise (function (resolve, reject) {
 
 		if ( !_.isSet (config.url) )
-			reject (_.WARNING_SYRUP.ERROR.NOURL);
+			_.error (_.WARNING_SYRUP.ERROR.NOURL, '(Http Request)');
 
 		if ( !_.isFormData (_data)
 			 && _.isSet (_data)
@@ -107,12 +105,12 @@ Http.add ('request', function (config) {
 		}
 
 		if ( _type === 'GET' && _.isSet (_data) ) {
-			_processor += '?' + _data;
+			_query += '?' + _data;
 		}
 
 		//Process url
-		_processor = config.url + (_processor || '');
-		_xhr.open (_type, _processor, _async);
+		_query = config.url + (_query);
+		_xhr.open (_type, _query, true);
 		_xhr.timeout = _timeout;
 
 		//Setting Headers
@@ -156,32 +154,32 @@ Http.add ('request', function (config) {
 
 		_xhr.addEventListener ('readystatechange', function (e) {
 			if ( this.readyState ) {
-				if ( !!_self.state ) {
+				if ( _self.state ) {
 					_self.state (this.readyState, e);
 				}
 			}
 		});
 
 		_xhr.addEventListener ('abort', function (e) {
-			if ( !!_self.abort ) {
+			if ( _self.abort ) {
 				_self.abort (e);
 			}
 		});
 
 		_xhr.addEventListener ('timeout', function (e) {
-			if ( !!_self.time_out ) {
+			if ( _self.time_out ) {
 				_self.time_out (e);
 			}
 		});
 
 		_xhr.addEventListener ('loadend', function (e) {
-			if ( !!_self.complete ) {
+			if ( _self.complete ) {
 				_self.complete (e);
 			}
 		});
 
 		_xhr.addEventListener ('loadstart', function (e) {
-			if ( !!_self.before ) {
+			if ( _self.before ) {
 				_self.before (e);
 			}
 		});
@@ -206,7 +204,7 @@ Http.add ('request', function (config) {
  * */
 Http.add ('get', function (url, data) {
 	var _conf = {
-		url : url || location.href,
+		url : url || location.pathname,
 		data: data || {}
 	};
 
@@ -223,7 +221,7 @@ Http.add ('get', function (url, data) {
 Http.add ('post', function (url, data) {
 	var _conf = {
 		method: 'POST',
-		url   : url || location.href,
+		url   : url || location.pathname,
 		data  : data || {}
 	};
 
@@ -240,7 +238,7 @@ Http.add ('post', function (url, data) {
 Http.add ('put', function (url, data) {
 	var _conf = {
 		method: 'PUT',
-		url   : url || location.href,
+		url   : url || location.pathname,
 		data  : data || {}
 	};
 
@@ -257,14 +255,13 @@ Http.add ('put', function (url, data) {
 Http.add ('delete', function (url, data) {
 	var _conf = {
 		method: 'DELETE',
-		url   : url || location.href,
+		url   : url || location.pathname,
 		data  : data || {}
 	};
 
 	this.kill ();
 	return this.request (_conf);
 });
-
 
 
 /** Set Request Header

@@ -7,7 +7,8 @@
  * @constructor
  */
 function Router () {
-	this.routes = {}
+	this.routes = {};
+	this.history = window.history;
 }
 
 
@@ -29,7 +30,7 @@ Router.add ('setRoutes', function (routes) {
  * @returns {boolean}
  */
 Router.add ('when', function (route_name) {
-	_.assert (route_name, _.WARNING_SYRUP.ERROR.NOPARAM);
+	_.assert (route_name, _.WARNING_SYRUP.ERROR.NOPARAM, '(Router When)');
 	var _self = this;
 	return (new Promise (function (resolve, reject) {
 
@@ -47,6 +48,25 @@ Router.add ('when', function (route_name) {
 
 	}));
 
+});
+
+/**Redirect to route
+ * @param route_name
+ * */
+Router.add ('redirect', function (route_name) {
+	_.assert (route_name, _.WARNING_SYRUP.ERROR.NOPARAM, '(Router Redirect)');
+	var _self = this;
+	return (new Promise (function (resolve, reject) {
+
+		//Not routing
+		if ( !(route_name in _self.routes) )
+			reject (route_name);
+
+
+
+
+
+	}));
 });
 
 Router.add ('parseQueryString', function () {

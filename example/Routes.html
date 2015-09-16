@@ -36,7 +36,7 @@
             //A global service
             console.log ('hi')
 
-        }).beforeInit (['Hey.You'], function (moduleId, $) {
+        }).spice (['Hey.You'], function (moduleId, $) {
 
             //Before execution of recipes list, what to do?
             $.Router.setRoutes ({
@@ -45,7 +45,7 @@
 
             // console.log(my_Lib.getRecipe(moduleId));
 
-        }).afterInit (['Hey.You', 'Hey.Do'], function (moduleId, $) {
+        }).afters (['Hey.You', 'Hey.Do'], function (moduleId, $) {
 
             //After execution of recipes list, what to do?
             console.log ('I\m served: ' + moduleId)
@@ -65,6 +65,7 @@
 
                 },
                 destroy: function ($) {
+                    //Dropped? What to do?
                     alert ('destroyed?')
                 }
             }
@@ -83,6 +84,7 @@
                         ]
                     });
 
+                    //Drop the Hey.You lib
                     my_Lib.drop ('Hey.You')
                 },
                 destroy: function () {

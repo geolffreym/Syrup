@@ -5,7 +5,6 @@
 //Basic Config
 
 var setting = {
-	processor  : '',
 	app_path   : '/syrup/app',
 	system_path: '/syrup/system',
 	env        : 'development'
@@ -39,8 +38,8 @@ if ( typeof exports !== 'undefined' )
 				NOPARAM              : 'Param needed',
 				NONETWORK            : 'Network Error',
 				NOOBJECT             : 'An object param is needed.',
-				NOARRAY              : 'An array necessary.',
-				NOFUNCTION           : 'An function needed.',
+				NOARRAY              : 'An array param needed.',
+				NOFUNCTION           : 'An function param needed.',
 				NODATE               : 'Invalid Date',
 				NOSTRING             : 'String is required',
 				NOPACK               : 'Error packing model',
@@ -636,7 +635,7 @@ if ( typeof exports !== 'undefined' )
 	 * @param cls
 	 */
 	_$_.add ('hasClass', function (cls) {
-		_.assert (cls, WARNING_SYRUP.ERROR.NOPARAM);
+		_.assert (cls, WARNING_SYRUP.ERROR.NOPARAM, '($ .hasClass)');
 		var elem = this.get (0);
 		if ( _.isSet (elem.classList) ) {
 			if ( Array.prototype.indexOf.call (elem.classList, cls) > -1 ) {
@@ -766,7 +765,7 @@ if ( typeof exports !== 'undefined' )
 	 * @retur object
 	 * */
 	_$_.add ('is', function (context) {
-		_.assert (context, WARNING_SYRUP.ERROR.NOPARAM);
+		_.assert (context, WARNING_SYRUP.ERROR.NOPARAM, '($ .is)');
 		var v = this.get (0),
 			_return = false;
 
@@ -959,9 +958,9 @@ if ( typeof exports !== 'undefined' )
 	 * @param msg
 	 * @returns {object}
 	 */
-	Syrup.add ('assert', function (obj, msg) {
+	Syrup.add ('assert', function (obj, msg, breakpoint) {
 		if ( !_.isSet (obj) ) {
-			_.error (_.isSet (msg) ? msg : 'Param needed');
+			_.error (_.isSet (msg) ? msg : 'Param needed', breakpoint);
 		}
 		return this;
 	});
@@ -1128,10 +1127,12 @@ if ( typeof exports !== 'undefined' )
 	/**Console Log error con tiempo de ejecucion
 	 * @param msg
 	 */
-	Syrup.add ('error', function (msg) {
-		var date = _.getDate (false);
+	Syrup.add ('error', function (msg, breakpoint) {
+		var date = _.getDate (false)
+
 		throw (
-			date.hour + ':' + date.minutes + ':' + date.seconds + ' ' + date.meridian + ' -> ' + msg
+			(date.hour + ':' + date.minutes + ':' + date.seconds + ' ' + date.meridian + ' -> ' + msg) +
+			(breakpoint ? ' | Method: ' + breakpoint : _.emptyStr)
 		);
 	});
 
@@ -1201,7 +1202,7 @@ if ( typeof exports !== 'undefined' )
 					);
 				}
 			} else {
-				_.error (WARNING_SYRUP.ERROR.NOOBJECTREPLACEREGEXP);
+				_.error (WARNING_SYRUP.ERROR.NOOBJECTREPLACEREGEXP, '(Syrup Replace)');
 			}
 		} else {
 
@@ -1608,7 +1609,7 @@ if ( typeof exports !== 'undefined' )
 	 */
 	Syrup.add ('specArray', function (arr) {
 		if ( !_.isArray (arr) ) {
-			_.error (WARNING_SYRUP.ERROR.NOARRAY);
+			_.error (WARNING_SYRUP.ERROR.NOARRAY, '(Syrup specArray)');
 		}
 
 		return arr.length > 1
@@ -1715,7 +1716,7 @@ if ( typeof exports !== 'undefined' )
 			return nativeObject.valueOf.call (element);
 
 		if ( !_.isArray (element) )
-			_.error (WARNING_SYRUP.ERROR.NOARRAY);
+			_.error (WARNING_SYRUP.ERROR.NOARRAY, '(Syrup toObject)');
 
 
 		return element.reduce (function (o, v, i) {
@@ -4561,7 +4562,7 @@ Apps.add ('_triggerOn', function (moduleList, callback, toList) {
 /**Add a custom trigger to execute before the given modules
  * @param moduleList
  * @callback*/
-Apps.add ('beforeInit', function (moduleList, callback) {
+Apps.add ('spice', function (moduleList, callback) {
 	return this._triggerOn (moduleList, callback, this.triggerBefore);
 });
 
@@ -4569,7 +4570,7 @@ Apps.add ('beforeInit', function (moduleList, callback) {
 /**Add a custom trigger to execute after the given modules
  * @param moduleList
  * @callback*/
-Apps.add ('afterInit', function (moduleList, callback) {
+Apps.add ('afters', function (moduleList, callback) {
 	return this._triggerOn (moduleList, callback, this.triggerAfter);
 });
 
@@ -4726,9 +4727,10 @@ Apps.add ('_serve', function (moduleId, template) {
 							_view[view_name] (_scope, function (my_html) {
 								_dom.html (my_html);
 							})
-					})
-				} else if ( _dom_template.exist ) {
+					});
+
 					//Exist inline tpl?
+				} else if ( _dom_template.exist ) {
 					var _parse = _dom_template.html ();
 					if ( _.isSet (_parse) ) {
 						_view.render (_parse, _scope).then (function (result) {
@@ -4866,7 +4868,6 @@ function Http () {
 	this.progress = null;
 	this.state = null;
 	this.abort = null;
-	this.error = null;
 	this.time_out = null;
 }
 
@@ -4922,19 +4923,18 @@ Http.add ('on', function (event, callback) {
  * **/
 Http.add ('request', function (config) {
 	if ( !_.isObject (config) ) {
-		throw (_.WARNING_SYRUP.ERROR.NOOBJECT)
+		_.error (_.WARNING_SYRUP.ERROR.NOOBJECT, '(Http Request)')
 	}
 
 	var _self = this,
 		_xhr = _self.xhr,
-		_async = config.async || true,
+		_query = _.emptyStr,
 		_type = (config.method || 'GET').toUpperCase (),
 		_timeout = config.timeout || 0xFA0,
 		_cors = config.cors || false,
-		_processor = config.processor || setting.processor,
-		_token = config.token || null,
+		_token = config.token || false,
 		_contentType = config.contentType || 'application/x-www-form-urlencoded;charset=utf-8',
-		_data = config.data || null,
+		_data = config.data || false,
 		_contentHeader = {
 			header: 'Content-Type',
 			value : _contentType
@@ -4944,7 +4944,7 @@ Http.add ('request', function (config) {
 	return (new Promise (function (resolve, reject) {
 
 		if ( !_.isSet (config.url) )
-			reject (_.WARNING_SYRUP.ERROR.NOURL);
+			_.error (_.WARNING_SYRUP.ERROR.NOURL, '(Http Request)');
 
 		if ( !_.isFormData (_data)
 			 && _.isSet (_data)
@@ -4954,12 +4954,12 @@ Http.add ('request', function (config) {
 		}
 
 		if ( _type === 'GET' && _.isSet (_data) ) {
-			_processor += '?' + _data;
+			_query += '?' + _data;
 		}
 
 		//Process url
-		_processor = config.url + (_processor || '');
-		_xhr.open (_type, _processor, _async);
+		_query = config.url + (_query);
+		_xhr.open (_type, _query, true);
 		_xhr.timeout = _timeout;
 
 		//Setting Headers
@@ -5003,32 +5003,32 @@ Http.add ('request', function (config) {
 
 		_xhr.addEventListener ('readystatechange', function (e) {
 			if ( this.readyState ) {
-				if ( !!_self.state ) {
+				if ( _self.state ) {
 					_self.state (this.readyState, e);
 				}
 			}
 		});
 
 		_xhr.addEventListener ('abort', function (e) {
-			if ( !!_self.abort ) {
+			if ( _self.abort ) {
 				_self.abort (e);
 			}
 		});
 
 		_xhr.addEventListener ('timeout', function (e) {
-			if ( !!_self.time_out ) {
+			if ( _self.time_out ) {
 				_self.time_out (e);
 			}
 		});
 
 		_xhr.addEventListener ('loadend', function (e) {
-			if ( !!_self.complete ) {
+			if ( _self.complete ) {
 				_self.complete (e);
 			}
 		});
 
 		_xhr.addEventListener ('loadstart', function (e) {
-			if ( !!_self.before ) {
+			if ( _self.before ) {
 				_self.before (e);
 			}
 		});
@@ -5053,7 +5053,7 @@ Http.add ('request', function (config) {
  * */
 Http.add ('get', function (url, data) {
 	var _conf = {
-		url : url || location.href,
+		url : url || location.pathname,
 		data: data || {}
 	};
 
@@ -5070,7 +5070,7 @@ Http.add ('get', function (url, data) {
 Http.add ('post', function (url, data) {
 	var _conf = {
 		method: 'POST',
-		url   : url || location.href,
+		url   : url || location.pathname,
 		data  : data || {}
 	};
 
@@ -5087,7 +5087,7 @@ Http.add ('post', function (url, data) {
 Http.add ('put', function (url, data) {
 	var _conf = {
 		method: 'PUT',
-		url   : url || location.href,
+		url   : url || location.pathname,
 		data  : data || {}
 	};
 
@@ -5104,14 +5104,13 @@ Http.add ('put', function (url, data) {
 Http.add ('delete', function (url, data) {
 	var _conf = {
 		method: 'DELETE',
-		url   : url || location.href,
+		url   : url || location.pathname,
 		data  : data || {}
 	};
 
 	this.kill ();
 	return this.request (_conf);
 });
-
 
 
 /** Set Request Header
@@ -5145,7 +5144,8 @@ Http.add ('kill', function () {
  * @constructor
  */
 function Router () {
-	this.routes = {}
+	this.routes = {};
+	this.history = window.history;
 }
 
 
@@ -5167,7 +5167,7 @@ Router.add ('setRoutes', function (routes) {
  * @returns {boolean}
  */
 Router.add ('when', function (route_name) {
-	_.assert (route_name, _.WARNING_SYRUP.ERROR.NOPARAM);
+	_.assert (route_name, _.WARNING_SYRUP.ERROR.NOPARAM, '(Router When)');
 	var _self = this;
 	return (new Promise (function (resolve, reject) {
 
@@ -5185,6 +5185,25 @@ Router.add ('when', function (route_name) {
 
 	}));
 
+});
+
+/**Redirect to route
+ * @param route_name
+ * */
+Router.add ('redirect', function (route_name) {
+	_.assert (route_name, _.WARNING_SYRUP.ERROR.NOPARAM, '(Router Redirect)');
+	var _self = this;
+	return (new Promise (function (resolve, reject) {
+
+		//Not routing
+		if ( !(route_name in _self.routes) )
+			reject (route_name);
+
+
+
+
+
+	}));
 });
 
 Router.add ('parseQueryString', function () {
@@ -5319,8 +5338,7 @@ function View () {
 View.add ('lookup', function (template) {
 	var _conf = {
 		url        : setting.app_path + '/templates/' + template,
-		contentType: 'text/plain',
-		processor  : '.html'
+		contentType: 'text/plain'
 	};
 
 	return this.Http.request (_conf);
@@ -5351,7 +5369,8 @@ View.add ('seekTpl', function (template) {
 				_self.tpl = temp;
 				resolve (_self);
 			}).catch (function () {
-				reject (_.WARNING_SYRUP.ERROR.NONETWORK);
+				reject (template);
+				_.error (_.WARNING_SYRUP.ERROR.NONETWORK, '(View SeekTpl)');
 			});
 		}
 	}));
@@ -5370,7 +5389,7 @@ View.add ('clear', function () {
 });
 
 //Clear View from Storage
-View.add ('remove', function () {
+View.add ('cleanCache', function () {
 	if ( this.dir ) {
 		var old_templates = this.Storage.get ('templates');
 		if ( old_templates ) {
@@ -5436,8 +5455,9 @@ Model.add ('method', function (method) {
  */
 Model.add ('attach', function (name, attach) {
 	var self = this;
-	_.assert (self.modelData, _.WARNING_SYRUP.ERROR.NOPACK);
+	_.assert (self.modelData, _.WARNING_SYRUP.ERROR.NOPACK, '(Model Attach)');
 	self.modelData.append (name, attach);
+	return this;
 });
 
 /**Getting a array of values name="input[]"
@@ -5475,7 +5495,7 @@ Model.add ('fail', function (field, error) {
  * @param event*/
 Model.add ('send', function (url, data) {
 	var self = this;
-	_.assert (data, _.WARNING_SYRUP.ERROR.NOPACK);
+	_.assert (data, _.WARNING_SYRUP.ERROR.NOPACK, '(Model Send)');
 
 	var conf = {
 		url   : url,
@@ -5758,7 +5778,7 @@ GoogleMap = function () {
 		}
 
 		if ( !_.isFunction (callback) )
-			_.error (_.WARNING_SYRUP.ERROR.NOFUNCTION);
+			_.error (_.WARNING_SYRUP.ERROR.NOFUNCTION, '(Map On)');
 
 		if ( !_.isObject (elem) )
 			_.error (WARNING_GOOGLE_MAP.ERROR.NOMAP);

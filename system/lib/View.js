@@ -24,8 +24,7 @@ function View () {
 View.add ('lookup', function (template) {
 	var _conf = {
 		url        : setting.app_path + '/templates/' + template,
-		contentType: 'text/plain',
-		processor  : '.html'
+		contentType: 'text/plain'
 	};
 
 	return this.Http.request (_conf);
@@ -56,7 +55,8 @@ View.add ('seekTpl', function (template) {
 				_self.tpl = temp;
 				resolve (_self);
 			}).catch (function () {
-				reject (_.WARNING_SYRUP.ERROR.NONETWORK);
+				reject (template);
+				_.error (_.WARNING_SYRUP.ERROR.NONETWORK, '(View SeekTpl)');
 			});
 		}
 	}));
@@ -75,7 +75,7 @@ View.add ('clear', function () {
 });
 
 //Clear View from Storage
-View.add ('remove', function () {
+View.add ('cleanCache', function () {
 	if ( this.dir ) {
 		var old_templates = this.Storage.get ('templates');
 		if ( old_templates ) {

@@ -37,8 +37,9 @@ Model.add ('method', function (method) {
  */
 Model.add ('attach', function (name, attach) {
 	var self = this;
-	_.assert (self.modelData, _.WARNING_SYRUP.ERROR.NOPACK);
+	_.assert (self.modelData, _.WARNING_SYRUP.ERROR.NOPACK, '(Model Attach)');
 	self.modelData.append (name, attach);
+	return this;
 });
 
 /**Getting a array of values name="input[]"
@@ -76,7 +77,7 @@ Model.add ('fail', function (field, error) {
  * @param event*/
 Model.add ('send', function (url, data) {
 	var self = this;
-	_.assert (data, _.WARNING_SYRUP.ERROR.NOPACK);
+	_.assert (data, _.WARNING_SYRUP.ERROR.NOPACK, '(Model Send)');
 
 	var conf = {
 		url   : url,

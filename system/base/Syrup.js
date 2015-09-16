@@ -20,8 +20,8 @@
 				NOPARAM              : 'Param needed',
 				NONETWORK            : 'Network Error',
 				NOOBJECT             : 'An object param is needed.',
-				NOARRAY              : 'An array necessary.',
-				NOFUNCTION           : 'An function needed.',
+				NOARRAY              : 'An array param needed.',
+				NOFUNCTION           : 'An function param needed.',
 				NODATE               : 'Invalid Date',
 				NOSTRING             : 'String is required',
 				NOPACK               : 'Error packing model',
@@ -617,7 +617,7 @@
 	 * @param cls
 	 */
 	_$_.add ('hasClass', function (cls) {
-		_.assert (cls, WARNING_SYRUP.ERROR.NOPARAM);
+		_.assert (cls, WARNING_SYRUP.ERROR.NOPARAM, '($ .hasClass)');
 		var elem = this.get (0);
 		if ( _.isSet (elem.classList) ) {
 			if ( Array.prototype.indexOf.call (elem.classList, cls) > -1 ) {
@@ -747,7 +747,7 @@
 	 * @retur object
 	 * */
 	_$_.add ('is', function (context) {
-		_.assert (context, WARNING_SYRUP.ERROR.NOPARAM);
+		_.assert (context, WARNING_SYRUP.ERROR.NOPARAM, '($ .is)');
 		var v = this.get (0),
 			_return = false;
 
@@ -940,9 +940,9 @@
 	 * @param msg
 	 * @returns {object}
 	 */
-	Syrup.add ('assert', function (obj, msg) {
+	Syrup.add ('assert', function (obj, msg, breakpoint) {
 		if ( !_.isSet (obj) ) {
-			_.error (_.isSet (msg) ? msg : 'Param needed');
+			_.error (_.isSet (msg) ? msg : 'Param needed', breakpoint);
 		}
 		return this;
 	});
@@ -1109,10 +1109,12 @@
 	/**Console Log error con tiempo de ejecucion
 	 * @param msg
 	 */
-	Syrup.add ('error', function (msg) {
-		var date = _.getDate (false);
+	Syrup.add ('error', function (msg, breakpoint) {
+		var date = _.getDate (false)
+
 		throw (
-			date.hour + ':' + date.minutes + ':' + date.seconds + ' ' + date.meridian + ' -> ' + msg
+			(date.hour + ':' + date.minutes + ':' + date.seconds + ' ' + date.meridian + ' -> ' + msg) +
+			(breakpoint ? ' | Method: ' + breakpoint : _.emptyStr)
 		);
 	});
 
@@ -1182,7 +1184,7 @@
 					);
 				}
 			} else {
-				_.error (WARNING_SYRUP.ERROR.NOOBJECTREPLACEREGEXP);
+				_.error (WARNING_SYRUP.ERROR.NOOBJECTREPLACEREGEXP, '(Syrup Replace)');
 			}
 		} else {
 
@@ -1589,7 +1591,7 @@
 	 */
 	Syrup.add ('specArray', function (arr) {
 		if ( !_.isArray (arr) ) {
-			_.error (WARNING_SYRUP.ERROR.NOARRAY);
+			_.error (WARNING_SYRUP.ERROR.NOARRAY, '(Syrup specArray)');
 		}
 
 		return arr.length > 1
@@ -1696,7 +1698,7 @@
 			return nativeObject.valueOf.call (element);
 
 		if ( !_.isArray (element) )
-			_.error (WARNING_SYRUP.ERROR.NOARRAY);
+			_.error (WARNING_SYRUP.ERROR.NOARRAY, '(Syrup toObject)');
 
 
 		return element.reduce (function (o, v, i) {

@@ -6,7 +6,8 @@
 View.add ('myView', function (data, callback) {
 	//The template as relative path of config app_path
 	//Hey/You in app/templates respects namespace
-	this.seekTpl ('Hey/You').then (function (view) {
+	this.seekTpl ('Hey/You.html').then (function (view) {
+		//view.cleanCache();
 		if ( _.isSet (callback) ) {
 			view.render (view.getTpl (), data).then (callback);
 		}

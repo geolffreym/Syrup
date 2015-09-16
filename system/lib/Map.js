@@ -165,7 +165,7 @@ GoogleMap = function () {
 		}
 
 		if ( !_.isFunction (callback) )
-			_.error (_.WARNING_SYRUP.ERROR.NOFUNCTION);
+			_.error (_.WARNING_SYRUP.ERROR.NOFUNCTION, '(Map On)');
 
 		if ( !_.isObject (elem) )
 			_.error (WARNING_GOOGLE_MAP.ERROR.NOMAP);

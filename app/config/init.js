@@ -5,7 +5,6 @@
 //Basic Config
 
 var setting = {
-	processor  : '',
 	app_path   : '/syrup/app',
 	system_path: '/syrup/system',
 	env        : 'development'

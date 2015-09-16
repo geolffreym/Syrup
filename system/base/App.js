@@ -110,7 +110,7 @@ Apps.add ('_triggerOn', function (moduleList, callback, toList) {
 /**Add a custom trigger to execute before the given modules
  * @param moduleList
  * @callback*/
-Apps.add ('beforeInit', function (moduleList, callback) {
+Apps.add ('spice', function (moduleList, callback) {
 	return this._triggerOn (moduleList, callback, this.triggerBefore);
 });
 
@@ -118,7 +118,7 @@ Apps.add ('beforeInit', function (moduleList, callback) {
 /**Add a custom trigger to execute after the given modules
  * @param moduleList
  * @callback*/
-Apps.add ('afterInit', function (moduleList, callback) {
+Apps.add ('afters', function (moduleList, callback) {
 	return this._triggerOn (moduleList, callback, this.triggerAfter);
 });
 
@@ -275,9 +275,10 @@ Apps.add ('_serve', function (moduleId, template) {
 							_view[view_name] (_scope, function (my_html) {
 								_dom.html (my_html);
 							})
-					})
-				} else if ( _dom_template.exist ) {
+					});
+
 					//Exist inline tpl?
+				} else if ( _dom_template.exist ) {
 					var _parse = _dom_template.html ();
 					if ( _.isSet (_parse) ) {
 						_view.render (_parse, _scope).then (function (result) {
