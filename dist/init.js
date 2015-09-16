@@ -1188,31 +1188,34 @@ if ( typeof exports !== 'undefined' )
 	 * @return String
 	 */
 	Syrup.add ('replace', function (_string, _find, _replace) {
-		var o = _string.toString (),
+		var _self = this,
+			o = _string.toString (),
 			s = o.toLowerCase (),
-			r = _.emptyStr, b = 0, e = 1, _tmp;
+			r = _.emptyStr, b = 0, e = 1;
 
 
 		if ( !_.isRegexp (_find) ) {
 			_find = _find.toLowerCase ();
 		} else {
 			_find = o.match (_find);
-			this.recursiveStr = s;
+			_self.recursiveStr = s;
 		}
+
 
 		//Regexp result?
 		if ( _.isArray (_find) ) {
 			if ( _.isObject (_replace) ) {
-				if ( _find.length > 0 ) {
-					_tmp = _find.pop ();
+
+				//For each match
+				_.each (_find, function (_tmp) {
 
 					//Search for the replace index
 					if ( _tmp in _replace )
-						this.recursiveStr = _.replace (
-							this.recursiveStr, _tmp,
+						_self.recursiveStr = _.replace (
+							_self.recursiveStr, _tmp,
 							_replace[_tmp]
 						);
-				}
+				})
 			} else {
 				_.error (WARNING_SYRUP.ERROR.NOOBJECTREPLACEREGEXP, '(Syrup Replace)');
 			}
@@ -1233,11 +1236,11 @@ if ( typeof exports !== 'undefined' )
 			}
 
 			if ( !_.isEmpty (r) ) {
-				this.recursiveStr = r;
+				_self.recursiveStr = r;
 			}
 		}
 
-		return this.recursiveStr;
+		return _self.recursiveStr;
 	});
 
 
@@ -5165,7 +5168,7 @@ function Router () {
 		if ( _.isSet (e.state) && 'route_name' in e.state ) {
 			if ( e.state.route_name in _self.onpopstate ) {
 				_self.onpopstate[e.state.route_name].forEach (function (v, i) {
-					v (e.state);
+					v (e.state, e);
 				});
 			}
 		}

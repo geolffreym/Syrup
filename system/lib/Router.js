@@ -18,7 +18,7 @@ function Router () {
 		if ( _.isSet (e.state) && 'route_name' in e.state ) {
 			if ( e.state.route_name in _self.onpopstate ) {
 				_self.onpopstate[e.state.route_name].forEach (function (v, i) {
-					v (e.state);
+					v (e.state, e);
 				});
 			}
 		}

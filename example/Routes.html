@@ -8,9 +8,13 @@
 <script src="/syrup/dist/init.js"></script>
 
 
-<div sp-recipe="Hey.You"></div>
+<div sp-recipe="Hey.You">
+    <!--Hey.You recipe -->
+</div>
+
 
 <div sp-recipe="Hey.Do">
+    <!--Hey.Do recipe -->
     <button sp-click="redirect">Redirect</button>
 </div>
 
@@ -23,16 +27,13 @@
         var my_Lib = App.blend ('Hey', ['Http', 'Model', 'Router']);
 
         //Providing features to App
-        my_Lib.service ('HeyConsole', function () {
-            //A global service
-            console.log ('hi')
-
-        }).spice (['Hey.You'], function (moduleId, $) {
+        my_Lib.spice (['Hey.You'], function (moduleId, $) {
 
             //Before execution of recipes list, what to do?
+            //Initialize the routes
             $.Router.setRoutes ({
                 'myLocalRoute': '/Routes.html',
-                'theNewRoute' : '/route/:page/'
+                'theNewRoute' : '/route/:page/:user/'
             });
 
         });
@@ -43,12 +44,15 @@
         my_Lib.recipe ('Hey.You', function (_, _$, scope) {
             return {
                 init   : function ($) {
-                    $.Router.when ('theNewRoute').then (function (params) {
+
+                    //When the "theNewRoute" match. What to do?
+                    $.Router.when ('theNewRoute').then (function (params, event) {
                         console.log (params.getIndex (':page'));
                     })
 
                 },
                 destroy: function ($) {
+
                     //Dropped? What to do?
                     alert ('destroyed?')
                 }
@@ -58,14 +62,10 @@
         //A new recipe for Hey
         my_Lib.recipe ('Hey.Do', function (_, _$, scope) {
             return {
-                init    : function ($) {
-                    $.Router.when('theNewRoute').then(function(params){
-                        console.log('I will do something too.')
-                    });
-                },
+                init    : function ($) {},
                 redirect: function (e, $) {
-
-                    $.Router.redirect ('theNewRoute', { ':page': '3' })
+                    //Redirect to "theNewRoute" with params { ':page': '3' }
+                    $.Router.redirect ('theNewRoute', { ':page': '3', ':user': '2' })
                             .then (function () { });
                 }
             }
