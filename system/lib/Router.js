@@ -10,21 +10,9 @@ function Router () {
 	this.routes = {};
 	this.history = window.history;
 	this.findParams = /(:[\w]+)/g;
-	this.listening = false;
 	this.onpopstate = {};
-}
 
-
-/**Set the routes
- * @param routes
- * @return object
- * */
-Router.add ('setRoutes', function (routes) {
 	var _self = this;
-
-	if(!_self.listening){
-
-	}
 	//Set Pop State
 	window.addEventListener ('popstate', function (e) {
 		if ( _.isSet (e.state) && 'route_name' in e.state ) {
@@ -35,6 +23,15 @@ Router.add ('setRoutes', function (routes) {
 			}
 		}
 	});
+}
+
+
+/**Set the routes
+ * @param routes
+ * @return object
+ * */
+Router.add ('setRoutes', function (routes) {
+	var _self = this;
 
 	return (new Promise (function (resolve, reject) {
 		_self.routes = _.extend (_self.routes, routes);
