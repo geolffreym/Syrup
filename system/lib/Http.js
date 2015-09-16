@@ -202,8 +202,8 @@ Http.add ('request', function (config) {
  * */
 Http.add ('get', function (url, data) {
 	var _conf = {
-		url : url || location.pathname,
-		data: data || {}
+		url : url,
+		data: data
 	};
 
 	this.kill ();
@@ -219,8 +219,8 @@ Http.add ('get', function (url, data) {
 Http.add ('post', function (url, data) {
 	var _conf = {
 		method: 'POST',
-		url   : url || location.pathname,
-		data  : data || {}
+		url   : url,
+		data  : data
 	};
 
 	this.kill ();
@@ -236,8 +236,8 @@ Http.add ('post', function (url, data) {
 Http.add ('put', function (url, data) {
 	var _conf = {
 		method: 'PUT',
-		url   : url || location.pathname,
-		data  : data || {}
+		url   : url,
+		data  : data
 	};
 
 	this.kill ();
@@ -253,8 +253,8 @@ Http.add ('put', function (url, data) {
 Http.add ('delete', function (url, data) {
 	var _conf = {
 		method: 'DELETE',
-		url   : url || location.pathname,
-		data  : data || {}
+		url   : url,
+		data  : data
 	};
 
 	this.kill ();

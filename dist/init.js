@@ -1192,14 +1192,18 @@ if ( typeof exports !== 'undefined' )
 			this.recursiveStr = s;
 		}
 
+		//Regexp result?
 		if ( _.isArray (_find) ) {
 			if ( _.isObject (_replace) ) {
 				if ( _find.length > 0 ) {
 					_tmp = _find.pop ();
-					this.recursiveStr = _.replace (
-						this.recursiveStr, _tmp,
-						_replace[_tmp]
-					);
+
+					//Search for the replace index
+					if ( _tmp in _replace )
+						this.recursiveStr = _.replace (
+							this.recursiveStr, _tmp,
+							_replace[_tmp]
+						);
 				}
 			} else {
 				_.error (WARNING_SYRUP.ERROR.NOOBJECTREPLACEREGEXP, '(Syrup Replace)');
@@ -4911,9 +4915,7 @@ Http.add ('on', function (event, callback) {
  * Config object {
  *  url: (string) the request url
  *  type: (string) the request type GET or POST
- *	async: bool,
  *	timeout: (int) request timeout,
- *	processor: (string) ajax server side processor file extension,
  *	token: (string or bool) CSRF token needed?,
  *	contentType: (string) the content type,
  *	data: (object) the request data,
@@ -5053,8 +5055,8 @@ Http.add ('request', function (config) {
  * */
 Http.add ('get', function (url, data) {
 	var _conf = {
-		url : url || location.pathname,
-		data: data || {}
+		url : url,
+		data: data
 	};
 
 	this.kill ();
@@ -5070,8 +5072,8 @@ Http.add ('get', function (url, data) {
 Http.add ('post', function (url, data) {
 	var _conf = {
 		method: 'POST',
-		url   : url || location.pathname,
-		data  : data || {}
+		url   : url,
+		data  : data
 	};
 
 	this.kill ();
@@ -5087,8 +5089,8 @@ Http.add ('post', function (url, data) {
 Http.add ('put', function (url, data) {
 	var _conf = {
 		method: 'PUT',
-		url   : url || location.pathname,
-		data  : data || {}
+		url   : url,
+		data  : data
 	};
 
 	this.kill ();
@@ -5104,8 +5106,8 @@ Http.add ('put', function (url, data) {
 Http.add ('delete', function (url, data) {
 	var _conf = {
 		method: 'DELETE',
-		url   : url || location.pathname,
-		data  : data || {}
+		url   : url,
+		data  : data
 	};
 
 	this.kill ();
@@ -5146,6 +5148,8 @@ Http.add ('kill', function () {
 function Router () {
 	this.routes = {};
 	this.history = window.history;
+	this.findParams = /(:[\w]+)/g;
+	this.onpopstate = {};
 }
 
 
@@ -5155,6 +5159,18 @@ function Router () {
  * */
 Router.add ('setRoutes', function (routes) {
 	var _self = this;
+	                console.log('test')
+	//Set Pop State
+	window.addEventListener ('popstate', function (e) {
+		if ( _.isSet (e.state) && 'route_name' in e.state ) {
+			if ( e.state.route_name in _self.onpopstate ) {
+				_self.onpopstate[e.state.route_name].forEach (function (v, i) {
+					v (e.state);
+				});
+			}
+		}
+	});
+
 	return (new Promise (function (resolve, reject) {
 		_self.routes = _.extend (_self.routes, routes);
 		resolve (_self.routes);
@@ -5169,46 +5185,68 @@ Router.add ('setRoutes', function (routes) {
 Router.add ('when', function (route_name) {
 	_.assert (route_name, _.WARNING_SYRUP.ERROR.NOPARAM, '(Router When)');
 	var _self = this;
-	return (new Promise (function (resolve, reject) {
 
-		//Not routing
-		if ( !(route_name in _self.routes) )
-			reject (route_name);
-
-		var _the_regexp = _self.routes[route_name],
-			_to_route = window.location.pathname,
-			_result = _to_route.match ((new RegExp (_the_regexp, 'g')));
-
-		//Improve router result params
-		if ( _result )
-			resolve (_result)
-
-	}));
+	return {
+		then: function (callback) {
+			if ( _.isFunction (callback) ) {
+				if ( !(route_name in _self.onpopstate) )
+					_self.onpopstate[route_name] = [];
+				_self.onpopstate[route_name].push (callback);
+			}
+		}
+	};
 
 });
 
 /**Redirect to route
  * @param route_name
  * */
-Router.add ('redirect', function (route_name) {
+Router.add ('redirect', function (route_name, params) {
 	_.assert (route_name, _.WARNING_SYRUP.ERROR.NOPARAM, '(Router Redirect)');
-	var _self = this;
+
+	var _self = this,
+		_the_new_route = null,
+		_params = null;
+
 	return (new Promise (function (resolve, reject) {
 
 		//Not routing
-		if ( !(route_name in _self.routes) )
+		if ( !(route_name in _self.routes) ) {
 			reject (route_name);
+			return;
+		}
 
+		_params = _.isObject (params)
+			? params : {};
 
+		//Set old regex in state object
+		_params['route_name'] = route_name;
+		_the_new_route = _self.routes[route_name];
 
+		//Replace params?
+		_the_new_route = _.isSet (params) && _.getObjectSize (params) > 0
+			? _.replace (_the_new_route, _self.findParams, params)
+			: _the_new_route;
+
+		//Set state in history
+		_self._triggerPopState (_params, route_name, _the_new_route);
+
+		//Resolve Promise
+		resolve (_the_new_route);
 
 
 	}));
 });
 
-Router.add ('parseQueryString', function () {
 
+Router.add ('_triggerPopState', function (_params, route_name, _the_new_route) {
+	//Set state in history
+	//Two times, for execution in "popstate"
+	this.history.pushState (_params, route_name, _the_new_route);
+	this.history.pushState (_params, route_name, _the_new_route);
+	this.history.back ();
 });
+
 /**
  * Created by gmena on 07-26-14.
  */

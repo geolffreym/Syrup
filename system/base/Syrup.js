@@ -1174,14 +1174,18 @@
 			this.recursiveStr = s;
 		}
 
+		//Regexp result?
 		if ( _.isArray (_find) ) {
 			if ( _.isObject (_replace) ) {
 				if ( _find.length > 0 ) {
 					_tmp = _find.pop ();
-					this.recursiveStr = _.replace (
-						this.recursiveStr, _tmp,
-						_replace[_tmp]
-					);
+
+					//Search for the replace index
+					if ( _tmp in _replace )
+						this.recursiveStr = _.replace (
+							this.recursiveStr, _tmp,
+							_replace[_tmp]
+						);
 				}
 			} else {
 				_.error (WARNING_SYRUP.ERROR.NOOBJECTREPLACEREGEXP, '(Syrup Replace)');

@@ -8,20 +8,11 @@
 <script src="/syrup/dist/init.js"></script>
 
 
-<div sp-recipe="Hey.You">
-
-</div>
-
+<div sp-recipe="Hey.You"></div>
 
 <div sp-recipe="Hey.Do">
-    <!-- The method "method" in module Hey.Do-->
-    <a href="#" sp-click="method">
-        Change You
-    </a>
-
-
+    <button sp-click="redirect">Redirect</button>
 </div>
-
 
 <script>
 
@@ -36,32 +27,25 @@
             //A global service
             console.log ('hi')
 
-        }).spice (['Hey.You'], function (moduleId, $) {
+        }).spice (['Hey.You','Hey.Do'], function (moduleId, $) {
 
             //Before execution of recipes list, what to do?
             $.Router.setRoutes ({
-                'myLocalRoute': '/Routes.html'
+                'myLocalRoute': '/Routes.html',
+                'theNewRoute' : '/route/:page/'
             });
 
-            // console.log(my_Lib.getRecipe(moduleId));
-
-        }).afters (['Hey.You', 'Hey.Do'], function (moduleId, $) {
-
-            //After execution of recipes list, what to do?
-            console.log ('I\m served: ' + moduleId)
         });
 
 
+        //RECIPES
         //A new recipe for Hey
         my_Lib.recipe ('Hey.You', function (_, _$, scope) {
             return {
                 init   : function ($) {
-
-                    $.Router.when ('myLocalRoute').then (function (r) {
-                        console.log (r)
-                    }).catch (function () {
-                        console.log ('noohh!!')
-                    });
+                    $.Router.when ('theNewRoute').then (function (e) {
+                        console.log (e);
+                    })
 
                 },
                 destroy: function ($) {
@@ -74,29 +58,15 @@
         //A new recipe for Hey
         my_Lib.recipe ('Hey.Do', function (_, _$, scope) {
             return {
-                init   : function (tools) {
-
-                },
-                method : function (e, $) {
-                    my_Lib.setScope ('Hey.You', {
-                        'beatles': [
-                            { "firstName": "John", "lastName": "Pasa" }
-                        ]
-                    });
-
-                    //Drop the Hey.You lib
-                    my_Lib.drop ('Hey.You')
-                },
-                destroy: function () {
-                    alert('Me too?')
+                init    : function ($) {},
+                redirect: function (e, $) {
+                    $.Router.redirect ('theNewRoute', { ':page': '3' })
+                            .then (function () { });
                 }
             }
         });
 
-        //my_Lib.dropAll()
-
-
-    })
+    });
 
 </script>
 </body>
