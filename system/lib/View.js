@@ -56,7 +56,7 @@ View.add ('seekTpl', function (template) {
 				resolve (_self);
 			}).catch (function () {
 				reject (template);
-				_.error (_.WARNING_SYRUP.ERROR.NONETWORK, '(View SeekTpl)');
+				_.error (_.WARNING_SYRUP.ERROR.NONETWORK, '(View .seekTpl)');
 			});
 		}
 	}));

@@ -24,7 +24,7 @@ Socket.add ('set', function (config) {
 	var self = this;
 
 	if ( !config && !(_.isObject (config)) ) {
-		_.error (_.WARNING_SYRUP.ERROR.NOOBJECT, '(Socket Set)');
+		_.error (_.WARNING_SYRUP.ERROR.NOOBJECT, '(Socket .set)');
 	}
 
 	var user = config.user || 'default',

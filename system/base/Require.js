@@ -10,6 +10,8 @@
 
 //http://requirejs.org/docs/api.html
 //Fallback
+
+"use strict";
 function Required () {
 	var requirejs, require, define;
 	(function (global) {

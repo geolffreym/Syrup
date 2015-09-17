@@ -19,15 +19,12 @@
 			ERROR: {
 				NOPARAM              : 'Param needed',
 				NONETWORK            : 'Network Error',
-				NOOBJECT             : 'An object param is needed.',
-				NOARRAY              : 'An array param needed.',
-				NOFUNCTION           : 'An function param needed.',
+				NOOBJECT             : 'A object is needed.',
+				NOARRAY              : 'A array is needed.',
+				NOSTRING             : 'A string is needed',
+				NOFUNCTION           : 'A function is needed.',
 				NODATE               : 'Invalid Date',
-				NOSTRING             : 'String is required',
-				NOPACK               : 'Error packing model',
-				NOCALLBACK           : 'Callback error on execution time.',
-				NOURL                : 'URL is required for the request.',
-				NOHTML               : 'Html string is required',
+				NOURL                : 'URL is needed.',
 				NOOBJECTREPLACEREGEXP: 'A object replace param is needed to replace a regexp ex: {match:replace}'
 			}
 		};
@@ -1109,9 +1106,12 @@
 	/**Console Log con tiempo de ejecucion
 	 * @param msg
 	 */
-	Syrup.add ('warning', function (msg) {
+	Syrup.add ('warning', function (msg, breakpoint) {
 		var date = _.getDate (false);
-		console.log (date.hour + ':' + date.minutes + ':' + date.seconds + ' ' + date.meridian + ' -> ' + msg);
+		console.log (
+			(date.hour + ':' + date.minutes + ':' + date.seconds + ' ' + date.meridian + ' -> ' + msg) +
+			(breakpoint ? ' | Method: ' + breakpoint : _.emptyStr)
+		);
 	});
 
 	/**Console Log error con tiempo de ejecucion
@@ -1199,7 +1199,7 @@
 						);
 				})
 			} else {
-				_.error (WARNING_SYRUP.ERROR.NOOBJECTREPLACEREGEXP, '(Syrup Replace)');
+				_.error (WARNING_SYRUP.ERROR.NOOBJECTREPLACEREGEXP, '(Syrup .replace)');
 			}
 		} else {
 
@@ -1606,7 +1606,7 @@
 	 */
 	Syrup.add ('specArray', function (arr) {
 		if ( !_.isArray (arr) ) {
-			_.error (WARNING_SYRUP.ERROR.NOARRAY, '(Syrup specArray)');
+			_.error (WARNING_SYRUP.ERROR.NOARRAY, '(Syrup .specArray)');
 		}
 
 		return arr.length > 1
@@ -1713,7 +1713,7 @@
 			return nativeObject.valueOf.call (element);
 
 		if ( !_.isArray (element) )
-			_.error (WARNING_SYRUP.ERROR.NOARRAY, '(Syrup toObject)');
+			_.error (WARNING_SYRUP.ERROR.NOARRAY, '(Syrup .toObject)');
 
 
 		return element.reduce (function (o, v, i) {

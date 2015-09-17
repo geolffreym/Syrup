@@ -37,15 +37,12 @@ if ( typeof exports !== 'undefined' )
 			ERROR: {
 				NOPARAM              : 'Param needed',
 				NONETWORK            : 'Network Error',
-				NOOBJECT             : 'An object param is needed.',
-				NOARRAY              : 'An array param needed.',
-				NOFUNCTION           : 'An function param needed.',
+				NOOBJECT             : 'A object is needed.',
+				NOARRAY              : 'A array is needed.',
+				NOSTRING             : 'A string is needed',
+				NOFUNCTION           : 'A function is needed.',
 				NODATE               : 'Invalid Date',
-				NOSTRING             : 'String is required',
-				NOPACK               : 'Error packing model',
-				NOCALLBACK           : 'Callback error on execution time.',
-				NOURL                : 'URL is required for the request.',
-				NOHTML               : 'Html string is required',
+				NOURL                : 'URL is needed.',
 				NOOBJECTREPLACEREGEXP: 'A object replace param is needed to replace a regexp ex: {match:replace}'
 			}
 		};
@@ -1127,9 +1124,12 @@ if ( typeof exports !== 'undefined' )
 	/**Console Log con tiempo de ejecucion
 	 * @param msg
 	 */
-	Syrup.add ('warning', function (msg) {
+	Syrup.add ('warning', function (msg, breakpoint) {
 		var date = _.getDate (false);
-		console.log (date.hour + ':' + date.minutes + ':' + date.seconds + ' ' + date.meridian + ' -> ' + msg);
+		console.log (
+			(date.hour + ':' + date.minutes + ':' + date.seconds + ' ' + date.meridian + ' -> ' + msg) +
+			(breakpoint ? ' | Method: ' + breakpoint : _.emptyStr)
+		);
 	});
 
 	/**Console Log error con tiempo de ejecucion
@@ -1217,7 +1217,7 @@ if ( typeof exports !== 'undefined' )
 						);
 				})
 			} else {
-				_.error (WARNING_SYRUP.ERROR.NOOBJECTREPLACEREGEXP, '(Syrup Replace)');
+				_.error (WARNING_SYRUP.ERROR.NOOBJECTREPLACEREGEXP, '(Syrup .replace)');
 			}
 		} else {
 
@@ -1624,7 +1624,7 @@ if ( typeof exports !== 'undefined' )
 	 */
 	Syrup.add ('specArray', function (arr) {
 		if ( !_.isArray (arr) ) {
-			_.error (WARNING_SYRUP.ERROR.NOARRAY, '(Syrup specArray)');
+			_.error (WARNING_SYRUP.ERROR.NOARRAY, '(Syrup .specArray)');
 		}
 
 		return arr.length > 1
@@ -1731,7 +1731,7 @@ if ( typeof exports !== 'undefined' )
 			return nativeObject.valueOf.call (element);
 
 		if ( !_.isArray (element) )
-			_.error (WARNING_SYRUP.ERROR.NOARRAY, '(Syrup toObject)');
+			_.error (WARNING_SYRUP.ERROR.NOARRAY, '(Syrup .toObject)');
 
 
 		return element.reduce (function (o, v, i) {
@@ -2226,6 +2226,8 @@ if ( !Object.observe ) {
 
 //http://requirejs.org/docs/api.html
 //Fallback
+
+"use strict";
 function Required () {
 	var requirejs, require, define;
 	(function (global) {
@@ -4359,12 +4361,13 @@ window.Require = new Required;
 Require.setConf ();
 
 
+
+
 /**
  * Created by gmena on 08-06-14.
  */
 
 "use strict";
-
 function Libs () {
 	this.breadcrumb = {};
 	this.object = {};
@@ -4465,11 +4468,11 @@ Libs.add ('cook', function (name, callback) {
 //The global object Lib
 window.Lib = new Libs;
 
+
 /**
  * Created by gmena on 07-31-14.
  */
 "use strict";
-
 function Apps () {
 	this.root = null;
 	this.lib = null;
@@ -4632,6 +4635,8 @@ Apps.add ('setScope', function (moduleId, object) {
 	}
 	return this;
 });
+
+//Apps.add (''
 
 /**Get Scope
  * @param moduleId
@@ -4862,6 +4867,8 @@ Apps.add ('dropAll', function () {
 //The global object App
 window.App = new Apps;
 
+
+
 /**
  * Created by gmena on 07-26-14.
  */
@@ -4936,7 +4943,7 @@ Http.add ('on', function (event, callback) {
  * **/
 Http.add ('request', function (config) {
 	if ( !_.isObject (config) ) {
-		_.error (_.WARNING_SYRUP.ERROR.NOOBJECT, '(Http Request)')
+		_.error (_.WARNING_SYRUP.ERROR.NOOBJECT, '(Http .request)')
 	}
 
 	var _self = this,
@@ -4957,7 +4964,7 @@ Http.add ('request', function (config) {
 	return (new Promise (function (resolve, reject) {
 
 		if ( !_.isSet (config.url) )
-			_.error (_.WARNING_SYRUP.ERROR.NOURL, '(Http Request)');
+			_.error (_.WARNING_SYRUP.ERROR.NOURL, '(Http .request)');
 
 		if ( !_.isFormData (_data)
 			 && _.isSet (_data)
@@ -5195,7 +5202,7 @@ Router.add ('setRoutes', function (routes) {
  * @returns {boolean}
  */
 Router.add ('when', function (route_name) {
-	_.assert (route_name, _.WARNING_SYRUP.ERROR.NOPARAM, '(Router When)');
+	_.assert (route_name, _.WARNING_SYRUP.ERROR.NOPARAM, '(Router .when)');
 	var _self = this;
 
 	return {
@@ -5214,7 +5221,7 @@ Router.add ('when', function (route_name) {
  * @param route_name
  * */
 Router.add ('redirect', function (route_name, params, config) {
-	_.assert (route_name, _.WARNING_SYRUP.ERROR.NOPARAM, '(Router Redirect)');
+	_.assert (route_name, _.WARNING_SYRUP.ERROR.NOPARAM, '(Router .redirect)');
 
 	var _self = this,
 		_the_new_route = null,
@@ -5434,7 +5441,7 @@ View.add ('seekTpl', function (template) {
 				resolve (_self);
 			}).catch (function () {
 				reject (template);
-				_.error (_.WARNING_SYRUP.ERROR.NONETWORK, '(View SeekTpl)');
+				_.error (_.WARNING_SYRUP.ERROR.NONETWORK, '(View .seekTpl)');
 			});
 		}
 	}));
@@ -5491,8 +5498,14 @@ View.add ('render', function (_template, _fields) {
 /**Dependencies
  * Http Lib
  * */
-
 "use strict";
+
+var WARNING_MODEL = {
+	ERROR: {
+		NOPACK: 'Error packing model'
+	}
+};
+
 function Model () {
 	this.Http = new Http;
 	this.modelData = null;
@@ -5519,7 +5532,7 @@ Model.add ('method', function (method) {
  */
 Model.add ('attach', function (name, attach) {
 	var self = this;
-	_.assert (self.modelData, _.WARNING_SYRUP.ERROR.NOPACK, '(Model Attach)');
+	_.assert (self.modelData, WARNING_MODEL.ERROR.NOPACK, '(Model Attach)');
 	self.modelData.append (name, attach);
 	return this;
 });
@@ -5559,7 +5572,7 @@ Model.add ('fail', function (field, error) {
  * @param event*/
 Model.add ('send', function (url, data) {
 	var self = this;
-	_.assert (data, _.WARNING_SYRUP.ERROR.NOPACK, '(Model Send)');
+	_.assert (data, WARNING_MODEL.ERROR.NOPACK, '(Model Send)');
 
 	var conf = {
 		url   : url,
@@ -5842,7 +5855,7 @@ GoogleMap = function () {
 		}
 
 		if ( !_.isFunction (callback) )
-			_.error (_.WARNING_SYRUP.ERROR.NOFUNCTION, '(Map On)');
+			_.error (_.WARNING_SYRUP.ERROR.NOFUNCTION, '(Map .on)');
 
 		if ( !_.isObject (elem) )
 			_.error (WARNING_GOOGLE_MAP.ERROR.NOMAP);

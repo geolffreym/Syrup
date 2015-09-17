@@ -45,7 +45,7 @@ Router.add ('setRoutes', function (routes) {
  * @returns {boolean}
  */
 Router.add ('when', function (route_name) {
-	_.assert (route_name, _.WARNING_SYRUP.ERROR.NOPARAM, '(Router When)');
+	_.assert (route_name, _.WARNING_SYRUP.ERROR.NOPARAM, '(Router .when)');
 	var _self = this;
 
 	return {
@@ -64,7 +64,7 @@ Router.add ('when', function (route_name) {
  * @param route_name
  * */
 Router.add ('redirect', function (route_name, params, config) {
-	_.assert (route_name, _.WARNING_SYRUP.ERROR.NOPARAM, '(Router Redirect)');
+	_.assert (route_name, _.WARNING_SYRUP.ERROR.NOPARAM, '(Router .redirect)');
 
 	var _self = this,
 		_the_new_route = null,
