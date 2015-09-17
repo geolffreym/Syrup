@@ -4361,13 +4361,12 @@ window.Require = new Required;
 Require.setConf ();
 
 
-
-
 /**
  * Created by gmena on 08-06-14.
  */
 
 "use strict";
+
 function Libs () {
 	this.breadcrumb = {};
 	this.object = {};
@@ -4468,11 +4467,11 @@ Libs.add ('cook', function (name, callback) {
 //The global object Lib
 window.Lib = new Libs;
 
-
 /**
  * Created by gmena on 07-31-14.
  */
 "use strict";
+
 function Apps () {
 	this.root = null;
 	this.lib = null;
@@ -4635,8 +4634,6 @@ Apps.add ('setScope', function (moduleId, object) {
 	}
 	return this;
 });
-
-//Apps.add (''
 
 /**Get Scope
  * @param moduleId
@@ -4867,8 +4864,6 @@ Apps.add ('dropAll', function () {
 //The global object App
 window.App = new Apps;
 
-
-
 /**
  * Created by gmena on 07-26-14.
  */
@@ -4894,8 +4889,8 @@ function Http () {
 }
 
 /*** Event handler
- * @param event
- * @param callback
+ * @param {string} event
+ * @param {function} callback
  * @return void
  * */
 Http.add ('on', function (event, callback) {
@@ -4926,8 +4921,8 @@ Http.add ('on', function (event, callback) {
 });
 
 /** Http Request
- * @param config
- * @param callback
+ * @param {object} config
+ * @param {function} callback
  * @return object
  *
  * Config object {
@@ -5067,9 +5062,9 @@ Http.add ('request', function (config) {
 
 
 /**Get request
- * @param url
- * @param data
- * @param callback
+ * @param {string} url
+ * @param {object} data
+ * @return object
  * */
 Http.add ('get', function (url, data) {
 	var _conf = {
@@ -5083,9 +5078,9 @@ Http.add ('get', function (url, data) {
 
 
 /**Post request
- * @param url
- * @param data
- * @param callback
+ * @param {string} url
+ * @param {object} data
+ * @return object
  * */
 Http.add ('post', function (url, data) {
 	var _conf = {
@@ -5100,9 +5095,9 @@ Http.add ('post', function (url, data) {
 
 
 /**Put request
- * @param url
- * @param data
- * @param callback
+ * @param {string} url
+ * @param {object} data
+ * @return object
  * */
 Http.add ('put', function (url, data) {
 	var _conf = {
@@ -5117,9 +5112,9 @@ Http.add ('put', function (url, data) {
 
 
 /**Delete request
- * @param url
- * @param data
- * @param callback
+ * @param {string} url
+ * @param {object} data
+ * @return object
  * */
 Http.add ('delete', function (url, data) {
 	var _conf = {
@@ -5134,8 +5129,8 @@ Http.add ('delete', function (url, data) {
 
 
 /** Set Request Header
- * @param header
- * @param type
+ * @param {string} header
+ * @param {string} type
  * @return object
  * **/
 Http.add ('requestHeader', function (header, type) {
@@ -5143,7 +5138,7 @@ Http.add ('requestHeader', function (header, type) {
 	return this;
 });
 
-//Kill Http
+/** Kill Http request */
 Http.add ('kill', function () {
 	_.each (this.xhr_list, function (xhr) {
 		xhr.abort ();
@@ -5184,7 +5179,7 @@ function Router () {
 
 
 /**Set the routes
- * @param routes
+ * @param {object} routes
  * @return object
  * */
 Router.add ('setRoutes', function (routes) {
@@ -5197,9 +5192,8 @@ Router.add ('setRoutes', function (routes) {
 });
 
 /**Delega rutas
- * @param path
- * @param callback
- * @returns {boolean}
+ * @param {string} route_name
+ * @returns object
  */
 Router.add ('when', function (route_name) {
 	_.assert (route_name, _.WARNING_SYRUP.ERROR.NOPARAM, '(Router .when)');
@@ -5218,7 +5212,8 @@ Router.add ('when', function (route_name) {
 });
 
 /**Redirect to route
- * @param route_name
+ * @param {string} route_name
+ * @return object
  * */
 Router.add ('redirect', function (route_name, params, config) {
 	_.assert (route_name, _.WARNING_SYRUP.ERROR.NOPARAM, '(Router .redirect)');
@@ -5264,9 +5259,9 @@ Router.add ('redirect', function (route_name, params, config) {
 
 
 /** Trigger the pop state
- * @param _params
- * @param route_name
- * @param _the_new_route
+ * @param {object} _params
+ * @param {string} route_name
+ * @param {string} _the_new_route
  * */
 Router.add ('_triggerPopState', function (_params, route_name, _the_new_route, _config) {
 	//Set state in history

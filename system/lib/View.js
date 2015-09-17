@@ -1,17 +1,14 @@
 /**
- * Created by gmena on 07-26-14.
+ * @author Geolffrey Mena <gmjun2000@gmail.com>
  */
 
 'use strict';
-/**View
- * @constructor
- */
 
-/**Dependencies
- * Http Lib
- * Worker Lib
- * Storage Lib
- * */
+/**
+ * Class for View handling.
+ *
+ * @class
+ */
 
 function View () {
 	this.Http = new Http;
@@ -20,7 +17,10 @@ function View () {
 	this.tpl = null;
 }
 
-//Search for the template
+/**Search for the template
+ * @param {string} template
+ * @return {object}
+ */
 View.add ('lookup', function (template) {
 	var _conf = {
 		url        : setting.app_path + '/templates/' + template,

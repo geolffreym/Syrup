@@ -27,8 +27,8 @@ function Router () {
 
 
 /**Set the routes
- * @param routes
- * @return object
+ * @param {object} routes
+ * @return {object}
  * */
 Router.add ('setRoutes', function (routes) {
 	var _self = this;
@@ -40,9 +40,8 @@ Router.add ('setRoutes', function (routes) {
 });
 
 /**Delega rutas
- * @param path
- * @param callback
- * @returns {boolean}
+ * @param {string} route_name
+ * @returns {object}
  */
 Router.add ('when', function (route_name) {
 	_.assert (route_name, _.WARNING_SYRUP.ERROR.NOPARAM, '(Router .when)');
@@ -61,7 +60,8 @@ Router.add ('when', function (route_name) {
 });
 
 /**Redirect to route
- * @param route_name
+ * @param {string} route_name
+ * @return {object}
  * */
 Router.add ('redirect', function (route_name, params, config) {
 	_.assert (route_name, _.WARNING_SYRUP.ERROR.NOPARAM, '(Router .redirect)');
@@ -107,9 +107,10 @@ Router.add ('redirect', function (route_name, params, config) {
 
 
 /** Trigger the pop state
- * @param _params
- * @param route_name
- * @param _the_new_route
+ * @param {object} _params
+ * @param {string} route_name
+ * @param {string} _the_new_route
+ * @return {void}
  * */
 Router.add ('_triggerPopState', function (_params, route_name, _the_new_route, _config) {
 	//Set state in history

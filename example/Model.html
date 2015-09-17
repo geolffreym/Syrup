@@ -34,15 +34,15 @@
         <div>
             <ul>
                 {{#beatles}}
-                    <li>{{ firstName }} {{lastName}}</li>
+                <li>{{ firstName }} {{lastName}}</li>
 
-                    {{#phone}}
-                        <li>{{ phone }}</li>
-                    {{/phone}}
+                {{#phone}}
+                <li>{{ phone }}</li>
+                {{/phone}}
 
-                    {{#id}}
-                        <li>{{ id }}</li>
-                    {{/id}}
+                {{#id}}
+                <li>{{ id }}</li>
+                {{/id}}
 
                 {{/beatles}}
             </ul>
@@ -81,6 +81,8 @@
         //A new recipe for Hey
         my_Lib.recipe ('Hey.You', function (_, _$, scope) {
             return {
+
+                /** @construct */
                 init        : function ($) {
                     var _self = this;
 
@@ -100,8 +102,8 @@
 
 
                     //When Hey.You scope change
-                   this.when ('change').then (function (changes) {
-                       // Render new data using the inline template
+                    this.when ('change').then (function (changes) {
+                        // Render new data using the inline template
                         // If not serve param is set, template inline is used
                         // If you set "Hey/You" "/app/view/Hey/You.js" view is used
                         // Lousing Coupling( The main dir -> "Hey" , The File -> "You", The view name -> "myView")
