@@ -4891,7 +4891,7 @@ function Http () {
 /*** Event handler
  * @param {string} event
  * @param {function} callback
- * @return void
+ * @return {void}
  * */
 Http.add ('on', function (event, callback) {
 	var self = this;
@@ -4923,7 +4923,7 @@ Http.add ('on', function (event, callback) {
 /** Http Request
  * @param {object} config
  * @param {function} callback
- * @return object
+ * @return {object}
  *
  * Config object {
  *  url: (string) the request url
@@ -5064,7 +5064,7 @@ Http.add ('request', function (config) {
 /**Get request
  * @param {string} url
  * @param {object} data
- * @return object
+ * @return {object}
  * */
 Http.add ('get', function (url, data) {
 	var _conf = {
@@ -5080,7 +5080,7 @@ Http.add ('get', function (url, data) {
 /**Post request
  * @param {string} url
  * @param {object} data
- * @return object
+ * @return {object}
  * */
 Http.add ('post', function (url, data) {
 	var _conf = {
@@ -5097,7 +5097,7 @@ Http.add ('post', function (url, data) {
 /**Put request
  * @param {string} url
  * @param {object} data
- * @return object
+ * @return {object}
  * */
 Http.add ('put', function (url, data) {
 	var _conf = {
@@ -5114,7 +5114,7 @@ Http.add ('put', function (url, data) {
 /**Delete request
  * @param {string} url
  * @param {object} data
- * @return object
+ * @return {object}
  * */
 Http.add ('delete', function (url, data) {
 	var _conf = {
@@ -5131,7 +5131,7 @@ Http.add ('delete', function (url, data) {
 /** Set Request Header
  * @param {string} header
  * @param {string} type
- * @return object
+ * @return {object}
  * **/
 Http.add ('requestHeader', function (header, type) {
 	this.xhr.setRequestHeader (header, type);
@@ -5180,7 +5180,7 @@ function Router () {
 
 /**Set the routes
  * @param {object} routes
- * @return object
+ * @return {object}
  * */
 Router.add ('setRoutes', function (routes) {
 	var _self = this;
@@ -5193,7 +5193,7 @@ Router.add ('setRoutes', function (routes) {
 
 /**Delega rutas
  * @param {string} route_name
- * @returns object
+ * @returns {object}
  */
 Router.add ('when', function (route_name) {
 	_.assert (route_name, _.WARNING_SYRUP.ERROR.NOPARAM, '(Router .when)');
@@ -5213,7 +5213,7 @@ Router.add ('when', function (route_name) {
 
 /**Redirect to route
  * @param {string} route_name
- * @return object
+ * @return {object}
  * */
 Router.add ('redirect', function (route_name, params, config) {
 	_.assert (route_name, _.WARNING_SYRUP.ERROR.NOPARAM, '(Router .redirect)');
@@ -5262,6 +5262,7 @@ Router.add ('redirect', function (route_name, params, config) {
  * @param {object} _params
  * @param {string} route_name
  * @param {string} _the_new_route
+ * @return {void}
  * */
 Router.add ('_triggerPopState', function (_params, route_name, _the_new_route, _config) {
 	//Set state in history
@@ -5379,19 +5380,16 @@ Workers.add ('kill', function () {
 });
 
 /**
- * Created by gmena on 07-26-14.
+ * @author Geolffrey Mena <gmjun2000@gmail.com>
  */
 
 'use strict';
-/**View
- * @constructor
- */
 
-/**Dependencies
- * Http Lib
- * Worker Lib
- * Storage Lib
- * */
+/**
+ * Class for View handling.
+ *
+ * @class
+ */
 
 function View () {
 	this.Http = new Http;
@@ -5400,7 +5398,10 @@ function View () {
 	this.tpl = null;
 }
 
-//Search for the template
+/**Search for the template
+ * @param {string} template
+ * @return {object}
+ */
 View.add ('lookup', function (template) {
 	var _conf = {
 		url        : setting.app_path + '/templates/' + template,
