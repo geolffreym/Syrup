@@ -5066,10 +5066,11 @@ Http.add ('request', function (config) {
  * @param {object} data
  * @return {object}
  * */
-Http.add ('get', function (url, data) {
+Http.add ('get', function (url, data, conf) {
 	var _conf = {
-		url : url,
-		data: data
+		url        : url,
+		data       : data,
+		contentType: conf.contentType || false
 	};
 
 	this.kill ();
@@ -5082,11 +5083,12 @@ Http.add ('get', function (url, data) {
  * @param {object} data
  * @return {object}
  * */
-Http.add ('post', function (url, data) {
+Http.add ('post', function (url, data, conf) {
 	var _conf = {
-		method: 'POST',
-		url   : url,
-		data  : data
+		method     : 'POST',
+		url        : url,
+		data       : data,
+		contentType: conf.contentType || false
 	};
 
 	this.kill ();
@@ -5099,11 +5101,12 @@ Http.add ('post', function (url, data) {
  * @param {object} data
  * @return {object}
  * */
-Http.add ('put', function (url, data) {
+Http.add ('put', function (url, data, conf) {
 	var _conf = {
-		method: 'PUT',
-		url   : url,
-		data  : data
+		method     : 'PUT',
+		url        : url,
+		data       : data,
+		contentType: conf.contentType || false
 	};
 
 	this.kill ();
@@ -5116,11 +5119,12 @@ Http.add ('put', function (url, data) {
  * @param {object} data
  * @return {object}
  * */
-Http.add ('delete', function (url, data) {
+Http.add ('delete', function (url, data, conf) {
 	var _conf = {
-		method: 'DELETE',
-		url   : url,
-		data  : data
+		method     : 'DELETE',
+		url        : url,
+		data       : data,
+		contentType: conf.contentType || false
 	};
 
 	this.kill ();
