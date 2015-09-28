@@ -241,7 +241,7 @@ Apps.add ('_bindListener', function (moduleId) {
 			//The dom object
 			dom_list.each (function (i) {
 
-				//Fint the listener in attributes
+				//Find the listener in attributes
 				_.each (i.attributes, function (v) {
 					if ( /sp-[a-z]+/.test (v.localName) ) {
 						var _event = _.replace (v.localName, 'sp-', _.emptyStr),
