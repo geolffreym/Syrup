@@ -7,119 +7,83 @@
  */
 
 'use strict';
-var Geolocation,
-	WARNING_GEOLOCATION = {
-		ERROR: {
-			UNACTIVE: 'Your browser has disabled please select the location for the proper operation of the site.',
-			NOLOCATE: 'It is not currently possible to track its location. Please try again.',
-			NOWATCH : 'No watch unseted'
-		}
-	};
+var WARNING_GEOLOCATION = {
+	ERROR: {
+		UNACTIVE: 'Your browser has disabled please select the location for the proper operation of the site.',
+		NOLOCATE: 'It is not currently possible to track its location. Please try again.',
+		NOWATCH : 'No watching location, can\'t stop it'
+	}
+};
 
-Geolocation = function (config) {
-	//Variables
-	var _proto = this.__proto__;
 
-	//Atributos
-	this.onlocation = null;
-	this.onerror = null;
+function Geolocation () {
 	this.location = null;
-	this.watch = null;
-	this.geolocation = navigator.geolocation;
-
-	this.conf = _.extend ({
+	this.watch = false;
+	this.geolocation = window.navigator.geolocation;
+	this.conf = {
 		enableHighAccuracy: true,
 		timeout           : 0x3E8,
 		maximumAge        : 0xEA60
-	}, config);
+	}
+}
 
-	/** Event Handler
-	 * @param event string
-	 * @param callback function
-	 * @return object
-	 * */
-	_proto.on = function (event, callback) {
-		var self = this;
+/**Set the initial conf
+ * @param {object} config
+ * @return {object}
+ * */
+Geolocation.add ('set', function (config) {
+	this.conf = _.extend (
+		this.conf,
+		config,
+		true
+	);
+});
 
-		return [
-			{
-				found: function () {
-					if ( callback ) {
-						self.onlocation = callback;
-					}
-				},
-				error: function () {
-					if ( callback ) {
-						self.onerror = callback;
-					}
-				}
-			}[event] ()
-		]
+/**Get the location
+ * @param {boolean} watch
+ * @return {object}
+ * */
+Geolocation.add ('get', function (watch) {
+	var _self = this,
+		_whatToDo = watch && _self.geolocation.watchPosition
+					|| _self.geolocation.getCurrentPosition;
 
-	};
+	//Watching?
+	_self.watch = watch;
 
-	/**Location Encontrada
-	 * @param u object
-	 * @return void
-	 * */
-	_proto.found = function (u) {
-		var self = this;
-		self.location = {
-			latitude : u.coords.latitude,
-			longitude: u.coords.longitude,
-			altitude : u.coords.altitude
-		};
+	return (new Promise (function (resolve, reject) {
+		_whatToDo (function (u) {
+			_self.location = {
+				latitude : u.coords.latitude,
+				longitude: u.coords.longitude,
+				altitude : u.coords.altitude
+			};
 
-		if ( self.onlocation ) {
-			self.onlocation (self.location);
-		}
+			//Working, then resolve
+			resolve (_self.location);
 
-	};
-
-	/**Location Error
-	 * @param e error
-	 * @return void
-	 * */
-	_proto.error = function (e) {
-		var self = this,
-			_error = {
+		}, function (e) {
+			var _error = {
 				1: WARNING_GEOLOCATION.ERROR.UNACTIVE,
 				2: WARNING_GEOLOCATION.ERROR.NOLOCATE,
 				3: (
 					this[2]
 				)
 			};
+			//Error, then reject
+			reject (_error[e.code])
+		}, _self.conf);
+	}));
 
-		if ( self.onerror ) {
-			self.onerror (_error[e.code]);
-		}
-	};
+});
 
-	/**Obtienela location actual
-	 * @return void
-	 * */
-	_proto.get = function () {
-		var self = this;
-		self.geolocation.getCurrentPosition (self.found, self.error, self.conf);
-	};
-
-	/**Obtienela location actual periodicamente
-	 * @return void
-	 * */
-	_proto.watch = function () {
-		var self = this;
-		self.watch = self.geolocation.watchPosition (self.found, self.error, self.conf);
-	};
-
-	/**Detiene el watch
-	 * @return void
-	 * */
-	_proto.wstop = function () {
-		var self = this;
-		if ( !self.watch ) {
-			self.error (WARNING_GEOLOCATION.ERROR.NOWATCH);
-		}
-		self.geolocation.clearWatch (self.watch);
-	};
-
-};
+/**Stop watching
+ * @return {void}
+ * */
+Geolocation.add ('watchStop', function () {
+	var self = this;
+	if ( !self.watch ) {
+		_.error (WARNING_GEOLOCATION.ERROR.NOWATCH, '(Geolocation .watchStop)');
+	}
+	self.geolocation.clearWatch (self.watch);
+});

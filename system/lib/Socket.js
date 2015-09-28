@@ -13,9 +13,7 @@ function Socket () {
 	this.close = null;
 	this.message = null;
 	this.error = null;
-	this.protocol = null;
 	this.user = null;
-	this.admin = null;
 	this.host = location.host;
 }
 
@@ -29,7 +27,7 @@ Socket.add ('set', function (config) {
 
 	var user = config.user || 'default',
 		port = config.port || 0x1F90,
-		query = '?';
+		query = _.emptyStr;
 
 
 	self.host = !!config.host
@@ -40,7 +38,8 @@ Socket.add ('set', function (config) {
 	delete config['host'];
 
 	//Parse the config in url to Websocket
-	query = query + _.parseJsonUrl (config);
+	query = _.getObjectSize (config) > 0
+		? query + _.parseJsonUrl (config) : query;
 
 	self.socket = new WebSocket ('ws://' + self.host + ':' + port + query);
 	self.socket.addEventListener ('open', function (e) {
@@ -90,13 +89,6 @@ Socket.add ('on', function (event, callback) {
 
 //Socket send message
 Socket.add ('send', function (config) {
-	var _myconf = {};
-
-	_myconf.all = false;
-	_myconf.from = this.user;
-
-	config = _.extend (_myconf, config);
-
 	if ( this.socket ) {
 		this.socket.send (JSON.stringify (config));
 	}
