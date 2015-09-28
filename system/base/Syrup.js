@@ -1795,7 +1795,7 @@
 		return new Syrup ();
 	}) ();
 
-	_.VERSION = '1.1';
+	_.VERSION = '1.2.2';
 	_.$fn = _$_;
 	_.emptyStr = '';
 	_.Syrup = Syrup;
