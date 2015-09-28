@@ -28,7 +28,7 @@
         var my_App = App.blend ('Hey', ['Http', 'Model', 'Router']);
 
         //A trigger for given recipes before execution
-        my_App.supply (function (moduleId, $) {
+        my_App.supply (function (_, _$, $) {
             //Before execution of recipes list, what to do?
             //Initialize the routes
             $.Router.setRoutes ({

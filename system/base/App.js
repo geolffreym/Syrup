@@ -44,7 +44,7 @@ Apps.add ('recipe', function (moduleId, module) {
 				creator : module,
 				instance: null
 			};
-			this._supplier (moduleId);
+			this._supplier ();
 			this._taste (moduleId);
 		}
 	}
@@ -97,9 +97,9 @@ Apps.add ('_trigger', function (moduleId) {
  * @param moduleId
  * @return void
  * **/
-Apps.add ('_supplier', function (moduleId) {
+Apps.add ('_supplier', function () {
 	if ( (_.isSet (this.autoconf)) )
-		this.autoconf (moduleId, this.lib.get (this.root));
+		this.autoconf (_, _$, this.lib.get (this.root));
 	return {}
 });
 /**Provide a global initial config
