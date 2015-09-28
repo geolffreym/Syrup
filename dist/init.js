@@ -4476,6 +4476,7 @@ function Apps () {
 	this.root = null;
 	this.lib = null;
 	this.app = null;
+	this.autoconf = null;
 	this.triggerAfter = {};
 	this.triggerBefore = {};
 	this.scope = {};
@@ -4512,6 +4513,7 @@ Apps.add ('recipe', function (moduleId, module) {
 				creator : module,
 				instance: null
 			};
+			this._supplier (moduleId);
 			this._taste (moduleId);
 		}
 	}
@@ -4560,12 +4562,31 @@ Apps.add ('_trigger', function (moduleId) {
 	return {}
 });
 
+/**Trigger autoconf execution
+ * @param moduleId
+ * @return void
+ * **/
+Apps.add ('_supplier', function (moduleId) {
+	if ( (_.isSet (this.autoconf)) )
+		this.autoconf (moduleId, this.lib.get (this.parent));
+	return {}
+});
+/**Provide a global initial config
+ * @param moduleId
+ * @return void
+ * **/
+Apps.add ('supply', function (callback) {
+	if ( _.isFunction (callback) )
+		this.autoconf = callback;
+	return this;
+});
+
 /**Trigger Helper
  * @param moduleList
  * @param callback
  * @param toList**/
 Apps.add ('_triggerOn', function (moduleList, callback, toList) {
-	if ( _.isArray (moduleList) ) {
+	if ( _.isArray (moduleList) && _.isFunction (callback) ) {
 		_.each (moduleList, function (moduleId) {
 			if ( !(moduleId in toList) )
 				toList[moduleId] = callback;
