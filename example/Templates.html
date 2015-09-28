@@ -50,10 +50,10 @@
     _$ (function () {
 
         //The App with dependencies
-        var my_Lib = App.blend ('Hey', ['Http']);
+        var my_App = App.blend ('Hey', ['Http']);
 
         //A global service
-        my_Lib.service ('myConsole', function (msg) {
+        my_App.service ('myConsole', function (msg) {
             console.log (msg)
         });
 
@@ -61,7 +61,7 @@
         //Recipes are declared as sp-recipe and is associated with the recipe's name
 
         //A new recipe for Hey
-        my_Lib.recipe ('Hey.You', function (_, _$, scope) {
+        my_App.recipe ('Hey.You', function (_, _$, scope) {
             return {
                 init   : function ($) {
                     var _self = this;
@@ -102,13 +102,13 @@
         });
 
         //A new recipe for Hey
-        my_Lib.recipe ('Hey.Do', function (_, _$, scope) {
+        my_App.recipe ('Hey.Do', function (_, _$, scope) {
             return {
                 init   : function (tools) {
 
                 },
                 method : function (e, $) {
-                    my_Lib.setScope ('Hey.You', {
+                    my_App.setScope ('Hey.You', {
                         'beatles': [
                             { "firstName": "John", "lastName": "Lennon" },
                         ]

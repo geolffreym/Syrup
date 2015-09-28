@@ -25,10 +25,10 @@
     _$ (function () {
 
         //The App with dependencies
-        var my_Lib = App.blend ('Hey', ['Http', 'Model', 'Router']);
+        var my_App = App.blend ('Hey', ['Http', 'Model', 'Router']);
 
         //A trigger for given recipes before execution
-        my_Lib.supply (function (moduleId, $) {
+        my_App.supply (function (moduleId, $) {
             //Before execution of recipes list, what to do?
             //Initialize the routes
             $.Router.setRoutes ({
@@ -41,7 +41,7 @@
 
         //RECIPES
         //A new recipe for Hey
-        my_Lib.recipe ('Hey.You', function (_, _$, scope) {
+        my_App.recipe ('Hey.You', function (_, _$, scope) {
             return {
                 init   : function ($) {
 
@@ -61,7 +61,7 @@
         });
 
         //A new recipe for Hey
-        my_Lib.recipe ('Hey.Do', function (_, _$, scope) {
+        my_App.recipe ('Hey.Do', function (_, _$, scope) {
             return {
                 init    : function ($) {},
                 redirect: function (e, $) {

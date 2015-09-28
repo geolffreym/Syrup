@@ -18,16 +18,16 @@
     _$ (function () {
 
         //The App
-        var my_Lib = App.blend ('Hey', ['Http']);
+        var my_App = App.blend ('Hey', ['Http']);
 
         //A global service
-        my_Lib.service ('HeyConsole', function () {
+        my_App.service ('HeyConsole', function () {
             console.log ('hi')
         });
 
 
         //A new recipe for Hey
-        my_Lib.recipe ('Hey.You', function (_, _$, scope) {
+        my_App.recipe ('Hey.You', function (_, _$, scope) {
             return {
                 init   : function (tools) {
                     this.setScope ({ a: 2 });
@@ -43,11 +43,11 @@
 
 
         //A new recipe for Hey
-        my_Lib.recipe ('Hey.Do', function (_, _$, scope) {
+        my_App.recipe ('Hey.Do', function (_, _$, scope) {
             return {
                 init   : function (tools) {
                     //Trigger change in Hey.You
-                    my_Lib.setScope ('Hey.You', { a: 3 })
+                    my_App.setScope ('Hey.You', { a: 3 })
                 },
                 destroy: function () {}
             }
