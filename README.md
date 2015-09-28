@@ -1,11 +1,11 @@
 Syrup
 =======
+App with sweet flavor
 [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/geolffreym/Syrup?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 
 Description
 ===========
-App with sweet flavor
 
 **With the help of**
 
