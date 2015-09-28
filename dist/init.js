@@ -4568,7 +4568,7 @@ Apps.add ('_trigger', function (moduleId) {
  * **/
 Apps.add ('_supplier', function (moduleId) {
 	if ( (_.isSet (this.autoconf)) )
-		this.autoconf (moduleId, this.lib.get (this.parent));
+		this.autoconf (moduleId, this.lib.get (this.root));
 	return {}
 });
 /**Provide a global initial config

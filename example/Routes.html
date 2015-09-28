@@ -28,8 +28,7 @@
         var my_Lib = App.blend ('Hey', ['Http', 'Model', 'Router']);
 
         //A trigger for given recipes before execution
-        my_Lib.spice (['Hey.You'], function (moduleId, $) {
-
+        my_Lib.supply (function (moduleId, $) {
             //Before execution of recipes list, what to do?
             //Initialize the routes
             $.Router.setRoutes ({
