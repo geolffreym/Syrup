@@ -5,7 +5,7 @@ Syrup
 
 Description
 ===========
-App with sweet flavor. Simple MVC | MTV framework
+App with sweet flavor
 
 **With the help of**
 
