@@ -1,19 +1,3 @@
-
-Nav Status
-----------
-See my browser status
-
-```js
-console.log(_.nav);
-/*object nav {
-    unsupported : true || false; //If the navigator support the framework
-    cookies : false || true //Cookies enabled? 
-    javascript : false || true //Javascript Enabled?
-    online : true || false // Site online ?
-    local : String // My local browser complete details;
-}*/
-
-```
 Native Features
 ==============
 
@@ -101,6 +85,22 @@ console.log((new myClass).myMethod()); // 0;
 
 ```
 
+
+Nav Status
+==========
+See my browser status
+
+```js
+console.log(_.nav);
+/*object nav {
+    unsupported : true || false; //If the navigator support the framework
+    cookies : false || true //Cookies enabled? 
+    javascript : false || true //Javascript Enabled?
+    online : true || false // Site online ?
+    local : String // My local browser complete details;
+}*/
+
+```
 
 
 DOM Tools
