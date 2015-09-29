@@ -33,7 +33,7 @@ var S = _.noConflict(),
 
 ```
 
-**Creating a $ object**
+**Creating a _$ object**
 
 *This method helps you find Nodes objects and generate $ object*
 
