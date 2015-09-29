@@ -271,6 +271,7 @@ Apps.add ('_bindListener', function (moduleId) {
  */
 Apps.add ('_serve', function (moduleId, template) {
 	var _view = null,
+		_self = this,
 		_scope = this.scope[moduleId];
 
 	//Is set the app
@@ -293,7 +294,7 @@ Apps.add ('_serve', function (moduleId, template) {
 					//Require th view if needed
 					Require.lookup (['view/' + view_dir]).then (function () {
 						if ( view_name in _view.__proto__ )
-							_view[view_name] (_scope, function (my_html) {
+							_view[view_name] (_, _scope, function (my_html) {
 								_dom.html (my_html);
 							})
 					});

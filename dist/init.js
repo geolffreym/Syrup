@@ -4513,7 +4513,7 @@ Apps.add ('recipe', function (moduleId, module) {
 				creator : module,
 				instance: null
 			};
-			this._supplier (moduleId);
+			this._supplier ();
 			this._taste (moduleId);
 		}
 	}
@@ -4566,9 +4566,9 @@ Apps.add ('_trigger', function (moduleId) {
  * @param moduleId
  * @return void
  * **/
-Apps.add ('_supplier', function (moduleId) {
+Apps.add ('_supplier', function () {
 	if ( (_.isSet (this.autoconf)) )
-		this.autoconf (moduleId, this.lib.get (this.root));
+		this.autoconf (_, _$, this.lib.get (this.root));
 	return {}
 });
 /**Provide a global initial config
@@ -4740,6 +4740,7 @@ Apps.add ('_bindListener', function (moduleId) {
  */
 Apps.add ('_serve', function (moduleId, template) {
 	var _view = null,
+		_self = this,
 		_scope = this.scope[moduleId];
 
 	//Is set the app
@@ -4762,7 +4763,7 @@ Apps.add ('_serve', function (moduleId, template) {
 					//Require th view if needed
 					Require.lookup (['view/' + view_dir]).then (function () {
 						if ( view_name in _view.__proto__ )
-							_view[view_name] (_scope, function (my_html) {
+							_view[view_name] (_, _scope, function (my_html) {
 								_dom.html (my_html);
 							})
 					});
