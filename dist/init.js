@@ -88,24 +88,6 @@ if ( typeof exports !== 'undefined' )
 		)
 	};
 
-	/** Remove extend
-	 * @param child
-	 * @reutn bool
-	 * */
-	nativeFunction.drop = function (child) {
-		var name = (
-			child.prototype.constructor.name
-			|| (
-				child.toString ().match (regexConstructor)[0]
-			).trim ()
-		);
-		if ( _[name] ) {
-			_[name] = null;
-			return true;
-		}
-		return false;
-	};
-
 
 	/**Add method to function
 	 * @param name

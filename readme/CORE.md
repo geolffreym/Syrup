@@ -14,6 +14,94 @@ console.log(_.nav);
 }*/
 
 ```
+Native Features
+==============
+
+Object
+------
+
+**Method `{object}.clone()`**
+
+*(Return a cloned object)*
+
+```js
+
+var obj = {a:3},
+    cloned = obj.clone();
+    
+
+console.log(obj) // {a:3}
+console.log(cloned) // {a:3} with another reference
+
+```
+
+**Method `{object}.getIndex(param)`**
+
+*(Return a value of index in object)*
+
+```js
+
+var obj = {a:3},
+    index = obj.getIndex('a');
+    
+
+console.log(obj) // {a:3}
+console.log(index) // 3
+
+```
+
+Function
+--------
+
+**Method `{instance}.blend(instance)`**
+
+*(It combines an instance of a "class" or function in javascript, with another instance, creating a kind of heritage)*
+
+```js
+function a () {
+    this.dataA = 0;
+}
+
+function b (){
+   this.dataB = 1;
+}
+
+console.log((new a).blend((new b))); // {a:{dataA: 0, __proto__: b: {dataB:1}}}
+
+
+```
+
+**Method `Function.factory(name)`**
+
+*(Return a named Function)*
+
+```js
+
+var custom = Function.factory('myCustomFunction');
+
+console.log(custom); // function myCustomFunction;
+
+```
+
+**Method `{function}.add(func_name, callback)`**
+
+*(Append prototype methods to "class")*
+
+```js
+
+function myClass(){
+    this.a = 0;
+}
+
+function.add('myMethod', function(){
+    return this.a;
+})
+
+console.log((new myClass).myMethod()); // 0;
+
+```
+
+
 
 DOM Tools
 =======
@@ -33,9 +121,9 @@ var S = _.noConflict(),
 
 ```
 
-**Creating a _$ object**
+**Creating a Dom object**
 
-*This method helps you find Nodes objects and generate $ object*
+*This method helps you find Nodes objects and generate dom object*
 
 ```js
 var my_selector = _$('<div>');
@@ -799,7 +887,7 @@ _.isGlobal(my_global) // Return TRUE
         
 **Method `.is$(param)`**
 
-*(Validate if param is $ object.) *
+*(Validate if param is _$ object.) *
 ```js    
 var no_$ = document, 
  my_$ = _$('body');
