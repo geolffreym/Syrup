@@ -4,6 +4,13 @@ App with sweet flavor
 
 [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/geolffreym/Syrup?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+Content
+=======
+
+* [Core](https://github.com/geolffreym/Syrup/blob/master/readme/CORE.md)
+* [About] (https://github.com/geolffreym/Syrup/blob/master/readme/ABOUT.md)
+
+
 Description
 ===========
 
@@ -97,10 +104,3 @@ Syrup is modular so you can create your own libraries and integrate the autoload
 Then you must get packages with `npm install` and finally run `npm start` and you'll have a unified library and .min in folder /dist/
 
 *If you do not have the option of using node, you must manually change the settings in the /dist/init.js and include libs separately*
-
-
-Content
-=======
-
-* [Core](https://github.com/geolffreym/Syrup/blob/master/readme/CORE.md)
-* [About] (https://github.com/geolffreym/Syrup/blob/master/readme/ABOUT.md)
