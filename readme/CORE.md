@@ -77,7 +77,7 @@ function myClass(){
     this.a = 0;
 }
 
-function.add('myMethod', function(){
+myClass.add('myMethod', function(){
     return this.a;
 })
 
