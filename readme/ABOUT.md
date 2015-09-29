@@ -1,72 +1,49 @@
-About
-=============
 
-Compatibility with browsers
----------------------------
-    
-    -IE > 10
-    -Chrome > 32
-    -Firefox > 29
-    -Opera > 23 
-    -Safari >  7 
+MVC or MTV
+==========
 
-
-Controlling browsers support.
-
-```js
-if(_.nav.unsupported){
-    //What to do?
-}
-```
-*If there is any browser incompatibility please notify*
-
-
-Installation
+Controllers
 -----------
 
-Using [Bower](http://bower.io/):
+Controllers are an intermediary between models and views which are classically responsible for two tasks: 
+they both update the view when the model changes and update the model when the user manipulates the view. 
+In Syrup drivers are handled from a dedicated environment (application modules), not combined application.
 
-`bower install syrup`
+The Controllers are located in the folder "app/controller/{app_name}/{file}.is", and are called to our site with script tags right after call Syrup core,
+you should not use the controllers on the unification of files, it is a good idea to have separate it for each application.
 
-Using [Git](http://git-scm.com/docs/git-clone):
-
-`git clone https://github.com/geolffreym/Syrup.git` 
-
-
-Config
-------
-Configuration is very simple, you just have to access the folder /config/ and edit the file init.js 
-
-You need to set the APP_PATH, is who is responsible for setting the relative directory of your application, the default is '/' and finally the environment, which can be either development or production.
-
-*Example APP_PATH: (/assets/)*  
-
-  
-Joining files
--------------
-
-**Node JS Required**
-
-Blend files is relatively simple, you must first establish the libraries you want to use in environment.
-
-Syrup is modular so you can create your own libraries and integrate the autoloader
-
-```js
-//Development
- exports.files = {
-        js: {
-            output: 'dist/init', //The output
-            src: [
-                'app/config/init', // Needed do not change
-                'system/base/init', // Needed do not change
-//              'lib/Form',
-//              'lib/Upload' // Add all the necessary scripts for startup
-            ]
-
-        }
-    }
+```html
+<script src="YOUR PATH/Syrup/dist/init.min.js"></script>
+<script src="YOUR PATH/Syrup/app/controller/contact/init.js"></script>
 ```
 
-Then you must get packages with `npm install` and finally run `npm start` and you'll have a unified library and .min in folder /dist/
+Views
+-----
 
-*If you do not have the option of using node, you must manually change the settings in the /dist/init.js and include libs separately*
+It is the representation of the information with which the system operates, therefore manages all access to 
+such information, both queries and updates, also implementing access privileges have been described in the specifications of the application (business logic). 
+Renders the model into a form suitable for interaction, typically a user interface element. 
+
+In Syrup the views are locate in the folder "app/controller/{view_name}/{file}.js".
+The views are handled by the "controller", are based on [loose coupling](https://en.wikipedia.org/wiki/Loose_coupling), and are an interface between the template and the controller. 
+
+Models
+------
+
+The domain-specific representation of the information on which the application operates. The model is another name for the domain layer. Domain logic adds meaning to raw data.
+Model is where the application’s data objects are stored. The model doesn’t know anything about views and controllers. When a model changes, typically it will notify its observers that a change has occurred.
+
+In Syrup models are data resources, which are obtained through data entry forms.
+
+
+Templates
+---------
+
+This layer contains presentation-related decisions: how something should be displayed on a Web page or other type of document.
+
+In Syrup, the templates are handled with the help of [Mustache](https://mustache.github.io/). 
+The templates are related to views, they make use of the templates to display data.
+
+
+
+
