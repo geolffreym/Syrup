@@ -848,7 +848,7 @@ _.isHtml(my_html) // Return TRUE
 *(Validate if param is Boolean.)*
 ```js    
 var no_bool = 'String example', 
- my_bool = TRUE';
+ my_bool = TRUE;
  
 _.isBoolean(no_bool) // Return FALSE
 _.isBoolean(my_bool) // Return TRUE
