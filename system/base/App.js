@@ -99,7 +99,7 @@ Apps.add ('_trigger', function (moduleId) {
  * **/
 Apps.add ('_supplier', function () {
 	if ( (_.isSet (this.autoconf)) )
-		this.autoconf (_, _$, this.lib.get (this.root));
+		this.autoconf (_, this.lib.get (this.root));
 	return {}
 });
 /**Provide a global initial config
