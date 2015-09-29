@@ -1,3 +1,12 @@
+Features
+========
+
+* [Loose coupling](https://en.wikipedia.org/wiki/Loose_coupling)
+* Less Code. Write just enough for your javascript application
+* Simple and easy
+* [Scalable Js](http://addyosmani.com/largescalejavascript/)
+* [DRY](http://c2.com/cgi/wiki?DontRepeatYourself)
+
 
 MVC or MTV
 ==========
@@ -25,7 +34,7 @@ such information, both queries and updates, also implementing access privileges 
 Renders the model into a form suitable for interaction, typically a user interface element. 
 
 In Syrup the views are locate in the folder "app/controller/{view_name}/{file}.js".
-The views are handled by the "controller", are based on [loose coupling](https://en.wikipedia.org/wiki/Loose_coupling), and are an interface between the template and the controller. 
+The views are handled by the "controller", and are an interface between the template and the controller. 
 
 Models
 ------
@@ -33,7 +42,7 @@ Models
 The domain-specific representation of the information on which the application operates. The model is another name for the domain layer. Domain logic adds meaning to raw data.
 Model is where the application’s data objects are stored. The model doesn’t know anything about views and controllers. When a model changes, typically it will notify its observers that a change has occurred.
 
-In Syrup models are data resources, which are obtained through data entry forms.
+In Syrup models are data resources, which are obtained through data entry forms, and are handled by the "controller".
 
 
 Templates
