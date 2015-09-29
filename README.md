@@ -27,3 +27,9 @@ Description
 * View
 * Template
 
+
+Content
+=======
+* [About](https://github.com/geolffreym/Syrup/blob/master/readme/ABOUT.md)
+* [Core](https://github.com/geolffreym/Syrup/blob/master/readme/CORE.md)
+* [Basic] (https://github.com/geolffreym/Syrup/blob/master/readme/THE_BASIC.md)

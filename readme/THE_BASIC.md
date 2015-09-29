@@ -1,14 +1,3 @@
-Design
-======
-
-Loose Coupling
---------------
-Coupling refers to the degree of direct knowledge that one component has of another.
-
-Less Code
----------
-Applications must use the least amount of code; they should not be repetitive.
-
 
 MVC or MTV
 ===
