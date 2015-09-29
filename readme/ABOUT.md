@@ -4,6 +4,7 @@ Features
 * [Loose coupling](https://en.wikipedia.org/wiki/Loose_coupling)
 * Less Code. Write just enough for your javascript application
 * Simple and easy
+* [Extensibility](https://en.wikipedia.org/wiki/Extensibility)
 * [Scalable Js](http://addyosmani.com/largescalejavascript/)
 * [DRY](http://c2.com/cgi/wiki?DontRepeatYourself)
 
