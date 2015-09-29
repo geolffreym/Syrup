@@ -2,8 +2,8 @@ Features
 ========
 
 * [Loose coupling](https://en.wikipedia.org/wiki/Loose_coupling)
-* Less Code. Write just enough for your javascript application
-* Simple and easy
+* [Less Code. Write just enough for your javascript application](https://github.com/geolffreym/Syrup/blob/master/readme/CORE.md)
+* [Simple and easy](https://github.com/geolffreym/Syrup/tree/master/example)
 * [Extensibility](https://en.wikipedia.org/wiki/Extensibility)
 * [Scalable Js](http://addyosmani.com/largescalejavascript/)
 * [DRY](http://c2.com/cgi/wiki?DontRepeatYourself)
