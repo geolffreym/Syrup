@@ -1089,9 +1089,7 @@
 	 * @param msg
 	 */
 	Syrup.add ('warning', function (msg, breakpoint) {
-		var date = _.getDate (false);
 		console.log (
-			(date.hour + ':' + date.minutes + ':' + date.seconds + ' ' + date.meridian + ' -> ' + msg) +
 			(breakpoint ? ' | Method: ' + breakpoint : _.emptyStr)
 		);
 	});
@@ -1100,10 +1098,8 @@
 	 * @param msg
 	 */
 	Syrup.add ('error', function (msg, breakpoint) {
-		var date = _.getDate (false)
-
 		throw (
-			(date.hour + ':' + date.minutes + ':' + date.seconds + ' ' + date.meridian + ' -> ' + msg) +
+			(msg) +
 			(breakpoint ? ' | Method: ' + breakpoint : _.emptyStr)
 		);
 	});
