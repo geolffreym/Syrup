@@ -4704,6 +4704,7 @@ Apps.add ('_bindListener', function (moduleId) {
 							if ( _.isFunction (_self[_attr]) ) {
 								_mod.listen (_event, '[' + v.localName + '="' + _attr + '"]', function (e) {
 									//Param event and dependencies
+									e.preventDefault ();
 									_self[_attr] (e, _this.lib.get (_self.parent));
 								});
 							}
