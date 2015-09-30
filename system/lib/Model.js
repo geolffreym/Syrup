@@ -43,7 +43,7 @@ Model.add ('method', function (method) {
  */
 Model.add ('attach', function (name, attach) {
 	var self = this;
-	_.assert (self.modelData, WARNING_MODEL.ERROR.NOPACK, '(Model Attach)');
+	_.assert (self.modelData, WARNING_MODEL.ERROR.NOPACK, '(Model .attach)');
 	self.modelData.append (name, attach);
 	return this;
 });
@@ -83,11 +83,15 @@ Model.add ('fail', function (field, error) {
  * @param event*/
 Model.add ('send', function (url, data) {
 	var self = this;
-	_.assert (data, WARNING_MODEL.ERROR.NOPACK, '(Model Send)');
+	if ( _.isObject (url) )
+		data = url;
+
+	if ( !_.isSet (data) && !_.isSet (self.modelData) )
+		_.error (WARNING_MODEL.ERROR.NOPACK, '(Model .send)');
 
 	var conf = {
-		url   : url,
-		data  : data,
+		url   : url || self.model.attr ('action'),
+		data  : data || self.modelData,
 		method: self.type
 	};
 
@@ -101,7 +105,6 @@ Model.add ('send', function (url, data) {
 		}).catch (reject);
 	}))
 });
-
 //Return object
 Model.add ('getObject', function () {
 	return this.object;
