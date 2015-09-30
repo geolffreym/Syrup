@@ -373,14 +373,17 @@ Apps.add ('_taste', function (moduleId) {
 
 			//Execution
 			_self.modules[moduleId].instance.init (this.lib.get (_self.root));
-			_self._bindListener (moduleId);
 
 			//After execute
-			if ( moduleId in _self.triggerAfter )
+			if ( moduleId in _self.triggerAfter ) {
 				_self.triggerAfter[moduleId] (moduleId, this.lib.get (_self.root));
+			}
 		}
 
-		//Observe scope
+		// Bind listeners
+		_self._bindListener (moduleId);
+
+		// Observe scope
 		_self._watch (moduleId);
 	}
 
