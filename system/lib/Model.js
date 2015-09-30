@@ -105,6 +105,7 @@ Model.add ('send', function (url, data) {
 		}).catch (reject);
 	}))
 });
+
 //Return object
 Model.add ('getObject', function () {
 	return this.object;
