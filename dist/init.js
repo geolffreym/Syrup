@@ -5573,7 +5573,7 @@ Model.add ('fail', function (field, error) {
  * @param event*/
 Model.add ('send', function (url, data) {
 	var self = this;
-	if ( _.isObject (url) )
+	if ( _.isObject (url) || _.isFormData (data) )
 		data = url;
 
 	if ( !_.isSet (data) && !_.isSet (self.modelData) )
