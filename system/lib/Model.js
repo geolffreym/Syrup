@@ -80,7 +80,9 @@ Model.add ('fail', function (field, error) {
 });
 
 /**Submit action
- * @param event*/
+ * @param {string} url
+ * @param {object} data
+ * @return {object}*/
 Model.add ('send', function (url, data) {
 	var self = this;
 	if ( _.isObject (url) || _.isFormData (data) ) {
