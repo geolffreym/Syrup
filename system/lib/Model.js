@@ -120,21 +120,68 @@ Model.add ('getData', function () {
 	return this.modelData;
 });
 
+
+/**Pack the input files in ModelData
+ * @param {object|string} input
+ * @return {object}
+ * */
+Model.add ('file', function (input) {
+	var _self = this,
+		_formData = _.isSet (_self.modelData) ?
+			_self.modelData : new FormData,
+		_files = [],
+		_field = _$ (input).get (0);
+
+	return (new Promise (function (resolve, reject) {
+		if ( _field.type === "file" ) {
+			var _temp = _field.files,
+				x = _temp.length;
+
+			while ( x-- ) {
+				_files[x] = _temp[x];
+				_formData.append (_field.name, _temp[x]);
+				_self.object[_field.name] = _temp[x];
+			}
+		}
+
+		_self.modelData = _formData;
+		resolve (_self);
+	}));
+
+});
+
+/**Pack all the input files in ModelData
+ * @param {object|string} model
+ * @return {object}
+ * */
+Model.add ('files', function (model) {
+	var _self = this;
+	_self.model = _$ (model);
+
+	return (new Promise (function (resolve, reject) {
+		_self.model.find ('input[type="file"]', function (field) {
+			_self.file (field.get (0));
+		});
+	}));
+
+});
+
 /**Pack the inputs in ModelData Object
- * @param model
- * @return object
+ * @param {object|string } model
+ * @return {object}
  */
 Model.add ('pack', function (model) {
-	var self = this;
-	self.model = _$ (model);
+	this.model = _$ (model);
 
-	var _modelData = new FormData,
+	var _self = this,
+		_modelData = _.isSet (_self.modelData) ?
+			_self.modelData : new FormData,
 		_field_array,
-		_model_obj = self.model.object (),
+		_model_obj = _self.model.object (),
 		_fields = _model_obj.querySelectorAll ('input, textarea, select'),
 		x = _fields.length;
 
-	self.failed = false;
+	_self.failed = false;
 
 	return (new Promise (function (resolve, reject) {
 		//Run over inputs
@@ -157,30 +204,30 @@ Model.add ('pack', function (model) {
 
 			//Skip?
 			if ( !( _$ (field).data ('skip')) && _.isEmpty (fieldValue) ) {
-				reject (self.fail (field, 'empty'));
+				reject (_self.fail (field, 'empty'));
 				break;
 				//isMail?
 			} else if ( _$ (field).data ('mail') && !_.isMail (fieldValue) ) {
-				reject (self.fail (field, 'invalid_mail'));
+				reject (_self.fail (field, 'invalid_mail'));
 				break;
 				//Overflow down?
 			} else if ( _$ (field).data ('min') && (
 					+_$ (field).data ('min') > fieldValue.length
 				) ) {
-				reject (self.fail (field, 'minim_chars'));
+				reject (_self.fail (field, 'minim_chars'));
 				break;
 				//Overflow?
 			} else if ( _$ (field).data ('max') && (
 					+_$ (field).data ('max') < fieldValue.length
 				) ) {
-				reject (self.fail (field, 'overflow_chars'));
+				reject (_self.fail (field, 'overflow_chars'));
 				break;
 			} else {
 				//Custom validation
 				if ( _$ (field).data ('custom') ) {
 					var Regex = new RegExp (_$ (field).data ('custom'), "g");
 					if ( !Regex.test (fieldValue) ) {
-						reject (self.fail (field, 'invalid_custom'));
+						reject (_self.fail (field, 'invalid_custom'));
 						break;
 					}
 				}
@@ -189,20 +236,20 @@ Model.add ('pack', function (model) {
 				if ( _.isSet (field.name) ) {
 
 					//Has multiple?
-					if ( !!(_field_array = self.multiple (field.name)) )
+					if ( !!(_field_array = _self.multiple (field.name)) )
 						fieldValue = _field_array;
 
 					//Append Data
 					_modelData.append (field.name, fieldValue);
-					self.object[field.name] = fieldValue;
+					_self.object[field.name] = fieldValue;
 				}
 
 			}
 		}
 
 		//The model data
-		self.modelData = _modelData;
-		resolve (self);
+		_self.modelData = _modelData;
+		resolve (_self);
 	}));
 
 });
