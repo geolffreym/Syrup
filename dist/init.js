@@ -5653,7 +5653,7 @@ Model.add ('files', function (model) {
 
 	return (new Promise (function (resolve, reject) {
 		_self.model.find ('input[type="file"]', function (field) {
-			_self.file (field.get (0));
+			_self.file (field.get (0)).then (resolve);
 		});
 	}));
 
