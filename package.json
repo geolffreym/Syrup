@@ -13,7 +13,11 @@
   "author": "Geolffrey Mena <gmjun2000@gmail.com>",
   "devDependencies": {
     "b_combiner-js": "*",
-    "nodemon": "*"
+    "nodemon": "*",
+    "karma": "*",
+    "karma-jasmine": "*",
+    "jasmine-core": "*",
+    "karma-chrome-launcher": "*"
   },
   "main": "Syrup.js",
   "version": "0.1.1",
