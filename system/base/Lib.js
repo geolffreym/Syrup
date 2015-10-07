@@ -16,11 +16,6 @@ function Libs () {
  * @return object
  * **/
 Libs.add ('blend', function (name, dependencies) {
-	var _split = _.splitString (name, '.');
-	if ( _.isArray (_split) ) {
-		name = _split[0];
-	}
-
 	var _anonymous = (
 		Function.factory (name)
 	) ();
