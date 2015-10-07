@@ -270,9 +270,8 @@ Apps.add ('_bindListener', function (moduleId) {
  * @param template
  * @return object
  */
-Apps.add ('_serve', function (moduleId, template) {
+Apps.add ('_serve', function (moduleId, view) {
 	var _view = null,
-		_self = this,
 		_scope = this.scope[moduleId];
 
 	//Is set the app
@@ -288,9 +287,9 @@ Apps.add ('_serve', function (moduleId, template) {
 				_view = new View;
 
 				//A view?
-				if ( _.isSet (template) && _.isString (template) ) {
-					var view_name = template.split ('/').pop (),
-						view_dir = _.replace (template, '/' + view_name, _.emptyStr);
+				if ( _.isSet (view) && _.isString (view) ) {
+					var view_name = view.split ('/').pop (),
+						view_dir = _.replace (view, '/' + view_name, _.emptyStr);
 
 					//Require th view if needed
 					Require.lookup (['view/' + view_dir]).then (function () {
@@ -353,8 +352,8 @@ Apps.add ('_taste', function (moduleId) {
 			return _self.getRecipe (moduleId);
 		};
 
-		_self.modules[moduleId].instance.serve = function (_template) {
-			_self._serve (moduleId, _template || null);
+		_self.modules[moduleId].instance.serve = function (_view) {
+			_self._serve (moduleId, _view || null);
 			return this;
 		};
 
