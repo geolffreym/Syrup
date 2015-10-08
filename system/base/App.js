@@ -235,33 +235,37 @@ Apps.add ('_bindListener', function (moduleId) {
 			_the_filter = enabled_events.join (' [sp-'),
 			_mod = _$ ('[sp-recipe="' + moduleId + '"]');
 
-		//Find events listeners
-		_mod.find (_the_filter, function (dom_list) {
+		//Exist the module?
+		if ( _mod.exist ) {
 
-			//The dom object
-			dom_list.each (function (i) {
+			//Find events listeners
+			_mod.find (_the_filter, function (dom_list) {
 
-				//Find the listener in attributes
-				_.each (i.attributes, function (v) {
-					if ( /sp-[a-z]+/.test (v.localName) ) {
-						var _event = _.replace (v.localName, 'sp-', _.emptyStr),
-							_attr = i.getAttribute (v.localName);
+				//The dom object
+				dom_list.each (function (i) {
 
-						//Is the attr value in module?
-						if ( _attr in _self ) {
-							//is Function the attr value?
-							if ( _.isFunction (_self[_attr]) ) {
-								_mod.listen (_event, '[' + v.localName + '="' + _attr + '"]', function (e) {
-									//Param event and dependencies
-									e.preventDefault ();
-									_self[_attr] (e, _this.lib.get (_self.parent));
-								});
+					//Find the listener in attributes
+					_.each (i.attributes, function (v) {
+						if ( /sp-[a-z]+/.test (v.localName) ) {
+							var _event = _.replace (v.localName, 'sp-', _.emptyStr),
+								_attr = i.getAttribute (v.localName);
+
+							//Is the attr value in module?
+							if ( _attr in _self ) {
+								//is Function the attr value?
+								if ( _.isFunction (_self[_attr]) ) {
+									_mod.listen (_event, '[' + v.localName + '="' + _attr + '"]', function (e) {
+										//Param event and dependencies
+										e.preventDefault ();
+										_self[_attr] (e, _this.lib.get (_self.parent));
+									});
+								}
 							}
 						}
-					}
-				});
-			})
-		});
+					});
+				})
+			});
+		}
 	}
 });
 
