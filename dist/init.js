@@ -5192,7 +5192,7 @@ function Router () {
  * @param {object} routes
  * @return {object}
  * */
-Router.add ('setRoutes', function (routes) {
+Router.add ('set', function (routes) {
 	var _self = this;
 
 	return (new Promise (function (resolve, reject) {

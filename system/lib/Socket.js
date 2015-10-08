@@ -66,7 +66,7 @@ Socket.add ('set', function (config) {
 });
 
 //Socket Event Handler
-Socket.add ('when', function (event, callback) {
+Socket.add ('on', function (event, callback) {
 	var self = this;
 	return event && (
 			{
