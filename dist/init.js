@@ -5633,7 +5633,10 @@ Model.add ('file', function (input) {
 		_files = [], _field = _$ (input).get (0);
 
 	return (new Promise (function (resolve, reject) {
-		if ( _field.type === "file" ) {
+		if (
+			_field.type === "file"
+			&& _.isSet (_field.name)
+		) {
 			var _temp = _field.files,
 				x = _temp.length;
 
