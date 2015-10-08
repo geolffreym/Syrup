@@ -13,13 +13,13 @@ function Workers () {
 //Worker event handler
 Workers.add ('on', function (event, callback) {
 	var self = this;
-	return [
-		{
-			message: function () {
-				self.onsuccess = callback;
-			}
-		}[event] ()
-	]
+	return event &&
+		   ({
+				message: function () {
+					self.onsuccess = callback;
+				}
+			}[event] || function () {}) ()
+
 });
 
 //Set new Worker

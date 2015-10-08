@@ -66,24 +66,24 @@ Socket.add ('set', function (config) {
 });
 
 //Socket Event Handler
-Socket.add ('on', function (event, callback) {
+Socket.add ('when', function (event, callback) {
 	var self = this;
-	return [
-		{
-			message: function () {
-				self.message = callback;
-			},
-			open   : function () {
-				self.open = callback;
-			},
-			close  : function () {
-				self.close = callback;
-			},
-			error  : function () {
-				self.error = callback;
-			}
-		}[event] ()
-	]
+	return event && (
+			{
+				message: function () {
+					self.message = callback;
+				},
+				open   : function () {
+					self.open = callback;
+				},
+				close  : function () {
+					self.close = callback;
+				},
+				error  : function () {
+					self.error = callback;
+				}
+			}[event] || function () {}
+		) ()
 });
 
 

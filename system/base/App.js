@@ -206,13 +206,13 @@ Apps.add ('getScope', function (moduleId) {
  */
 Apps.add ('when', function (event, name) {
 	var self = this;
-	return {
-		change: ({
-			then: (function (resolve) {
-				self.onchange[name] = resolve;
+	return event && ({
+			change: ({
+				then: (function (resolve) {
+					self.onchange[name] = resolve;
+				})
 			})
-		})
-	}[event]
+		}[event] || { then: function () {} })
 });
 
 /**Bind Listeners

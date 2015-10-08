@@ -4648,13 +4648,13 @@ Apps.add ('getScope', function (moduleId) {
  */
 Apps.add ('when', function (event, name) {
 	var self = this;
-	return {
-		change: ({
-			then: (function (resolve) {
-				self.onchange[name] = resolve;
+	return event && ({
+			change: ({
+				then: (function (resolve) {
+					self.onchange[name] = resolve;
+				})
 			})
-		})
-	}[event]
+		}[event] || { then: function () {} })
 });
 
 /**Bind Listeners
@@ -4902,29 +4902,28 @@ function Http () {
  * */
 Http.add ('on', function (event, callback) {
 	var self = this;
-	return [
-		{
-			before  : function () {
-				self.before = callback;
-			},
-			complete: function () {
-				self.complete = callback;
-			},
-			abort   : function () {
-				self.abort = callback;
-			},
-			state   : function () {
-				self.state = callback;
-			},
-			timeout : function () {
-				self.time_out = callback;
-			},
-			progress: function () {
-				self.progress = callback;
-			}
-		}[event] ()
-	]
-
+	return event && (
+			{
+				before  : function () {
+					self.before = callback;
+				},
+				complete: function () {
+					self.complete = callback;
+				},
+				abort   : function () {
+					self.abort = callback;
+				},
+				state   : function () {
+					self.state = callback;
+				},
+				timeout : function () {
+					self.time_out = callback;
+				},
+				progress: function () {
+					self.progress = callback;
+				}
+			}[event] || function () {}
+		) ()
 });
 
 /** Http Request
@@ -5348,13 +5347,13 @@ function Workers () {
 //Worker event handler
 Workers.add ('on', function (event, callback) {
 	var self = this;
-	return [
-		{
-			message: function () {
-				self.onsuccess = callback;
-			}
-		}[event] ()
-	]
+	return event &&
+		   ({
+				message: function () {
+					self.onsuccess = callback;
+				}
+			}[event] || function () {}) ()
+
 });
 
 //Set new Worker

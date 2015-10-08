@@ -29,29 +29,28 @@ function Http () {
  * */
 Http.add ('on', function (event, callback) {
 	var self = this;
-	return [
-		{
-			before  : function () {
-				self.before = callback;
-			},
-			complete: function () {
-				self.complete = callback;
-			},
-			abort   : function () {
-				self.abort = callback;
-			},
-			state   : function () {
-				self.state = callback;
-			},
-			timeout : function () {
-				self.time_out = callback;
-			},
-			progress: function () {
-				self.progress = callback;
-			}
-		}[event] ()
-	]
-
+	return event && (
+			{
+				before  : function () {
+					self.before = callback;
+				},
+				complete: function () {
+					self.complete = callback;
+				},
+				abort   : function () {
+					self.abort = callback;
+				},
+				state   : function () {
+					self.state = callback;
+				},
+				timeout : function () {
+					self.time_out = callback;
+				},
+				progress: function () {
+					self.progress = callback;
+				}
+			}[event] || function () {}
+		) ()
 });
 
 /** Http Request
