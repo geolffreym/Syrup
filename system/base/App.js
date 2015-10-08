@@ -306,10 +306,15 @@ Apps.add ('_serve', function (moduleId, view) {
 						_view.render (_parse, _scope).then (function (result) {
 							_dom.html (result);
 						});
+
 					}
+
 				}
+
 			}
+
 		}
+
 	}
 
 	return this;
@@ -357,8 +362,8 @@ Apps.add ('_taste', function (moduleId) {
 			return this;
 		};
 
-		_self.modules[moduleId].instance.listen = function (event, callback) {
-			_$ ('[sp-recipe="' + moduleId + '"]').listen (event, '[sp-' + event + ']', callback);
+		_self.modules[moduleId].instance.listen = function (event, delegate, callback) {
+			_$ ('[sp-recipe="' + moduleId + '"]').listen (event, delegate, callback);
 			return this;
 		};
 
