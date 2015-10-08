@@ -4677,33 +4677,37 @@ Apps.add ('_bindListener', function (moduleId) {
 			_the_filter = enabled_events.join (' [sp-'),
 			_mod = _$ ('[sp-recipe="' + moduleId + '"]');
 
-		//Find events listeners
-		_mod.find (_the_filter, function (dom_list) {
+		//Exist the module?
+		if ( _mod.exist ) {
 
-			//The dom object
-			dom_list.each (function (i) {
+			//Find events listeners
+			_mod.find (_the_filter, function (dom_list) {
 
-				//Find the listener in attributes
-				_.each (i.attributes, function (v) {
-					if ( /sp-[a-z]+/.test (v.localName) ) {
-						var _event = _.replace (v.localName, 'sp-', _.emptyStr),
-							_attr = i.getAttribute (v.localName);
+				//The dom object
+				dom_list.each (function (i) {
 
-						//Is the attr value in module?
-						if ( _attr in _self ) {
-							//is Function the attr value?
-							if ( _.isFunction (_self[_attr]) ) {
-								_mod.listen (_event, '[' + v.localName + '="' + _attr + '"]', function (e) {
-									//Param event and dependencies
-									e.preventDefault ();
-									_self[_attr] (e, _this.lib.get (_self.parent));
-								});
+					//Find the listener in attributes
+					_.each (i.attributes, function (v) {
+						if ( /sp-[a-z]+/.test (v.localName) ) {
+							var _event = _.replace (v.localName, 'sp-', _.emptyStr),
+								_attr = i.getAttribute (v.localName);
+
+							//Is the attr value in module?
+							if ( _attr in _self ) {
+								//is Function the attr value?
+								if ( _.isFunction (_self[_attr]) ) {
+									_mod.listen (_event, '[' + v.localName + '="' + _attr + '"]', function (e) {
+										//Param event and dependencies
+										e.preventDefault ();
+										_self[_attr] (e, _this.lib.get (_self.parent));
+									});
+								}
 							}
 						}
-					}
-				});
-			})
-		});
+					});
+				})
+			});
+		}
 	}
 });
 
@@ -5512,6 +5516,7 @@ var WARNING_MODEL = {
 function Model () {
 	this.Http = new Http;
 	this.modelData = null;
+	this.modelFiles = null;
 	this.object = {};
 	this.type = 'POST';
 	this.model = null;
@@ -5587,7 +5592,7 @@ Model.add ('send', function (url, data) {
 
 	var conf = {
 		url   : url || self.model.attr ('action'),
-		data  : data || self.modelData,
+		data  : data || self.modelData || self.modelFiles,
 		method: self.type
 	};
 
@@ -5597,7 +5602,7 @@ Model.add ('send', function (url, data) {
 
 		self.Http.kill ();
 		self.Http.request (conf).then (function (response) {
-			resolve (response)
+			resolve (response);
 		}).catch (reject);
 	}))
 });
@@ -5612,6 +5617,11 @@ Model.add ('getData', function () {
 	return this.modelData;
 });
 
+//Return formdata
+Model.add ('getFiles', function () {
+	return this.modelFiles;
+});
+
 
 /**Pack the input files in ModelData
  * @param {object|string} input
@@ -5619,10 +5629,8 @@ Model.add ('getData', function () {
  * */
 Model.add ('file', function (input) {
 	var _self = this,
-		_formData = _.isSet (_self.modelData) ?
-			_self.modelData : new FormData,
-		_files = [],
-		_field = _$ (input).get (0);
+		_formData = new FormData,
+		_files = [], _field = _$ (input).get (0);
 
 	return (new Promise (function (resolve, reject) {
 		if ( _field.type === "file" ) {
@@ -5632,11 +5640,11 @@ Model.add ('file', function (input) {
 			while ( x-- ) {
 				_files[x] = _temp[x];
 				_formData.append (_field.name, _temp[x]);
-				_self.object[_field.name] = _temp[x];
 			}
 		}
 
-		_self.modelData = _formData;
+		_self.object['_files'] = _files;
+		_self.modelFiles = _formData;
 		resolve (_self);
 	}));
 
@@ -5666,10 +5674,8 @@ Model.add ('pack', function (model) {
 	this.model = _$ (model);
 
 	var _self = this,
-		_modelData = _.isSet (_self.modelData) ?
-			_self.modelData : new FormData,
-		_field_array,
-		_model_obj = _self.model.object (),
+		_modelData = new FormData,
+		_field_array, _model_obj = _self.model.get (0),
 		_fields = _model_obj.querySelectorAll ('input, textarea, select'),
 		x = _fields.length;
 
