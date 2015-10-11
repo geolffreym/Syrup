@@ -4766,7 +4766,6 @@ Apps.add ('_taste', function (moduleId) {
 		_self.modules[moduleId].instance = _self._trigger (moduleId);
 		_self.modules[moduleId].instance.name = moduleId;
 		_self.modules[moduleId].instance.parent = _self.root;
-		_self.modules[moduleId].instance.model = _$ ('[sp-recipe="' + moduleId + '"] [sp-submit]');
 
 		//Binding Methods
 		_self.modules[moduleId].instance.setScope = function (object) {

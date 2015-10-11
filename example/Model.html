@@ -16,7 +16,7 @@
     </a>
 
     <!-- The model -->
-    <form action="" sp-model sp-submit="process_form">
+    <form action="" sp-submit="process_form">
         <input type="text" name="firstName" placeholder="Name" data-min="2"/> <br/>
         <input type="text" name="lastName" placeholder="Last Name" data-min="2"/><br/>
         <input type="text" name="phone" placeholder="Phone Number"/><br/>
@@ -113,13 +113,13 @@
 
                         // The global service in tools
                         $.myConsole ('Done');
-                    })
+                    });
                 },
-                process_form: function ($) {
+                process_form: function ($, event) {
                     var _self = this;
 
                     //Pack the model, from source
-                    $.Model.pack (this.model).then (function (model) {
+                    $.Model.pack (event.target).then (function (model) {
                         _self.setScope ({ 'beatles': [model.scope] });
                     }).catch (function () {});
 
