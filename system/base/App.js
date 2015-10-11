@@ -207,12 +207,12 @@ Apps.add ('getScope', function (moduleId) {
 Apps.add ('when', function (event, name) {
 	var self = this;
 	return event && ({
-			change: ({
-				then: (function (resolve) {
-					self.onchange[name] = resolve;
-				})
-			})
-		}[event] || { then: function () {} })
+						 change: ({
+							 then: (function (resolve) {
+								 self.onchange[name] = resolve;
+							 })
+						 })
+					 }[event] || { then: function () {} })
 });
 
 /**Bind Listeners
@@ -230,7 +230,7 @@ Apps.add ('_bindListener', function (moduleId) {
 	];
 
 	if ( this.app.exist ) {
-		var _this = this,
+		var _this = this, _dom = null,
 			_self = this.modules[moduleId].instance,
 			_the_filter = enabled_events.join (' [sp-'),
 			_mod = _$ ('[sp-recipe="' + moduleId + '"]');
@@ -241,29 +241,28 @@ Apps.add ('_bindListener', function (moduleId) {
 			//Find events listeners
 			_mod.find (_the_filter, function (dom_list) {
 
-				//The dom object
-				dom_list.each (function (i) {
+				//Find the listener in attributes
+				_.each ((_dom = dom_list.get ()).attributes,
+						function (v) {
+							if ( /sp-[a-z]+/.test (v.localName) ) {
+								var _event = _.replace (v.localName, 'sp-', _.emptyStr),
+									_attr = _dom.getAttribute (v.localName);
 
-					//Find the listener in attributes
-					_.each (i.attributes, function (v) {
-						if ( /sp-[a-z]+/.test (v.localName) ) {
-							var _event = _.replace (v.localName, 'sp-', _.emptyStr),
-								_attr = i.getAttribute (v.localName);
-
-							//Is the attr value in module?
-							if ( _attr in _self ) {
-								//is Function the attr value?
-								if ( _.isFunction (_self[_attr]) ) {
-									_mod.listen (_event, '[' + v.localName + '="' + _attr + '"]', function (e) {
-										//Param event and dependencies
-										e.preventDefault ();
-										_self[_attr] (e, _this.lib.get (_self.parent));
-									});
+								//Is the attr value in module?
+								if ( _attr in _self ) {
+									//is Function the attr value?
+									if ( _.isFunction (_self[_attr]) ) {
+										_mod.listen (_event, '[' + v.localName + '="' + _attr + '"]', function (e) {
+											//Param event and dependencies
+											e.preventDefault ();
+											_self[_attr] (e, _this.lib.get (_self.parent));
+										});
+									}
 								}
 							}
 						}
-					});
-				})
+				)
+				;
 			});
 		}
 	}
