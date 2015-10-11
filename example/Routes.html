@@ -15,7 +15,8 @@
 
 <div sp-recipe="Hey.Do">
     <!-- Hey.Do recipe -->
-    <!-- Event callback in recipe Hey.Do -->
+    <!-- Event callback in recipe Hey.Do -->a
+
     <button sp-click="redirect">Redirect</button>
 </div>
 
@@ -28,7 +29,11 @@
         var my_App = App.blend ('Hey', ['Http', 'Model', 'Router']);
 
         //Before execution
-        my_App.supply (function (_, $) {
+        my_App.spice ({
+            //Provide constant
+            MAX: 3
+        }).cook (function (_, $) {
+
             //Before execution what to do?
             //Initialize the routes
             $.Router.set ({
@@ -36,6 +41,9 @@
                 'theNewRoute' : '/route/:page/:user/'
             });
 
+        }).afters (function ($) {
+            //After execute
+            console.log ($.MAX)
         });
 
 

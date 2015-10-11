@@ -116,16 +116,11 @@
                     })
                 },
                 process_form: function (e, $) {
-                    e.preventDefault ();
                     var _self = this;
                     //Pack the model, from source
-                    //$.Model.pack (e.target).then (function (model) {
-                        $.Model.send()
-                        //_self.setScope ({ 'beatles': [model.getObject ()] });
-                        //Send to server
-//                        model.send ('/miapp/myServerSideScript', model.getObject ())
-//                                .then (function (result) {})
-                    //});
+                    $.Model.pack (e.target).then (function (model) {
+                        _self.setScope ({ 'beatles': [model.scope] });
+                    }).catch (function () {});
 
 
                 },

@@ -4450,8 +4450,7 @@ function Apps () {
 	this.lib = null;
 	this.app = null;
 	this.autoconf = null;
-	this.triggerAfter = {};
-	this.triggerBefore = {};
+	this.after = null;
 	this.scope = {};
 	this.modules = {};
 	this.onchange = {};
@@ -4549,41 +4548,30 @@ Apps.add ('_supplier', function () {
  * @param moduleId
  * @return void
  * **/
-Apps.add ('supply', function (callback) {
+Apps.add ('cook', function (callback) {
 	if ( _.isFunction (callback) )
 		this.autoconf = callback;
 	return this;
 });
 
-/**Trigger Helper
- * @param moduleList
- * @param callback
- * @param toList**/
-Apps.add ('_triggerOn', function (moduleList, callback, toList) {
-	if ( _.isArray (moduleList) && _.isFunction (callback) ) {
-		_.each (moduleList, function (moduleId) {
-			if ( !(moduleId in toList) )
-				toList[moduleId] = callback;
-		});
 
-	}
-	return this;
-});
-
-
-/**Add a custom trigger to execute before the given modules
+/**Global attributes supplier
  * @param moduleList
  * @callback*/
-Apps.add ('spice', function (moduleList, callback) {
-	return this._triggerOn (moduleList, callback, this.triggerBefore);
+Apps.add ('spice', function (object) {
+	if ( _.isObject (object) )
+		this.lib.make (object);
+	return this;
 });
 
 
 /**Add a custom trigger to execute after the given modules
  * @param moduleList
  * @callback*/
-Apps.add ('afters', function (moduleList, callback) {
-	return this._triggerOn (moduleList, callback, this.triggerAfter);
+Apps.add ('afters', function (callback) {
+	if ( _.isFunction (callback) )
+		this.after = callback;
+	return this;
 });
 
 /** Append global service
@@ -4684,29 +4672,25 @@ Apps.add ('_bindListener', function (moduleId) {
 
 			//Find events listeners
 			_mod.find (_the_filter, function (dom_list) {
-
 				//Find the listener in attributes
-				_.each ((_dom = dom_list.get ()).attributes,
-						function (v) {
-							if ( /sp-[a-z]+/.test (v.localName) ) {
-								var _event = _.replace (v.localName, 'sp-', _.emptyStr),
-									_attr = _dom.getAttribute (v.localName);
+				_.each ((_dom = dom_list.get ()).attributes, function (v) {
+					if ( /sp-[a-z]+/.test (v.localName) ) {
+						var _event = _.replace (v.localName, 'sp-', _.emptyStr),
+							_attr = _dom.getAttribute (v.localName);
 
-								//Is the attr value in module?
-								if ( _attr in _self ) {
-									//is Function the attr value?
-									if ( _.isFunction (_self[_attr]) ) {
-										_mod.listen (_event, '[' + v.localName + '="' + _attr + '"]', function (e) {
-											//Param event and dependencies
-											e.preventDefault ();
-											_self[_attr] (e, _this.lib.get (_self.parent));
-										});
-									}
-								}
+						//Is the attr value in module?
+						if ( _attr in _self ) {
+							//is Function the attr value?
+							if ( _.isFunction (_self[_attr]) ) {
+								_mod.listen (_event, '[' + v.localName + '="' + _attr + '"]', function (e) {
+									//Param event and dependencies
+									e.preventDefault ();
+									_self[_attr] (e, _this.lib.get (_self.parent));
+								});
 							}
 						}
-				)
-				;
+					}
+				});
 			});
 		}
 	}
@@ -4782,7 +4766,7 @@ Apps.add ('_taste', function (moduleId) {
 		_self.modules[moduleId].instance = _self._trigger (moduleId);
 		_self.modules[moduleId].instance.name = moduleId;
 		_self.modules[moduleId].instance.parent = _self.root;
-		//_self.modules[moduleId].instance.dom = _$ ('[sp-recipe="' + moduleId + '"]');
+		_self.modules[moduleId].instance.model = _$ ('[sp-recipe="' + moduleId + '"] [sp-model]');
 
 		//Binding Methods
 		_self.modules[moduleId].instance.setScope = function (object) {
@@ -4818,16 +4802,12 @@ Apps.add ('_taste', function (moduleId) {
 		//Init the module
 		if ( 'init' in _self.modules[moduleId].instance ) {
 
-			//Before execute
-			if ( moduleId in this.triggerBefore )
-				_self.triggerBefore[moduleId] (moduleId, this.lib.get (_self.root));
-
 			//Execution
 			_self.modules[moduleId].instance.init (this.lib.get (_self.root));
 
 			//After execute
-			if ( moduleId in _self.triggerAfter ) {
-				_self.triggerAfter[moduleId] (moduleId, this.lib.get (_self.root));
+			if ( _.isSet (_self.after) ) {
+				_self.after (this.lib.get (_self.root), moduleId);
 			}
 		}
 
@@ -5515,9 +5495,9 @@ var WARNING_MODEL = {
 
 function Model () {
 	this.Http = new Http;
-	this.modelData = null;
-	this.modelFiles = null;
-	this.object = {};
+	this.data = null;
+	this.files = null;
+	this.scope = {};
 	this.type = 'POST';
 	this.model = null;
 	this.failed = null;
@@ -5540,8 +5520,8 @@ Model.add ('method', function (method) {
  */
 Model.add ('attach', function (name, attach) {
 	var self = this;
-	_.assert (self.modelData, WARNING_MODEL.ERROR.NOPACK, '(Model .attach)');
-	self.modelData.append (name, attach);
+	_.assert (self.data, WARNING_MODEL.ERROR.NOPACK, '(Model .attach)');
+	self.data.append (name, attach);
 	return this;
 });
 
@@ -5551,7 +5531,7 @@ Model.add ('attach', function (name, attach) {
  */
 Model.add ('multiple', function (name) {
 	var _return = [],
-		_model_obj = this.model.object ();
+		_model_obj = this.model.get (0);
 
 	if ( name in _model_obj.elements ) {
 		_.each (_model_obj.elements[name], function (v, i) {
@@ -5582,17 +5562,17 @@ Model.add ('fail', function (field, error) {
  * @return {object}*/
 Model.add ('send', function (url, data) {
 	var self = this;
-	if ( _.isObject (url) || _.isFormData (data) ) {
+	if ( _.isObject (url) || _.isFormData (url) ) {
 		data = url;
 		url = null;
 	}
 
-	if ( !_.isSet (data) && !_.isSet (self.modelData) )
+	if ( !_.isSet (data) && !_.isSet (self.data) )
 		_.error (WARNING_MODEL.ERROR.NOPACK, '(Model .send)');
 
 	var conf = {
 		url   : url || self.model.attr ('action'),
-		data  : data || self.modelData || self.modelFiles,
+		data  : data || self.data || self.files,
 		method: self.type
 	};
 
@@ -5608,18 +5588,18 @@ Model.add ('send', function (url, data) {
 });
 
 //Return object
-Model.add ('getObject', function () {
-	return this.object;
+Model.add ('getScope', function () {
+	return this.scope;
 });
 
 //Return formdata
 Model.add ('getData', function () {
-	return this.modelData;
+	return this.data;
 });
 
 //Return formdata
 Model.add ('getFiles', function () {
-	return this.modelFiles;
+	return this.files;
 });
 
 
@@ -5630,7 +5610,9 @@ Model.add ('getFiles', function () {
 Model.add ('file', function (input) {
 	var _self = this,
 		_formData = new FormData,
-		_files = [], _field = _$ (input).get (0);
+		_files = [], _field = !_.is$ (input)
+							  && _$ (input).get (0)
+							  || input;
 
 	return (new Promise (function (resolve, reject) {
 		if (
@@ -5646,8 +5628,8 @@ Model.add ('file', function (input) {
 			}
 		}
 
-		_self.object['_files'] = _files;
-		_self.modelFiles = _formData;
+		_self.scope['_files'] = _files;
+		_self.files = _formData;
 		resolve (_self);
 	}));
 
@@ -5659,7 +5641,9 @@ Model.add ('file', function (input) {
  * */
 Model.add ('files', function (model) {
 	var _self = this;
-	_self.model = _$ (model);
+	_self.model = !_.is$ (model)
+				  && _$ (model)
+				  || model;
 
 	return (new Promise (function (resolve, reject) {
 		_self.model.find ('input[type="file"]', function (field) {
@@ -5674,7 +5658,9 @@ Model.add ('files', function (model) {
  * @return {object}
  */
 Model.add ('pack', function (model) {
-	this.model = _$ (model);
+	this.model = !_.is$ (model)
+				 && _$ (model)
+				 || model;
 
 	var _self = this,
 		_modelData = new FormData,
@@ -5688,8 +5674,13 @@ Model.add ('pack', function (model) {
 		//Run over inputs
 		while ( x-- ) {
 
-			//Skip file type
-			if ( _fields[x].type === 'file' || !_fields[x] ) {
+			//Skip none type
+			if ( !_fields[x] )
+				continue;
+
+			//If file pack it
+			if ( _fields[x].type === 'file' ) {
+				_self.file (_fields[x]);
 				continue;
 			}
 
@@ -5742,14 +5733,14 @@ Model.add ('pack', function (model) {
 
 					//Append Data
 					_modelData.append (field.name, fieldValue);
-					_self.object[field.name] = fieldValue;
+					_self.scope[field.name] = fieldValue;
 				}
 
 			}
 		}
 
 		//The model data
-		_self.modelData = _modelData;
+		_self.data = _modelData;
 		resolve (_self);
 	}));
 

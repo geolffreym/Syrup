@@ -19,9 +19,9 @@ var WARNING_MODEL = {
 
 function Model () {
 	this.Http = new Http;
-	this.modelData = null;
-	this.modelFiles = null;
-	this.object = {};
+	this.data = null;
+	this.files = null;
+	this.scope = {};
 	this.type = 'POST';
 	this.model = null;
 	this.failed = null;
@@ -44,8 +44,8 @@ Model.add ('method', function (method) {
  */
 Model.add ('attach', function (name, attach) {
 	var self = this;
-	_.assert (self.modelData, WARNING_MODEL.ERROR.NOPACK, '(Model .attach)');
-	self.modelData.append (name, attach);
+	_.assert (self.data, WARNING_MODEL.ERROR.NOPACK, '(Model .attach)');
+	self.data.append (name, attach);
 	return this;
 });
 
@@ -55,7 +55,7 @@ Model.add ('attach', function (name, attach) {
  */
 Model.add ('multiple', function (name) {
 	var _return = [],
-		_model_obj = this.model.object ();
+		_model_obj = this.model.get (0);
 
 	if ( name in _model_obj.elements ) {
 		_.each (_model_obj.elements[name], function (v, i) {
@@ -86,17 +86,17 @@ Model.add ('fail', function (field, error) {
  * @return {object}*/
 Model.add ('send', function (url, data) {
 	var self = this;
-	if ( _.isObject (url) || _.isFormData (data) ) {
+	if ( _.isObject (url) || _.isFormData (url) ) {
 		data = url;
 		url = null;
 	}
 
-	if ( !_.isSet (data) && !_.isSet (self.modelData) )
+	if ( !_.isSet (data) && !_.isSet (self.data) )
 		_.error (WARNING_MODEL.ERROR.NOPACK, '(Model .send)');
 
 	var conf = {
 		url   : url || self.model.attr ('action'),
-		data  : data || self.modelData || self.modelFiles,
+		data  : data || self.data || self.files,
 		method: self.type
 	};
 
@@ -112,18 +112,18 @@ Model.add ('send', function (url, data) {
 });
 
 //Return object
-Model.add ('getObject', function () {
-	return this.object;
+Model.add ('getScope', function () {
+	return this.scope;
 });
 
 //Return formdata
 Model.add ('getData', function () {
-	return this.modelData;
+	return this.data;
 });
 
 //Return formdata
 Model.add ('getFiles', function () {
-	return this.modelFiles;
+	return this.files;
 });
 
 
@@ -134,7 +134,9 @@ Model.add ('getFiles', function () {
 Model.add ('file', function (input) {
 	var _self = this,
 		_formData = new FormData,
-		_files = [], _field = _$ (input).get (0);
+		_files = [], _field = !_.is$ (input)
+							  && _$ (input).get (0)
+							  || input;
 
 	return (new Promise (function (resolve, reject) {
 		if (
@@ -150,8 +152,8 @@ Model.add ('file', function (input) {
 			}
 		}
 
-		_self.object['_files'] = _files;
-		_self.modelFiles = _formData;
+		_self.scope['_files'] = _files;
+		_self.files = _formData;
 		resolve (_self);
 	}));
 
@@ -163,7 +165,9 @@ Model.add ('file', function (input) {
  * */
 Model.add ('files', function (model) {
 	var _self = this;
-	_self.model = _$ (model);
+	_self.model = !_.is$ (model)
+				  && _$ (model)
+				  || model;
 
 	return (new Promise (function (resolve, reject) {
 		_self.model.find ('input[type="file"]', function (field) {
@@ -178,7 +182,9 @@ Model.add ('files', function (model) {
  * @return {object}
  */
 Model.add ('pack', function (model) {
-	this.model = _$ (model);
+	this.model = !_.is$ (model)
+				 && _$ (model)
+				 || model;
 
 	var _self = this,
 		_modelData = new FormData,
@@ -192,8 +198,13 @@ Model.add ('pack', function (model) {
 		//Run over inputs
 		while ( x-- ) {
 
-			//Skip file type
-			if ( _fields[x].type === 'file' || !_fields[x] ) {
+			//Skip none type
+			if ( !_fields[x] )
+				continue;
+
+			//If file pack it
+			if ( _fields[x].type === 'file' ) {
+				_self.file (_fields[x]);
 				continue;
 			}
 
@@ -246,14 +257,14 @@ Model.add ('pack', function (model) {
 
 					//Append Data
 					_modelData.append (field.name, fieldValue);
-					_self.object[field.name] = fieldValue;
+					_self.scope[field.name] = fieldValue;
 				}
 
 			}
 		}
 
 		//The model data
-		_self.modelData = _modelData;
+		_self.data = _modelData;
 		resolve (_self);
 	}));
 

@@ -8,8 +8,7 @@ function Apps () {
 	this.lib = null;
 	this.app = null;
 	this.autoconf = null;
-	this.triggerAfter = {};
-	this.triggerBefore = {};
+	this.after = null;
 	this.scope = {};
 	this.modules = {};
 	this.onchange = {};
@@ -107,41 +106,30 @@ Apps.add ('_supplier', function () {
  * @param moduleId
  * @return void
  * **/
-Apps.add ('supply', function (callback) {
+Apps.add ('cook', function (callback) {
 	if ( _.isFunction (callback) )
 		this.autoconf = callback;
 	return this;
 });
 
-/**Trigger Helper
- * @param moduleList
- * @param callback
- * @param toList**/
-Apps.add ('_triggerOn', function (moduleList, callback, toList) {
-	if ( _.isArray (moduleList) && _.isFunction (callback) ) {
-		_.each (moduleList, function (moduleId) {
-			if ( !(moduleId in toList) )
-				toList[moduleId] = callback;
-		});
 
-	}
-	return this;
-});
-
-
-/**Add a custom trigger to execute before the given modules
+/**Global attributes supplier
  * @param moduleList
  * @callback*/
-Apps.add ('spice', function (moduleList, callback) {
-	return this._triggerOn (moduleList, callback, this.triggerBefore);
+Apps.add ('spice', function (object) {
+	if ( _.isObject (object) )
+		this.lib.make (object);
+	return this;
 });
 
 
 /**Add a custom trigger to execute after the given modules
  * @param moduleList
  * @callback*/
-Apps.add ('afters', function (moduleList, callback) {
-	return this._triggerOn (moduleList, callback, this.triggerAfter);
+Apps.add ('afters', function (callback) {
+	if ( _.isFunction (callback) )
+		this.after = callback;
+	return this;
 });
 
 /** Append global service
@@ -242,29 +230,25 @@ Apps.add ('_bindListener', function (moduleId) {
 
 			//Find events listeners
 			_mod.find (_the_filter, function (dom_list) {
-
 				//Find the listener in attributes
-				_.each ((_dom = dom_list.get ()).attributes,
-						function (v) {
-							if ( /sp-[a-z]+/.test (v.localName) ) {
-								var _event = _.replace (v.localName, 'sp-', _.emptyStr),
-									_attr = _dom.getAttribute (v.localName);
+				_.each ((_dom = dom_list.get ()).attributes, function (v) {
+					if ( /sp-[a-z]+/.test (v.localName) ) {
+						var _event = _.replace (v.localName, 'sp-', _.emptyStr),
+							_attr = _dom.getAttribute (v.localName);
 
-								//Is the attr value in module?
-								if ( _attr in _self ) {
-									//is Function the attr value?
-									if ( _.isFunction (_self[_attr]) ) {
-										_mod.listen (_event, '[' + v.localName + '="' + _attr + '"]', function (e) {
-											//Param event and dependencies
-											e.preventDefault ();
-											_self[_attr] (e, _this.lib.get (_self.parent));
-										});
-									}
-								}
+						//Is the attr value in module?
+						if ( _attr in _self ) {
+							//is Function the attr value?
+							if ( _.isFunction (_self[_attr]) ) {
+								_mod.listen (_event, '[' + v.localName + '="' + _attr + '"]', function (e) {
+									//Param event and dependencies
+									e.preventDefault ();
+									_self[_attr] (e, _this.lib.get (_self.parent));
+								});
 							}
 						}
-				)
-				;
+					}
+				});
 			});
 		}
 	}
@@ -340,7 +324,7 @@ Apps.add ('_taste', function (moduleId) {
 		_self.modules[moduleId].instance = _self._trigger (moduleId);
 		_self.modules[moduleId].instance.name = moduleId;
 		_self.modules[moduleId].instance.parent = _self.root;
-		//_self.modules[moduleId].instance.dom = _$ ('[sp-recipe="' + moduleId + '"]');
+		_self.modules[moduleId].instance.model = _$ ('[sp-recipe="' + moduleId + '"] [sp-model]');
 
 		//Binding Methods
 		_self.modules[moduleId].instance.setScope = function (object) {
@@ -376,16 +360,12 @@ Apps.add ('_taste', function (moduleId) {
 		//Init the module
 		if ( 'init' in _self.modules[moduleId].instance ) {
 
-			//Before execute
-			if ( moduleId in this.triggerBefore )
-				_self.triggerBefore[moduleId] (moduleId, this.lib.get (_self.root));
-
 			//Execution
 			_self.modules[moduleId].instance.init (this.lib.get (_self.root));
 
 			//After execute
-			if ( moduleId in _self.triggerAfter ) {
-				_self.triggerAfter[moduleId] (moduleId, this.lib.get (_self.root));
+			if ( _.isSet (_self.after) ) {
+				_self.after (this.lib.get (_self.root), moduleId);
 			}
 		}
 
