@@ -4544,6 +4544,7 @@ Apps.add ('_supplier', function () {
 		this.autoconf (_, this.lib.get (this.root));
 	return {}
 });
+
 /**Provide a global initial config
  * @param moduleId
  * @return void
@@ -4648,13 +4649,14 @@ Apps.add ('getScope', function (moduleId) {
  */
 Apps.add ('when', function (event, name) {
 	var self = this;
-	return event && ({
-						 change: ({
-							 then: (function (resolve) {
-								 self.onchange[name] = resolve;
-							 })
-						 })
-					 }[event] || { then: function () {} })
+	return event && (
+		{
+			change: ({
+				then: (function (resolve) {
+					self.onchange[name] = resolve;
+				})
+			})
+		}[event] || { then: function () {} })
 });
 
 /**Bind Listeners
