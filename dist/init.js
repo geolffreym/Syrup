@@ -4685,7 +4685,7 @@ Apps.add ('_bindListener', function (moduleId) {
 								_mod.listen (_event, '[' + v.localName + '="' + _attr + '"]', function (e) {
 									//Param event and dependencies
 									e.preventDefault ();
-									_self[_attr] (e, _this.lib.get (_self.parent));
+									_self[_attr] (_this.lib.get (_self.parent), e);
 								});
 							}
 						}
@@ -4722,7 +4722,7 @@ Apps.add ('_serve', function (moduleId, view) {
 					var view_name = view.split ('/').pop (),
 						view_dir = _.replace (view, '/' + view_name, _.emptyStr);
 
-					//Require th view if needed
+					//Require the view if needed
 					Require.lookup (['view/' + view_dir]).then (function () {
 						if ( view_name in _view.__proto__ )
 							_view[view_name] (_, _scope, function (my_html) {
@@ -4766,7 +4766,7 @@ Apps.add ('_taste', function (moduleId) {
 		_self.modules[moduleId].instance = _self._trigger (moduleId);
 		_self.modules[moduleId].instance.name = moduleId;
 		_self.modules[moduleId].instance.parent = _self.root;
-		_self.modules[moduleId].instance.model = _$ ('[sp-recipe="' + moduleId + '"] [sp-model]');
+		_self.modules[moduleId].instance.model = _$ ('[sp-recipe="' + moduleId + '"] [sp-submit]');
 
 		//Binding Methods
 		_self.modules[moduleId].instance.setScope = function (object) {
@@ -4793,9 +4793,10 @@ Apps.add ('_taste', function (moduleId) {
 			return this;
 		};
 
-		_self.modules[moduleId].instance.listen = function (event, delegate, callback) {
-			_$ ('[sp-recipe="' + moduleId + '"]').listen (event, delegate, callback);
-			return this;
+		_self.modules[moduleId].instance.listen = function (event, delegate) {
+			return new Promise (function (resolve) {
+				_$ ('[sp-recipe="' + moduleId + '"]').listen (event, delegate, resolve);
+			})
 		};
 
 

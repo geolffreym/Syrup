@@ -72,7 +72,7 @@
         my_App.recipe ('Hey.Do', function (_, _$, scope) {
             return {
                 init    : function ($) {},
-                redirect: function (e, $) {
+                redirect: function ($) {
 
                     //Redirect to "theNewRoute" with params { ':page': '3', ':user':'2' }
                     $.Router.redirect ('theNewRoute', { ':page': '3', ':user': '2' })

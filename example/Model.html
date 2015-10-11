@@ -16,7 +16,7 @@
     </a>
 
     <!-- The model -->
-    <form action="" sp-submit="process_form">
+    <form action="" sp-model sp-submit="process_form">
         <input type="text" name="firstName" placeholder="Name" data-min="2"/> <br/>
         <input type="text" name="lastName" placeholder="Last Name" data-min="2"/><br/>
         <input type="text" name="phone" placeholder="Phone Number"/><br/>
@@ -79,7 +79,7 @@
         //Recipes are declared as sp-recipe and is associated with the recipe's name
 
         //A new recipe for Hey
-        my_App.recipe ('Hey.You', function (_, _$, scope) {
+        my_App.recipe ('Hey.You', function (_, _$, gScope) {
             return {
 
                 /** @construct */
@@ -115,10 +115,11 @@
                         $.myConsole ('Done');
                     })
                 },
-                process_form: function (e, $) {
+                process_form: function ($) {
                     var _self = this;
+
                     //Pack the model, from source
-                    $.Model.pack (e.target).then (function (model) {
+                    $.Model.pack (this.model).then (function (model) {
                         _self.setScope ({ 'beatles': [model.scope] });
                     }).catch (function () {});
 
@@ -131,12 +132,12 @@
         });
 
         //A new recipe for Hey
-        my_App.recipe ('Hey.Do', function (_, _$, scope) {
+        my_App.recipe ('Hey.Do', function (_, _$, gScope) {
             return {
                 init   : function (tools) {
 
                 },
-                method : function (e, $) {
+                method : function ($) {
                     my_App.setScope ('Hey.You', {
                         'beatles': [
                             { "firstName": "John", "lastName": "Pasa" }
