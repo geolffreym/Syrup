@@ -8,7 +8,7 @@ View.add ('myView', function (_, data, onReadyCallback) {
 	//Hey/You in app/templates respects namespace
 	this.seekTpl ('Hey/You.html').then (function (view) {
 		//view.cleanCache();
-		view.render (view.getTpl (), data)
+		view.render (data)
 			.then (onReadyCallback);
 
 	});

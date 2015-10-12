@@ -10,6 +10,15 @@
  * @class
  */
 
+
+var WARNING_MODEL = {
+	ERROR: {
+		NOPACK      : 'Error packing model',
+		OBJECTNEEDED: 'Object need to set in model'
+	}
+};
+
+
 function View () {
 	this.Http = new Http;
 	this.Storage = new Storage;
@@ -91,7 +100,11 @@ View.add ('cleanCache', function () {
 
 //Parse the View
 View.add ('render', function (_template, _fields) {
+	var _self = this;
 	return (new Promise (function (resolve, reject) {
+		_fields = _.isObject (_template) && _template || _fields;
+		_template = !_.isObject (_template) && _.isString (_template) && _template || _self.tpl;
+
 		(new Workers).set ('/workers/setting/Parser').then (function (worker) {
 			worker.send ({ template: _template, fields: _fields });
 			worker.on ('message', function (e) {

@@ -4811,37 +4811,52 @@ Apps.add ('_taste', function (moduleId) {
 
 	if ( moduleId in _self.modules && _.isSet (_self.root) ) {
 
-		//Initialize module
+		// Initialize module
 		_self._add (moduleId);
 		_self.modules[moduleId].instance = _self._trigger (moduleId);
 		_self.modules[moduleId].instance.name = moduleId;
 		_self.modules[moduleId].instance.parent = _self.root;
 
-		//Binding Methods
-		_self.modules[moduleId].instance.setScope = function (object) {
-			if ( _.isObject (object) ) {
-				_self.setScope (moduleId, object);
+		// Binding Methods
+		// Set new scope
+		_self.modules[moduleId].instance.setScope = function (nModule, object) {
+			var _moduleId = !_.isObject (nModule)
+							&& _.isString (nModule) && nModule
+							|| moduleId,
+				_object = _.isObject (nModule) && nModule
+						  || object;
+
+			if ( _.isObject (_object) ) {
+				_self.setScope (_moduleId, _object);
 				return this;
 			}
 		};
 
-		_self.modules[moduleId].instance.getScope = function () {
-			return _self.getScope (moduleId);
+		// Get scope
+		_self.modules[moduleId].instance.getScope = function (nModule) {
+			var _moduleId = _.isString (nModule)
+				? nModule : moduleId;
+
+			return _self.getScope (_moduleId);
 		};
 
-		_self.modules[moduleId].instance.when = function (event) {
-			return _self.when (event, moduleId);
-		};
-
+		// Get recipe
 		_self.modules[moduleId].instance.getRecipe = function () {
 			return _self.getRecipe (moduleId);
 		};
 
-		_self.modules[moduleId].instance.serve = function (_view) {
+		// Event handler
+		_self.modules[moduleId].instance.when = function (event) {
+			return _self.when (event, moduleId);
+		};
+
+		// Render view
+		_self.modules[moduleId].instance.render = function (_view) {
 			_self._serve (moduleId, _view || null);
 			return this;
 		};
 
+		// Custom listener for recipe
 		_self.modules[moduleId].instance.listen = function (event, delegate) {
 			var _recipe = _$ ('[sp-recipe="' + moduleId + '"]');
 
@@ -5441,6 +5456,15 @@ Workers.add ('kill', function () {
  * @class
  */
 
+
+var WARNING_MODEL = {
+	ERROR: {
+		NOPACK      : 'Error packing model',
+		OBJECTNEEDED: 'Object need to set in model'
+	}
+};
+
+
 function View () {
 	this.Http = new Http;
 	this.Storage = new Storage;
@@ -5522,7 +5546,11 @@ View.add ('cleanCache', function () {
 
 //Parse the View
 View.add ('render', function (_template, _fields) {
+	var _self = this;
 	return (new Promise (function (resolve, reject) {
+		_fields = _.isObject (_template) && _template || _fields;
+		_template = !_.isObject (_template) && _.isString (_template) && _template || _self.tpl;
+
 		(new Workers).set ('/workers/setting/Parser').then (function (worker) {
 			worker.send ({ template: _template, fields: _fields });
 			worker.on ('message', function (e) {
