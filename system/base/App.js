@@ -261,7 +261,7 @@ Apps.add ('_models', function (moduleId) {
 			resource: _resource,
 			set     : function (obj) {
 				_model.set (_resource, obj);
-				return this;
+				return _self.modules[moduleId].instance;
 			},
 			send    : function () {
 				if ( _.getObjectSize (_model.scope) > 0 )
@@ -338,11 +338,18 @@ Apps.add ('_recipes', function (moduleId) {
 	// Render view
 	var _self = this;
 	_self.modules[moduleId].instance.recipe = {
-		get: function (nModule) {
+		get : function (nModule) {
 			var _moduleId = _.isString (nModule)
 				? nModule : moduleId;
 
 			return _self.getRecipe (_moduleId);
+		},
+		drop: function (nModule) {
+			var _moduleId = _.isString (nModule)
+				? nModule : moduleId;
+
+			_self.drop (_moduleId);
+			return _self.modules[moduleId].instance;
 		}
 	};
 });
