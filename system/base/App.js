@@ -4,14 +4,18 @@
 "use strict";
 
 function Apps () {
-	this.root = null;
-	this.lib = null;
-	this.app = null;
-	this.autoconf = null;
-	this.after = null;
-	this.scope = {};
-	this.modules = {};
-	this.onchange = {};
+	this.root = null; // Root name
+	this.lib = null; // Lib handler
+	this.app = null; // The main app
+
+	this.autoconf = null; // Initial auto conf
+	this.configured = false; // Auto conf executed?
+	this.after = null; // After recipes init execution
+
+	this.model = null; // The model
+	this.scope = {}; // Global scope
+	this.modules = {}; // Modules list
+	this.onchange = {}; // Change handler
 }
 
 /** Blend a method in global Syrup object
@@ -43,7 +47,12 @@ Apps.add ('recipe', function (moduleId, module) {
 				creator : module,
 				instance: null
 			};
-			this._supplier ();
+
+			//Not configured yet?
+			if ( !this.configured )
+				this._supplier ();
+
+			//Constructor
 			this._taste (moduleId);
 		}
 	}
@@ -97,9 +106,10 @@ Apps.add ('_trigger', function (moduleId) {
  * @return void
  * **/
 Apps.add ('_supplier', function () {
-	if ( (_.isSet (this.autoconf)) )
+	if ( (_.isSet (this.autoconf)) ) {
 		this.autoconf (_, this.lib.get (this.root));
-	return {}
+		this.configured = true;
+	}
 });
 
 /**Provide a global initial config
@@ -123,7 +133,7 @@ Apps.add ('spice', function (object) {
 });
 
 
-/**Add a custom trigger to execute after the given modules
+/**Add a custom trigger to execute after init
  * @param moduleList
  * @callback*/
 Apps.add ('afters', function (callback) {
@@ -254,9 +264,57 @@ Apps.add ('_bindListener', function (moduleId) {
 	}
 });
 
+/** Prepare Model
+ * @param moduleId
+ */
+Apps.add ('_resources', function (moduleId) {
+	var _self = this,
+		_model = new Model,
+		_resource = _$ ('[sp-recipe="' + moduleId + '"] [sp-model]');
+
+	//Exist the app and the model?
+	if ( this.app.exist && _resource.exist ) {
+		_self.modules[moduleId].instance.model = {
+			object  : _model,
+			resource: _resource,
+			set     : function (obj) {
+				_model.set (_resource, obj);
+				return this;
+			},
+			file    : function () {
+				return new Promise (function (resolve, reject) {
+					_model.files (_resource).then (function (e) {
+						//The files
+						resolve (e.scope._files);
+					})
+				});
+			},
+			send    : function () {
+				if ( _.getObjectSize (_model.scope) > 0 )
+					return _model.send ();
+			},
+			get     : function (item) {
+				return new Promise (function (resolve, reject) {
+					_model.get (_resource).then (function (e) {
+						if ( _.isSet (item) && item in e.scope ) {
+							//If filter item
+							resolve (e.scope[item]);
+						} else {
+							//Else all the scope
+							resolve (e.scope);
+						}
+					}).catch (reject);
+				});
+
+			}
+		}
+	}
+
+});
+
 /** Render the View
  * @param moduleId
- * @param template
+ * @param view
  * @return object
  */
 Apps.add ('_serve', function (moduleId, view) {
@@ -351,11 +409,20 @@ Apps.add ('_taste', function (moduleId) {
 		};
 
 		_self.modules[moduleId].instance.listen = function (event, delegate) {
-			return new Promise (function (resolve) {
-				_$ ('[sp-recipe="' + moduleId + '"]').listen (event, delegate, resolve);
+			var _recipe = _$ ('[sp-recipe="' + moduleId + '"]');
+
+			return new Promise (function (resolve, reject) {
+				if ( _recipe.exist ) {
+					_$ ('[sp-recipe="' + moduleId + '"]').listen (event, delegate, resolve);
+				} else {
+					reject (_recipe);
+				}
 			})
 		};
 
+
+		//Handle Model
+		_self._resources (moduleId);
 
 		//Init the module
 		if ( 'init' in _self.modules[moduleId].instance ) {

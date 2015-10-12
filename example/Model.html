@@ -16,7 +16,7 @@
     </a>
 
     <!-- The model -->
-    <form action="" sp-submit="process_form">
+    <form action="" sp-model>
         <input type="text" name="firstName" placeholder="Name" data-min="2"/> <br/>
         <input type="text" name="lastName" placeholder="Last Name" data-min="2"/><br/>
         <input type="text" name="phone" placeholder="Phone Number"/><br/>
@@ -68,7 +68,7 @@
     _$ (function () {
 
         //The App with dependencies
-        var my_App = App.blend ('Hey', ['Http', 'Model']);
+        var my_App = App.blend ('Hey', ['Http']);
 
         //A global service
         my_App.service ('myConsole', function (msg) {
@@ -83,7 +83,7 @@
             return {
 
                 /** @construct */
-                init        : function ($) {
+                init: function ($) {
                     var _self = this;
 
 
@@ -115,17 +115,15 @@
                         $.myConsole ('Done');
                     });
                 },
-                process_form: function ($, event) {
-                    var _self = this;
 
-                    //Pack the model, from source
-                    $.Model.pack (event.target).then (function (model) {
-                        _self.setScope ({ 'beatles': [model.scope] });
-                    }).catch (function () {});
-
-
+                the_method: function () {
+                    this.model.set ({
+                        'firstName': 'Pedro',
+                        'lastName' : 'Martinez'
+                    })
                 },
-                destroy     : function ($) {
+
+                destroy: function ($) {
                     alert ('destroyed?')
                 }
             }

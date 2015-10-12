@@ -1631,8 +1631,8 @@
 	});
 
 	/**Busca un elemento en un arreglo por RegExp
-	 * @param find
-	 * @param haystack
+	 * @param {String} find
+	 * @param {Array} haystack
 	 * @returns {boolean}
 	 */
 	Syrup.add ('matchInArray', function (find, haystack) {
@@ -1641,8 +1641,8 @@
 	});
 
 	/**Crea un arreglo unico de valores
-	 * @param object
-	 * @returns Array
+	 * @param {Object} array
+	 * @returns {Array}
 	 */
 	Syrup.add ('uniqueArray', function (array) {
 		var _new = [];

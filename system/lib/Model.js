@@ -13,14 +13,15 @@
 
 var WARNING_MODEL = {
 	ERROR: {
-		NOPACK: 'Error packing model'
+		NOPACK      : 'Error packing model',
+		OBJECTNEEDED: 'Object need to set in model'
 	}
 };
 
 function Model () {
 	this.Http = new Http;
 	this.data = null;
-	this.files = null;
+	this.blob = null;
 	this.scope = {};
 	this.type = 'POST';
 	this.model = null;
@@ -91,12 +92,12 @@ Model.add ('send', function (url, data) {
 		url = null;
 	}
 
-	if ( !_.isSet (data) && !_.isSet (self.data) )
+	if ( !_.isSet (data) && !_.isSet (self.data) && !_.isSet (self.blob) )
 		_.error (WARNING_MODEL.ERROR.NOPACK, '(Model .send)');
 
 	var conf = {
-		url   : url || self.model.attr ('action'),
-		data  : data || self.data || self.files,
+		url   : url || self.model.attr ('action') || location.pathname,
+		data  : data || self.data || self.blob,
 		method: self.type
 	};
 
@@ -123,7 +124,7 @@ Model.add ('getData', function () {
 
 //Return formdata
 Model.add ('getFiles', function () {
-	return this.files;
+	return this.blob;
 });
 
 
@@ -153,7 +154,7 @@ Model.add ('file', function (input) {
 		}
 
 		_self.scope['_files'] = _files;
-		_self.files = _formData;
+		_self.blob = _formData;
 		resolve (_self);
 	}));
 
@@ -177,11 +178,34 @@ Model.add ('files', function (model) {
 
 });
 
+/**Set data to inputs from Object
+ * @param {object|string } model
+ * @return {void}
+ */
+Model.add ('set', function (model, object) {
+
+	if ( !_.isObject (object) )
+		_.error (WARNING_MODEL.ERROR.OBJECTNEEDED, '(Model .set)');
+
+	var _self = this;
+	_self.model = !_.is$ (model)
+				  && _$ (model)
+				  || model;
+
+	// For each input fill with data
+	_.each (object, function (v, i) {
+		_self.model.find ('input[name=' + i + ']', function (e) {
+			e.val (v);
+		})
+	})
+
+});
+
 /**Pack the inputs in ModelData Object
  * @param {object|string } model
  * @return {object}
  */
-Model.add ('pack', function (model) {
+Model.add ('get', function (model) {
 	this.model = !_.is$ (model)
 				 && _$ (model)
 				 || model;
