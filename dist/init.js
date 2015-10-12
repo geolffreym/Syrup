@@ -4449,9 +4449,6 @@ function Apps () {
 	this.root = null; // Root name
 	this.lib = null; // Lib handler
 	this.app = null; // The main app
-
-	this.autoconf = null; // Initial auto conf
-	this.configured = false; // Auto conf executed?
 	this.after = null; // After recipes init execution
 
 	this.model = null; // The model
@@ -4489,10 +4486,6 @@ Apps.add ('recipe', function (moduleId, module) {
 				creator : module,
 				instance: null
 			};
-
-			//Not configured yet?
-			if ( !this.configured )
-				this._supplier ();
 
 			//Constructor
 			this._taste (moduleId);
@@ -4543,24 +4536,13 @@ Apps.add ('_trigger', function (moduleId) {
 	return {}
 });
 
-/**Trigger autoconf execution
- * @param moduleId
- * @return void
- * **/
-Apps.add ('_supplier', function () {
-	if ( (_.isSet (this.autoconf)) ) {
-		this.autoconf (_, this.lib.get (this.root));
-		this.configured = true;
-	}
-});
-
 /**Provide a global initial config
  * @param moduleId
  * @return void
  * **/
 Apps.add ('cook', function (callback) {
 	if ( _.isFunction (callback) )
-		this.autoconf = callback;
+		callback (this.lib.get (this.root), _);
 	return this;
 });
 
