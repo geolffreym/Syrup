@@ -4709,7 +4709,7 @@ Apps.add ('_bindListener', function (moduleId) {
 /** Prepare Model
  * @param moduleId
  */
-Apps.add ('_resources', function (moduleId) {
+Apps.add ('_models', function (moduleId) {
 	var _self = this,
 		_model = new Model,
 		_resource = _$ ('[sp-recipe="' + moduleId + '"] [sp-model]');
@@ -4761,7 +4761,7 @@ Apps.add ('_views', function (moduleId) {
 	};
 });
 
-/**Prepare Views
+/**Prepare Scopes
  * @param moduleId
  * */
 
@@ -4790,6 +4790,22 @@ Apps.add ('_scopes', function (moduleId) {
 	};
 });
 
+
+/**Prepare Recipes
+ * @param moduleId
+ * */
+Apps.add ('_recipes', function (moduleId) {
+	// Render view
+	var _self = this;
+	_self.modules[moduleId].instance.recipe = {
+		get: function (nModule) {
+			var _moduleId = _.isString (nModule)
+				? nModule : moduleId;
+
+			return _self.getRecipe (_moduleId);
+		}
+	};
+});
 
 /** Render the View
  * @param moduleId
@@ -4863,12 +4879,6 @@ Apps.add ('_taste', function (moduleId) {
 		_self.modules[moduleId].instance.parent = _self.root;
 
 		// Binding Methods
-
-		// Get recipe
-		_self.modules[moduleId].instance.getRecipe = function () {
-			return _self.getRecipe (moduleId);
-		};
-
 		// Event handler
 		_self.modules[moduleId].instance.when = function (event) {
 			return _self.when (event, moduleId);
@@ -4888,10 +4898,13 @@ Apps.add ('_taste', function (moduleId) {
 		};
 
 		//Scoping
+		_self._recipes (moduleId);
+
+		//Scoping
 		_self._scopes (moduleId);
 
 		//Handle Model
-		_self._resources (moduleId);
+		_self._models (moduleId);
 
 		//Handle Views
 		_self._views (moduleId);

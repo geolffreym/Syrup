@@ -105,7 +105,6 @@
                         ]
                     }).view.render ();
 
-
                     //When Hey.You scope change
                     this.when ('change').then (function (changes) {
                         // Render new data using the inline template
@@ -122,7 +121,8 @@
                 },
 
                 the_method: function () {
-                    console.log(this.scope.get())
+                    console.log(this.recipe.get());
+                    console.log(this.scope.get());
                 },
 
                 destroy: function ($) {
