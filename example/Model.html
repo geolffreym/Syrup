@@ -90,15 +90,20 @@
                     //$ has dependencies object
                     // $ = {Http: HttpObject}
 
+                    this.model.set ({
+                        'firstName': 'Pedro',
+                        'lastName' : 'Martinez'
+                    });
+
                     //The context in template as scope
-                    this.setScope ({
+                    this.scope.set ({
                         'beatles': [
                             { "firstName": "John", "lastName": "Lennon" },
                             { "firstName": "Paul", "lastName": "McCartney" },
                             { "firstName": "George", "lastName": "Harrison" },
                             { "firstName": "Ringo", "lastName": "Starr" }
                         ]
-                    }).render ();
+                    }).view.render ();
 
 
                     //When Hey.You scope change
@@ -108,7 +113,7 @@
                         // If you set "Hey/You" "/app/view/Hey/You.js" view is used
                         // Lousing Coupling( The main dir -> "Hey" , The File -> "You", The view name -> "myView")
 
-                        _self.render ('Hey/You/myView');
+                        _self.view.render ('Hey/You/myView');
                         //_self.render ();
 
                         // The global service in tools
@@ -117,10 +122,7 @@
                 },
 
                 the_method: function () {
-                    this.model.set ({
-                        'firstName': 'Pedro',
-                        'lastName' : 'Martinez'
-                    })
+                    console.log(this.scope.get())
                 },
 
                 destroy: function ($) {
@@ -136,7 +138,7 @@
 
                 },
                 method : function ($) {
-                    this.setScope ('Hey.You', {
+                    this.scope.set ('Hey.You', {
                         'beatles': [
                             { "firstName": "John", "lastName": "Pasa" }
                         ]

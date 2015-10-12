@@ -304,6 +304,51 @@ Apps.add ('_resources', function (moduleId) {
 
 });
 
+/**Prepare Views
+ * @param moduleId
+ * */
+
+Apps.add ('_views', function (moduleId) {
+	// Render view
+	var _self = this;
+	_self.modules[moduleId].instance.view = {
+		render: function (_view) {
+			_self._serve (moduleId, _view || null);
+			return _self.modules[moduleId].instance;
+		}
+	};
+});
+
+/**Prepare Views
+ * @param moduleId
+ * */
+
+Apps.add ('_scopes', function (moduleId) {
+	// Render view
+	var _self = this;
+	_self.modules[moduleId].instance.scope = {
+		set: function (nModule, object) {
+			var _moduleId = !_.isObject (nModule)
+							&& _.isString (nModule) && nModule
+							|| moduleId,
+				_object = _.isObject (nModule) && nModule
+						  || object;
+
+			if ( _.isObject (_object) ) {
+				_self.setScope (_moduleId, _object);
+				return _self.modules[moduleId].instance;
+			}
+		},
+		get: function (nModule) {
+			var _moduleId = _.isString (nModule)
+				? nModule : moduleId;
+
+			return _self.getScope (_moduleId);
+		}
+	};
+});
+
+
 /** Render the View
  * @param moduleId
  * @param view
@@ -376,27 +421,6 @@ Apps.add ('_taste', function (moduleId) {
 		_self.modules[moduleId].instance.parent = _self.root;
 
 		// Binding Methods
-		// Set new scope
-		_self.modules[moduleId].instance.setScope = function (nModule, object) {
-			var _moduleId = !_.isObject (nModule)
-							&& _.isString (nModule) && nModule
-							|| moduleId,
-				_object = _.isObject (nModule) && nModule
-						  || object;
-
-			if ( _.isObject (_object) ) {
-				_self.setScope (_moduleId, _object);
-				return this;
-			}
-		};
-
-		// Get scope
-		_self.modules[moduleId].instance.getScope = function (nModule) {
-			var _moduleId = _.isString (nModule)
-				? nModule : moduleId;
-
-			return _self.getScope (_moduleId);
-		};
 
 		// Get recipe
 		_self.modules[moduleId].instance.getRecipe = function () {
@@ -406,12 +430,6 @@ Apps.add ('_taste', function (moduleId) {
 		// Event handler
 		_self.modules[moduleId].instance.when = function (event) {
 			return _self.when (event, moduleId);
-		};
-
-		// Render view
-		_self.modules[moduleId].instance.render = function (_view) {
-			_self._serve (moduleId, _view || null);
-			return this;
 		};
 
 		// Custom listener for recipe
@@ -427,9 +445,14 @@ Apps.add ('_taste', function (moduleId) {
 			})
 		};
 
+		//Scoping
+		_self._scopes (moduleId);
 
 		//Handle Model
 		_self._resources (moduleId);
+
+		//Handle Views
+		_self._views (moduleId);
 
 		//Init the module
 		if ( 'init' in _self.modules[moduleId].instance ) {
