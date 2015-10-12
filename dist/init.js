@@ -4723,14 +4723,6 @@ Apps.add ('_resources', function (moduleId) {
 				_model.set (_resource, obj);
 				return this;
 			},
-			file    : function () {
-				return new Promise (function (resolve, reject) {
-					_model.files (_resource).then (function (e) {
-						//The files
-						resolve (e.scope._files);
-					})
-				});
-			},
 			send    : function () {
 				if ( _.getObjectSize (_model.scope) > 0 )
 					return _model.send ();
