@@ -4847,7 +4847,7 @@ Apps.add ('_taste', function (moduleId) {
 
 			return new Promise (function (resolve, reject) {
 				if ( _recipe.exist ) {
-					_$ ('[sp-recipe="' + moduleId + '"]').listen (event, delegate, resolve);
+					_recipe.listen (event, delegate, resolve);
 				} else {
 					reject (_recipe);
 				}
