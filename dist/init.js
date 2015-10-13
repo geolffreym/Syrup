@@ -6328,7 +6328,7 @@ GoogleMap = function () {
 	/**Rutas*/
 	_proto.drawRoute = function (config, callback) {
 		var self = this;
-		if ( self.coordsCollection.length == 0 ) {
+		if ( _.isEmpty (self.coordsCollection) ) {
 			self.error (WARNING_GOOGLE_MAP.ERROR.NOROUTES);
 		}
 
