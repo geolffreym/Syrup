@@ -2140,7 +2140,7 @@
 		}));
 	});
 
-	//The global object Require
+	//Global access
 	window.Require = new Required;
 	Require.setConf ();
 
