@@ -1038,9 +1038,12 @@
 	 * @returns {boolean}
 	 */
 	Syrup.add ('isEmpty', function (input) {
-		if ( _.isArray (input) ) {
+		if ( _.isObject (input) )
+			return _.getObjectSize (input) == 0;
+
+		if ( _.isArray (input) )
 			return input.length === 0;
-		}
+
 
 		return (
 			!input || input === _.emptyStr || /^\s+$/.test (input)
