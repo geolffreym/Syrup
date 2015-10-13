@@ -1,6 +1,6 @@
 {
   "name": "syrup",
-  "description": "App with sweet flavor. Simple MVC | MTV frameworks",
+  "description": "App with sweet flavor.",
   "main": [
     "dist/init.min.js"
   ],
