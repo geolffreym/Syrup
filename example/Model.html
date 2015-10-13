@@ -79,7 +79,7 @@
         //Recipes are declared as sp-recipe and is associated with the recipe's name
 
         //A new recipe for Hey
-        my_App.recipe ('Hey.You', function (_, _$, gScope) {
+        my_App.recipe ('Hey.You', function (_, gScope) {
             return {
 
                 /** @construct */
@@ -121,8 +121,13 @@
                 },
 
                 the_method: function () {
-                    console.log(this.recipe.get());
-                    console.log(this.scope.get());
+                    this.model.get ([]).then (function (e) {
+                        console.log(e)
+                    });
+                },
+
+                after: function () {
+                    console.log ('yeah')
                 },
 
                 destroy: function ($) {
@@ -132,7 +137,7 @@
         });
 
         //A new recipe for Hey
-        my_App.recipe ('Hey.Do', function (_, _$, gScope) {
+        my_App.recipe ('Hey.Do', function (_, gScope) {
             return {
                 init   : function (tools) {
 

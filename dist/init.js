@@ -4511,6 +4511,7 @@ Apps.add ('_watch', function (moduleId) {
 					type  : v.type,
 					object: v.object[v.name]
 				});
+				return false;
 			}
 		});
 	});
@@ -4532,7 +4533,7 @@ Apps.add ('_add', function (moduleId) {
  * **/
 Apps.add ('_trigger', function (moduleId) {
 	if ( moduleId in this.modules )
-		return this.modules[moduleId].creator (_, _$, this.scope);
+		return this.modules[moduleId].creator (_, this.scope);
 	return {}
 });
 
@@ -4712,9 +4713,19 @@ Apps.add ('_models', function (moduleId) {
 			get     : function (item) {
 				return new Promise (function (resolve, reject) {
 					_model.get (_resource).then (function (e) {
-						if ( _.isSet (item) && item in e.scope ) {
+						if (
+							_.isSet (item)
+							&& _.isArray (item)
+							&& !_.isEmpty (item)
+						) {
+							var _result = {};
+							_.each (item, function (v, i) {
+								if ( v in e.scope )
+									_result[v] = e.scope[v];
+							});
 							//If filter item
-							resolve (e.scope[item]);
+							resolve (_result);
+
 						} else {
 							//Else all the scope
 							resolve (e.scope);
@@ -4780,6 +4791,7 @@ Apps.add ('_recipes', function (moduleId) {
 	// Render view
 	var _self = this;
 	_self.modules[moduleId].instance.recipe = {
+		$   : _$ ('[sp-recipe="' + moduleId + '"]'),
 		get : function (nModule) {
 			var _moduleId = _.isString (nModule)
 				? nModule : moduleId;
@@ -4899,7 +4911,10 @@ Apps.add ('_taste', function (moduleId) {
 		_self._views (moduleId);
 
 		//Init the module
-		if ( 'init' in _self.modules[moduleId].instance ) {
+		if (
+			'init' in _self.modules[moduleId].instance
+			&& _.isFunction (_self.modules[moduleId].instance.init)
+		) {
 
 			//Execution
 			_self.modules[moduleId].instance.init (this.lib.get (_self.root));
@@ -4908,6 +4923,13 @@ Apps.add ('_taste', function (moduleId) {
 			if ( _.isSet (_self.after) ) {
 				_self.after (this.lib.get (_self.root), moduleId);
 			}
+
+			//Individual after execution
+			if (
+				'after' in _self.modules[moduleId].instance
+				&& _.isFunction (_self.modules[moduleId].instance.after)
+			)
+				_self.modules[moduleId].instance.after (this.lib.get (_self.root));
 		}
 
 		// Bind listeners
