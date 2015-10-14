@@ -138,10 +138,13 @@ var my_selector = _$('#selector');
 var my_selector = _$('.selector+'); //Get all .selector in DOM
 ```
 
-*You also have the option of creating plugins using the object context using Syrup Core.*
+Open Closing
+--------
+*Open to extension, closed for modification*
 
 **Attribute `.$fn` in Syrup**
 
+*You also have the option of creating plugins using the object context using Syrup Core.*
 *(Create a simple plugin)*
 ```js
 
