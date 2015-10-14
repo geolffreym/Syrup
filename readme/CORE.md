@@ -155,7 +155,7 @@ Open Closing
 _.$fn.add('hideOrShowAllPTags', function(params){
 
     //Reference to object
-    //For each element
+    //For each element 'a'
     
     this.each(function(v){
         _$(v).listen('hover', function(e){
