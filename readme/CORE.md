@@ -138,8 +138,40 @@ var my_selector = _$('.selector+'); //Get all .selector in DOM
 ```
     
 *You can try many possibilities to find and get dom elements*
+*You also have the option of creating plugins using the object context using Syrup Core.*
 
-*Now we can use it.*
+**Attribute `.$fn` in `_`**
+
+*(Create a simple plugin)*
+```js
+
+//My Plugin
+
+_.$fn.add('hideOrShowAllPTags', function(params){
+
+    //Reference to object
+    //For each element
+    
+    this.each(function(v){
+        _$(v).listen('hover', function(e){
+            if (params.hide){
+                _$('p').hide();
+            } else {
+                _$('p').show();
+            }     
+        })
+    });
+    
+});
+
+
+//Usage
+_$('a').hideAllPTags({'hide':true})
+
+```
+
+Chaining
+--------
 
 **Attribute `exist`**
 
@@ -787,7 +819,7 @@ my_selector.listen('click', function(e){
 })
 ```
 
-**Method `.unlisten(event)`**
+**Method `.listenOff(event)`**
 
 *(Remove event listener to object)*
 ```js
@@ -801,7 +833,7 @@ body.listen('click',  function(e){
 })
 
 //Remove Event assign
-body.unlisten('click')
+body.listenOff('click')
 ```
     
 Helpers
@@ -1382,13 +1414,4 @@ _.getScript('//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js', funct
  _$('body').listen('click','#startRender', function(){
         _.requestAnimationFrame(render);
  })
-```
-
-**Method `.getScript(url, callback)`**
-
-*(Get local or remote script.)*
-```js    
-_.getScript('//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js', function(){
-    //Script ready
-});
 ```

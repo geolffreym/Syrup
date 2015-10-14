@@ -478,9 +478,9 @@
 				_self.modules[moduleId].instance.init (this.lib.get (_self.root));
 
 				//After execute
-				if ( _.isSet (_self.after) ) {
+				if ( _.isSet (_self.after) )
 					_self.after (this.lib.get (_self.root), moduleId);
-				}
+
 
 				//Individual after execution
 				if (

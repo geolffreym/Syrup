@@ -131,13 +131,6 @@
 		return _self;
 	});
 
-	/***Add fn to object
-	 * @param callback
-	 */
-	_$_.add ('fn', function (name, fn) {
-		return this.__proto__[name] = fn;
-	});
-
 	/***Event Handler
 	 * @param callback
 	 */
@@ -211,7 +204,7 @@
 	 * @param callback
 	 * @return object
 	 */
-	_$_.add ('unlisten', function (event) {
+	_$_.add ('listenOff', function (event) {
 		return this.each (function (elem) {
 
 			if ( _.isSet (elem.listListener) ) {
@@ -1776,7 +1769,13 @@
 		return new Syrup ();
 	}) ();
 
-	_.VERSION = '1.2.2';
+	windowGlobal._$ = (function () {
+		return (
+			new _$_ ()
+		).$;
+	}) ();
+
+	_.VERSION = '1.0.0';
 	_.$fn = _$_;
 	_.emptyStr = '';
 	_.Syrup = Syrup;
@@ -1796,10 +1795,6 @@
 	_.nav.online = windowGlobal.navigator.onLine;
 	_.nav.local = windowGlobal.navigator.userAgent.toLowerCase ();
 
-	windowGlobal._$ = (function () {
-		return (
-			new _$_ ()
-		).$;
-	}) ();
+
 
 }) (window);

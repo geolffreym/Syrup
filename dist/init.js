@@ -149,13 +149,6 @@ if ( typeof exports !== 'undefined' )
 		return _self;
 	});
 
-	/***Add fn to object
-	 * @param callback
-	 */
-	_$_.add ('fn', function (name, fn) {
-		return this.__proto__[name] = fn;
-	});
-
 	/***Event Handler
 	 * @param callback
 	 */
@@ -229,7 +222,7 @@ if ( typeof exports !== 'undefined' )
 	 * @param callback
 	 * @return object
 	 */
-	_$_.add ('unlisten', function (event) {
+	_$_.add ('listenOff', function (event) {
 		return this.each (function (elem) {
 
 			if ( _.isSet (elem.listListener) ) {
@@ -1794,7 +1787,13 @@ if ( typeof exports !== 'undefined' )
 		return new Syrup ();
 	}) ();
 
-	_.VERSION = '1.2.2';
+	windowGlobal._$ = (function () {
+		return (
+			new _$_ ()
+		).$;
+	}) ();
+
+	_.VERSION = '1.0.0';
 	_.$fn = _$_;
 	_.emptyStr = '';
 	_.Syrup = Syrup;
@@ -1814,11 +1813,7 @@ if ( typeof exports !== 'undefined' )
 	_.nav.online = windowGlobal.navigator.onLine;
 	_.nav.local = windowGlobal.navigator.userAgent.toLowerCase ();
 
-	windowGlobal._$ = (function () {
-		return (
-			new _$_ ()
-		).$;
-	}) ();
+
 
 }) (window);
 /*
@@ -4337,7 +4332,7 @@ if ( !Object.observe ) {
 		}));
 	});
 
-	//The global object Require
+	//Global access
 	window.Require = new Required;
 	Require.setConf ();
 
@@ -4926,9 +4921,9 @@ if ( !Object.observe ) {
 				_self.modules[moduleId].instance.init (this.lib.get (_self.root));
 
 				//After execute
-				if ( _.isSet (_self.after) ) {
+				if ( _.isSet (_self.after) )
 					_self.after (this.lib.get (_self.root), moduleId);
-				}
+
 
 				//Individual after execution
 				if (
