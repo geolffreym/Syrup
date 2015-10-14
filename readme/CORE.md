@@ -125,6 +125,8 @@ var S = _.noConflict(),
 
 *This method helps you find Nodes objects and generate dom object*
 
+*You can try many possibilities to find and get dom elements*
+
 ```js
 var my_selector = _$('<div>');
 var my_selector = _$('*+'); // All the dom nodes ^_^
@@ -136,11 +138,10 @@ var my_selector = _$('#selector');
 //Example Selector All:
 var my_selector = _$('.selector+'); //Get all .selector in DOM
 ```
-    
-*You can try many possibilities to find and get dom elements*
+
 *You also have the option of creating plugins using the object context using Syrup Core.*
 
-**Attribute `.$fn` in `_`**
+**Attribute `.$fn` in Syrup**
 
 *(Create a simple plugin)*
 ```js
