@@ -124,7 +124,6 @@ var S = _.noConflict(),
 **Creating a Dom object**
 
 *This method helps you find Nodes objects and generate dom object*
-
 *You can try many possibilities to find and get dom elements*
 
 ```js
