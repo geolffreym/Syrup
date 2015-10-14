@@ -483,11 +483,11 @@
 
 
 				//Individual after execution
-				if (
-					'after' in _self.modules[moduleId].instance
-					&& _.isFunction (_self.modules[moduleId].instance.after)
-				)
-					_self.modules[moduleId].instance.after (this.lib.get (_self.root));
+				//if (
+				//	'after' in _self.modules[moduleId].instance
+				//	&& _.isFunction (_self.modules[moduleId].instance.after)
+				//)
+				//	_self.modules[moduleId].instance.after (this.lib.get (_self.root));
 			}
 
 			// Bind listeners
