@@ -123,10 +123,12 @@ var S = _.noConflict(),
 
 **Creating a Dom object**
 
-*This method helps you find Nodes objects and generate dom object*
-*You can try many possibilities to find and get dom elements*
+*This method helps you find Nodes objects and generate dom object.*
 
 ```js
+
+//You can try many possibilities to find and get dom elements
+
 var my_selector = _$('<div>');
 var my_selector = _$('*+'); // All the dom nodes ^_^
 var my_selector = _$('.selector');
@@ -145,7 +147,7 @@ Open Closing
 **Attribute `.$fn` in Syrup**
 
 *You also have the option of creating plugins using the object context using Syrup Core.*
-*(Create a simple plugin)*
+
 ```js
 
 //My Plugin
