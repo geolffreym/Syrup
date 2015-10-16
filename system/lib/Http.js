@@ -26,7 +26,7 @@
 	Http.add ('request', function (url, data) {
 		var _self = this,
 			_query = _.emptyStr,
-			_data = data || false;
+			_data = data || null;
 
 		//Make global conf
 		_self.config = {
@@ -52,13 +52,14 @@
 			//parse Object to querystring
 			if ( !_.isFormData (_data)
 				 && _.isObject (_data)
+				 && _.getObjectSize (_data) > 0
 			) {
 				_data = _.jsonToQueryString (_data);
 			}
 
 			//If method is GET and data exists
 			if ( _self.config.method === 'GET'
-				 && _.isSet (_data)
+				 && _.isString (_data)
 			) {
 				_query += '?' + _data;
 			}
@@ -96,6 +97,9 @@
 						_response = JSON.parse (_response);
 					}
 					resolve (_response);
+
+					//Find a interceptor for success
+					_self._handleInterceptor ('success', _response);
 				}
 			});
 
@@ -135,8 +139,10 @@
 
 			_self.xhr.addEventListener ('error', function (e) {
 				reject (e);
-			});
 
+				//Find a interceptor for success
+				_self._handleInterceptor ('error', e);
+			});
 
 			//Send
 			_self.xhr_list.push (_self.xhr);
@@ -150,17 +156,20 @@
 	 * @param {object} param
 	 * */
 	Http.add ('_handleInterceptor', function (type, param) {
-		var _self = this;
+		var _self = this,
+			_interceptor = MiddleWare.getInterceptors (_self, type);
 
 		//Find a interceptor for request
-		_.each (MiddleWare.getInterceptors (_self, type),
-				function (v, k) {
-					// Process the interceptor
-					v (param, _self);
-				}, true);
+		if ( _interceptor.length > 0 ) {
+			_.each (_interceptor,
+					function (v, k) {
+						// Process the interceptor
+						v (param, _self);
+					}, true);
 
-		//Clean the interceptor
-		MiddleWare.cleanInterceptor (_self, type);
+			//Clean the interceptor
+			MiddleWare.cleanInterceptor (_self, type);
+		}
 
 	});
 
@@ -171,7 +180,7 @@
 	 * */
 	Http.add ('get', function (url, data) {
 		this.kill ();
-		return this.request (url, data || {});
+		return this.request (url, data);
 	});
 
 
@@ -190,7 +199,7 @@
 		});
 
 		this.kill ();
-		return this.request (url, data || {});
+		return this.request (url, data);
 	});
 
 
@@ -210,7 +219,7 @@
 
 
 		this.kill ();
-		return this.request (url, data || {});
+		return this.request (url, data);
 	});
 
 
@@ -229,7 +238,7 @@
 		});
 
 		this.kill ();
-		return this.request (url, data || {});
+		return this.request (url, data);
 	});
 
 

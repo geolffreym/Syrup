@@ -105,24 +105,33 @@
 			if ( self.failed )
 				reject (data);
 
-			self.Http.kill ();
-			self.Http.request (conf).then (function (response) {
+			//The middleware
+			MiddleWare.intercept (self.Http, {
+				request: function (config) {
+					config.method = conf.method;
+				}
+			});
+
+			//The request
+			self.Http.kill ()
+				.request (conf.url, conf.data)
+				.then (function (response) {
 				resolve (response);
 			}).catch (reject);
 		}))
 	});
 
-//Return object
+	//Return object
 	Model.add ('getScope', function () {
 		return this.scope;
 	});
 
-//Return formdata
+	//Return formdata
 	Model.add ('getData', function () {
 		return this.data;
 	});
 
-//Return formdata
+	//Return formdata
 	Model.add ('getFiles', function () {
 		return this.blob;
 	});

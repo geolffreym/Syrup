@@ -31,16 +31,13 @@
         MAX: 3
     }).cook (function ($) {
 
-        //The interceptor
-        MiddleWare.intercept ($.Http, {
-            request: function (config, xhr) {
-                config.headers['X-Auth-Token'] = '123456';
-            }
-        });
+
 
         //The request
-        $.Http.post ('/').then (function () {
+        $.Http.post('/',{a:3}).then (function () {
 
+        }).catch(function(e){
+            console.log(e)
         });
 
         //Before execution what to do?

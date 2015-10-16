@@ -50,7 +50,8 @@
 		if ( _.isArray (dependencies) && _.isSet (_self.object) ) {
 			_.each (dependencies, function (v) {
 				_self.object.__proto__[v] = !(v in _self.object)
-					? ( _[v] || new window[v]) : _self.object[v];
+					? ( _[v] || _.isFunction (window[v]) && new window[v])
+					: _self.object[v];
 			})
 		}
 	});

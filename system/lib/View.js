@@ -24,12 +24,16 @@
 	 * @return {object}
 	 */
 	View.add ('lookup', function (template) {
-		var _conf = {
-			url        : setting.app_path + '/templates/' + template,
-			contentType: 'text/plain'
-		};
+		//MiddleWare
+		MiddleWare.intercept (this.Http, {
+			request: function (config) {
+				config.headers['Content-Type'] = 'text/plain';
+			}
+		});
 
-		return this.Http.request (_conf);
+		return this.Http.request (
+			setting.app_path + '/templates/' + template
+		);
 	});
 
 	//Set the template

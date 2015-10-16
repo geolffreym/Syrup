@@ -24,11 +24,9 @@
             my_Lib.supply ({
                 sayHi: function () {
                     console.log ('Hey i\'m ' + this.user);
-
                     //Http in dependencies
                     _.warning ('Calling Http');
                     console.log (this.Http);
-
                     //myTestLib dependencies
                     _.warning ('Calling myTestLib');
                     console.log (this.myTestLib);

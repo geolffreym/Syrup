@@ -6,6 +6,8 @@
 View.add ('myView', function (_, data, onReadyCallback) {
 	//The template as relative path of config app_path
 	//Hey/You in app/templates respects namespace
+
+	this.clear()
 	this.seekTpl ('Hey/You.html').then (function (view) {
 		//view.cleanCache();
 		view.render (data)

@@ -1085,6 +1085,7 @@
 	 */
 	Syrup.add ('warning', function (msg, breakpoint) {
 		console.log (
+			(msg) +
 			(breakpoint ? ' | Method: ' + breakpoint : _.emptyStr)
 		);
 	});

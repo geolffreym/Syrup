@@ -1103,6 +1103,7 @@ if ( typeof exports !== 'undefined' )
 	 */
 	Syrup.add ('warning', function (msg, breakpoint) {
 		console.log (
+			(msg) +
 			(breakpoint ? ' | Method: ' + breakpoint : _.emptyStr)
 		);
 	});
@@ -4484,7 +4485,8 @@ if ( !Object.observe ) {
 		if ( _.isArray (dependencies) && _.isSet (_self.object) ) {
 			_.each (dependencies, function (v) {
 				_self.object.__proto__[v] = !(v in _self.object)
-					? ( _[v] || new window[v]) : _self.object[v];
+					? ( _[v] || _.isFunction (window[v]) && new window[v])
+					: _self.object[v];
 			})
 		}
 	});
@@ -5096,7 +5098,7 @@ if ( !Object.observe ) {
 	Http.add ('request', function (url, data) {
 		var _self = this,
 			_query = _.emptyStr,
-			_data = data || false;
+			_data = data || null;
 
 		//Make global conf
 		_self.config = {
@@ -5122,13 +5124,14 @@ if ( !Object.observe ) {
 			//parse Object to querystring
 			if ( !_.isFormData (_data)
 				 && _.isObject (_data)
+				 && _.getObjectSize (_data) > 0
 			) {
 				_data = _.jsonToQueryString (_data);
 			}
 
 			//If method is GET and data exists
 			if ( _self.config.method === 'GET'
-				 && _.isSet (_data)
+				 && _.isString (_data)
 			) {
 				_query += '?' + _data;
 			}
@@ -5166,6 +5169,9 @@ if ( !Object.observe ) {
 						_response = JSON.parse (_response);
 					}
 					resolve (_response);
+
+					//Find a interceptor for success
+					_self._handleInterceptor ('success', _response);
 				}
 			});
 
@@ -5205,8 +5211,10 @@ if ( !Object.observe ) {
 
 			_self.xhr.addEventListener ('error', function (e) {
 				reject (e);
-			});
 
+				//Find a interceptor for success
+				_self._handleInterceptor ('error', e);
+			});
 
 			//Send
 			_self.xhr_list.push (_self.xhr);
@@ -5220,17 +5228,20 @@ if ( !Object.observe ) {
 	 * @param {object} param
 	 * */
 	Http.add ('_handleInterceptor', function (type, param) {
-		var _self = this;
+		var _self = this,
+			_interceptor = MiddleWare.getInterceptors (_self, type);
 
 		//Find a interceptor for request
-		_.each (MiddleWare.getInterceptors (_self, type),
-				function (v, k) {
-					// Process the interceptor
-					v (param, _self);
-				}, true);
+		if ( _interceptor.length > 0 ) {
+			_.each (_interceptor,
+					function (v, k) {
+						// Process the interceptor
+						v (param, _self);
+					}, true);
 
-		//Clean the interceptor
-		MiddleWare.cleanInterceptor (_self, type);
+			//Clean the interceptor
+			MiddleWare.cleanInterceptor (_self, type);
+		}
 
 	});
 
@@ -5241,7 +5252,7 @@ if ( !Object.observe ) {
 	 * */
 	Http.add ('get', function (url, data) {
 		this.kill ();
-		return this.request (url, data || {});
+		return this.request (url, data);
 	});
 
 
@@ -5260,7 +5271,7 @@ if ( !Object.observe ) {
 		});
 
 		this.kill ();
-		return this.request (url, data || {});
+		return this.request (url, data);
 	});
 
 
@@ -5280,7 +5291,7 @@ if ( !Object.observe ) {
 
 
 		this.kill ();
-		return this.request (url, data || {});
+		return this.request (url, data);
 	});
 
 
@@ -5299,7 +5310,7 @@ if ( !Object.observe ) {
 		});
 
 		this.kill ();
-		return this.request (url, data || {});
+		return this.request (url, data);
 	});
 
 
@@ -5597,12 +5608,16 @@ if ( !Object.observe ) {
 	 * @return {object}
 	 */
 	View.add ('lookup', function (template) {
-		var _conf = {
-			url        : setting.app_path + '/templates/' + template,
-			contentType: 'text/plain'
-		};
+		//MiddleWare
+		MiddleWare.intercept (this.Http, {
+			request: function (config) {
+				config.headers['Content-Type'] = 'text/plain';
+			}
+		});
 
-		return this.Http.request (_conf);
+		return this.Http.request (
+			setting.app_path + '/templates/' + template
+		);
 	});
 
 	//Set the template
@@ -5791,24 +5806,33 @@ if ( !Object.observe ) {
 			if ( self.failed )
 				reject (data);
 
-			self.Http.kill ();
-			self.Http.request (conf).then (function (response) {
+			//The middleware
+			MiddleWare.intercept (self.Http, {
+				request: function (config) {
+					config.method = conf.method;
+				}
+			});
+
+			//The request
+			self.Http.kill ()
+				.request (conf.url, conf.data)
+				.then (function (response) {
 				resolve (response);
 			}).catch (reject);
 		}))
 	});
 
-//Return object
+	//Return object
 	Model.add ('getScope', function () {
 		return this.scope;
 	});
 
-//Return formdata
+	//Return formdata
 	Model.add ('getData', function () {
 		return this.data;
 	});
 
-//Return formdata
+	//Return formdata
 	Model.add ('getFiles', function () {
 		return this.blob;
 	});
