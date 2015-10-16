@@ -171,11 +171,11 @@ _.$fn.add('hideOrShowAllPTags', function(params){
 
 
 //Usage
-_$('a').hideAllPTags({'hide':true})
+_$('a').hideOrShowAllPTags({'hide':true})
 
 ```
 
-Chaining
+Methods
 --------
 
 **Attribute `exist`**
