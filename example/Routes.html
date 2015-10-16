@@ -31,6 +31,17 @@
         MAX: 3
     }).cook (function ($) {
 
+        MiddleWare.intercept ($.Http, {
+            request: function (config) {
+                console.log('yeah')
+            }
+        });
+
+        MiddleWare.intercept ($.Http, {
+            request: function (config) {
+                console.log('yeah2')
+            }
+        });
 
         //The request
         $.Http.get ('/').then (function () {
