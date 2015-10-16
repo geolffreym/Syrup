@@ -30,12 +30,17 @@
         //Provide constant
         MAX: 3
     }).cook (function ($) {
-        MiddleWare.intercept ($.Http, function () {
-            return {
-                'progress': function () {
 
-                }
+        //The interceptor
+        MiddleWare.intercept ($.Http, {
+            request: function (config, xhr) {
+                config.headers['X-Auth-Token'] = '123456';
             }
+        });
+
+        //The request
+        $.Http.post ('/').then (function () {
+
         });
 
         //Before execution what to do?
@@ -45,9 +50,6 @@
             'theNewRoute' : '/route/:page/:user/'
         });
 
-    }).afters (function ($) {
-        //After execute
-        console.log ($.MAX)
     });
 
 
@@ -59,8 +61,8 @@
 
                 //When the "theNewRoute" match. What to do?
                 $.Router.when ('theNewRoute').then (function (params, event) {
-                    console.log (params.getIndex (':page'));
-                    console.log (params.getIndex (':user'));
+                    //console.log (params.getIndex (':page'));
+                    //console.log (params.getIndex (':user'));
                 })
 
             },

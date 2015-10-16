@@ -299,7 +299,7 @@
 		this.each (function (v) {
 			if ( _.isString (_prop) ) {
 				_props.push (v[_prop]);
-			} else {
+			} else if ( _.isObject (_prop) ) {
 				_.each (_prop, function (value, index) {
 					v[index] = value;
 				});

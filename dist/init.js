@@ -317,7 +317,7 @@ if ( typeof exports !== 'undefined' )
 		this.each (function (v) {
 			if ( _.isString (_prop) ) {
 				_props.push (v[_prop]);
-			} else {
+			} else if ( _.isObject (_prop) ) {
 				_.each (_prop, function (value, index) {
 					v[index] = value;
 				});
@@ -4345,27 +4345,88 @@ if ( !Object.observe ) {
  */
 
 (function (window) {
+	var WARNING_MIDDLEWARE = {
+		ERROR: {
+			NOTFOUND: 'Interceptor not found'
+		}
+	};
+
 	"use strict";
 	function MiddleWare () {
 
 	}
 
+	/** Intercept signals in object
+	 * @param {object} intercepted
+	 * @param {function} result
+	 * @return {object}
+	 * */
 	MiddleWare.add ('intercept', function (intercepted, result) {
-		if ( 'interceptors' in intercepted ) {
-			if ( _.isFunction (result) ) {
-				var _interceptor = result (intercepted),
-					_clean_by_key = [];
+		return new Promise (function (resolve, reject) {
+			if ( 'interceptors' in intercepted ) {
 
-				if ( _.isObject (_interceptor) ) {
-					_.each (_interceptor, function (t, v) {
-						console.log (v)
-					}, true)
+				if ( _.isObject (result) ) {
+					_.each (result, function (v, k) {
+						//Intercepted has interceptors?
+						if ( !(k in intercepted.interceptors) )
+							intercepted.interceptors[k] = [];
+
+						//New interceptor
+						if ( _.isFunction (v) )
+							intercepted.interceptors[k].push (v);
+
+					}, true);
+
+					//Resolve
+					resolve (intercepted);
 				}
 
+			} else {
+				//Not interceptors in intercepted
+				reject (WARNING_MIDDLEWARE.ERROR.NOTFOUND)
+			}
+		})
+	});
 
-				//intercepted.interceptors.push (_interceptor);
+	/** Find signals in object
+	 * @param {object} intercepted
+	 * @param {string} find
+	 * @return {object}
+	 * */
+	MiddleWare.add ('getInterceptors', function (intercepted, find) {
+		if ( 'interceptors' in intercepted ) {
+			if (
+				find in intercepted.interceptors
+				&& _.isArray (intercepted.interceptors[find])
+				&& intercepted.interceptors[find].length > 0
+			) {
+				return intercepted.interceptors[find];
 			}
 		}
+		return [];
+	});
+
+	/** Trigger the interceptors
+	 * @param {object} intercepted
+	 * @param {string} find
+	 * */
+	MiddleWare.add ('cleanInterceptor', function (intercepted, find) {
+		if ( 'interceptors' in intercepted ) {
+			if ( find in intercepted.interceptors ) {
+				delete intercepted.interceptors[find];
+			}
+		}
+	});
+
+	/** Trigger the interceptors
+	 * @param {object} intercepted
+	 * @param {string} find
+	 * */
+	MiddleWare.add ('trigger', function (intercepted, interceptors) {
+		_.each (interceptors, function (v) {
+			if ( _.isFunction (v) )
+				v (intercepted);
+		}, true);
 	});
 
 	window.MiddleWare = new MiddleWare;
@@ -5023,90 +5084,82 @@ if ( !Object.observe ) {
 				   || new window.ActiveXObject ("Microsoft.XMLHTTP");
 		this.xhr_list = [];
 		this.upload = null;
+		this.config = null;
 		this.interceptors = {};
 	}
 
 	/** Http Request
-	 * @param {object} config
-	 * @param {function} callback
+	 * @param {string} url
+	 * @param {object} data
 	 * @return {object}
-	 *
-	 * Config object {
-	 *  url: (string) the request url
-	 *  type: (string) the request type GET or POST
-	 *	timeout: (int) request timeout,
-	 *	token: (string or bool) CSRF token needed?,
-	 *	contentType: (string) the content type,
-	 *	data: (object) the request data,
-	 *	upload: (bool) is upload process?
-	 *
-	 * }
 	 * **/
-	Http.add ('request', function (config) {
-		if ( !_.isObject (config) ) {
-			_.error (_.WARNING_SYRUP.ERROR.NOOBJECT, '(Http .request)')
-		}
-
+	Http.add ('request', function (url, data) {
 		var _self = this,
-			_xhr = _self.xhr,
 			_query = _.emptyStr,
-			_type = (config.method || 'GET').toUpperCase (),
-			_timeout = config.timeout || 0xFA0,
-			_cors = config.cors || false,
-			_token = config.token || false,
-			_contentType = config.contentType || 'application/x-www-form-urlencoded;charset=utf-8',
-			_data = config.data || false,
-			_contentHeader = {
-				header: 'Content-Type',
-				value : _contentType
-			};
+			_data = data || false;
 
+		//Make global conf
+		_self.config = {
+			method : 'GET',
+			timeout: 0xFA0,
+			upload : false,
+			cors   : false,
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'
+			}
+		};
 
+		//Handle request interceptor
+		_self._handleInterceptor ('request', _self.config);
+
+		//Promise execution
 		return (new Promise (function (resolve, reject) {
 
-			if ( !_.isSet (config.url) )
+			if ( !_.isSet (url) )
 				_.error (_.WARNING_SYRUP.ERROR.NOURL, '(Http .request)');
 
+			//If is Object and not formData
+			//parse Object to querystring
 			if ( !_.isFormData (_data)
-				 && _.isSet (_data)
-				 && _contentType !== 'auto'
+				 && _.isObject (_data)
 			) {
 				_data = _.jsonToQueryString (_data);
 			}
 
-			if ( _type === 'GET' && _.isSet (_data) ) {
+			//If method is GET and data exists
+			if ( _self.config.method === 'GET'
+				 && _.isSet (_data)
+			) {
 				_query += '?' + _data;
 			}
 
+
 			//Process url
-			_query = config.url + (_query);
-			_xhr.open (_type, _query, true);
-			_xhr.timeout = _timeout;
+			_query = url + (_query);
+			_self.xhr.open (_self.config.method, _query, true);
+			_self.xhr.timeout = _self.config.timeout;
 
 			//Setting Headers
-			if ( !_.isFormData (_data) && _contentType !== 'auto' ) {
-				_self.requestHeader (
-					_contentHeader.header,
-					_contentHeader.value
-				);
+			if ( !_.isFormData (_data) ) {
+				_.each (_self.config.headers, function (value, header) {
+					_self._requestHeader (header, value);
+				});
 			}
 
 			//Cors?
-			if ( _.isSet (_cors) )
-				_xhr.withCredentials = true;
-
-			//Using Token
-			if ( _.isSet (_token) )
-				_self.requestHeader ("X-CSRFToken", _token);
+			_self.xhr.withCredentials = _self.config.cors;
 
 			//If upload needed
-			if ( _.isSet (config.upload) && _.isBoolean (config.upload) ) {
+			if ( _.isSet (_self.config.upload)
+				 && _.isBoolean (_self.config.upload)
+			) {
 				_self.upload = _self.xhr.upload;
-				_xhr = _self.upload;
+				_self.xhr = _self.upload;
 			}
 
 			//Event Listeners
-			_xhr.addEventListener ('load', function (e) {
+			//Success
+			_self.xhr.addEventListener ('load', function (e) {
 				if ( this.status >= 0xC8 && this.status < 0x190 ) {
 					var _response = this.response || this.responseText;
 					if ( _.isJson (_response) ) {
@@ -5116,69 +5169,79 @@ if ( !Object.observe ) {
 				}
 			});
 
-			_xhr.addEventListener ('progress', function (e) {
+			//Progress
+			_self.xhr.addEventListener ('progress', function (e) {
+				//Find a interceptor for progress
+				_self._handleInterceptor ('request', e);
 
 			}, false);
 
-			_xhr.addEventListener ('readystatechange', function (e) {
+			//State
+			_self.xhr.addEventListener ('readystatechange', function (e) {
 				if ( this.readyState ) {
-					//if ( _self.state ) {
-					//	_self.state (this.readyState, e);
-					//}
+					//Find a interceptor for state
+					_self._handleInterceptor ('request', e);
 				}
 			});
 
-			_xhr.addEventListener ('abort', function (e) {
-				//if ( _self.abort ) {
-				//	_self.abort (e);
-				//}
+			//Abort
+			_self.xhr.addEventListener ('abort', function (e) {
+				//Find a interceptor for abort
+				_self._handleInterceptor ('abort', e);
+
 			});
 
-			_xhr.addEventListener ('timeout', function (e) {
-				//if ( _self.time_out ) {
-				//	_self.time_out (e);
-				//}
+			//Complete
+			_self.xhr.addEventListener ('loadend', function (e) {
+				//Find a interceptor for complete
+				_self._handleInterceptor ('complete', e);
+
 			});
 
-			_xhr.addEventListener ('loadend', function (e) {
-				//if ( _self.complete ) {
-				//	_self.complete (e);
-				//}
+			_self.xhr.addEventListener ('loadstart', function (e) {
+				//Find a interceptor for  before
+				_self._handleInterceptor ('before', e);
 			});
 
-			_xhr.addEventListener ('loadstart', function (e) {
-				//if ( _self.before ) {
-				//	_self.before (e);
-				//}
-			});
-
-			_xhr.addEventListener ('error', function (e) {
+			_self.xhr.addEventListener ('error', function (e) {
 				reject (e);
 			});
 
 
 			//Send
 			_self.xhr_list.push (_self.xhr);
-			_xhr.send (_type !== 'GET' ? _data : null);
+			_self.xhr.send (_self.config.method !== 'GET' ? _data : null);
 		}));
 
 	});
 
+	/** Handle the interceptors
+	 * @param {string} type
+	 * @param {object} param
+	 * */
+	Http.add ('_handleInterceptor', function (type, param) {
+		var _self = this;
+
+		//Find a interceptor for request
+		_.each (MiddleWare.getInterceptors (_self, type),
+				function (v, k) {
+					// Process the interceptor
+					v (param, _self);
+				}, true);
+
+		//Clean the interceptor
+		MiddleWare.cleanInterceptor (_self, type);
+
+	});
 
 	/**Get request
 	 * @param {string} url
 	 * @param {object} data
 	 * @return {object}
 	 * */
-	Http.add ('get', function (url, data, conf) {
-		var _conf = {
-			url        : url,
-			data       : data,
-			contentType: conf.contentType || false
-		};
-
+	Http.add ('get', function (url, data) {
 		this.kill ();
-		return this.request (_conf);
+		return this.request (url, data || {});
 	});
 
 
@@ -5187,16 +5250,17 @@ if ( !Object.observe ) {
 	 * @param {object} data
 	 * @return {object}
 	 * */
-	Http.add ('post', function (url, data, conf) {
-		var _conf = {
-			method     : 'POST',
-			url        : url,
-			data       : data,
-			contentType: conf.contentType || false
-		};
+	Http.add ('post', function (url, data) {
+
+		//MiddleWare
+		MiddleWare.intercept (this, {
+			request: function (config, xhr) {
+				config.method = 'POST';
+			}
+		});
 
 		this.kill ();
-		return this.request (_conf);
+		return this.request (url, data || {});
 	});
 
 
@@ -5205,16 +5269,18 @@ if ( !Object.observe ) {
 	 * @param {object} data
 	 * @return {object}
 	 * */
-	Http.add ('put', function (url, data, conf) {
-		var _conf = {
-			method     : 'PUT',
-			url        : url,
-			data       : data,
-			contentType: conf.contentType || false
-		};
+	Http.add ('put', function (url, data) {
+
+		//MiddleWare
+		MiddleWare.intercept (this, {
+			request: function (config, xhr) {
+				config.method = 'PUT';
+			}
+		});
+
 
 		this.kill ();
-		return this.request (_conf);
+		return this.request (url, data || {});
 	});
 
 
@@ -5223,16 +5289,17 @@ if ( !Object.observe ) {
 	 * @param {object} data
 	 * @return {object}
 	 * */
-	Http.add ('delete', function (url, data, conf) {
-		var _conf = {
-			method     : 'DELETE',
-			url        : url,
-			data       : data,
-			contentType: conf.contentType || false
-		};
+	Http.add ('delete', function (url, data) {
+
+		//MiddleWare
+		MiddleWare.intercept (this, {
+			request: function (config, xhr) {
+				config.method = 'DELETE';
+			}
+		});
 
 		this.kill ();
-		return this.request (_conf);
+		return this.request (url, data || {});
 	});
 
 
@@ -5241,7 +5308,7 @@ if ( !Object.observe ) {
 	 * @param {string} type
 	 * @return {object}
 	 * **/
-	Http.add ('requestHeader', function (header, type) {
+	Http.add ('_requestHeader', function (header, type) {
 		this.xhr.setRequestHeader (header, type);
 		return this;
 	});
