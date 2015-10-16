@@ -456,19 +456,19 @@
 				})
 			};
 
-			//Scoping
+			// Recipes
 			_self._recipes (moduleId);
 
-			//Scoping
+			// Scoping
 			_self._scopes (moduleId);
 
-			//Handle Model
+			// Handle Model
 			_self._models (moduleId);
 
-			//Handle Views
+			// Handle Views
 			_self._views (moduleId);
 
-			//Init the module
+			// Init the module?
 			if (
 				'init' in _self.modules[moduleId].instance
 				&& _.isFunction (_self.modules[moduleId].instance.init)
@@ -481,13 +481,6 @@
 				if ( _.isSet (_self.after) )
 					_self.after (this.lib.get (_self.root), moduleId);
 
-
-				//Individual after execution
-				//if (
-				//	'after' in _self.modules[moduleId].instance
-				//	&& _.isFunction (_self.modules[moduleId].instance.after)
-				//)
-				//	_self.modules[moduleId].instance.after (this.lib.get (_self.root));
 			}
 
 			// Bind listeners

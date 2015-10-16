@@ -1116,7 +1116,7 @@ var _my_callback = function(a,b){
     alert(a);
     alert(b);
 }       
-_.callbackAudit();//No callback, no execution and no errors throws, just omitted
+_.callbackAudit(null);//No callback, no execution and no errors throws, just omitted
 _.callbackAudit(_my_callback, 1, 2);//Callback executed with 1 and 2 parameters 
 ```
 
