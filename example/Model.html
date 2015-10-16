@@ -33,7 +33,6 @@
     <template sp-tpl>
         <div>
             <ul>
-                {{#beatles}}
                 <li>{{ firstName }} {{lastName}}</li>
 
                 {{#phone}}
@@ -43,8 +42,6 @@
                 {{#id}}
                 <li>{{ id }}</li>
                 {{/id}}
-
-                {{/beatles}}
             </ul>
 
         </div>
@@ -61,95 +58,86 @@
 
 </div>
 
-
 <script>
 
-    //The controller
-   // _$ (function () {
+    //The App with dependencies
+    var my_App = App.blend ('Hey', ['Http','MiddleWare']);
 
-        //The App with dependencies
-        var my_App = App.blend ('Hey', ['Http']);
+    //A global service
+    my_App.service ('myConsole', function (msg) {
+        console.log (msg)
+    });
 
-        //A global service
-        my_App.service ('myConsole', function (msg) {
-            console.log (msg)
-        });
+    //The modules, templates, events, view are encapsulated in recipes
+    //Recipes are declared as sp-recipe and is associated with the recipe's name
 
-        //The modules, templates, events, view are encapsulated in recipes
-        //Recipes are declared as sp-recipe and is associated with the recipe's name
+    //A new recipe for Hey
+    my_App.recipe ('Hey.You', function (_, gScope) {
+        return {
 
-        //A new recipe for Hey
-        my_App.recipe ('Hey.You', function (_, gScope) {
-            return {
-
-                /** @construct */
-                init: function ($) {
-                    var _self = this;
+            /** @construct */
+            init: function ($) {
+                var _self = this;
 
 
-                    this.model.set ({
-                        'firstName': 'Pedro',
-                        'lastName' : 'Martinez'
-                    });
+                this.model.set ({
+                    'firstName': 'Pedro',
+                    'lastName' : 'Martinez'
+                });
 
-                    //The context in template as scope
-                    this.scope.set ({
-                        'beatles': [
-                            { "firstName": "John", "lastName": "Lennon" },
-                            { "firstName": "Paul", "lastName": "McCartney" },
-                            { "firstName": "George", "lastName": "Harrison" },
-                            { "firstName": "Ringo", "lastName": "Starr" }
-                        ]
-                    }).view.render ();
+                //The context in template as scope
+                this.scope.set ({
+                    "firstName": "John",
+                    "lastName" : "Lennon"
+                }).view.render ();
 
-                    //When Hey.You scope change
-                    this.when ('change').then (function (changes) {
-                        // Render new data using the inline template
-                        // If not serve param is set, template inline is used
-                        // If you set "Hey/You" "/app/view/Hey/You.js" view is used
-                        // Lousing Coupling( The main dir -> "Hey" , The File -> "You", The view name -> "myView")
+                //When Hey.You scope change
+                this.when ('change').then (function (changes) {
+                    // Render new data using the inline template
+                    // If not serve param is set, template inline is used
+                    // If you set "Hey/You" "/app/view/Hey/You.js" view is used
+                    // Lousing Coupling( The main dir -> "Hey" , The File -> "You", The view name -> "myView")
 
-                        _self.view.render ('Hey/You/myView');
-                        //_self.render ();
+                    _self.view.render ('Hey/You/myView');
+                    //_self.render ();
 
-                        // The global service in tools
-                        $.myConsole ('Done');
-                    });
-                },
+                    // The global service in tools
+                    $.myConsole ('Done');
+                });
+            },
 
-                the_method: function () {
-                    this.model.get ([]).then (function (e) {
-                        console.log(e)
-                    });
-                },
+            the_method: function () {
+
+                this.model.get ([]).then (function (e) {
+                    console.log (e)
+                });
+            },
 
 
-                destroy: function ($) {
-                    alert ('destroyed?')
-                }
+            destroy: function ($) {
+                alert ('destroyed?')
             }
-        });
+        }
+    });
 
-        //A new recipe for Hey
-        my_App.recipe ('Hey.Do', function (_, gScope) {
-            return {
-                init   : function (tools) {
+    //A new recipe for Hey
+    my_App.recipe ('Hey.Do', function (_, gScope) {
+        return {
+            init   : function (tools) {
 
-                },
-                method : function ($) {
-                    this.scope.set ('Hey.You', {
-                        'beatles': [
-                            { "firstName": "John", "lastName": "Pasa" }
-                        ]
-                    });
+            },
+            method : function ($) {
+                this.scope.set ('Hey.You', {
+                    'beatles': [
+                        { "firstName": "John", "lastName": "Pasa" }
+                    ]
+                });
 
-                },
-                destroy: function () {}
-            }
-        });
+            },
+            destroy: function () {}
+        }
+    });
 
-
-   // })
 
 </script>
 </body>

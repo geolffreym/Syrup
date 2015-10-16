@@ -22,65 +22,66 @@
 
 <script>
 
-    //The controller
-    _$ (function () {
+    //The App with dependencies
+    var my_App = App.blend ('Hey', ['Http', 'Router']);
 
-        //The App with dependencies
-        var my_App = App.blend ('Hey', ['Http', 'Router']);
-
-        //Before execution
-        my_App.spice ({
-            //Provide constant
-            MAX: 3
-        }).cook (function ($) {
-            //Before execution what to do?
-            //Initialize the routes
-            $.Router.set ({
-                'myLocalRoute': '/Routes.html',
-                'theNewRoute' : '/route/:page/:user/'
-            });
-
-        }).afters (function ($) {
-            //After execute
-            console.log ($.MAX)
-        });
-
-
-        //RECIPES
-        //A new recipe for Hey
-        my_App.recipe ('Hey.You', function (_, scope) {
+    //Before execution
+    my_App.spice ({
+        //Provide constant
+        MAX: 3
+    }).cook (function ($) {
+        MiddleWare.intercept ($.Http, function () {
             return {
-                init   : function ($) {
+                'progress': function () {
 
-                    //When the "theNewRoute" match. What to do?
-                    $.Router.when ('theNewRoute').then (function (params, event) {
-                        console.log (params.getIndex (':page'));
-                        console.log (params.getIndex (':user'));
-                    })
-
-                },
-                destroy: function ($) {
-
-                    //Dropped? What to do?
-                    alert ('destroyed?')
                 }
             }
         });
 
-        //A new recipe for Hey
-        my_App.recipe ('Hey.Do', function (_, scope) {
-            return {
-                init    : function ($) {},
-                redirect: function ($) {
-
-                    //Redirect to "theNewRoute" with params { ':page': '3', ':user':'2' }
-                    $.Router.redirect ('theNewRoute', { ':page': '3', ':user': '2' })
-                            .then (function () { });
-                }
-            }
+        //Before execution what to do?
+        //Initialize the routes
+        $.Router.set ({
+            'myLocalRoute': '/Routes.html',
+            'theNewRoute' : '/route/:page/:user/'
         });
 
+    }).afters (function ($) {
+        //After execute
+        console.log ($.MAX)
     });
+
+
+    //RECIPES
+    //A new recipe for Hey
+    my_App.recipe ('Hey.You', function (_, scope) {
+        return {
+            init   : function ($) {
+
+                //When the "theNewRoute" match. What to do?
+                $.Router.when ('theNewRoute').then (function (params, event) {
+                    console.log (params.getIndex (':page'));
+                    console.log (params.getIndex (':user'));
+                })
+
+            },
+            destroy: function ($) {
+
+                //Dropped? What to do?
+                alert ('destroyed?')
+            }
+        }
+    }).recipe ('Hey.Do', function (_, scope) {
+        return {
+            init    : function ($) {},
+            redirect: function ($) {
+
+                //Redirect to "theNewRoute" with params { ':page': '3', ':user':'2' }
+                $.Router.redirect ('theNewRoute', { ':page': '3', ':user': '2' })
+                        .then (function () { });
+            }
+        }
+    });
+
 
 </script>
 </body>

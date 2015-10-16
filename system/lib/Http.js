@@ -14,44 +14,8 @@
 				   || new window.ActiveXObject ("Microsoft.XMLHTTP");
 		this.xhr_list = [];
 		this.upload = null;
-		this.before = null;
-		this.complete = null;
-		this.progress = null;
-		this.state = null;
-		this.abort = null;
-		this.time_out = null;
+		this.interceptors = {};
 	}
-
-	/*** Event handler
-	 * @param {string} event
-	 * @param {function} callback
-	 * @return {void}
-	 * */
-	Http.add ('on', function (event, callback) {
-		var self = this;
-		return event && (
-				{
-					before  : function () {
-						self.before = callback;
-					},
-					complete: function () {
-						self.complete = callback;
-					},
-					abort   : function () {
-						self.abort = callback;
-					},
-					state   : function () {
-						self.state = callback;
-					},
-					timeout : function () {
-						self.time_out = callback;
-					},
-					progress: function () {
-						self.progress = callback;
-					}
-				}[event] || function () {}
-			) ()
-	});
 
 	/** Http Request
 	 * @param {object} config
@@ -59,15 +23,15 @@
 	 * @return {object}
 	 *
 	 * Config object {
- *  url: (string) the request url
- *  type: (string) the request type GET or POST
- *	timeout: (int) request timeout,
- *	token: (string or bool) CSRF token needed?,
- *	contentType: (string) the content type,
- *	data: (object) the request data,
- *	upload: (bool) is upload process?
- *
- * }
+	 *  url: (string) the request url
+	 *  type: (string) the request type GET or POST
+	 *	timeout: (int) request timeout,
+	 *	token: (string or bool) CSRF token needed?,
+	 *	contentType: (string) the content type,
+	 *	data: (object) the request data,
+	 *	upload: (bool) is upload process?
+	 *
+	 * }
 	 * **/
 	Http.add ('request', function (config) {
 		if ( !_.isObject (config) ) {
@@ -144,41 +108,39 @@
 			});
 
 			_xhr.addEventListener ('progress', function (e) {
-				if ( _self.progress ) {
-					_self.progress (e);
-				}
+
 			}, false);
 
 			_xhr.addEventListener ('readystatechange', function (e) {
 				if ( this.readyState ) {
-					if ( _self.state ) {
-						_self.state (this.readyState, e);
-					}
+					//if ( _self.state ) {
+					//	_self.state (this.readyState, e);
+					//}
 				}
 			});
 
 			_xhr.addEventListener ('abort', function (e) {
-				if ( _self.abort ) {
-					_self.abort (e);
-				}
+				//if ( _self.abort ) {
+				//	_self.abort (e);
+				//}
 			});
 
 			_xhr.addEventListener ('timeout', function (e) {
-				if ( _self.time_out ) {
-					_self.time_out (e);
-				}
+				//if ( _self.time_out ) {
+				//	_self.time_out (e);
+				//}
 			});
 
 			_xhr.addEventListener ('loadend', function (e) {
-				if ( _self.complete ) {
-					_self.complete (e);
-				}
+				//if ( _self.complete ) {
+				//	_self.complete (e);
+				//}
 			});
 
 			_xhr.addEventListener ('loadstart', function (e) {
-				if ( _self.before ) {
-					_self.before (e);
-				}
+				//if ( _self.before ) {
+				//	_self.before (e);
+				//}
 			});
 
 			_xhr.addEventListener ('error', function (e) {

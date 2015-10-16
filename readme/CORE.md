@@ -1086,10 +1086,12 @@ _.interval(function (x) {
      }, conf);
 ```
      
-**Method `.each(object || array, callback)`**
+**Method `.each(object || array, callback, noFilter(optional))`**
 
 *(Intuitive objects or tour arrangements)*
-```js           
+```js        
+   
+   
 _.each([1,2,3], function(v,i,p){
     v // Element
     i // Index or Key
@@ -1106,7 +1108,10 @@ _.each([1,2,3], function(v,i,p){
     v (3)
     i (2)
     p (p.first is FALSE and p.last is TRUE)
-})
+},(optional param noFilter))
+// If 'noFilter' is 'true', the object or array will not being filtered,  
+// for default it filter the functions contained in objects or array
+
 ```
 **Method `.callbackAudit(callback, param1, param2, ..)`**
 

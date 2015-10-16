@@ -337,12 +337,13 @@ if ( typeof exports !== 'undefined' )
 		this.each (function (v) {
 			if ( _.isString (attr) ) {
 				_attr.push (v.getAttribute (attr));
-			} else {
+			} else if ( _.isObject (attr) ) {
 				_.each (attr, function (value, index) {
 					v.setAttribute (index, value);
 				});
 			}
 		});
+
 		return _.isString (attr)
 			? _.specArray (_attr) : this;
 	});
@@ -373,7 +374,7 @@ if ( typeof exports !== 'undefined' )
 			if ( _.isString (css) ) {
 				var _style = windowGlobal.getComputedStyle (dom, null);
 				_css.push (_style.getPropertyValue (css));
-			} else {
+			} else if ( _.isObject (dom) ) {
 				_.each (css, function (value, index) {
 					dom.style[index] = value;
 				});
@@ -732,9 +733,7 @@ if ( typeof exports !== 'undefined' )
 		}
 		var _width = [];
 		this.each (function (elem) {
-			_width.push ((
-							 _.cartesianPlane (elem)
-						 ).width);
+			_width.push ((_.cartesianPlane (elem)).width);
 		});
 
 		return _.specArray (_width);
@@ -789,7 +788,7 @@ if ( typeof exports !== 'undefined' )
 	 */
 	_$_.add ('each', function (callback) {
 		var _element = this.collection;
-		if ( _.isSet (_element.childNodes)
+		if ( 'childNodes' in _element
 			 || _.isGlobal (_element) ) {
 			_.callbackAudit (callback, _element, 0);
 		} else {
@@ -1500,7 +1499,7 @@ if ( typeof exports !== 'undefined' )
 	 * @param callback
 	 * @returns {boolean}
 	 */
-	Syrup.add ('each', function (_object, callback) {
+	Syrup.add ('each', function (_object, callback, noFilterF) {
 		var _p = { first: false, last: false };
 		if ( _.isArray (_object) ) {
 			var i = 0,
@@ -1510,7 +1509,10 @@ if ( typeof exports !== 'undefined' )
 				_p.last = (
 							  i + 1
 						  ) === max;
-				_.callbackAudit (callback, _object[i], i, _p);
+
+				callback && noFilterF ? callback (_object[i], i, _p)
+					: _.callbackAudit (callback, _object[i], i, _p);
+
 			}
 		} else {
 			if ( _.isObject (_object) ) {
@@ -1522,8 +1524,9 @@ if ( typeof exports !== 'undefined' )
 								   _i + 1
 							   ) === _tmp;
 					_p.last = _i === 0;
-					_.callbackAudit (callback, _object[_keys[_i]], _keys[_i], _p);
 
+					callback && noFilterF ? callback (_object[_keys[_i]], _keys[_i], _p)
+						: _.callbackAudit (callback, _object[_keys[_i]], _keys[_i], _p);
 
 				}
 			}
@@ -1812,7 +1815,6 @@ if ( typeof exports !== 'undefined' )
 	_.nav.javascript = windowGlobal.navigator.javaEnabled ();
 	_.nav.online = windowGlobal.navigator.onLine;
 	_.nav.local = windowGlobal.navigator.userAgent.toLowerCase ();
-
 
 
 }) (window);
@@ -4339,6 +4341,37 @@ if ( !Object.observe ) {
 }) (window);
 
 /**
+ * Created by gmena on 10-13-15.
+ */
+
+(function (window) {
+	"use strict";
+	function MiddleWare () {
+
+	}
+
+	MiddleWare.add ('intercept', function (intercepted, result) {
+		if ( 'interceptors' in intercepted ) {
+			if ( _.isFunction (result) ) {
+				var _interceptor = result (intercepted),
+					_clean_by_key = [];
+
+				if ( _.isObject (_interceptor) ) {
+					_.each (_interceptor, function (t, v) {
+						console.log (v)
+					}, true)
+				}
+
+
+				//intercepted.interceptors.push (_interceptor);
+			}
+		}
+	});
+
+	window.MiddleWare = new MiddleWare;
+	window.MiddleWareClass = MiddleWare;
+}) (window);
+/**
  * Created by gmena on 08-06-14.
  */
 
@@ -4524,8 +4557,9 @@ if ( !Object.observe ) {
 	 * @return void
 	 * **/
 	Apps.add ('_add', function (moduleId) {
-		if ( !_.isObject (this.scope[moduleId]) )
+		if ( !_.isObject (this.scope[moduleId]) ) {
 			this.scope[moduleId] = {};
+		}
 	});
 
 	/**Trigger code execution
@@ -4755,15 +4789,18 @@ if ( !Object.observe ) {
 		};
 	});
 
+
 	/**Prepare Scopes
 	 * @param moduleId
 	 * */
-
 	Apps.add ('_scopes', function (moduleId) {
 		// Render view
 		var _self = this;
+
 		_self.modules[moduleId].instance.scope = {
-			set: function (nModule, object) {
+			global: _self.scope,
+			object: _self.scope[moduleId],
+			set   : function (nModule, object) {
 				var _moduleId = !_.isObject (nModule)
 								&& _.isString (nModule) && nModule
 								|| moduleId,
@@ -4775,7 +4812,7 @@ if ( !Object.observe ) {
 					return _self.modules[moduleId].instance;
 				}
 			},
-			get: function (nModule) {
+			get   : function (nModule) {
 				var _moduleId = _.isString (nModule)
 					? nModule : moduleId;
 
@@ -4986,44 +5023,8 @@ if ( !Object.observe ) {
 				   || new window.ActiveXObject ("Microsoft.XMLHTTP");
 		this.xhr_list = [];
 		this.upload = null;
-		this.before = null;
-		this.complete = null;
-		this.progress = null;
-		this.state = null;
-		this.abort = null;
-		this.time_out = null;
+		this.interceptors = {};
 	}
-
-	/*** Event handler
-	 * @param {string} event
-	 * @param {function} callback
-	 * @return {void}
-	 * */
-	Http.add ('on', function (event, callback) {
-		var self = this;
-		return event && (
-				{
-					before  : function () {
-						self.before = callback;
-					},
-					complete: function () {
-						self.complete = callback;
-					},
-					abort   : function () {
-						self.abort = callback;
-					},
-					state   : function () {
-						self.state = callback;
-					},
-					timeout : function () {
-						self.time_out = callback;
-					},
-					progress: function () {
-						self.progress = callback;
-					}
-				}[event] || function () {}
-			) ()
-	});
 
 	/** Http Request
 	 * @param {object} config
@@ -5031,15 +5032,15 @@ if ( !Object.observe ) {
 	 * @return {object}
 	 *
 	 * Config object {
- *  url: (string) the request url
- *  type: (string) the request type GET or POST
- *	timeout: (int) request timeout,
- *	token: (string or bool) CSRF token needed?,
- *	contentType: (string) the content type,
- *	data: (object) the request data,
- *	upload: (bool) is upload process?
- *
- * }
+	 *  url: (string) the request url
+	 *  type: (string) the request type GET or POST
+	 *	timeout: (int) request timeout,
+	 *	token: (string or bool) CSRF token needed?,
+	 *	contentType: (string) the content type,
+	 *	data: (object) the request data,
+	 *	upload: (bool) is upload process?
+	 *
+	 * }
 	 * **/
 	Http.add ('request', function (config) {
 		if ( !_.isObject (config) ) {
@@ -5116,41 +5117,39 @@ if ( !Object.observe ) {
 			});
 
 			_xhr.addEventListener ('progress', function (e) {
-				if ( _self.progress ) {
-					_self.progress (e);
-				}
+
 			}, false);
 
 			_xhr.addEventListener ('readystatechange', function (e) {
 				if ( this.readyState ) {
-					if ( _self.state ) {
-						_self.state (this.readyState, e);
-					}
+					//if ( _self.state ) {
+					//	_self.state (this.readyState, e);
+					//}
 				}
 			});
 
 			_xhr.addEventListener ('abort', function (e) {
-				if ( _self.abort ) {
-					_self.abort (e);
-				}
+				//if ( _self.abort ) {
+				//	_self.abort (e);
+				//}
 			});
 
 			_xhr.addEventListener ('timeout', function (e) {
-				if ( _self.time_out ) {
-					_self.time_out (e);
-				}
+				//if ( _self.time_out ) {
+				//	_self.time_out (e);
+				//}
 			});
 
 			_xhr.addEventListener ('loadend', function (e) {
-				if ( _self.complete ) {
-					_self.complete (e);
-				}
+				//if ( _self.complete ) {
+				//	_self.complete (e);
+				//}
 			});
 
 			_xhr.addEventListener ('loadstart', function (e) {
-				if ( _self.before ) {
-					_self.before (e);
-				}
+				//if ( _self.before ) {
+				//	_self.before (e);
+				//}
 			});
 
 			_xhr.addEventListener ('error', function (e) {
@@ -5284,9 +5283,9 @@ if ( !Object.observe ) {
 		window.addEventListener ('popstate', function (e) {
 			if ( _.isSet (e.state) && 'route_name' in e.state ) {
 				if ( e.state.route_name in _self.onpopstate ) {
-					_self.onpopstate[e.state.route_name].forEach (function (v, i) {
+					_.each (_self.onpopstate[e.state.route_name], function (v, i) {
 						v (e.state, e);
-					});
+					}, true);
 				}
 			}
 		});

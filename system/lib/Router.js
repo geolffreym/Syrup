@@ -20,9 +20,9 @@
 		window.addEventListener ('popstate', function (e) {
 			if ( _.isSet (e.state) && 'route_name' in e.state ) {
 				if ( e.state.route_name in _self.onpopstate ) {
-					_self.onpopstate[e.state.route_name].forEach (function (v, i) {
+					_.each (_self.onpopstate[e.state.route_name], function (v, i) {
 						v (e.state, e);
-					});
+					}, true);
 				}
 			}
 		});

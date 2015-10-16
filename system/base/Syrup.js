@@ -319,12 +319,13 @@
 		this.each (function (v) {
 			if ( _.isString (attr) ) {
 				_attr.push (v.getAttribute (attr));
-			} else {
+			} else if ( _.isObject (attr) ) {
 				_.each (attr, function (value, index) {
 					v.setAttribute (index, value);
 				});
 			}
 		});
+
 		return _.isString (attr)
 			? _.specArray (_attr) : this;
 	});
@@ -355,7 +356,7 @@
 			if ( _.isString (css) ) {
 				var _style = windowGlobal.getComputedStyle (dom, null);
 				_css.push (_style.getPropertyValue (css));
-			} else {
+			} else if ( _.isObject (dom) ) {
 				_.each (css, function (value, index) {
 					dom.style[index] = value;
 				});
@@ -714,9 +715,7 @@
 		}
 		var _width = [];
 		this.each (function (elem) {
-			_width.push ((
-							 _.cartesianPlane (elem)
-						 ).width);
+			_width.push ((_.cartesianPlane (elem)).width);
 		});
 
 		return _.specArray (_width);
@@ -771,7 +770,7 @@
 	 */
 	_$_.add ('each', function (callback) {
 		var _element = this.collection;
-		if ( _.isSet (_element.childNodes)
+		if ( 'childNodes' in _element
 			 || _.isGlobal (_element) ) {
 			_.callbackAudit (callback, _element, 0);
 		} else {
@@ -1482,7 +1481,7 @@
 	 * @param callback
 	 * @returns {boolean}
 	 */
-	Syrup.add ('each', function (_object, callback) {
+	Syrup.add ('each', function (_object, callback, noFilterF) {
 		var _p = { first: false, last: false };
 		if ( _.isArray (_object) ) {
 			var i = 0,
@@ -1492,7 +1491,10 @@
 				_p.last = (
 							  i + 1
 						  ) === max;
-				_.callbackAudit (callback, _object[i], i, _p);
+
+				callback && noFilterF ? callback (_object[i], i, _p)
+					: _.callbackAudit (callback, _object[i], i, _p);
+
 			}
 		} else {
 			if ( _.isObject (_object) ) {
@@ -1504,8 +1506,9 @@
 								   _i + 1
 							   ) === _tmp;
 					_p.last = _i === 0;
-					_.callbackAudit (callback, _object[_keys[_i]], _keys[_i], _p);
 
+					callback && noFilterF ? callback (_object[_keys[_i]], _keys[_i], _p)
+						: _.callbackAudit (callback, _object[_keys[_i]], _keys[_i], _p);
 
 				}
 			}
@@ -1794,7 +1797,6 @@
 	_.nav.javascript = windowGlobal.navigator.javaEnabled ();
 	_.nav.online = windowGlobal.navigator.onLine;
 	_.nav.local = windowGlobal.navigator.userAgent.toLowerCase ();
-
 
 
 }) (window);

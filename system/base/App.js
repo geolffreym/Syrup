@@ -81,8 +81,9 @@
 	 * @return void
 	 * **/
 	Apps.add ('_add', function (moduleId) {
-		if ( !_.isObject (this.scope[moduleId]) )
+		if ( !_.isObject (this.scope[moduleId]) ) {
 			this.scope[moduleId] = {};
+		}
 	});
 
 	/**Trigger code execution
@@ -312,15 +313,18 @@
 		};
 	});
 
+
 	/**Prepare Scopes
 	 * @param moduleId
 	 * */
-
 	Apps.add ('_scopes', function (moduleId) {
 		// Render view
 		var _self = this;
+
 		_self.modules[moduleId].instance.scope = {
-			set: function (nModule, object) {
+			global: _self.scope,
+			object: _self.scope[moduleId],
+			set   : function (nModule, object) {
 				var _moduleId = !_.isObject (nModule)
 								&& _.isString (nModule) && nModule
 								|| moduleId,
@@ -332,7 +336,7 @@
 					return _self.modules[moduleId].instance;
 				}
 			},
-			get: function (nModule) {
+			get   : function (nModule) {
 				var _moduleId = _.isString (nModule)
 					? nModule : moduleId;
 

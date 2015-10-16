@@ -12,6 +12,7 @@ exports.files = {
 			'system/base/Syrup',
 			'system/base/Observer',
 			'system/base/Require',
+			'system/base/MiddleWare',
 			'system/base/Lib',
 			'system/base/App',
 			// Until here the core
