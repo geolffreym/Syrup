@@ -32,12 +32,11 @@
     }).cook (function ($) {
 
 
-
         //The request
-        $.Http.post('/',{a:3}).then (function () {
+        $.Http.get ('/').then (function () {
 
-        }).catch(function(e){
-            console.log(e)
+        }).catch (function (e) {
+            console.log (e)
         });
 
         //Before execution what to do?

@@ -21,28 +21,26 @@
 	 * */
 	MiddleWare.add ('intercept', function (intercepted, result) {
 		return new Promise (function (resolve, reject) {
-			if ( 'interceptors' in intercepted ) {
+			if ( !( 'interceptors' in intercepted ) )
+				intercepted['interceptors'] = {};
 
-				if ( _.isObject (result) ) {
-					_.each (result, function (v, k) {
-						//Intercepted has interceptors?
-						if ( !(k in intercepted.interceptors) )
-							intercepted.interceptors[k] = [];
+			if ( _.isObject (result) ) {
+				_.each (result, function (v, k) {
+					//Intercepted has interceptors?
+					if ( !(k in intercepted.interceptors) )
+						intercepted.interceptors[k] = [];
 
-						//New interceptor
-						if ( _.isFunction (v) )
-							intercepted.interceptors[k].push (v);
+					//New interceptor
+					if ( _.isFunction (v) )
+						intercepted.interceptors[k].push (v);
 
-					}, true);
+				}, true);
 
-					//Resolve
-					resolve (intercepted);
-				}
-
-			} else {
-				//Not interceptors in intercepted
-				reject (WARNING_MIDDLEWARE.ERROR.NOTFOUND)
+				//Resolve
+				resolve (intercepted);
 			}
+
+
 		})
 	});
 
