@@ -135,9 +135,8 @@
 	 * @param callback
 	 */
 	_$_.add ('ready', function (callback) {
-		var _self = this;
-		if ( _.isGlobal (_self.collection) )
-			_self.collection.addEventListener (
+		if ( _.isGlobal (this.collection) )
+			this.collection.addEventListener (
 				"DOMContentLoaded",
 				callback
 			);
@@ -148,9 +147,8 @@
 	 * @param callback
 	 */
 	_$_.add ('load', function (callback) {
-		var _self = this;
-		if ( _.isGlobal (_self.collection) ) {
-			_self.collection.onload = callback;
+		if ( _.isGlobal (this.collection) ) {
+			this.collection.onload = callback;
 		}
 	});
 
@@ -1348,19 +1346,23 @@
 	});
 
 	/** Interval Manager
-	 * @param callback
-	 * @param delay
-	 * @param max
-	 * @param orientation
+	 * @param {function} callback
+	 * @param {object} conf -- delay:int, max:int, orientation:int
+	 * @return {object}
 	 */
 	Syrup.add ('interval', function (callback, conf) {
 		var _worker = new Workers;
-		_worker.set ('/workers/setting/Interval').then (function (_worker) {
-			_worker.send (conf);
-			_worker.on ('message', function (e) {
+
+		//Interceptor
+		_worker.intercept ({
+			'message': function (e) {
 				_.callbackAudit (callback, e.data);
-			})
+			}
+		}).run ('/workers/setting/Interval').then (function (_worker) {
+			//Worker Running
+			_worker.toWork (conf);
 		});
+
 		return _worker;
 	});
 

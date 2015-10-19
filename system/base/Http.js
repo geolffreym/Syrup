@@ -78,7 +78,7 @@
 			}
 
 			//Cors?
-			_self.xhr.withCredentials = _self.config.cors;
+			_self.xhr.withCredentials = !!_self.config.cors;
 
 			//If upload needed
 			if ( _.isSet (_self.config.upload)
@@ -114,7 +114,7 @@
 			_self.xhr.addEventListener ('readystatechange', function (e) {
 				if ( this.readyState ) {
 					//Find a interceptor for state
-					_self._handleInterceptor ('request', e);
+					_self._handleInterceptor ('state', e);
 				}
 			});
 
@@ -151,26 +151,31 @@
 
 	});
 
+	/** Interceptors
+	 * @param  {object} interceptors
+	 * @return {object}
+	 * */
+	Http.add ('intercept', function (interceptors) {
+		if ( _.isObject (interceptors) )
+			MiddleWare.intercept (this, interceptors);
+		return this;
+	});
+
+
 	/** Handle the interceptors
 	 * @param {string} type
 	 * @param {object} param
+	 * @return {void}
 	 * */
 	Http.add ('_handleInterceptor', function (type, param) {
-		var _self = this,
-			_interceptor = MiddleWare.getInterceptors (_self, type);
+		//Trigger Interceptors
+		MiddleWare.trigger (
+			MiddleWare.getInterceptors (this, type),
+			[param, this]
+		);
 
-		//Find a interceptor for request
-		if ( _interceptor.length > 0 ) {
-			_.each (_interceptor,
-					function (v, k) {
-						// Process the interceptor
-						v (param, _self);
-					}, true);
-
-			//Clean the interceptor
-			MiddleWare.cleanInterceptor (_self, type);
-		}
-
+		//Clean the interceptor
+		MiddleWare.cleanInterceptor (this, type);
 	});
 
 	/**Get request
@@ -252,7 +257,9 @@
 		return this;
 	});
 
-	/** Kill Http request */
+	/** Kill Http request
+	 * @return {object}
+	 * */
 	Http.add ('kill', function () {
 		_.each (this.xhr_list, function (xhr) {
 			xhr.abort ();

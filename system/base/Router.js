@@ -38,25 +38,57 @@
 
 		return (new Promise (function (resolve, reject) {
 			_self.routes = _.extend (_self.routes, routes);
-			resolve (_self.routes);
+			resolve (_self);
 		}))
+	});
+
+	Router.add ('_handleSkull', function (tpl) {
+		var _view = new View;
+		//Clear cache
+		_view.clear ();
+		return _view.seekTpl (tpl);
 	});
 
 	/**Delega rutas
 	 * @param {string} route_name
 	 * @returns {object}
 	 */
-	Router.add ('when', function (route_name) {
+	Router.add ('when', function (route_name, conf) {
 		_.assert (route_name, _.WARNING_SYRUP.ERROR.NOPARAM, '(Router .when)');
 		var _self = this;
 
 		return {
 			then: function (callback) {
+				//Is function callback?
 				if ( _.isFunction (callback) ) {
+					//Handle Route
+
+					//No route?
 					if ( !(route_name in _self.onpopstate) )
 						_self.onpopstate[route_name] = [];
-					_self.onpopstate[route_name].push (callback);
+
+					//Append a new route
+					_self.onpopstate[route_name].push (function (state, e) {
+						if ( conf && 'tpl' in conf ) {
+							_self._handleSkull (conf.tpl).then (function (view) {
+								//Render skull
+								_$ ('[sp-main]').html (view.getTpl ());
+								callback (state, e);
+							})
+						} else {
+							callback (state, e);
+						}
+					});
+
+					//First action
+					if ( _.matchInArray (route_name, [
+							'home', 'default',
+							'init', 'initial'
+						]) ) {
+						_self.redirect (route_name, {});
+					}
 				}
+				return _self;
 			}
 		};
 
@@ -128,6 +160,7 @@
 	});
 
 	//Global access
-	window.Router = Router;
+	window.Router = new Router;
+	window.RouterClass = Router;
 
 }) (window);

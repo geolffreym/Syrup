@@ -106,7 +106,7 @@
 				reject (data);
 
 			//The middleware
-			MiddleWare.intercept (self.Http, {
+			self.Http.intercept ({
 				request: function (config) {
 					config.method = conf.method;
 				}

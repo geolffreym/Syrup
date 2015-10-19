@@ -10,21 +10,20 @@ exports.files = {
 		output: 'dist/init',
 		src   : [
 			'system/base/Syrup',
+			'system/base/Lib',
+			'system/base/MiddleWare',
 			'system/base/Observer',
 			'system/base/Require',
-			'system/base/MiddleWare',
-			'system/base/Lib',
+			'system/base/Http',
+			'system/base/Repo',
+			'system/base/Workers',
+			'system/base/View',
+			'system/base/Model',
 			'system/base/App',
-			// Until here the core
-			'system/lib/Http',
-			'system/lib/Router',
-			'system/lib/Storage',
-			'system/lib/Workers',
-			'system/lib/View',
-			'system/lib/Model',
-			// Until here libs needed do not change
-			// Add all the necessary modules
-			'system/lib/Map'
+			'system/base/Router'
+			// Until here the core do not change
+			// Add all the necessary libs from here
+			//'system/lib/Map'
 		]
 	}
 };

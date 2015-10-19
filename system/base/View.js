@@ -10,11 +10,12 @@
 	 * Class for View handling.
 	 *
 	 * @class
+	 *
 	 */
 
 	function View () {
 		this.Http = new Http;
-		this.Storage = new Storage;
+		this.Storage = new Repo;
 		this.dir = null;
 		this.tpl = null;
 	}
@@ -25,7 +26,7 @@
 	 */
 	View.add ('lookup', function (template) {
 		//MiddleWare
-		MiddleWare.intercept (this.Http, {
+		this.Http.intercept ({
 			request: function (config) {
 				config.headers['Content-Type'] = 'text/plain';
 			}
@@ -97,16 +98,23 @@
 
 	//Parse the View
 	View.add ('render', function (_template, _fields) {
-		var _self = this;
+		var _self = this,
+			_worker = new Workers;
 		return (new Promise (function (resolve, reject) {
 			_fields = _.isObject (_template) && _template || _fields;
 			_template = !_.isObject (_template) && _.isString (_template) && _template || _self.tpl;
 
-			(new Workers).set ('/workers/setting/Parser').then (function (worker) {
-				worker.send ({ template: _template, fields: _fields });
-				worker.on ('message', function (e) {
-					resolve (e.data)
-				})
+			//Interceptor
+			_worker.intercept ({
+				'message': function (e) {
+					resolve (e.data);
+				}
+			}).run ('/workers/setting/Parser').then (function (worker) {
+				//Worker running
+				worker.toWork ({
+					template: _template,
+					fields  : _fields
+				});
 			});
 		}));
 	});

@@ -153,9 +153,8 @@ if ( typeof exports !== 'undefined' )
 	 * @param callback
 	 */
 	_$_.add ('ready', function (callback) {
-		var _self = this;
-		if ( _.isGlobal (_self.collection) )
-			_self.collection.addEventListener (
+		if ( _.isGlobal (this.collection) )
+			this.collection.addEventListener (
 				"DOMContentLoaded",
 				callback
 			);
@@ -166,9 +165,8 @@ if ( typeof exports !== 'undefined' )
 	 * @param callback
 	 */
 	_$_.add ('load', function (callback) {
-		var _self = this;
-		if ( _.isGlobal (_self.collection) ) {
-			_self.collection.onload = callback;
+		if ( _.isGlobal (this.collection) ) {
+			this.collection.onload = callback;
 		}
 	});
 
@@ -1366,19 +1364,23 @@ if ( typeof exports !== 'undefined' )
 	});
 
 	/** Interval Manager
-	 * @param callback
-	 * @param delay
-	 * @param max
-	 * @param orientation
+	 * @param {function} callback
+	 * @param {object} conf -- delay:int, max:int, orientation:int
+	 * @return {object}
 	 */
 	Syrup.add ('interval', function (callback, conf) {
 		var _worker = new Workers;
-		_worker.set ('/workers/setting/Interval').then (function (_worker) {
-			_worker.send (conf);
-			_worker.on ('message', function (e) {
+
+		//Interceptor
+		_worker.intercept ({
+			'message': function (e) {
 				_.callbackAudit (callback, e.data);
-			})
+			}
+		}).run ('/workers/setting/Interval').then (function (_worker) {
+			//Worker Running
+			_worker.toWork (conf);
 		});
+
 		return _worker;
 	});
 
@@ -1818,6 +1820,197 @@ if ( typeof exports !== 'undefined' )
 	_.nav.local = windowGlobal.navigator.userAgent.toLowerCase ();
 
 
+}) (window);
+/**
+ * Created by gmena on 08-06-14.
+ */
+
+"use strict";
+(function (window) {
+	function Libs () {
+		this.breadcrumb = {};
+		this.object = {};
+		this.name = null;
+	}
+
+	/** Blend a method in global Syrup object
+	 * @param {string} name
+	 * @param {array} dependencies
+	 * @return {object}
+	 * **/
+	Libs.add ('blend', function (name, dependencies) {
+		var _anonymous = (
+			Function.factory (name)
+		) ();
+
+
+		if ( !(name in this.breadcrumb) ) {
+			_.Syrup.blend (_anonymous);
+			this.name = name;
+			this.object = _[name];
+			this.breadcrumb[name] = this.object;
+			this._dependencies (dependencies);
+		}
+
+		return this;
+
+	});
+
+	/** Return a method saved in breadcrumb
+	 * @param {string} name
+	 * @return {object}
+	 * **/
+	Libs.add ('get', function (name) {
+		return (name in this.breadcrumb) && this.breadcrumb[name];
+	});
+
+	/**Dependencies gestor
+	 * @param {array} dependencies
+	 * @return {void}
+	 * */
+	Libs.add ('_dependencies', function (dependencies) {
+		var _self = this;
+		if ( _.isArray (dependencies) && _.isSet (_self.object) ) {
+			_.each (dependencies, function (v) {
+				_self.object.__proto__[v] = !(v in _self.object)
+					? ( _[v] || (
+						_.isFunction (window[v]) && new window[v]
+						|| _.isFunction (window[v + 'Class']) && new window[v + 'Class']
+				)) : _self.object[v];
+			})
+		}
+	});
+
+	/**Attributes provider
+	 * @param {object} attributes
+	 * @return {object}
+	 * */
+	Libs.add ('make', function (attributes) {
+		var _self = this;
+		_.each (attributes, function (v, i) {
+			_self.object[i] = v;
+		});
+
+		return this;
+	});
+
+	/** Methods provider
+	 * @param {object} supplier
+	 * @return {object}
+	 * **/
+	Libs.add ('supply', function (supplier) {
+		var _self = this;
+
+		//Each elemento of supplier
+		_.each (supplier, function (v, i) {
+			if ( _.isFunction (v) )
+				_self.cook (i, v);
+		}, true);
+
+		return this;
+	});
+
+
+	/**Append methods
+	 * @param {string} name
+	 * @param {function} callback
+	 * @return {object}
+	 * */
+	Libs.add ('cook', function (name, callback) {
+		if ( _.isFunction (callback) )
+			this.object.__proto__[name] = callback;
+		return this;
+	});
+
+	//The global object Lib
+	window.Lib = new Libs;
+	window.LibClass = Libs;
+}) (window);
+
+/**
+ * Created by gmena on 10-13-15.
+ */
+
+(function (window) {
+	"use strict";
+	function MiddleWare () {
+
+	}
+
+	/** Intercept signals in object
+	 * @param {object} intercepted
+	 * @param {function} result
+	 * @return {object}
+	 * */
+	MiddleWare.add ('intercept', function (intercepted, result) {
+		return new Promise (function (resolve, reject) {
+			if ( !( 'interceptors' in intercepted ) )
+				intercepted['interceptors'] = {};
+
+			if ( _.isObject (result) ) {
+				_.each (result, function (v, k) {
+					//Intercepted has interceptors?
+					if ( !(k in intercepted.interceptors) )
+						intercepted.interceptors[k] = [];
+
+					//New interceptor
+					if ( _.isFunction (v) )
+						intercepted.interceptors[k].push (v);
+
+				}, true);
+
+				//Resolve
+				resolve (intercepted);
+			}
+
+
+		})
+	});
+
+	/** Find signals in object
+	 * @param {object} intercepted
+	 * @param {string} find
+	 * @return {object}
+	 * */
+	MiddleWare.add ('getInterceptors', function (intercepted, find) {
+		if ( 'interceptors' in intercepted ) {
+			if (
+				find in intercepted.interceptors
+				&& _.isArray (intercepted.interceptors[find])
+				&& intercepted.interceptors[find].length > 0
+			) {
+				return intercepted.interceptors[find];
+			}
+		}
+		return [];
+	});
+
+	/** Trigger the interceptors
+	 * @param {object} intercepted
+	 * @param {string} find
+	 * */
+	MiddleWare.add ('cleanInterceptor', function (intercepted, find) {
+		if ( 'interceptors' in intercepted ) {
+			if ( find in intercepted.interceptors ) {
+				delete intercepted.interceptors[find];
+			}
+		}
+	});
+
+	/** Trigger the interceptors
+	 * @param {object} intercepted
+	 * @param {string} find
+	 * */
+	MiddleWare.add ('trigger', function (interceptors, params) {
+		if (interceptors.length > 0)
+			_.each (interceptors, function (v) {
+				if ( _.isFunction (v) )
+					v.apply (null, params || []);
+			}, true);
+	});
+
+	window.MiddleWare = new MiddleWare;
+	window.MiddleWareClass = MiddleWare;
 }) (window);
 /*
  Tested against Chromium build with Object.observe and acts EXACTLY the same,
@@ -4342,733 +4535,6 @@ if ( !Object.observe ) {
 }) (window);
 
 /**
- * Created by gmena on 10-13-15.
- */
-
-(function (window) {
-	var WARNING_MIDDLEWARE = {
-		ERROR: {
-			NOTFOUND: 'Interceptor not found'
-		}
-	};
-
-	"use strict";
-	function MiddleWare () {
-
-	}
-
-	/** Intercept signals in object
-	 * @param {object} intercepted
-	 * @param {function} result
-	 * @return {object}
-	 * */
-	MiddleWare.add ('intercept', function (intercepted, result) {
-		return new Promise (function (resolve, reject) {
-			if ( !( 'interceptors' in intercepted ) )
-				intercepted['interceptors'] = {};
-
-			if ( _.isObject (result) ) {
-				_.each (result, function (v, k) {
-					//Intercepted has interceptors?
-					if ( !(k in intercepted.interceptors) )
-						intercepted.interceptors[k] = [];
-
-					//New interceptor
-					if ( _.isFunction (v) )
-						intercepted.interceptors[k].push (v);
-
-				}, true);
-
-				//Resolve
-				resolve (intercepted);
-			}
-
-
-		})
-	});
-
-	/** Find signals in object
-	 * @param {object} intercepted
-	 * @param {string} find
-	 * @return {object}
-	 * */
-	MiddleWare.add ('getInterceptors', function (intercepted, find) {
-		if ( 'interceptors' in intercepted ) {
-			if (
-				find in intercepted.interceptors
-				&& _.isArray (intercepted.interceptors[find])
-				&& intercepted.interceptors[find].length > 0
-			) {
-				return intercepted.interceptors[find];
-			}
-		}
-		return [];
-	});
-
-	/** Trigger the interceptors
-	 * @param {object} intercepted
-	 * @param {string} find
-	 * */
-	MiddleWare.add ('cleanInterceptor', function (intercepted, find) {
-		if ( 'interceptors' in intercepted ) {
-			if ( find in intercepted.interceptors ) {
-				delete intercepted.interceptors[find];
-			}
-		}
-	});
-
-	/** Trigger the interceptors
-	 * @param {object} intercepted
-	 * @param {string} find
-	 * */
-	MiddleWare.add ('trigger', function (intercepted, interceptors) {
-		_.each (interceptors, function (v) {
-			if ( _.isFunction (v) )
-				v (intercepted);
-		}, true);
-	});
-
-	window.MiddleWare = new MiddleWare;
-	window.MiddleWareClass = MiddleWare;
-}) (window);
-/**
- * Created by gmena on 08-06-14.
- */
-
-"use strict";
-(function (window) {
-	function Libs () {
-		this.breadcrumb = {};
-		this.object = {};
-		this.name = null;
-	}
-
-	/** Blend a method in global Syrup object
-	 * @param name
-	 * @param dependencies []
-	 * @return object
-	 * **/
-	Libs.add ('blend', function (name, dependencies) {
-		var _anonymous = (
-			Function.factory (name)
-		) ();
-
-
-		if ( !(name in this.breadcrumb) ) {
-			_.Syrup.blend (_anonymous);
-			this.name = name;
-			this.object = _[name];
-			this.breadcrumb[name] = this.object;
-			this._dependencies (dependencies);
-		}
-
-		return this;
-
-	});
-
-	/** Return a method saved in breadcrumb
-	 * @param name
-	 * @return object
-	 * **/
-	Libs.add ('get', function (name) {
-		return (name in this.breadcrumb) && this.breadcrumb[name];
-	});
-
-	/**Dependencies gestor
-	 * @param dependencies []
-	 * @return void
-	 * */
-	Libs.add ('_dependencies', function (dependencies) {
-		var _self = this;
-		if ( _.isArray (dependencies) && _.isSet (_self.object) ) {
-			_.each (dependencies, function (v) {
-				_self.object.__proto__[v] = !(v in _self.object)
-					? ( _[v] || _.isFunction (window[v]) && new window[v])
-					: _self.object[v];
-			})
-		}
-	});
-
-	/**Attributes provider
-	 * @param attributes object
-	 * @return object
-	 * */
-	Libs.add ('make', function (attributes) {
-		var _self = this;
-		_.each (attributes, function (v, i) {
-			_self.object[i] = v;
-		});
-
-		return this;
-	});
-
-	/** Methods provider
-	 * @param supplier
-	 * @return object
-	 * **/
-	Libs.add ('supply', function (supplier) {
-		var _self = this,
-			_k = _.getObjectKeys (supplier),
-			_i = _k.length;
-
-		while ( _i-- ) {
-			if ( _.isFunction (supplier[_k[_i]]) )
-				_self.cook (_k[_i], supplier[_k[_i]]);
-		}
-
-		return this;
-	});
-
-
-	/**Append methods
-	 * @param name
-	 * @param callback
-	 * @return object
-	 * */
-	Libs.add ('cook', function (name, callback) {
-		this.object.__proto__[name] = callback;
-		return this;
-	});
-
-//The global object Lib
-	window.Lib = new Libs;
-	window.LibClass = Libs;
-}) (window);
-
-/**
- * Created by gmena on 07-31-14.
- */
-"use strict";
-(function (window) {
-	function Apps () {
-		this.root = null; // Root name
-		this.lib = null; // Lib handler
-		this.app = null; // The main app
-		this.after = null; // After recipes init execution
-
-		this.model = null; // The model
-		this.scope = {}; // Global scope
-		this.modules = {}; // Modules list
-		this.onchange = {}; // Change handler
-	}
-
-	/** Blend a method in global Syrup object
-	 * @param name
-	 * @param dependencies []
-	 * @return object
-	 * **/
-	Apps.add ('blend', function (name, dependencies) {
-		var _self = new Apps;
-		_self.lib = new LibClass;
-		_self.root = name;
-		_self.scope = {};
-		_self.app = _$ ('[sp-app="' + name + '"]');
-		_self.lib.blend (name, dependencies);
-
-		return _self;
-	});
-
-	/** Make a recipe for blend
-	 *  @param moduleId string
-	 *  @param module function
-	 *  @return object
-	 * */
-	Apps.add ('recipe', function (moduleId, module) {
-		if ( _.isSet (this.root) ) {
-			if ( _.isSet (module) ) {
-				this.temp = moduleId;
-				this.modules[moduleId] = {
-					creator : module,
-					instance: null
-				};
-
-				//Constructor
-				this._taste (moduleId);
-			}
-		}
-		return this;
-	});
-
-	/**Object Observer
-	 * @param moduleId
-	 * **/
-	Apps.add ('_watch', function (moduleId) {
-		var _self = this;
-		Object.observe (_self.scope, function (change) {
-			_.each (change, function (v) {
-				if ( (v.name in _self.onchange)
-					 && _.getObjectSize (v.object) > 0
-					 && moduleId === v.name
-				) {
-					_self.onchange[v.name] ({
-						name  : v.name,
-						old   : v.oldValue,
-						type  : v.type,
-						object: v.object[v.name]
-					});
-					return false;
-				}
-			});
-		});
-
-	});
-
-	/**Add new child module
-	 * @param moduleId
-	 * @return void
-	 * **/
-	Apps.add ('_add', function (moduleId) {
-		if ( !_.isObject (this.scope[moduleId]) ) {
-			this.scope[moduleId] = {};
-		}
-	});
-
-	/**Trigger code execution
-	 * @param moduleId
-	 * @return void
-	 * **/
-	Apps.add ('_trigger', function (moduleId) {
-		if ( moduleId in this.modules )
-			return this.modules[moduleId].creator (_, this.scope);
-		return {}
-	});
-
-	/**Provide a global initial config
-	 * @param moduleId
-	 * @return void
-	 * **/
-	Apps.add ('cook', function (callback) {
-		if ( _.isFunction (callback) )
-			callback (this.lib.get (this.root), _);
-		return this;
-	});
-
-
-	/**Global attributes supplier
-	 * @param moduleList
-	 * @callback*/
-	Apps.add ('spice', function (object) {
-		if ( _.isObject (object) )
-			this.lib.make (object);
-		return this;
-	});
-
-
-	/**Add a custom trigger to execute after init
-	 * @param moduleList
-	 * @callback*/
-	Apps.add ('afters', function (callback) {
-		if ( _.isFunction (callback) )
-			this.after = callback;
-		return this;
-	});
-
-	/** Append global service
-	 * @param name
-	 * @param callback function
-	 * @return void
-	 *
-	 * */
-	Apps.add ('service', function (name, callback) {
-		this.lib.cook (name, callback);
-		return this;
-	});
-
-	/** Append global services
-	 * @param object
-	 * @return void
-	 *
-	 * */
-	Apps.add ('services', function (object) {
-		this.lib.supply (object);
-		return this;
-	});
-
-
-	/**Return a recipe by name
-	 * @param moduleId
-	 * @return object
-	 * */
-	Apps.add ('getRecipe', function (moduleId) {
-		if ( moduleId in this.modules && _.isSet (this.root) )
-			return this.modules[moduleId].instance;
-		return null;
-	});
-
-	/**Set Scope
-	 * @param moduleId
-	 * @param object
-	 * @return void
-	 * **/
-	Apps.add ('setScope', function (moduleId, object) {
-		if ( moduleId in this.scope ) {
-			this.scope[moduleId] = object;
-		}
-		return this;
-	});
-
-	/**Get Scope
-	 * @param moduleId
-	 * @return object
-	 * **/
-	Apps.add ('getScope', function (moduleId) {
-		if ( moduleId in this.scope ) {
-			return this.scope[moduleId];
-		}
-		return {};
-	});
-
-	/**Event handler
-	 * @param event
-	 * @param name
-	 * @param callback
-	 * @return object
-	 */
-	Apps.add ('when', function (event, name) {
-		var self = this;
-		return event && (
-			{
-				change: ({
-					then: (function (resolve) {
-						self.onchange[name] = resolve;
-					})
-				})
-			}[event] || { then: function () {} })
-	});
-
-	/**Bind Listeners
-	 * @param moduleId
-	 * */
-	Apps.add ('_bindListener', function (moduleId) {
-		var enabled_events = [
-			'[sp-click], ', 'submit], ',
-			'change], ', 'dblclick], ',
-			'mousedown], ', 'mouseenter], ',
-			'mouseleave], ', 'mousemove], ',
-			'mouseover], ', 'mouseout], ', 'mouseup], ',
-			'keydown], ', 'keypress], ', 'keyup], ', 'blur], ',
-			'focus], ', 'input], ', 'select], ', 'reset]'
-		];
-
-		if ( this.app.exist ) {
-			var _this = this, _dom = null,
-				_self = this.modules[moduleId].instance,
-				_the_filter = enabled_events.join (' [sp-'),
-				_mod = _$ ('[sp-recipe="' + moduleId + '"]');
-
-			//Exist the module?
-			if ( _mod.exist ) {
-
-				//Find events listeners
-				_mod.find (_the_filter, function (dom_list) {
-					//Find the listener in attributes
-					_.each ((_dom = dom_list.get ()).attributes, function (v) {
-						if ( /sp-[a-z]+/.test (v.localName) ) {
-							var _event = _.replace (v.localName, 'sp-', _.emptyStr),
-								_attr = _dom.getAttribute (v.localName);
-
-							//Is the attr value in module?
-							if ( _attr in _self ) {
-								//is Function the attr value?
-								if ( _.isFunction (_self[_attr]) ) {
-									_mod.listen (_event, '[' + v.localName + '="' + _attr + '"]', function (e) {
-										//Param event and dependencies
-										e.preventDefault ();
-										_self[_attr] (_this.lib.get (_self.parent), e);
-									});
-								}
-							}
-						}
-					});
-				});
-			}
-		}
-	});
-
-	/** Prepare Model
-	 * @param moduleId
-	 */
-	Apps.add ('_models', function (moduleId) {
-		var _self = this,
-			_model = new Model,
-			_resource = _$ ('[sp-recipe="' + moduleId + '"] [sp-model]');
-
-		//Exist the app and the model?
-		if ( this.app.exist && _resource.exist ) {
-			_self.modules[moduleId].instance.model = {
-				object  : _model,
-				resource: _resource,
-				set     : function (obj) {
-					_model.set (_resource, obj);
-					return _self.modules[moduleId].instance;
-				},
-				send    : function () {
-					if ( _.getObjectSize (_model.scope) > 0 )
-						return _model.send ();
-				},
-				get     : function (item) {
-					return new Promise (function (resolve, reject) {
-						_model.get (_resource).then (function (e) {
-							if (
-								_.isSet (item)
-								&& _.isArray (item)
-								&& !_.isEmpty (item)
-							) {
-								var _result = {};
-								_.each (item, function (v, i) {
-									if ( v in e.scope )
-										_result[v] = e.scope[v];
-								});
-								//If filter item
-								resolve (_result);
-
-							} else {
-								//Else all the scope
-								resolve (e.scope);
-							}
-						}).catch (reject);
-					});
-
-				}
-			}
-		}
-
-	});
-
-	/**Prepare Views
-	 * @param moduleId
-	 * */
-
-	Apps.add ('_views', function (moduleId) {
-		// Render view
-		var _self = this;
-		_self.modules[moduleId].instance.view = {
-			render: function (_view) {
-				_self._serve (moduleId, _view || null);
-				return _self.modules[moduleId].instance;
-			}
-		};
-	});
-
-
-	/**Prepare Scopes
-	 * @param moduleId
-	 * */
-	Apps.add ('_scopes', function (moduleId) {
-		// Render view
-		var _self = this;
-
-		_self.modules[moduleId].instance.scope = {
-			global: _self.scope,
-			object: _self.scope[moduleId],
-			set   : function (nModule, object) {
-				var _moduleId = !_.isObject (nModule)
-								&& _.isString (nModule) && nModule
-								|| moduleId,
-					_object = _.isObject (nModule) && nModule
-							  || object;
-
-				if ( _.isObject (_object) ) {
-					_self.setScope (_moduleId, _object);
-					return _self.modules[moduleId].instance;
-				}
-			},
-			get   : function (nModule) {
-				var _moduleId = _.isString (nModule)
-					? nModule : moduleId;
-
-				return _self.getScope (_moduleId);
-			}
-		};
-	});
-
-
-	/**Prepare Recipes
-	 * @param moduleId
-	 * */
-	Apps.add ('_recipes', function (moduleId) {
-		// Render view
-		var _self = this;
-		_self.modules[moduleId].instance.recipe = {
-			$   : _$ ('[sp-recipe="' + moduleId + '"]'),
-			get : function (nModule) {
-				var _moduleId = _.isString (nModule)
-					? nModule : moduleId;
-
-				return _self.getRecipe (_moduleId);
-			},
-			drop: function (nModule) {
-				var _moduleId = _.isString (nModule)
-					? nModule : moduleId;
-
-				_self.drop (_moduleId);
-				return _self.modules[moduleId].instance;
-			}
-		};
-	});
-
-	/** Render the View
-	 * @param moduleId
-	 * @param view
-	 * @return object
-	 */
-	Apps.add ('_serve', function (moduleId, view) {
-		var _view = null,
-			_scope = this.scope[moduleId];
-
-		//Is set the app
-		if ( this.app.exist ) {
-			//Find the recipe
-			var _dom = _$ ('[sp-recipe="' + moduleId + '"] [sp-view]'),
-				_dom_template = _$ ('[sp-recipe="' + moduleId + '"] [sp-tpl]');
-
-			if ( _dom.exist ) { //Exist?
-				if ( _.getObjectSize (_scope) > 0 ) {
-
-					//The view object
-					_view = new View;
-
-					//A view?
-					if ( _.isSet (view) && _.isString (view) ) {
-						var view_name = view.split ('/').pop (),
-							view_dir = _.replace (view, '/' + view_name, _.emptyStr);
-
-						//Require the view if needed
-						Require.lookup (['view/' + view_dir]).then (function () {
-							if ( view_name in _view.__proto__ )
-								_view[view_name] (_, _scope, function (my_html) {
-									_dom.html (my_html);
-								})
-						});
-
-						//Exist inline tpl?
-					} else if ( _dom_template.exist ) {
-						var _parse = _dom_template.html ();
-						if ( _.isSet (_parse) ) {
-							_view.render (_parse, _scope).then (function (result) {
-								_dom.html (result);
-							});
-
-						}
-
-					}
-
-				}
-
-			}
-
-		}
-
-		return this;
-	});
-
-	/** Execute Module
-	 *@param moduleId
-	 * @return object
-	 */
-
-	Apps.add ('_taste', function (moduleId) {
-		var _self = this;
-
-		if ( moduleId in _self.modules && _.isSet (_self.root) ) {
-
-			// Initialize module
-			_self._add (moduleId);
-			_self.modules[moduleId].instance = _self._trigger (moduleId);
-			_self.modules[moduleId].instance.name = moduleId;
-			_self.modules[moduleId].instance.parent = _self.root;
-
-			// Binding Methods
-			// Event handler
-			_self.modules[moduleId].instance.when = function (event) {
-				return _self.when (event, moduleId);
-			};
-
-			// Custom listener for recipe
-			_self.modules[moduleId].instance.listen = function (event, delegate) {
-				var _recipe = _$ ('[sp-recipe="' + moduleId + '"]');
-
-				return new Promise (function (resolve, reject) {
-					if ( _recipe.exist ) {
-						_recipe.listen (event, delegate, resolve);
-					} else {
-						reject (_recipe);
-					}
-				})
-			};
-
-			// Recipes
-			_self._recipes (moduleId);
-
-			// Scoping
-			_self._scopes (moduleId);
-
-			// Handle Model
-			_self._models (moduleId);
-
-			// Handle Views
-			_self._views (moduleId);
-
-			// Init the module?
-			if (
-				'init' in _self.modules[moduleId].instance
-				&& _.isFunction (_self.modules[moduleId].instance.init)
-			) {
-
-				//Execution
-				_self.modules[moduleId].instance.init (this.lib.get (_self.root));
-
-				//After execute
-				if ( _.isSet (_self.after) )
-					_self.after (this.lib.get (_self.root), moduleId);
-
-			}
-
-			// Bind listeners
-			_self._bindListener (moduleId);
-
-			// Observe scope
-			_self._watch (moduleId);
-		}
-
-		return this;
-	});
-
-
-	/**Drop a Module
-	 * @param moduleId
-	 * @return object
-	 * */
-	Apps.add ('drop', function (moduleId) {
-		if ( moduleId in this.modules ) {
-			if ( this.modules[moduleId].instance ) {
-				if ( 'destroy' in this.modules[moduleId].instance )
-					this.modules[moduleId].instance.destroy (this.lib.get (this.root));
-				this.modules[moduleId] = null;
-			}
-		}
-		return this;
-	});
-
-
-	/**Drop all Modules
-	 * @return object
-	 * */
-	Apps.add ('dropAll', function () {
-		var _self = this;
-		_.each (this.modules, function (module, id) {
-			_self.drop (id);
-		});
-		return this;
-	});
-
-	//The global object App
-	window.App = new Apps;
-	window.AppClass = Apps;
-
-}) (window);
-
-/**
  * Created by gmena on 07-26-14.
  */
 
@@ -5148,7 +4614,7 @@ if ( !Object.observe ) {
 			}
 
 			//Cors?
-			_self.xhr.withCredentials = _self.config.cors;
+			_self.xhr.withCredentials = !!_self.config.cors;
 
 			//If upload needed
 			if ( _.isSet (_self.config.upload)
@@ -5184,7 +4650,7 @@ if ( !Object.observe ) {
 			_self.xhr.addEventListener ('readystatechange', function (e) {
 				if ( this.readyState ) {
 					//Find a interceptor for state
-					_self._handleInterceptor ('request', e);
+					_self._handleInterceptor ('state', e);
 				}
 			});
 
@@ -5221,26 +4687,31 @@ if ( !Object.observe ) {
 
 	});
 
+	/** Interceptors
+	 * @param  {object} interceptors
+	 * @return {object}
+	 * */
+	Http.add ('intercept', function (interceptors) {
+		if ( _.isObject (interceptors) )
+			MiddleWare.intercept (this, interceptors);
+		return this;
+	});
+
+
 	/** Handle the interceptors
 	 * @param {string} type
 	 * @param {object} param
+	 * @return {void}
 	 * */
 	Http.add ('_handleInterceptor', function (type, param) {
-		var _self = this,
-			_interceptor = MiddleWare.getInterceptors (_self, type);
+		//Trigger Interceptors
+		MiddleWare.trigger (
+			MiddleWare.getInterceptors (this, type),
+			[param, this]
+		);
 
-		//Find a interceptor for request
-		if ( _interceptor.length > 0 ) {
-			_.each (_interceptor,
-					function (v, k) {
-						// Process the interceptor
-						v (param, _self);
-					}, true);
-
-			//Clean the interceptor
-			MiddleWare.cleanInterceptor (_self, type);
-		}
-
+		//Clean the interceptor
+		MiddleWare.cleanInterceptor (this, type);
 	});
 
 	/**Get request
@@ -5322,7 +4793,9 @@ if ( !Object.observe ) {
 		return this;
 	});
 
-	/** Kill Http request */
+	/** Kill Http request
+	 * @return {object}
+	 * */
 	Http.add ('kill', function () {
 		_.each (this.xhr_list, function (xhr) {
 			xhr.abort ();
@@ -5340,157 +4813,24 @@ if ( !Object.observe ) {
 /**
  * Created by gmena on 07-26-14.
  */
-
-
-(function (window) {
-
-	'use strict';
-	/**Router
-	 * @constructor
-	 */
-	function Router () {
-		this.routes = {};
-		this.history = window.history;
-		this.findParams = /(:[\w]+)/g;
-		this.onpopstate = {};
-
-		var _self = this;
-		//Set Pop State
-		window.addEventListener ('popstate', function (e) {
-			if ( _.isSet (e.state) && 'route_name' in e.state ) {
-				if ( e.state.route_name in _self.onpopstate ) {
-					_.each (_self.onpopstate[e.state.route_name], function (v, i) {
-						v (e.state, e);
-					}, true);
-				}
-			}
-		});
-	}
-
-
-	/**Set the routes
-	 * @param {object} routes
-	 * @return {object}
-	 * */
-	Router.add ('set', function (routes) {
-		var _self = this;
-
-		return (new Promise (function (resolve, reject) {
-			_self.routes = _.extend (_self.routes, routes);
-			resolve (_self.routes);
-		}))
-	});
-
-	/**Delega rutas
-	 * @param {string} route_name
-	 * @returns {object}
-	 */
-	Router.add ('when', function (route_name) {
-		_.assert (route_name, _.WARNING_SYRUP.ERROR.NOPARAM, '(Router .when)');
-		var _self = this;
-
-		return {
-			then: function (callback) {
-				if ( _.isFunction (callback) ) {
-					if ( !(route_name in _self.onpopstate) )
-						_self.onpopstate[route_name] = [];
-					_self.onpopstate[route_name].push (callback);
-				}
-			}
-		};
-
-	});
-
-	/**Redirect to route
-	 * @param {string} route_name
-	 * @return {object}
-	 * */
-	Router.add ('redirect', function (route_name, params, config) {
-		_.assert (route_name, _.WARNING_SYRUP.ERROR.NOPARAM, '(Router .redirect)');
-
-		var _self = this,
-			_the_new_route = null,
-			_params = null, _config = {
-				trigger: true
-			};
-
-		return (new Promise (function (resolve, reject) {
-
-			//Not routing
-			if ( !(route_name in _self.routes) ) {
-				reject (route_name);
-				return;
-			}
-
-			//Params and config
-			_params = _.isObject (params)
-				? params : {};
-
-			_config = _.extend (_config, config || {}, true);
-
-			//Set old regex in state object
-			_params['route_name'] = route_name;
-			_the_new_route = _self.routes[route_name];
-
-			//Replace params?
-			_the_new_route = _.isSet (params) && _.getObjectSize (params) > 0
-				? _.replace (_the_new_route, _self.findParams, params)
-				: _the_new_route;
-
-			//Set state in history
-			_self._triggerPopState (_params, route_name, _the_new_route, _config);
-
-			//Resolve Promise
-			resolve (_the_new_route);
-
-
-		}));
-	});
-
-
-	/** Trigger the pop state
-	 * @param {object} _params
-	 * @param {string} route_name
-	 * @param {string} _the_new_route
-	 * @return {void}
-	 * */
-	Router.add ('_triggerPopState', function (_params, route_name, _the_new_route, _config) {
-		//Set state in history
-		//Two times, for trigger "popstate"
-
-		if ( _config.trigger ) {
-			this.history.pushState (_params, route_name, _the_new_route);
-			this.history.pushState (_params, route_name, _the_new_route);
-			this.history.back ();
-		}
-
-	});
-
-	//Global access
-	window.Router = Router;
-
-}) (window);
-/**
- * Created by gmena on 07-26-14.
- */
 'use strict';
 (function (window) {
-	function Storage () {}
+	function Repo () {}
 
 	//Set registry to bucket
-	Storage.add ('set', function (key, data) {
+	Repo.add ('set', function (key, data) {
 		localStorage.setItem (key, JSON.stringify (data));
 	});
 
 
 	//Get registry from bucket
-	Storage.add ('get', function (key) {
+	Repo.add ('get', function (key) {
 		return _.isJson (localStorage.getItem (key))
 			? JSON.parse (localStorage.getItem (key)) : null;
 	});
 
 	//Append data to existing bucket
-	Storage.add ('append', function (key, element) {
+	Repo.add ('append', function (key, element) {
 		var _existent = this.get (key),
 			_new = _.extend (_.isSet (_existent) ? _existent : {}, element);
 
@@ -5499,24 +4839,24 @@ if ( !Object.observe ) {
 	});
 
 	//Detroy all buckets
-	Storage.add ('destroy', function () {
+	Repo.add ('destroy', function () {
 		localStorage.clear ();
 	});
 
 	//Clear a bucket
-	Storage.add ('clear', function (key) {
+	Repo.add ('clear', function (key) {
 		localStorage.removeItem (key);
 		return this;
 	});
 
 
 	//Return count buckets
-	Storage.add ('count', function () {
+	Repo.add ('count', function () {
 		return localStorage.length;
 	});
 
 	//Global access
-	window.Storage = Storage;
+	window.Repo = Repo;
 
 }) (window);
 /**
@@ -5528,45 +4868,72 @@ if ( !Object.observe ) {
 (function (window) {
 	function Workers () {
 		this.Worker = null;
-		this.onsuccess = null;
+		this.interceptors = {};
 	}
 
-	//Worker event handler
-	Workers.add ('on', function (event, callback) {
-		var self = this;
-		return event &&
-			   ({
-					message: function () {
-						self.onsuccess = callback;
-					}
-				}[event] || function () {}) ()
 
-	});
-
-	//Set new Worker
-	Workers.add ('set', function (url) {
+	/** Run worker
+	 * @param {string} url
+	 * @return {object}
+	 * **/
+	Workers.add ('run', function (url) {
 		var self = this;
 		return (new Promise (function (resolve, reject) {
 			self.Worker = (new Worker (setting.system_path + url + '.min.js'));
 			self.Worker.addEventListener ('message', function (e) {
-				_.callbackAudit (self.onsuccess, e);
+				//Intercept message
+				self._handleInterceptor ('message', e);
 			}, false);
 			resolve (self);
 		}))
 	});
 
-	//Get Worker
+	/**Get Worker
+	 * @return {object}
+	 * **/
 	Workers.add ('get', function () {
 		return this.Worker;
 	});
 
-	//Send Message to Worker
-	Workers.add ('send', function (message) {
-		this.Worker.postMessage (!!message ? message : '');
+	/** Interceptors
+	 * @param  {object} interceptors
+	 * @return {object}
+	 * */
+	Workers.add ('intercept', function (interceptors) {
+		if ( _.isObject (interceptors) )
+			MiddleWare.intercept (this, interceptors);
 		return this;
 	});
 
-	//Kill Worker
+	/** Handle the interceptors
+	 * @param {string} type
+	 * @param {object} param
+	 * @return {void}
+	 * */
+	Workers.add ('_handleInterceptor', function (type, param) {
+		//Trigger Interceptors
+		MiddleWare.trigger (
+			MiddleWare.getInterceptors (this, type),
+			[param, this]
+		);
+
+		//Clean the interceptor
+		MiddleWare.cleanInterceptor (this, type);
+	});
+
+
+	/**Send Message to Worker
+	 * @param {string} message
+	 * @return {object}
+	 * **/
+	Workers.add ('toWork', function (message) {
+		this.Worker.postMessage (message || null);
+		return this;
+	});
+
+	/**Kill Worker
+	 *@return {object}
+	 * **/
 	Workers.add ('kill', function () {
 		if ( _.isSet (this.Worker) ) {
 			this.Worker.terminate ();
@@ -5592,11 +4959,12 @@ if ( !Object.observe ) {
 	 * Class for View handling.
 	 *
 	 * @class
+	 *
 	 */
 
 	function View () {
 		this.Http = new Http;
-		this.Storage = new Storage;
+		this.Storage = new Repo;
 		this.dir = null;
 		this.tpl = null;
 	}
@@ -5607,7 +4975,7 @@ if ( !Object.observe ) {
 	 */
 	View.add ('lookup', function (template) {
 		//MiddleWare
-		MiddleWare.intercept (this.Http, {
+		this.Http.intercept ({
 			request: function (config) {
 				config.headers['Content-Type'] = 'text/plain';
 			}
@@ -5679,16 +5047,23 @@ if ( !Object.observe ) {
 
 	//Parse the View
 	View.add ('render', function (_template, _fields) {
-		var _self = this;
+		var _self = this,
+			_worker = new Workers;
 		return (new Promise (function (resolve, reject) {
 			_fields = _.isObject (_template) && _template || _fields;
 			_template = !_.isObject (_template) && _.isString (_template) && _template || _self.tpl;
 
-			(new Workers).set ('/workers/setting/Parser').then (function (worker) {
-				worker.send ({ template: _template, fields: _fields });
-				worker.on ('message', function (e) {
-					resolve (e.data)
-				})
+			//Interceptor
+			_worker.intercept ({
+				'message': function (e) {
+					resolve (e.data);
+				}
+			}).run ('/workers/setting/Parser').then (function (worker) {
+				//Worker running
+				worker.toWork ({
+					template: _template,
+					fields  : _fields
+				});
 			});
 		}));
 	});
@@ -5805,7 +5180,7 @@ if ( !Object.observe ) {
 				reject (data);
 
 			//The middleware
-			MiddleWare.intercept (self.Http, {
+			self.Http.intercept ({
 				request: function (config) {
 					config.method = conf.method;
 				}
@@ -6008,547 +5383,718 @@ if ( !Object.observe ) {
 }) (window);
 
 /**
- * Created with JetBrains PhpStorm.
- * User: Geolffrey Mena
- * Date: 18/11/13
- * Time: 12:55
- * To change this template use File | Settings | File Templates.
+ * Created by gmena on 07-31-14.
  */
+"use strict";
 (function (window) {
-	'use strict';
-	var GoogleMap,
-		WARNING_GOOGLE_MAP = {
-			ERROR: {
-				NOLOCATION : 'No coordinates seted.',
-				NOMAP      : 'No map seted.',
-				NOCONTAINER: 'No map container seted.',
-				NOCONFIG   : 'The configuration object is necessary.',
-				NOROUTES   : 'No mapped routes',
-				NODISTANCE : 'You need the source and target to measure the distance.'
+	function Apps () {
+		this.root = null; // Root name
+		this.lib = null; // Lib handler
+		this.app = null; // The main app
+		this.after = null; // After recipes init execution
 
+		this.model = null; // The model
+		this.scope = {}; // Global scope
+		this.modules = {}; // Modules list
+		this.onchange = {}; // Change handler
+	}
+
+	/** Blend a method in global Syrup object
+	 * @param name
+	 * @param dependencies []
+	 * @return object
+	 * **/
+	Apps.add ('blend', function (name, dependencies) {
+		var _self = new Apps;
+		_self.lib = new LibClass;
+		_self.root = name;
+		_self.scope = {};
+		_self.app = _$ ('[sp-app="' + name + '"]');
+		_self.lib.blend (name, dependencies);
+
+		return _self;
+	});
+
+	/** Make a recipe for blend
+	 *  @param moduleId string
+	 *  @param module function
+	 *  @return object
+	 * */
+	Apps.add ('recipe', function (moduleId, module) {
+		if ( _.isSet (this.root) ) {
+			if ( _.isSet (module) ) {
+				this.temp = moduleId;
+				this.modules[moduleId] = {
+					creator : module,
+					instance: null
+				};
+
+				//Constructor
+				this._taste (moduleId);
 			}
-		};
+		}
+		return this;
+	});
 
-	GoogleMap = function () {
-		var _proto = this.__proto__ || GoogleMap.prototype,
-			_self = this || _proto;
-
-		/**Atributos*/
-		_self.markersCollection = [];
-		_self.coordsCollection = [];
-		_self.routesCollection = [];
-		_self.infoLabels = [];
-		_self.distanceCollection = {};
-		_self.container = null;
-		_self.mapa = null;
-		_self.position = null;
-		_self.mapType = 'roadmap';
-		_self.travelType = 'DRIVING';
-		_self.marker = null;
-		_self.ruta = null;
-		_self.mapObject = google.maps;
-		_self.infoWindow = null;
-		_self.animationType = _self.mapObject.Animation.DROP;
-		_self.geocoder = new _self.mapObject.Geocoder ();
-		_self.distance = new _self.mapObject.DistanceMatrixService ();
-
-		/**Map Config
-		 * @param map
-		 */
-		_proto.setMapType = function (map) {
-			var self = this;
-			self.mapType = [
-							   {
-								   road     : self.mapObject.MapTypeId.ROADMAP,
-								   satellite: self.mapObject.MapTypeId.SATELLITE,
-								   hybrid   : self.mapObject.MapTypeId.HYBRID,
-								   terrain  : self.mapObject.MapTypeId.TERRAIN
-							   }[map]
-						   ].toString () || self.mapType;
-		};
-
-		/**Set Container of Map
-		 * @param container DOM
-		 */
-		_proto.setMapContainer = function (container) {
-			if ( _.is$ (container) )
-				container = container.object ();
-			this.container = container;
-		};
-
-		//Return Map Position
-		_proto.getMapPosition = function () {
-			return this.position;
-		};
-
-		/**Parse event object google.maps.event to coordinates
-		 *  @param e object Event Class
-		 * */
-		_proto.parseLatLngEvent = function (e) {
-			if ( e.latLng ) {
-				return {
-					latitude : e.latLng.lat (),
-					longitude: e.latLng.lng ()
-				}
-			}
-			return null;
-		};
-
-		//Return Map
-		_proto.getMap = function () {
-			return this.mapa;
-		};
-
-		//Return coords Collection
-		_proto.getCoords = function () {
-			return this.coordsCollection;
-		};
-
-		//Clean Coords
-		_proto.cleanCoords = function () {
-			this.coordsCollection = [];
-		};
-
-		//Return the center point of a coords collection
-		_proto.getCoordsCenterPoint = function () {
-			var coords = this.coordsCollection,
-				x = 0.0,
-				y = 0.0,
-				z = 0.0,
-				lat = 0,
-				long = 0;
-
-			_.each (coords, function (v) {
-				lat = (
-						  v.lat () * Math.PI
-					  ) / 180;
-				long = (
-						   v.lng () * Math.PI
-					   ) / 180;
-
-				x += (
-					Math.cos (lat) * Math.cos (long)
-				);
-				y += (
-					Math.cos (lat) * Math.sin (long)
-				);
-				z += (
-					Math.sin (lat)
-				);
-
-			});
-
-			x /= coords.length;
-			y /= coords.length;
-			z /= coords.length;
-
-			long = Math.atan2 (y, x);
-			lat = Math.atan2 (z, Math.sqrt (x * x + y * y));
-
-			return {
-				latitude : lat * 180 / Math.PI,
-				longitude: long * 180 / Math.PI
-			}
-
-		};
-
-
-		/**Append a coord to collection
-		 * @param ltnLgn LatLng Class
-		 * */
-		_proto.appendCoord = function (ltnLgn) {
-			this.coordsCollection.push (ltnLgn);
-		};
-
-		/**Event Handler
-		 * @param elem Marker Class | Map Class
-		 * @param event
-		 * @param callback
-		 * */
-		_proto.on = function (elem, event, callback) {
-			if ( _.isString (elem) ) {
-				callback = event;
-				event = elem;
-				if ( _.isSet (this.mapa) )
-					elem = this.mapa;
-			}
-
-			if ( !_.isFunction (callback) )
-				_.error (_.WARNING_SYRUP.ERROR.NOFUNCTION, '(Map .on)');
-
-			if ( !_.isObject (elem) )
-				_.error (WARNING_GOOGLE_MAP.ERROR.NOMAP);
-
-			_self.mapObject.event.addListener (elem, event, callback);
-		};
-
-		/** Make a google map position with coords latitude, longitude
-		 * @param latLong object {latitude:int, longitude:int}
-		 * */
-		_proto.makePosition = function (latLong) {
-
-			if ( !_.isObject (latLong) ) {
-				_.error (WARNING_GOOGLE_MAP.ERROR.NOCONFIG);
-			}
-
-			return new this.mapObject.LatLng (
-				latLong.latitude,
-				latLong.longitude
-			);
-		};
-
-		/**Set Map Position
-		 * @param latLong object {latitude:int, longitude:int}
-		 */
-		_proto.setMapPosition = function (latLong) {
-			if ( !_.isObject (latLong) ) {
-				_.error (WARNING_GOOGLE_MAP.ERROR.NOCONFIG);
-			}
-			this.position = this.makePosition (latLong);
-		};
-
-		/**Change Map Position
-		 * @param latLong object {latitude:int, longitude:int}
-		 */
-		_proto.changeMapPosition = function (latLong) {
-			var self = this;
-			if ( !_.isObject (latLong) ) {
-				_.error (WARNING_GOOGLE_MAP.ERROR.NOCONFIG);
-			}
-
-			if ( !self.mapa ) {
-				_.error (WARNING_GOOGLE_MAP.ERROR.NOMAP);
-			}
-
-			self.setMapPosition (latLong);
-			self.mapa.setCenter (self.position);
-		};
-
-		/**Create a new map object
-		 * @param config object
-		 * @param callback function
-		 */
-		_proto.createMap = function (config, callback) {
-			var self = this;
-			if ( !self.position ) {
-				_.error (WARNING_GOOGLE_MAP.ERROR.NOLOCATION);
-			}
-
-			if ( !self.container ) {
-				_.error (WARNING_GOOGLE_MAP.ERROR.NOCONTAINER);
-			}
-
-			var mapOptionsDefault = {
-				zoom     : 10,
-				center   : self.position,
-				mapTypeId: self.mapType
-			}, options;
-
-			if ( !_.isFunction (config) ) {
-				options = _.extend (config, mapOptionsDefault);
-			} else {
-				options = mapOptionsDefault;
-				callback = arguments[0];
-			}
-
-			self.mapa = new self.mapObject.Map (self.container, options);
-			_.callbackAudit (callback, self.mapa);
-		};
-
-
-		/**Markers Create
-		 * https://developers.google.com/maps/documentation/javascript/3.exp/reference?hl=es#Marker
-		 * @param position object {latitude:int, longitude:int}
-		 * @param config object
-		 * @returns object
-		 */
-		_proto.setMarker = function (position, config) {
-
-			if ( !this.mapa )
-				_.error (WARNING_GOOGLE_MAP.ERROR.NOMAP);
-
-			if ( !_.isObject (config) )
-				config = {};
-
-			if ( position && _.isObject (position) ) {
-				this.setMapPosition (position);
-			} else {
-				if ( !this.position ) {
-					_.error (WARNING_GOOGLE_MAP.ERROR.NOLOCATION);
-				}
-			}
-
-			var conf = _.extend ({ position: this.position, map: this.mapa }, config);
-
-			this.marker = new this.mapObject.Marker (conf);
-			this.marker.setAnimation (this.animationType);
-
-			this.markersCollection.push (this.marker);
-			this.coordsCollection.push (this.position);
-
-			return this.marker;
-		};
-
-
-		/** Set Marker ANimation Type
-		 *  @param animation string fall|infinitejump
-		 * */
-		_proto.setMarkerAnimationType = function (animation) {
-			var self = this;
-			self.animationType = [
-									 {
-										 fall        : self.mapObject.Animation.DROP,
-										 infinitejump: self.mapObject.Animation.BOUNCE
-									 }[animation]
-								 ].toString () || self.animationType;
-		};
-
-		//Stop Marker Animation
-		_proto.stopMarkerAnimation = function () {
-			this.marker.setAnimation (null);
-		};
-
-		/**Show all Markers
-		 *  @param map object Map Class
-		 * */
-		_proto.showAllMarkers = function (map) {
-			_.each (this.markersCollection, function (v) {
-				v.setMap (map);
-			});
-		};
-
-		_proto.clearMarkers = function () {
-			this.showAllMarkers (null);
-		};
-
-		_proto.deleteMarkers = function () {
-			this.markersCollection = [];
-		};
-
-		_proto.getMarkers = function () {
-			return this.markersCollection;
-		};
-
-		/**Create a info label in marker
-		 * https://developers.google.com/maps/documentation/javascript/reference?hl=es#InfoWindowOptions
-		 * @param content string
-		 * @param marker object Marker Class
-		 * @param config object
-		 * */
-		_proto.setMarkerInfo = function (content, marker, config) {
-			var self = this;
-			config = _.extend ({ content: content }, config);
-
-			var info = this.createInfoLabel (content, config);
-			info.open (self.mapa, marker);
-
-			return info;
-		};
-
-		/**Create a info label in map
-		 * https://developers.google.com/maps/documentation/javascript/reference?hl=es#InfoWindow
-		 * @param content string
-		 * @param config object
-		 * */
-		_proto.createInfoLabel = function (content, config) {
-			var self = this;
-			config = _.extend ({ content: content }, config);
-
-			self.infoWindow = new self.mapObject.InfoWindow (config);
-			self.infoLabels.push (self.infoWindow);
-			return self.infoWindow;
-		};
-
-		//Clear all info labels
-		_proto.clearInfoLabels = function () {
-			_.each (this.infoLabels, function (v) {
-				v.close ();
-			})
-		};
-
-		//Clear actual Info Label
-		_proto.clearInfoLabel = function () {
-			self.infoWindow.close ()
-		};
-
-		_proto.geoCodeRequest = function (object, callback) {
-			this.geocoder.geocode (object, callback);
-		};
-
-		/**Location String Info
-		 * @param position
-		 * @param callback
-		 */
-		_proto.getLocationInfo = function (position, callback) {
-			var self = this;
-			if ( _.isSet (position) && _.isObject (position) ) {
-				self.setMapPosition (position);
-			} else {
-				if ( !_.isSet (self.position) ) {
-					self.error (WARNING_GOOGLE_MAP.ERROR.NOLOCATION);
-				}
-
-				if ( _.isFunction (position) ) {
-					callback = arguments[0];
-				}
-			}
-
-			this.geoCodeRequest ({ 'latLng': self.position }, function (result, status) {
-				if ( status === self.mapObject.GeocoderStatus.OK ) {
-					_.callbackAudit (callback, {
-						street : _.isSet (result[0].address_components[0])
-							? result[0].address_components[0].long_name : null,
-						city   : _.isSet (result[0].address_components[1])
-							? result[0].address_components[1].long_name : null,
-						state  : _.isSet (result[0].address_components[2])
-							? result[0].address_components[2].long_name : null,
-						country: _.isSet (result[0].address_components[3])
-							? result[0].address_components[3].long_name : null
-
+	/**Object Observer
+	 * @param moduleId
+	 * **/
+	Apps.add ('_watch', function (moduleId) {
+		var _self = this;
+		Object.observe (_self.scope, function (change) {
+			_.each (change, function (v) {
+				if ( (v.name in _self.onchange)
+					 && _.getObjectSize (v.object) > 0
+					 && moduleId === v.name
+				) {
+					_self.onchange[v.name] ({
+						name  : v.name,
+						old   : v.oldValue,
+						type  : v.type,
+						object: v.object[v.name]
 					});
+					return false;
 				}
 			});
+		});
 
-		};
+	});
 
-		/**Return Lat, Long from string position
-		 * @param query
-		 * @param callback
-		 */
-		_proto.getLocationBySearch = function (query, callback) {
-			this.geoCodeRequest ({ 'address': query }, function (results, status) {
-				if ( status == google.maps.GeocoderStatus.OK ) {
-					var data = results[0].geometry.location;
-					_.callbackAudit (callback, {
-						latitude : data.lat (),
-						longitude: data.lng (),
-						altitude : 0
-					});
-				}
-			});
-		};
+	/**Add new child module
+	 * @param moduleId
+	 * @return void
+	 * **/
+	Apps.add ('_add', function (moduleId) {
+		if ( !_.isObject (this.scope[moduleId]) ) {
+			this.scope[moduleId] = {};
+		}
+	});
 
-		/**Rutas*/
-		_proto.drawRoute = function (config, callback) {
-			var self = this;
-			if ( _.isEmpty (self.coordsCollection) ) {
-				self.error (WARNING_GOOGLE_MAP.ERROR.NOROUTES);
-			}
+	/**Trigger code execution
+	 * @param moduleId
+	 * @return void
+	 * **/
+	Apps.add ('_trigger', function (moduleId) {
+		if ( moduleId in this.modules )
+			return this.modules[moduleId].creator (_, this.scope);
+		return {}
+	});
 
-			if ( _.isFunction (config) ) {
-				callback = arguments[0];
-			}
+	/**Provide a global initial config
+	 * @param moduleId
+	 * @return void
+	 * **/
+	Apps.add ('cook', function (callback) {
+		if ( _.isFunction (callback) )
+			callback (this.lib.get (this.root), _);
+		return this;
+	});
 
-			var _Conf = _.extend ({
-				path         : self.coordsCollection,
-				geodesic     : true,
-				strokeColor  : '#FF0000',
-				strokeOpacity: 1.0,
-				strokeWeight : 2
-			}, config, true);
 
-			self.ruta = new self.mapObject.Polyline (_Conf);
+	/**Global attributes supplier
+	 * @param moduleList
+	 * @callback*/
+	Apps.add ('spice', function (object) {
+		if ( _.isObject (object) )
+			this.lib.make (object);
+		return this;
+	});
 
-			self.ruta.setMap (self.mapa);
-			self.appendRoute (self.ruta);
-			_.callbackAudit (callback, self.ruta);
-		};
 
-		/**Append Route
-		 * @param route PoliLyne Class
-		 * */
-		_proto.appendRoute = function (route) {
-			this.routesCollection.push (route);
-		};
+	/**Add a custom trigger to execute after init
+	 * @param moduleList
+	 * @callback*/
+	Apps.add ('afters', function (callback) {
+		if ( _.isFunction (callback) )
+			this.after = callback;
+		return this;
+	});
 
-		_proto.getRoutes = function () {
-			return this.routesCollection;
-		};
+	/** Append global service
+	 * @param {string }name
+	 * @param {function} callback
+	 * @return {void}
+	 *
+	 * */
+	Apps.add ('service', function (name, callback) {
+		this.lib.cook (name, callback);
+		return this;
+	});
 
-		_proto.clearRoutes = function () {
-			_.each (this.routesCollection, function (v) {
-				v.setMap (null);
-			});
-		};
+	/** Append global services
+	 * @param {object} object
+	 * @return {void}
+	 *
+	 * */
+	Apps.add ('services', function (object) {
+		this.lib.supply (object);
+		return this;
+	});
 
-		_proto.deleteRoutes = function () {
-			this.routesCollection = [];
-		};
 
-		/**Distances*/
-		_proto.setTravelMode = function (type) {
-			var self = this;
-			self.travelType = [
-					{
-						'drive': self.mapObject.TravelMode.DRIVING,
-						'walk' : self.mapObject.TravelMode.WALKING,
-						'bike' : self.mapObject.TravelMode.BICYCLING,
-						'bus'  : self.mapObject.TravelMode.TRANSIT
-					}[type]
-				] || self.travelType;
-		};
+	/**Return a recipe by name
+	 * @param moduleId
+	 * @return object
+	 * */
+	Apps.add ('getRecipe', function (moduleId) {
+		if ( moduleId in this.modules && _.isSet (this.root) )
+			return this.modules[moduleId].instance;
+		return null;
+	});
 
-		_proto.packDistances = function (object) {
-			var self = this,
-				_destination = object.destinationAddresses,
-				_origin = object.originAddresses,
-				_distance = object.rows;
+	/**Set Scope
+	 * @param moduleId
+	 * @param object
+	 * @return void
+	 * **/
+	Apps.add ('setScope', function (moduleId, object) {
+		if ( moduleId in this.scope ) {
+			this.scope[moduleId] = object;
+		}
+		return this;
+	});
 
-			for ( var i in _destination ) {
-				self.distanceCollection[i] = {};
-				for ( var j in _origin ) {
-					if ( _destination[i] != _origin[j] ) {
-						if ( _distance[i].elements[j].status == 'OK' ) {
-							self.distanceCollection[i][j] = {};
-							self.distanceCollection[i][j]['from'] = _destination[i];
-							self.distanceCollection[i][j]['destiny'] = _origin[j];
-							self.distanceCollection[i][j]['distance'] = _distance[i].elements[j].distance.text;
-							self.distanceCollection[i][j]['time'] = _distance[i].elements[j].duration.text
-						} else {
-							self.distanceCollection[i] = false;
+	/**Get Scope
+	 * @param moduleId
+	 * @return object
+	 * **/
+	Apps.add ('getScope', function (moduleId) {
+		if ( moduleId in this.scope ) {
+			return this.scope[moduleId];
+		}
+		return {};
+	});
+
+	/**Event handler
+	 * @param event
+	 * @param name
+	 * @param callback
+	 * @return object
+	 */
+	Apps.add ('when', function (event, name) {
+		var self = this;
+		return event && (
+			{
+				change: ({
+					then: (function (resolve) {
+						self.onchange[name] = resolve;
+					})
+				})
+			}[event] || { then: function () {} })
+	});
+
+	/**Bind Listeners
+	 * @param moduleId
+	 * */
+	Apps.add ('_bindListener', function (moduleId) {
+		var enabled_events = [
+			'[sp-click], ', 'submit], ',
+			'change], ', 'dblclick], ',
+			'mousedown], ', 'mouseenter], ',
+			'mouseleave], ', 'mousemove], ',
+			'mouseover], ', 'mouseout], ', 'mouseup], ',
+			'keydown], ', 'keypress], ', 'keyup], ', 'blur], ',
+			'focus], ', 'input], ', 'select], ', 'reset]'
+		];
+
+		if ( this.app.exist ) {
+			var _this = this, _dom = null,
+				_self = this.modules[moduleId].instance,
+				_the_filter = enabled_events.join (' [sp-'),
+				_mod = _$ ('[sp-recipe="' + moduleId + '"]');
+
+			//Exist the module?
+			if ( _mod.exist ) {
+				//Find events listeners
+				_mod.find (_the_filter, function (dom_list) {
+					//Find the listener in attributes
+					_.each ((_dom = dom_list.get ()).attributes, function (v) {
+						if ( /sp-[a-z]+/.test (v.localName) ) {
+							var _event = _.replace (v.localName, 'sp-', _.emptyStr),
+								_attr = _dom.getAttribute (v.localName);
+
+							//Is the attr value in module? and is Function the attr value?
+							if ( _attr in _self && _.isFunction (_self[_attr]) ) {
+								_mod.listen (_event, '[' + v.localName + '="' + _attr + '"]', function (e) {
+									//Param event and dependencies
+									e.preventDefault ();
+									_self[_attr] (_this.lib.get (_self.parent), e);
+								});
+							}
 						}
-					}
+					});
+				});
+			}
+		}
+	});
+
+	/** Prepare Model
+	 * @param moduleId
+	 */
+	Apps.add ('_models', function (moduleId) {
+		var _self = this,
+			_model = new Model,
+			_resource = _$ ('[sp-recipe="' + moduleId + '"] [sp-model]');
+
+		//Exist the app and the model?
+		if ( this.app.exist && _resource.exist ) {
+			_self.modules[moduleId].instance.model = {
+				object  : _model,
+				resource: _resource,
+				set     : function (obj) {
+					_model.set (_resource, obj);
+					return _self.modules[moduleId].instance;
+				},
+				send    : function () {
+					if ( _.getObjectSize (_model.scope) > 0 )
+						return _model.send ();
+				},
+				get     : function (item) {
+					return new Promise (function (resolve, reject) {
+						_model.get (_resource).then (function (e) {
+							if (
+								_.isSet (item)
+								&& _.isArray (item)
+								&& !_.isEmpty (item)
+							) {
+								var _result = {};
+								_.each (item, function (v, i) {
+									if ( v in e.scope )
+										_result[v] = e.scope[v];
+								});
+								//If filter item
+								resolve (_result);
+
+							} else {
+								//Else all the scope
+								resolve (e.scope);
+							}
+						}).catch (
+							reject
+						);
+					});
 				}
 			}
-			return self.distanceCollection;
+		}
+	});
+
+	/**Prepare Views
+	 * @param moduleId
+	 * */
+
+	Apps.add ('_views', function (moduleId) {
+		// Render view
+		var _self = this;
+		_self.modules[moduleId].instance.view = {
+			render: function (_view) {
+				_self._serve (moduleId, _view || null);
+				return _self.modules[moduleId].instance;
+			}
 		};
+	});
 
-		/**Get the distance of a collection of routes
-		 *  @param routes | routes object LatLng Class Collection
-		 *  @param config
-		 *  @param callback
-		 * */
-		_proto.getDistance = function (routes, config, callback) {
-			var self = this;
-			if ( !routes || _.isObject (routes) ) {
-				self.error (WARNING_GOOGLE_MAP.ERROR.NODISTANCE);
+
+	/**Prepare Scopes
+	 * @param moduleId
+	 * */
+	Apps.add ('_scopes', function (moduleId) {
+		// Render view
+		var _self = this;
+
+		_self.modules[moduleId].instance.scope = {
+			global: _self.scope,
+			object: _self.scope[moduleId],
+			set   : function (nModule, object) {
+				var _moduleId = !_.isObject (nModule)
+								&& _.isString (nModule) && nModule
+								|| moduleId,
+					_object = _.isObject (nModule) && nModule
+							  || object;
+
+				if ( _.isObject (_object) ) {
+					_self.setScope (_moduleId, _object);
+					return _self.modules[moduleId].instance;
+				}
+			},
+			get   : function (nModule) {
+				var _moduleId = _.isString (nModule)
+					? nModule : moduleId;
+
+				return _self.getScope (_moduleId);
 			}
+		};
+	});
 
-			if ( _.isFunction (config) ) {
-				callback = arguments[1];
+	/**Prepare App
+	 * @param moduleId
+	 * */
+	Apps.add ('_app', function (moduleId) {
+		// Render view
+		var _self = this;
+
+		_self.modules[moduleId].instance.app = {
+			object: _self.app,
+			title : function (title) {
+				var _title = _$ ('title');
+				if ( _title.exist ) {
+					_title.text (title)
+				}
 			}
+		};
+	});
 
-			var _Conf = _.extend ({
-				origins     : routes,
-				destinations: routes,
-				travelMode  : self.travelType
-			}, config), _Distances = false;
 
-			self.distance.getDistanceMatrix (_Conf, function (result, status) {
-				if ( status == 'OK' ) {
-					_Distances = self.packDistances (result);
+	/**Prepare Recipes
+	 * @param moduleId
+	 * */
+	Apps.add ('_recipes', function (moduleId) {
+		// Render view
+		var _self = this;
+		_self.modules[moduleId].instance.recipe = {
+			$   : _$ ('[sp-recipe="' + moduleId + '"]'),
+			get : function (nModule) {
+				var _moduleId = _.isString (nModule)
+					? nModule : moduleId;
+
+				return _self.getRecipe (_moduleId);
+			},
+			drop: function (nModule) {
+				var _moduleId = _.isString (nModule)
+					? nModule : moduleId;
+
+				_self.drop (_moduleId);
+				return _self.modules[moduleId].instance;
+			}
+		};
+	});
+
+	/** Render the View
+	 * @param moduleId
+	 * @param view
+	 * @return object
+	 */
+	Apps.add ('_serve', function (moduleId, view) {
+		var _view = null,
+			_scope = this.scope[moduleId];
+
+		//Is set the app
+		if ( this.app.exist ) {
+			//Find the recipe
+			var _dom = _$ ('[sp-recipe="' + moduleId + '"] [sp-view]'),
+				_dom_template = _$ ('[sp-recipe="' + moduleId + '"] [sp-tpl]');
+
+			if ( _dom.exist ) { //Exist?
+				if ( _.getObjectSize (_scope) > 0 ) {
+
+					//The view object
+					_view = new View;
+
+					//A view?
+					if ( _.isSet (view) && _.isString (view) ) {
+						var view_name = view.split ('/').pop (),
+							view_dir = _.replace (view, '/' + view_name, _.emptyStr);
+
+						//Require the view if needed
+						Require.lookup (['view/' + view_dir]).then (function () {
+							if ( view_name in _view.__proto__ )
+								_view[view_name] (_, _scope, function (my_html) {
+									_dom.html (my_html);
+								})
+						});
+
+						//Exist inline tpl?
+					} else if ( _dom_template.exist ) {
+						var _parse = _dom_template.html ();
+						if ( _.isSet (_parse) ) {
+							_view.render (_parse, _scope).then (function (result) {
+								_dom.html (result);
+							});
+
+						}
+
+					}
+
 				}
 
-				if ( callback ) {
-					callback (_Distances);
-				}
-			});
+			}
 
 		}
 
-	};
+		return this;
+	});
+
+	/** Execute Module
+	 *@param moduleId
+	 * @return object
+	 */
+
+	Apps.add ('_taste', function (moduleId) {
+		var _self = this;
+
+		if ( moduleId in _self.modules && _.isSet (_self.root) ) {
+
+			// Initialize module
+			_self._add (moduleId);
+			_self.modules[moduleId].instance = _self._trigger (moduleId);
+			_self.modules[moduleId].instance.name = moduleId;
+			_self.modules[moduleId].instance.parent = _self.root;
+
+			// Binding Methods
+			// Event handler
+			_self.modules[moduleId].instance.when = function (event) {
+				return _self.when (event, moduleId);
+			};
+
+			// Custom listener for recipe
+			_self.modules[moduleId].instance.listen = function (event, delegate) {
+				var _recipe = _$ ('[sp-recipe="' + moduleId + '"]');
+
+				return new Promise (function (resolve, reject) {
+					if ( _recipe.exist ) {
+						_recipe.listen (event, delegate, resolve);
+					} else {
+						reject (_recipe);
+					}
+				})
+			};
+
+			// Recipes
+			_self._recipes (moduleId);
+
+			// Scoping
+			_self._scopes (moduleId);
+
+			// Handle Model
+			_self._models (moduleId);
+
+			// Handle Views
+			_self._app (moduleId);
+
+			// Handle Views
+			_self._views (moduleId);
+
+			// Init the module?
+			if (
+				'init' in _self.modules[moduleId].instance
+				&& _.isFunction (_self.modules[moduleId].instance.init)
+			) {
+
+				//Execution
+				_self.modules[moduleId].instance.init (this.lib.get (_self.root));
+
+				//After execute
+				if ( _.isSet (_self.after) )
+					_self.after (this.lib.get (_self.root), moduleId);
+
+			}
+
+			// Bind listeners
+			_self._bindListener (moduleId);
+
+			// Observe scope
+			_self._watch (moduleId);
+		}
+
+		return this;
+	});
+
+
+	/**Drop a Module
+	 * @param moduleId
+	 * @return object
+	 * */
+	Apps.add ('drop', function (moduleId) {
+		if ( moduleId in this.modules ) {
+			if ( this.modules[moduleId].instance ) {
+				if ( 'destroy' in this.modules[moduleId].instance )
+					this.modules[moduleId].instance.destroy (this.lib.get (this.root));
+				this.modules[moduleId] = null;
+			}
+		}
+		return this;
+	});
+
+
+	/**Drop all Modules
+	 * @return object
+	 * */
+	Apps.add ('dropAll', function () {
+		var _self = this;
+		_.each (this.modules, function (module, id) {
+			_self.drop (id);
+		});
+		return this;
+	});
+
+	//The global object App
+	window.App = new Apps;
+	window.AppClass = Apps;
+
+}) (window);
+
+/**
+ * Created by gmena on 07-26-14.
+ */
+
+
+(function (window) {
+
+	'use strict';
+	/**Router
+	 * @constructor
+	 */
+	function Router () {
+		this.routes = {};
+		this.history = window.history;
+		this.findParams = /(:[\w]+)/g;
+		this.onpopstate = {};
+
+		var _self = this;
+		//Set Pop State
+		window.addEventListener ('popstate', function (e) {
+			if ( _.isSet (e.state) && 'route_name' in e.state ) {
+				if ( e.state.route_name in _self.onpopstate ) {
+					_.each (_self.onpopstate[e.state.route_name], function (v, i) {
+						v (e.state, e);
+					}, true);
+				}
+			}
+		});
+	}
+
+
+	/**Set the routes
+	 * @param {object} routes
+	 * @return {object}
+	 * */
+	Router.add ('set', function (routes) {
+		var _self = this;
+
+		return (new Promise (function (resolve, reject) {
+			_self.routes = _.extend (_self.routes, routes);
+			resolve (_self);
+		}))
+	});
+
+	Router.add ('_handleSkull', function (tpl) {
+		var _view = new View;
+		//Clear cache
+		_view.clear ();
+		return _view.seekTpl (tpl);
+	});
+
+	/**Delega rutas
+	 * @param {string} route_name
+	 * @returns {object}
+	 */
+	Router.add ('when', function (route_name, conf) {
+		_.assert (route_name, _.WARNING_SYRUP.ERROR.NOPARAM, '(Router .when)');
+		var _self = this;
+
+		return {
+			then: function (callback) {
+				//Is function callback?
+				if ( _.isFunction (callback) ) {
+					//Handle Route
+
+					//No route?
+					if ( !(route_name in _self.onpopstate) )
+						_self.onpopstate[route_name] = [];
+
+					//Append a new route
+					_self.onpopstate[route_name].push (function (state, e) {
+						if ( conf && 'tpl' in conf ) {
+							_self._handleSkull (conf.tpl).then (function (view) {
+								//Render skull
+								_$ ('[sp-main]').html (view.getTpl ());
+								callback (state, e);
+							})
+						} else {
+							callback (state, e);
+						}
+					});
+
+					//First action
+					if ( _.matchInArray (route_name, [
+							'home', 'default',
+							'init', 'initial'
+						]) ) {
+						_self.redirect (route_name, {});
+					}
+				}
+				return _self;
+			}
+		};
+
+	});
+
+	/**Redirect to route
+	 * @param {string} route_name
+	 * @return {object}
+	 * */
+	Router.add ('redirect', function (route_name, params, config) {
+		_.assert (route_name, _.WARNING_SYRUP.ERROR.NOPARAM, '(Router .redirect)');
+
+		var _self = this,
+			_the_new_route = null,
+			_params = null, _config = {
+				trigger: true
+			};
+
+		return (new Promise (function (resolve, reject) {
+
+			//Not routing
+			if ( !(route_name in _self.routes) ) {
+				reject (route_name);
+				return;
+			}
+
+			//Params and config
+			_params = _.isObject (params)
+				? params : {};
+
+			_config = _.extend (_config, config || {}, true);
+
+			//Set old regex in state object
+			_params['route_name'] = route_name;
+			_the_new_route = _self.routes[route_name];
+
+			//Replace params?
+			_the_new_route = _.isSet (params) && _.getObjectSize (params) > 0
+				? _.replace (_the_new_route, _self.findParams, params)
+				: _the_new_route;
+
+			//Set state in history
+			_self._triggerPopState (_params, route_name, _the_new_route, _config);
+
+			//Resolve Promise
+			resolve (_the_new_route);
+
+
+		}));
+	});
+
+
+	/** Trigger the pop state
+	 * @param {object} _params
+	 * @param {string} route_name
+	 * @param {string} _the_new_route
+	 * @return {void}
+	 * */
+	Router.add ('_triggerPopState', function (_params, route_name, _the_new_route, _config) {
+		//Set state in history
+		//Two times, for trigger "popstate"
+
+		if ( _config.trigger ) {
+			this.history.pushState (_params, route_name, _the_new_route);
+			this.history.pushState (_params, route_name, _the_new_route);
+			this.history.back ();
+		}
+
+	});
 
 	//Global access
-	window.GoogleMap = GoogleMap;
+	window.Router = new Router;
+	window.RouterClass = Router;
 
 }) (window);

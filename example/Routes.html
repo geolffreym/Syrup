@@ -1,95 +1,74 @@
 <!DOCTYPE html>
-<html lang="en" sp-app="Hey">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title></title>
 </head>
+
 <body>
+
+<main sp-main></main>
 <script src="/syrup/dist/init.js"></script>
-
-
-<div sp-recipe="Hey.You">
-    <!-- Hey.You recipe -->
-</div>
-
-
-<div sp-recipe="Hey.Do">
-    <!-- Hey.Do recipe -->
-    <!-- Event callback in recipe Hey.Do -->a
-
-    <button sp-click="redirect">Redirect</button>
-</div>
-
 <script>
 
-    //The App with dependencies
-    var my_App = App.blend ('Hey', ['Http', 'Router']);
+    Router.set ({
+        'home' : '/syrup/Routes.html',
+        'route': '/route/:page/:user/'
 
-    //Before execution
-    my_App.spice ({
-        //Provide constant
-        MAX: 3
-    }).cook (function ($) {
+    }).then (function (router) {
 
-        MiddleWare.intercept ($.Http, {
-            request: function (config) {
-                console.log('yeah')
-            }
-        });
+        //Router ready
+        router.when ('home', {
+            'tpl': 'skull/home.html'
+        }).then (function (params, skull) {
 
-        MiddleWare.intercept ($.Http, {
-            request: function (config) {
-                console.log('yeah2')
-            }
-        });
+            //The App with dependencies
+            var _App = App.blend ('home', ['Http']);
 
-        //The request
-        $.Http.get ('/').then (function () {
+            _App.recipe ('home1', function (_, scope) {
+                return {
+                    init   : function ($) {
+                        this.app.title ('Home');
+                        this.scope.set ({
+                            'message': 'Hey Man'
+                        }).view.render ();
 
-        }).catch (function (e) {
-            console.log (e)
-        });
+                    },
+                    destroy: function ($) {
 
-        //Before execution what to do?
-        //Initialize the routes
-        $.Router.set ({
-            'myLocalRoute': '/Routes.html',
-            'theNewRoute' : '/route/:page/:user/'
-        });
+                        //Dropped? What to do?
+                        alert ('destroyed?')
+                    }
+                }
+            }).recipe ('home2', function (_, scope) {
+                return {
+                    init    : function ($) {},
+                    redirect: function ($) {
+                        Router.redirect ('route', { ':page': 1, ':user': 2 })
+                    }
+                }
+            });
 
-    });
+        }).when ('route', {
+            tpl: 'skull/route.html'
 
+        }).then (function (params, e) {
 
-    //RECIPES
-    //A new recipe for Hey
-    my_App.recipe ('Hey.You', function (_, scope) {
-        return {
-            init   : function ($) {
+            //The App with dependencies
+            App.blend ('route', []).recipe ('router', function (_, scope) {
+                return {
+                    init    : function ($) {
+                        console.log ('Handling route')
 
-                //When the "theNewRoute" match. What to do?
-                $.Router.when ('theNewRoute').then (function (params, event) {
-                    //console.log (params.getIndex (':page'));
-                    //console.log (params.getIndex (':user'));
-                })
+                    },
+                    redirect: function () {
+                        Router.redirect ('home', {});
+                    }
+                }
+            })
 
-            },
-            destroy: function ($) {
-
-                //Dropped? What to do?
-                alert ('destroyed?')
-            }
-        }
-    }).recipe ('Hey.Do', function (_, scope) {
-        return {
-            init    : function ($) {},
-            redirect: function ($) {
-
-                //Redirect to "theNewRoute" with params { ':page': '3', ':user':'2' }
-                $.Router.redirect ('theNewRoute', { ':page': '3', ':user': '2' })
-                        .then (function () { });
-            }
-        }
-    });
+        })
+    })
 
 
 </script>

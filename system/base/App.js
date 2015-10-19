@@ -127,9 +127,9 @@
 	});
 
 	/** Append global service
-	 * @param name
-	 * @param callback function
-	 * @return void
+	 * @param {string }name
+	 * @param {function} callback
+	 * @return {void}
 	 *
 	 * */
 	Apps.add ('service', function (name, callback) {
@@ -138,8 +138,8 @@
 	});
 
 	/** Append global services
-	 * @param object
-	 * @return void
+	 * @param {object} object
+	 * @return {void}
 	 *
 	 * */
 	Apps.add ('services', function (object) {
@@ -221,7 +221,6 @@
 
 			//Exist the module?
 			if ( _mod.exist ) {
-
 				//Find events listeners
 				_mod.find (_the_filter, function (dom_list) {
 					//Find the listener in attributes
@@ -230,16 +229,13 @@
 							var _event = _.replace (v.localName, 'sp-', _.emptyStr),
 								_attr = _dom.getAttribute (v.localName);
 
-							//Is the attr value in module?
-							if ( _attr in _self ) {
-								//is Function the attr value?
-								if ( _.isFunction (_self[_attr]) ) {
-									_mod.listen (_event, '[' + v.localName + '="' + _attr + '"]', function (e) {
-										//Param event and dependencies
-										e.preventDefault ();
-										_self[_attr] (_this.lib.get (_self.parent), e);
-									});
-								}
+							//Is the attr value in module? and is Function the attr value?
+							if ( _attr in _self && _.isFunction (_self[_attr]) ) {
+								_mod.listen (_event, '[' + v.localName + '="' + _attr + '"]', function (e) {
+									//Param event and dependencies
+									e.preventDefault ();
+									_self[_attr] (_this.lib.get (_self.parent), e);
+								});
 							}
 						}
 					});
@@ -289,13 +285,13 @@
 								//Else all the scope
 								resolve (e.scope);
 							}
-						}).catch (reject);
+						}).catch (
+							reject
+						);
 					});
-
 				}
 			}
 		}
-
 	});
 
 	/**Prepare Views
@@ -341,6 +337,24 @@
 					? nModule : moduleId;
 
 				return _self.getScope (_moduleId);
+			}
+		};
+	});
+
+	/**Prepare App
+	 * @param moduleId
+	 * */
+	Apps.add ('_app', function (moduleId) {
+		// Render view
+		var _self = this;
+
+		_self.modules[moduleId].instance.app = {
+			object: _self.app,
+			title : function (title) {
+				var _title = _$ ('title');
+				if ( _title.exist ) {
+					_title.text (title)
+				}
 			}
 		};
 	});
@@ -468,6 +482,9 @@
 
 			// Handle Model
 			_self._models (moduleId);
+
+			// Handle Views
+			_self._app (moduleId);
 
 			// Handle Views
 			_self._views (moduleId);

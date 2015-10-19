@@ -3,12 +3,6 @@
  */
 
 (function (window) {
-	var WARNING_MIDDLEWARE = {
-		ERROR: {
-			NOTFOUND: 'Interceptor not found'
-		}
-	};
-
 	"use strict";
 	function MiddleWare () {
 
@@ -78,11 +72,12 @@
 	 * @param {object} intercepted
 	 * @param {string} find
 	 * */
-	MiddleWare.add ('trigger', function (intercepted, interceptors) {
-		_.each (interceptors, function (v) {
-			if ( _.isFunction (v) )
-				v (intercepted);
-		}, true);
+	MiddleWare.add ('trigger', function (interceptors, params) {
+		if (interceptors.length > 0)
+			_.each (interceptors, function (v) {
+				if ( _.isFunction (v) )
+					v.apply (null, params || []);
+			}, true);
 	});
 
 	window.MiddleWare = new MiddleWare;
