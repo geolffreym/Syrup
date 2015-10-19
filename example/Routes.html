@@ -24,7 +24,7 @@
             'tpl': 'skull/home.html'
 
         }).then (function (params, skull) {
-
+            //HOME APP
             //The App with dependencies
             var _App = App.blend ('home', ['Http']);
 
@@ -59,13 +59,13 @@
             tpl: 'skull/route.html'
 
         }).then (function (params, e) {
-
+            //ROUTE APP
             //The App with dependencies
             App.blend ('route', []).recipe ('router', function (_, scope) {
                 return {
                     init    : function ($) {
                         this.app.title ('Router');
-                        console.log (params.getIndex(':page'))
+                        console.log (params.getIndex (':page'))
 
                     },
                     redirect: function () {
