@@ -5949,17 +5949,6 @@ if ( !Object.observe ) {
 		this.findParams = /(:[\w]+)/g;
 		this.onpopstate = {};
 
-		var _self = this;
-		//Set Pop State
-		window.addEventListener ('popstate', function (e) {
-			if ( _.isSet (e.state) && 'route_name' in e.state ) {
-				if ( e.state.route_name in _self.onpopstate ) {
-					_.each (_self.onpopstate[e.state.route_name], function (v, i) {
-						v (e.state, e);
-					}, true);
-				}
-			}
-		});
 	}
 
 
@@ -6095,6 +6084,16 @@ if ( !Object.observe ) {
 
 	//Global access
 	window.Router = new Router;
-	window.RouterClass = Router;
+
+	//Set Pop State
+	window.addEventListener ('popstate', function (e) {
+		if ( _.isSet (e.state) && 'route_name' in e.state ) {
+			if ( e.state.route_name in window.Router.onpopstate ) {
+				_.each (window.Router.onpopstate[e.state.route_name], function (v, i) {
+					v (e.state, e);
+				}, true);
+			}
+		}
+	});
 
 }) (window);
