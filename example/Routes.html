@@ -20,6 +20,7 @@
         //Router ready
         router.when ('home', {
             'tpl': 'skull/home.html'
+
         }).then (function (params, skull) {
 
             //The App with dependencies
@@ -44,7 +45,10 @@
                 return {
                     init    : function ($) {},
                     redirect: function ($) {
-                        Router.redirect ('route', { ':page': 1, ':user': 2 })
+                        Router.redirect ('route', {
+                            ':page': 1,
+                            ':user': 2
+                        })
                     }
                 }
             });
@@ -58,7 +62,8 @@
             App.blend ('route', []).recipe ('router', function (_, scope) {
                 return {
                     init    : function ($) {
-                        console.log ('Handling route')
+                        this.app.title ('Router');
+                        console.log (params.getIndex(':page'))
 
                     },
                     redirect: function () {
