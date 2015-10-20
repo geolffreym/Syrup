@@ -16,21 +16,21 @@
 		this.modules = {}; // Modules list
 		this.onchange = {}; // Change handler
 	}
-
-	/** Handle modules to Apps
-	 * @param name
-	 * @param dependencies []
-	 * @return object
-	 * **/
-	Apps.add ('module', function (name, dependencies) {
-		if ( !(name in this.app) ) {
-			this.app[name] = new Apps;
-			this.app[name].root = name;
-			this.app[name].lib = new LibClass;
-			this.app[name].lib.blend (name, dependencies)
-		}
-		return this.app[name];
-	});
+	//TODO Modules
+	///** Handle modules to Apps
+	// * @param name
+	// * @param dependencies []
+	// * @return object
+	// * **/
+	//Apps.add ('module', function (name, dependencies) {
+	//	if ( !(name in this.app) ) {
+	//		this.app[name] = new Apps;
+	//		this.app[name].root = name;
+	//		this.app[name].lib = new LibClass;
+	//		this.app[name].lib.blend (name, dependencies)
+	//	}
+	//	return this.app[name];
+	//});
 
 	/** Blend a method in global Syrup object
 	 * @param name
