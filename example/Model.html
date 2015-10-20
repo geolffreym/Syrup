@@ -113,10 +113,9 @@
             },
 
             the_method: function (e) {
-                var _self = this;
-                this.model.get ([]).then (function (e) {
-                    _self.scope.set (e);
-                });
+                this.model.get (['firstName']).then (function (model) {
+                    console.log ([model.scope])
+                })
             },
 
 

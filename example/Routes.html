@@ -31,7 +31,9 @@
             _App.recipe ('home1', function (_, scope) {
                 return {
                     init   : function ($) {
+
                         this.app.title ('Home');
+
                         this.scope.set ({
                             'message': 'Hey Man'
                         }).view.render ();

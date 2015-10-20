@@ -4986,7 +4986,10 @@ if ( !Object.observe ) {
 		);
 	});
 
-	//Set the template
+	/**Set the template
+	 * @param {string} template
+	 * @return {object}
+	 * **/
 	View.add ('seekTpl', function (template) {
 		var _self = this,
 			_repo = _self.Storage,
@@ -5005,10 +5008,9 @@ if ( !Object.observe ) {
 				resolve (_self)
 			} else {
 				//Get the template
-				_self.lookup (template).then (function (temp) {
-					_save[template] = temp;
+				_self.lookup (template).then (function (_tpl) {
+					_self.tpl = _save[template] = _tpl;
 					_repo.append ('templates', _save);
-					_self.tpl = temp;
 					resolve (_self);
 				}).catch (function () {
 					reject (template);
@@ -5019,18 +5021,24 @@ if ( !Object.observe ) {
 
 	});
 
-	//Return to render html
+	/**Return to render html
+	 * @return {string}
+	 * **/
 	View.add ('getTpl', function () {
 		return this.tpl;
 	});
 
-	//Clear View from Storage
+	/**Clear View from Repo
+	 * @return {object}
+	 * **/
 	View.add ('clear', function () {
 		this.Storage.clear ('templates');
 		return this;
 	});
 
-	//Clear View from Storage
+	/**Clear View from Repo
+	 * @return {object}
+	 * **/
 	View.add ('cleanCache', function () {
 		if ( this.dir ) {
 			var old_templates = this.Storage.get ('templates');
@@ -5045,7 +5053,11 @@ if ( !Object.observe ) {
 		return this;
 	});
 
-	//Parse the View
+	/**Render template
+	 * @param {string} _template
+	 * @param {object} _fields
+	 * @return {object}
+	 * **/
 	View.add ('render', function (_template, _fields) {
 		var _self = this,
 			_worker = new Workers;
@@ -5093,7 +5105,6 @@ if ( !Object.observe ) {
 	};
 
 	function Model () {
-		this.Http = new Http;
 		this.data = null;
 		this.blob = null;
 		this.scope = {};
@@ -5155,46 +5166,6 @@ if ( !Object.observe ) {
 		};
 	});
 
-	/**Submit action
-	 * @param {string} url
-	 * @param {object} data
-	 * @return {object}*/
-	Model.add ('send', function (url, data) {
-		var self = this;
-		if ( _.isObject (url) || _.isFormData (url) ) {
-			data = url;
-			url = null;
-		}
-
-		if ( !_.isSet (data) && !_.isSet (self.data) && !_.isSet (self.blob) )
-			_.error (WARNING_MODEL.ERROR.NOPACK, '(Model .send)');
-
-		var conf = {
-			url   : url || self.model.attr ('action') || location.pathname,
-			data  : data || self.data || self.blob,
-			method: self.type
-		};
-
-		return (new Promise (function (resolve, reject) {
-			if ( self.failed )
-				reject (data);
-
-			//The middleware
-			self.Http.intercept ({
-				request: function (config) {
-					config.method = conf.method;
-				}
-			});
-
-			//The request
-			self.Http.kill ()
-				.request (conf.url, conf.data)
-				.then (function (response) {
-				resolve (response);
-			}).catch (reject);
-		}))
-	});
-
 	//Return object
 	Model.add ('getScope', function () {
 		return this.scope;
@@ -5206,7 +5177,7 @@ if ( !Object.observe ) {
 	});
 
 	//Return formdata
-	Model.add ('getFiles', function () {
+	Model.add ('getBinaries', function () {
 		return this.blob;
 	});
 
@@ -5247,11 +5218,10 @@ if ( !Object.observe ) {
 	 * @param {object|string} model
 	 * @return {object}
 	 * */
-	Model.add ('files', function (model) {
+	Model.add ('binary', function (model) {
 		var _self = this;
 		_self.model = !_.is$ (model)
-					  && _$ (model)
-					  || model;
+					  && _$ (model) || model;
 
 		return (new Promise (function (resolve, reject) {
 			_self.model.find ('input[type="file"]', function (field) {
@@ -5272,12 +5242,12 @@ if ( !Object.observe ) {
 
 		var _self = this;
 		_self.model = !_.is$ (model)
-					  && _$ (model)
-					  || model;
+					  && _$ (model) || model;
 
 		// For each input fill with data
 		_.each (object, function (v, i) {
 			_self.model.find ('input[name=' + i + ']', function (e) {
+				_self.scope[i] = v;
 				e.val (v);
 			})
 		})
@@ -5290,8 +5260,7 @@ if ( !Object.observe ) {
 	 */
 	Model.add ('get', function (model) {
 		this.model = !_.is$ (model)
-					 && _$ (model)
-					 || model;
+					 && _$ (model) || model;
 
 		var _self = this,
 			_modelData = new FormData,
@@ -5645,10 +5614,6 @@ if ( !Object.observe ) {
 					_model.set (_resource, obj);
 					return _self.modules[moduleId].instance;
 				},
-				send    : function () {
-					if ( _.getObjectSize (_model.scope) > 0 )
-						return _model.send ();
-				},
 				get     : function (item) {
 					return new Promise (function (resolve, reject) {
 						_model.get (_resource).then (function (e) {
@@ -5662,12 +5627,14 @@ if ( !Object.observe ) {
 									if ( v in e.scope )
 										_result[v] = e.scope[v];
 								});
+
+								e.scope = _result;
 								//If filter item
-								resolve (_result);
+								resolve (e)
 
 							} else {
 								//Else all the scope
-								resolve (e.scope);
+								resolve (e);
 							}
 						}).catch (
 							reject
@@ -5965,11 +5932,26 @@ if ( !Object.observe ) {
 		}))
 	});
 
-	Router.add ('_handleSkull', function (tpl) {
+	/** Handle Tpl Skulls
+	 * @param {string} tpl
+	 * @param {function} callback
+	 * @return {void}
+	 */
+	Router.add ('_handleSkull', function (tpl, callback, params) {
 		var _view = new View;
 		//Clear cache
 		_view.clear ();
-		return _view.seekTpl (tpl);
+		_view.seekTpl (tpl).then (function (view) {
+
+			// Find main
+			var _main = _$ ('[sp-main]');
+			// Exist the skull?
+			if ( _main.exist )
+				_main.html (view.getTpl ());
+
+			//Execute
+			callback.apply (null, params);
+		});
 	});
 
 	/**Delega rutas
@@ -5992,15 +5974,10 @@ if ( !Object.observe ) {
 
 					//Append a new route
 					_self.onpopstate[route_name].push (function (state, e) {
+						//Handle tpl?
 						if ( conf && 'tpl' in conf ) {
-							_self._handleSkull (conf.tpl).then (function (view) {
-								//Render skull
-								_$ ('[sp-main]').html (view.getTpl ());
-								callback (state, e);
-							})
-						} else {
-							callback (state, e);
-						}
+							_self._handleSkull (conf.tpl, callback, [state, e])
+						} else { callback (state, e); }
 					});
 
 					//First action
@@ -6011,6 +5988,7 @@ if ( !Object.observe ) {
 						_self.redirect (route_name, {});
 					}
 				}
+
 				return _self;
 			}
 		};

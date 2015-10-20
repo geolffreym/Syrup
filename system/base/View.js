@@ -37,7 +37,10 @@
 		);
 	});
 
-	//Set the template
+	/**Set the template
+	 * @param {string} template
+	 * @return {object}
+	 * **/
 	View.add ('seekTpl', function (template) {
 		var _self = this,
 			_repo = _self.Storage,
@@ -56,10 +59,9 @@
 				resolve (_self)
 			} else {
 				//Get the template
-				_self.lookup (template).then (function (temp) {
-					_save[template] = temp;
+				_self.lookup (template).then (function (_tpl) {
+					_self.tpl = _save[template] = _tpl;
 					_repo.append ('templates', _save);
-					_self.tpl = temp;
 					resolve (_self);
 				}).catch (function () {
 					reject (template);
@@ -70,18 +72,24 @@
 
 	});
 
-	//Return to render html
+	/**Return to render html
+	 * @return {string}
+	 * **/
 	View.add ('getTpl', function () {
 		return this.tpl;
 	});
 
-	//Clear View from Storage
+	/**Clear View from Repo
+	 * @return {object}
+	 * **/
 	View.add ('clear', function () {
 		this.Storage.clear ('templates');
 		return this;
 	});
 
-	//Clear View from Storage
+	/**Clear View from Repo
+	 * @return {object}
+	 * **/
 	View.add ('cleanCache', function () {
 		if ( this.dir ) {
 			var old_templates = this.Storage.get ('templates');
@@ -96,7 +104,11 @@
 		return this;
 	});
 
-	//Parse the View
+	/**Render template
+	 * @param {string} _template
+	 * @param {object} _fields
+	 * @return {object}
+	 * **/
 	View.add ('render', function (_template, _fields) {
 		var _self = this,
 			_worker = new Workers;

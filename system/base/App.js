@@ -261,10 +261,6 @@
 					_model.set (_resource, obj);
 					return _self.modules[moduleId].instance;
 				},
-				send    : function () {
-					if ( _.getObjectSize (_model.scope) > 0 )
-						return _model.send ();
-				},
 				get     : function (item) {
 					return new Promise (function (resolve, reject) {
 						_model.get (_resource).then (function (e) {
@@ -278,12 +274,14 @@
 									if ( v in e.scope )
 										_result[v] = e.scope[v];
 								});
+
+								e.scope = _result;
 								//If filter item
-								resolve (_result);
+								resolve (e)
 
 							} else {
 								//Else all the scope
-								resolve (e.scope);
+								resolve (e);
 							}
 						}).catch (
 							reject

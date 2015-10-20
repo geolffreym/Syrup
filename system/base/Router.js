@@ -31,11 +31,26 @@
 		}))
 	});
 
-	Router.add ('_handleSkull', function (tpl) {
+	/** Handle Tpl Skulls
+	 * @param {string} tpl
+	 * @param {function} callback
+	 * @return {void}
+	 */
+	Router.add ('_handleSkull', function (tpl, callback, params) {
 		var _view = new View;
 		//Clear cache
 		_view.clear ();
-		return _view.seekTpl (tpl);
+		_view.seekTpl (tpl).then (function (view) {
+
+			// Find main
+			var _main = _$ ('[sp-main]');
+			// Exist the skull?
+			if ( _main.exist )
+				_main.html (view.getTpl ());
+
+			//Execute
+			callback.apply (null, params);
+		});
 	});
 
 	/**Delega rutas
@@ -58,15 +73,10 @@
 
 					//Append a new route
 					_self.onpopstate[route_name].push (function (state, e) {
+						//Handle tpl?
 						if ( conf && 'tpl' in conf ) {
-							_self._handleSkull (conf.tpl).then (function (view) {
-								//Render skull
-								_$ ('[sp-main]').html (view.getTpl ());
-								callback (state, e);
-							})
-						} else {
-							callback (state, e);
-						}
+							_self._handleSkull (conf.tpl, callback, [state, e])
+						} else { callback (state, e); }
 					});
 
 					//First action
@@ -77,6 +87,7 @@
 						_self.redirect (route_name, {});
 					}
 				}
+
 				return _self;
 			}
 		};

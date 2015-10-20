@@ -19,7 +19,6 @@
 	};
 
 	function Model () {
-		this.Http = new Http;
 		this.data = null;
 		this.blob = null;
 		this.scope = {};
@@ -81,46 +80,6 @@
 		};
 	});
 
-	/**Submit action
-	 * @param {string} url
-	 * @param {object} data
-	 * @return {object}*/
-	Model.add ('send', function (url, data) {
-		var self = this;
-		if ( _.isObject (url) || _.isFormData (url) ) {
-			data = url;
-			url = null;
-		}
-
-		if ( !_.isSet (data) && !_.isSet (self.data) && !_.isSet (self.blob) )
-			_.error (WARNING_MODEL.ERROR.NOPACK, '(Model .send)');
-
-		var conf = {
-			url   : url || self.model.attr ('action') || location.pathname,
-			data  : data || self.data || self.blob,
-			method: self.type
-		};
-
-		return (new Promise (function (resolve, reject) {
-			if ( self.failed )
-				reject (data);
-
-			//The middleware
-			self.Http.intercept ({
-				request: function (config) {
-					config.method = conf.method;
-				}
-			});
-
-			//The request
-			self.Http.kill ()
-				.request (conf.url, conf.data)
-				.then (function (response) {
-				resolve (response);
-			}).catch (reject);
-		}))
-	});
-
 	//Return object
 	Model.add ('getScope', function () {
 		return this.scope;
@@ -132,7 +91,7 @@
 	});
 
 	//Return formdata
-	Model.add ('getFiles', function () {
+	Model.add ('getBinaries', function () {
 		return this.blob;
 	});
 
@@ -173,11 +132,10 @@
 	 * @param {object|string} model
 	 * @return {object}
 	 * */
-	Model.add ('files', function (model) {
+	Model.add ('binary', function (model) {
 		var _self = this;
 		_self.model = !_.is$ (model)
-					  && _$ (model)
-					  || model;
+					  && _$ (model) || model;
 
 		return (new Promise (function (resolve, reject) {
 			_self.model.find ('input[type="file"]', function (field) {
@@ -198,12 +156,12 @@
 
 		var _self = this;
 		_self.model = !_.is$ (model)
-					  && _$ (model)
-					  || model;
+					  && _$ (model) || model;
 
 		// For each input fill with data
 		_.each (object, function (v, i) {
 			_self.model.find ('input[name=' + i + ']', function (e) {
+				_self.scope[i] = v;
 				e.val (v);
 			})
 		})
@@ -216,8 +174,7 @@
 	 */
 	Model.add ('get', function (model) {
 		this.model = !_.is$ (model)
-					 && _$ (model)
-					 || model;
+					 && _$ (model) || model;
 
 		var _self = this,
 			_modelData = new FormData,
