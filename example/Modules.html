@@ -14,47 +14,37 @@
 
 <script>
 
+    //Module
+    App.module ('main', [
+        'Http'
 
-    _$ (function () {
-
-        //The App
-        var my_App = App.blend ('Hey', ['Http']);
-
-        //A global service
-        my_App.service ('HeyConsole', function () {
-            console.log ('hi')
-        });
-
-
-        //A new recipe for Hey
-        my_App.recipe ('Hey.You', function (_, _$, scope) {
-            return {
-                init   : function (tools) {
-                    this.setScope ({ a: 2 });
-
-                    //When Hey.You scope change
-                    this.when ('change').then (function (d) {
-                        console.log (d)
-                    })
-                },
-                destroy: function () {}
+    ]).spice ({
+        MAX: 1
+    }).cook (function ($) {
+        //Http Interceptors
+        $.Http.intercept ({
+            'request': function (c) {
+                console.log (c)
             }
         });
 
-
-        //A new recipe for Hey
-        my_App.recipe ('Hey.Do', function (_, _$, scope) {
-            return {
-                init   : function (tools) {
-                    //Trigger change in Hey.You
-                    my_App.setScope ('Hey.You', { a: 3 })
-                },
-                destroy: function () {}
-            }
-        });
-
-
+        //Router
     })
+
+
+</script>
+
+<script>
+
+    //Apps
+    App.module ('main').blend ('index', []).recipe ('test', function (_, g) {
+        return {
+            init: function ($) {
+            }
+        }
+    });
+
+
 
 </script>
 </body>

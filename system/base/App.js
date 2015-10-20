@@ -6,14 +6,31 @@
 	function Apps () {
 		this.root = null; // Root name
 		this.lib = null; // Lib handler
-		this.app = null; // The main app
 		this.after = null; // After recipes init execution
 
 		this.model = null; // The model
 		this.scope = {}; // Global scope
+
+		this.app = {};
+		this.collection = {};
 		this.modules = {}; // Modules list
 		this.onchange = {}; // Change handler
 	}
+
+	/** Handle modules to Apps
+	 * @param name
+	 * @param dependencies []
+	 * @return object
+	 * **/
+	Apps.add ('module', function (name, dependencies) {
+		if ( !(name in this.app) ) {
+			this.app[name] = new Apps;
+			this.app[name].root = name;
+			this.app[name].lib = new LibClass;
+			this.app[name].lib.blend (name, dependencies)
+		}
+		return this.app[name];
+	});
 
 	/** Blend a method in global Syrup object
 	 * @param name
@@ -22,10 +39,10 @@
 	 * **/
 	Apps.add ('blend', function (name, dependencies) {
 		var _self = new Apps;
-		_self.lib = new LibClass;
-		_self.root = name;
+
+		_self.lib = this.lib || new LibClass; //Is handled Lib by module? or recreate
+		_self.root = this.root || name; //Is handled root by module? or recreate
 		_self.scope = {};
-		_self.app = _$ ('[sp-app="' + name + '"]');
 		_self.lib.blend (name, dependencies);
 
 		return _self;
@@ -39,14 +56,17 @@
 	Apps.add ('recipe', function (moduleId, module) {
 		if ( _.isSet (this.root) ) {
 			if ( _.isSet (module) ) {
-				this.temp = moduleId;
-				this.modules[moduleId] = {
+				var _self = this;
+				_self.modules[moduleId] = {
 					creator : module,
 					instance: null
 				};
 
 				//Constructor
-				this._taste (moduleId);
+				//On document ready
+				_$ (function () {
+					_self._taste (moduleId);
+				});
 			}
 		}
 		return this;
@@ -152,7 +172,7 @@
 	 * @param moduleId
 	 * @return object
 	 * */
-	Apps.add ('getRecipe', function (moduleId) {
+	Apps.add ('_getRecipe', function (moduleId) {
 		if ( moduleId in this.modules && _.isSet (this.root) )
 			return this.modules[moduleId].instance;
 		return null;
@@ -163,7 +183,7 @@
 	 * @param object
 	 * @return void
 	 * **/
-	Apps.add ('setScope', function (moduleId, object) {
+	Apps.add ('_setScope', function (moduleId, object) {
 		if ( moduleId in this.scope ) {
 			this.scope[moduleId] = object;
 		}
@@ -174,7 +194,7 @@
 	 * @param moduleId
 	 * @return object
 	 * **/
-	Apps.add ('getScope', function (moduleId) {
+	Apps.add ('_getScope', function (moduleId) {
 		if ( moduleId in this.scope ) {
 			return this.scope[moduleId];
 		}
@@ -213,34 +233,32 @@
 			'focus], ', 'input], ', 'select], ', 'reset]'
 		];
 
-		if ( this.app.exist ) {
-			var _this = this, _dom = null,
-				_self = this.modules[moduleId].instance,
-				_the_filter = enabled_events.join (' [sp-'),
-				_mod = _$ ('[sp-recipe="' + moduleId + '"]');
+		var _this = this, _dom = null,
+			_self = this.modules[moduleId].instance,
+			_the_filter = enabled_events.join (' [sp-'),
+			_mod = _$ ('[sp-recipe="' + moduleId + '"]');
 
-			//Exist the module?
-			if ( _mod.exist ) {
-				//Find events listeners
-				_mod.find (_the_filter, function (dom_list) {
-					//Find the listener in attributes
-					_.each ((_dom = dom_list.get ()).attributes, function (v) {
-						if ( /sp-[a-z]+/.test (v.localName) ) {
-							var _event = _.replace (v.localName, 'sp-', _.emptyStr),
-								_attr = _dom.getAttribute (v.localName);
+		//Exist the module?
+		if ( _mod.exist ) {
+			//Find events listeners
+			_mod.find (_the_filter, function (dom_list) {
+				//Find the listener in attributes
+				_.each ((_dom = dom_list.get ()).attributes, function (v) {
+					if ( /sp-[a-z]+/.test (v.localName) ) {
+						var _event = _.replace (v.localName, 'sp-', _.emptyStr),
+							_attr = _dom.getAttribute (v.localName);
 
-							//Is the attr value in module? and is Function the attr value?
-							if ( _attr in _self && _.isFunction (_self[_attr]) ) {
-								_mod.listen (_event, '[' + v.localName + '="' + _attr + '"]', function (e) {
-									//Param event and dependencies
-									e.preventDefault ();
-									_self[_attr] (_this.lib.get (_self.parent), e);
-								});
-							}
+						//Is the attr value in module? and is Function the attr value?
+						if ( _attr in _self && _.isFunction (_self[_attr]) ) {
+							_mod.listen (_event, '[' + v.localName + '="' + _attr + '"]', function (e) {
+								//Param event and dependencies
+								e.preventDefault ();
+								_self[_attr] (_this.lib.get (_self.parent), e);
+							});
 						}
-					});
+					}
 				});
-			}
+			});
 		}
 	});
 
@@ -252,8 +270,8 @@
 			_model = new Model,
 			_resource = _$ ('[sp-recipe="' + moduleId + '"] [sp-model]');
 
-		//Exist the app and the model?
-		if ( this.app.exist && _resource.exist ) {
+		//Exist the model?
+		if ( _resource.exist ) {
 			_self.modules[moduleId].instance.model = {
 				object  : _model,
 				resource: _resource,
@@ -326,7 +344,7 @@
 							  || object;
 
 				if ( _.isObject (_object) ) {
-					_self.setScope (_moduleId, _object);
+					_self._setScope (_moduleId, _object);
 					return _self.modules[moduleId].instance;
 				}
 			},
@@ -334,7 +352,7 @@
 				var _moduleId = _.isString (nModule)
 					? nModule : moduleId;
 
-				return _self.getScope (_moduleId);
+				return _self._getScope (_moduleId);
 			}
 		};
 	});
@@ -347,7 +365,7 @@
 		var _self = this;
 
 		_self.modules[moduleId].instance.app = {
-			object: _self.app,
+			object: _$ ('[sp-app="' + _self.root + '"]'),
 			title : function (title) {
 				var _title = _$ ('title');
 				if ( _title.exist ) {
@@ -370,7 +388,7 @@
 				var _moduleId = _.isString (nModule)
 					? nModule : moduleId;
 
-				return _self.getRecipe (_moduleId);
+				return _self._getRecipe (_moduleId);
 			},
 			drop: function (nModule) {
 				var _moduleId = _.isString (nModule)
@@ -391,47 +409,39 @@
 		var _view = null,
 			_scope = this.scope[moduleId];
 
-		//Is set the app
-		if ( this.app.exist ) {
-			//Find the recipe
-			var _dom = _$ ('[sp-recipe="' + moduleId + '"] [sp-view]'),
-				_dom_template = _$ ('[sp-recipe="' + moduleId + '"] [sp-tpl]');
+		//Find the recipe
+		var _dom = _$ ('[sp-recipe="' + moduleId + '"] [sp-view]'),
+			_dom_template = _$ ('[sp-recipe="' + moduleId + '"] [sp-tpl]');
 
-			if ( _dom.exist ) { //Exist?
-				if ( _.getObjectSize (_scope) > 0 ) {
+		if ( _dom.exist ) { //Exist?
+			if ( _.getObjectSize (_scope) > 0 ) {
 
-					//The view object
-					_view = new View;
+				//The view object
+				_view = new View;
 
-					//A view?
-					if ( _.isSet (view) && _.isString (view) ) {
-						var view_name = view.split ('/').pop (),
-							view_dir = _.replace (view, '/' + view_name, _.emptyStr);
+				//A view?
+				if ( _.isSet (view) && _.isString (view) ) {
+					var view_name = view.split ('/').pop (),
+						view_dir = _.replace (view, '/' + view_name, _.emptyStr);
 
-						//Require the view if needed
-						Require.lookup (['view/' + view_dir]).then (function () {
-							if ( view_name in _view.__proto__ )
-								_view[view_name] (_, _scope, function (my_html) {
-									_dom.html (my_html);
-								})
+					//Require the view if needed
+					Require.lookup (['view/' + view_dir]).then (function () {
+						if ( view_name in _view.__proto__ )
+							_view[view_name] (_, _scope, function (my_html) {
+								_dom.html (my_html);
+							})
+					});
+
+					//Exist inline tpl?
+				} else if ( _dom_template.exist ) {
+					var _parse = _dom_template.html ();
+					if ( _.isSet (_parse) ) {
+						_view.render (_parse, _scope).then (function (result) {
+							_dom.html (result);
 						});
-
-						//Exist inline tpl?
-					} else if ( _dom_template.exist ) {
-						var _parse = _dom_template.html ();
-						if ( _.isSet (_parse) ) {
-							_view.render (_parse, _scope).then (function (result) {
-								_dom.html (result);
-							});
-
-						}
-
 					}
-
 				}
-
 			}
-
 		}
 
 		return this;
@@ -481,7 +491,7 @@
 			// Handle Model
 			_self._models (moduleId);
 
-			// Handle Views
+			// Handle App
 			_self._app (moduleId);
 
 			// Handle Views

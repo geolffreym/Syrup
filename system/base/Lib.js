@@ -20,7 +20,6 @@
 			Function.factory (name)
 		) ();
 
-
 		if ( !(name in this.breadcrumb) ) {
 			_.Syrup.blend (_anonymous);
 			this.name = name;
@@ -49,6 +48,7 @@
 		var _self = this;
 		if ( _.isArray (dependencies) && _.isSet (_self.object) ) {
 			_.each (dependencies, function (v) {
+
 				_self.object.__proto__[v] = !(v in _self.object)
 					? ( _[v] || (
 						_.isFunction (window[v]) && new window[v]
