@@ -86,7 +86,6 @@
 
 	function Syrup () {
 		this.recursiveStr = false;
-		this.collection = {};
 	}
 
 	/**_$_

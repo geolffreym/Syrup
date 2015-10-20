@@ -43,7 +43,7 @@
 		_view.seekTpl (tpl).then (function (view) {
 
 			// Find main
-			var _main = _$ ('[sp-main]');
+			var _main = _$ ('[sp-app]');
 			// Exist the skull?
 			if ( _main.exist )
 				_main.html (view.getTpl ());

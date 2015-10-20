@@ -104,7 +104,6 @@ if ( typeof exports !== 'undefined' )
 
 	function Syrup () {
 		this.recursiveStr = false;
-		this.collection = {};
 	}
 
 	/**_$_
@@ -5361,30 +5360,28 @@ if ( !Object.observe ) {
 		this.root = null; // Root name
 		this.lib = null; // Lib handler
 		this.after = null; // After recipes init execution
-
-		this.model = null; // The model
 		this.scope = {}; // Global scope
 
-		this.app = {};
-		this.collection = {};
+		//this.app = {};
+		//this.collection = {};
 		this.modules = {}; // Modules list
 		this.onchange = {}; // Change handler
 	}
-
-	/** Handle modules to Apps
-	 * @param name
-	 * @param dependencies []
-	 * @return object
-	 * **/
-	Apps.add ('module', function (name, dependencies) {
-		if ( !(name in this.app) ) {
-			this.app[name] = new Apps;
-			this.app[name].root = name;
-			this.app[name].lib = new LibClass;
-			this.app[name].lib.blend (name, dependencies)
-		}
-		return this.app[name];
-	});
+	//TODO Modules
+	///** Handle modules to Apps
+	// * @param name
+	// * @param dependencies []
+	// * @return object
+	// * **/
+	//Apps.add ('module', function (name, dependencies) {
+	//	if ( !(name in this.app) ) {
+	//		this.app[name] = new Apps;
+	//		this.app[name].root = name;
+	//		this.app[name].lib = new LibClass;
+	//		this.app[name].lib.blend (name, dependencies)
+	//	}
+	//	return this.app[name];
+	//});
 
 	/** Blend a method in global Syrup object
 	 * @param name
@@ -5719,7 +5716,7 @@ if ( !Object.observe ) {
 		var _self = this;
 
 		_self.modules[moduleId].instance.app = {
-			object: _$ ('[sp-app="' + _self.root + '"]'),
+			object: _$ ('[sp-app]'),
 			title : function (title) {
 				var _title = _$ ('title');
 				if ( _title.exist ) {
@@ -5955,7 +5952,7 @@ if ( !Object.observe ) {
 		_view.seekTpl (tpl).then (function (view) {
 
 			// Find main
-			var _main = _$ ('[sp-main]');
+			var _main = _$ ('[sp-app]');
 			// Exist the skull?
 			if ( _main.exist )
 				_main.html (view.getTpl ());

@@ -7,12 +7,10 @@
 		this.root = null; // Root name
 		this.lib = null; // Lib handler
 		this.after = null; // After recipes init execution
-
-		this.model = null; // The model
 		this.scope = {}; // Global scope
 
-		this.app = {};
-		this.collection = {};
+		//this.app = {};
+		//this.collection = {};
 		this.modules = {}; // Modules list
 		this.onchange = {}; // Change handler
 	}
@@ -365,7 +363,7 @@
 		var _self = this;
 
 		_self.modules[moduleId].instance.app = {
-			object: _$ ('[sp-app="' + _self.root + '"]'),
+			object: _$ ('[sp-app]'),
 			title : function (title) {
 				var _title = _$ ('title');
 				if ( _title.exist ) {
