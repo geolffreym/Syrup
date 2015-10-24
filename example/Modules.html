@@ -21,7 +21,7 @@
         MAX: 1
     }).cook (function ($) {
 
-        $.Router.handle (this).set ({
+        $.Router.connect (this).set ({
             'home' : '/syrup/Modules.html',
             'route': '/route/:page/:user/'
         }).then (function (route) {

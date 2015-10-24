@@ -44,7 +44,7 @@
 	 * @param {object} routes
 	 * @return {object}
 	 * */
-	Router.add ('handle', function (to_route) {
+	Router.add ('connect', function (to_route) {
 		if ( !(to_route instanceof AppClass) )
 			_.error (WARNING_ROUTE.ERROR.BADINSTANCE, '(Router .route)');
 

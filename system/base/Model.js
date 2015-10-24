@@ -103,9 +103,8 @@
 	Model.add ('file', function (input) {
 		var _self = this,
 			_formData = new FormData,
-			_files = [], _field = !_.is$ (input)
-								  && _$ (input).get (0)
-								  || input;
+			_files = [],
+			_field = !_.is$ (input) && _$ (input).get (0) || input;
 
 		return (new Promise (function (resolve, reject) {
 			if (
@@ -134,8 +133,7 @@
 	 * */
 	Model.add ('binary', function (model) {
 		var _self = this;
-		_self.model = !_.is$ (model)
-					  && _$ (model) || model;
+		_self.model = !_.is$ (model) && _$ (model) || model;
 
 		return (new Promise (function (resolve, reject) {
 			_self.model.find ('input[type="file"]', function (field) {
@@ -173,8 +171,7 @@
 	 * @return {object}
 	 */
 	Model.add ('get', function (model) {
-		this.model = !_.is$ (model)
-					 && _$ (model) || model;
+		this.model = !_.is$ (model) && _$ (model) || model;
 
 		var _self = this,
 			_modelData = new FormData,
