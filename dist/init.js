@@ -5985,6 +5985,12 @@ if ( !Object.observe ) {
 
 (function (window) {
 
+	var WARNING_ROUTE = {
+		ERROR: {
+			BADINSTANCE: 'App instance needed'
+		}
+	};
+
 	'use strict';
 	/**Router
 	 * @constructor
@@ -6019,6 +6025,8 @@ if ( !Object.observe ) {
 	 * @return {object}
 	 * */
 	Router.add ('route', function (to_route) {
+		if ( !(to_route instanceof AppClass) )
+			_.error (WARNING_ROUTE.ERROR.BADINSTANCE, '(Router .route)');
 		this.module = to_route;
 		to_route.lazy = true;
 		return this;
