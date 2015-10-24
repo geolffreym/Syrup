@@ -22,11 +22,13 @@
 			//Factory
 			this.name = name;
 			this.object = Function.factory (name);
-			this.breadcrumb[name] = this.object;
 			this._dependencies (dependencies);
 
 			//Blend global scope
 			_.Syrup.blend (new this.object);
+
+			//Save history
+			this.breadcrumb[name] = _[name];
 		}
 
 		return this;

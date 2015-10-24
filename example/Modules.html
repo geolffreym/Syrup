@@ -39,9 +39,11 @@
 <script>
 
     //Apps
-    App.module ('main').blend ('index', []).recipe ('test', function (_, g) {
+    App.module ('main').blend ('index', ['Http']).recipe ('test', function (_, g) {
         return {
             init: function ($) {
+                console.log($.main.Http)
+                console.log($.Http)
             }
         }
     });

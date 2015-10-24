@@ -1844,11 +1844,13 @@ if ( typeof exports !== 'undefined' )
 			//Factory
 			this.name = name;
 			this.object = Function.factory (name);
-			this.breadcrumb[name] = this.object;
 			this._dependencies (dependencies);
 
 			//Blend global scope
 			_.Syrup.blend (new this.object);
+
+			//Save history
+			this.breadcrumb[name] = _[name];
 		}
 
 		return this;
@@ -5362,26 +5364,25 @@ if ( !Object.observe ) {
 		this.after = null; // After recipes init execution
 		this.scope = {}; // Global scope
 
-		//this.app = {};
-		//this.collection = {};
+		this.app = {};
 		this.modules = {}; // Modules list
 		this.onchange = {}; // Change handler
 	}
-	//TODO Modules
-	///** Handle modules to Apps
-	// * @param name
-	// * @param dependencies []
-	// * @return object
-	// * **/
-	//Apps.add ('module', function (name, dependencies) {
-	//	if ( !(name in this.app) ) {
-	//		this.app[name] = new Apps;
-	//		this.app[name].root = name;
-	//		this.app[name].lib = new LibClass;
-	//		this.app[name].lib.blend (name, dependencies)
-	//	}
-	//	return this.app[name];
-	//});
+
+	/** Handle modules to Apps
+	 * @param name
+	 * @param dependencies []
+	 * @return object
+	 * **/
+	Apps.add ('module', function (name, dependencies) {
+		if ( !(name in this.app) ) {
+			this.app[name] = new Apps;
+			this.app[name].root = name;
+			this.app[name].lib = new LibClass;
+			this.app[name].lib.blend (name, dependencies)
+		}
+		return this.app[name];
+	});
 
 	/** Blend a method in global Syrup object
 	 * @param name
@@ -5391,9 +5392,17 @@ if ( !Object.observe ) {
 	Apps.add ('blend', function (name, dependencies) {
 		var _self = new Apps;
 
-		_self.lib = this.lib || new LibClass; //Is handled Lib by module? or recreate
-		_self.root = this.root || name; //Is handled root by module? or recreate
+		_self.lib = new LibClass; //Is handled Lib by module? or recreate
+		_self.root = name; //Is handled root by module? or recreate
 		_self.scope = {};
+
+		//Inherit
+		if ( this.root ) {
+			dependencies = dependencies || [];
+			dependencies.push (this.root);
+		}
+
+		//Blend the libs
 		_self.lib.blend (name, dependencies);
 
 		return _self;
