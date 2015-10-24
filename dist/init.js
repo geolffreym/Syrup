@@ -5830,19 +5830,19 @@ if ( !Object.observe ) {
 			_self.modules[moduleId].instance.when = function (event) {
 				return _self.when (event, moduleId);
 			};
-
-			// Custom listener for recipe
-			_self.modules[moduleId].instance.listen = function (event, delegate) {
-				var _recipe = _$ ('[sp-recipe="' + moduleId + '"]');
-
-				return new Promise (function (resolve, reject) {
-					if ( _recipe.exist ) {
-						_recipe.listen (event, delegate, resolve);
-					} else {
-						reject (_recipe);
-					}
-				})
-			};
+			//
+			//// Custom listener for recipe
+			//_self.modules[moduleId].instance.listen = function (event, delegate) {
+			//	var _recipe = _$ ('[sp-recipe="' + moduleId + '"]');
+			//
+			//	return new Promise (function (resolve, reject) {
+			//		if ( _recipe.exist ) {
+			//			_recipe.listen (event, delegate, resolve);
+			//		} else {
+			//			reject (_recipe);
+			//		}
+			//	})
+			//};
 
 			// Recipes
 			_self._recipes (moduleId);
