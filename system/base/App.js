@@ -6,10 +6,10 @@
 	function Apps () {
 		this.root = null; // Root name
 		this.lib = null; // Lib handler
-		this.after = null; // After recipes init execution
 		this.scope = {}; // Global scope
 
 		this.app = {};
+		this.appCollection = {};
 		this.modules = {}; // Modules list
 		this.onchange = {}; // Change handler
 	}
@@ -41,10 +41,14 @@
 		_self.root = name; //Is handled root by module? or recreate
 		_self.scope = {};
 
-		//Inherit
+		//Is module
 		if ( this.root ) {
+			//Inherit
 			dependencies = dependencies || [];
 			dependencies.push (this.root);
+
+			//History
+			this.appCollection[name] = _self;
 		}
 
 		//Blend the libs
@@ -88,12 +92,15 @@
 					 && _.getObjectSize (v.object) > 0
 					 && moduleId === v.name
 				) {
-					_self.onchange[v.name] ({
-						name  : v.name,
-						old   : v.oldValue,
-						type  : v.type,
-						object: v.object[v.name]
-					});
+					_self.onchange[v.name].call (
+						_self.modules[moduleId].instance,
+						{
+							name  : v.name,
+							old   : v.oldValue,
+							type  : v.type,
+							object: v.object[v.name]
+						}
+					);
 					return false;
 				}
 			});
@@ -127,7 +134,11 @@
 	 * **/
 	Apps.add ('cook', function (callback) {
 		if ( _.isFunction (callback) )
-			callback (this.lib.get (this.root), _);
+			callback.call (
+				this,
+				this.lib.get (this.root),
+				_
+			);
 		return this;
 	});
 
@@ -141,15 +152,6 @@
 		return this;
 	});
 
-
-	/**Add a custom trigger to execute after init
-	 * @param moduleList
-	 * @callback*/
-	Apps.add ('afters', function (callback) {
-		if ( _.isFunction (callback) )
-			this.after = callback;
-		return this;
-	});
 
 	/** Append global service
 	 * @param {string }name
@@ -285,31 +287,31 @@
 					return _self.modules[moduleId].instance;
 				},
 				get     : function (item) {
-					return new Promise (function (resolve, reject) {
-						_model.get (_resource).then (function (e) {
-							if (
-								_.isSet (item)
-								&& _.isArray (item)
-								&& !_.isEmpty (item)
-							) {
-								var _result = {};
-								_.each (item, function (v, i) {
-									if ( v in e.scope )
-										_result[v] = e.scope[v];
-								});
 
-								e.scope = _result;
-								//If filter item
-								resolve (e)
+					return {
+						then: function (resolve) {
+							return _model.get (_resource).then (function (e) {
+								if (
+									_.isSet (item)
+									&& _.isArray (item)
+									&& !_.isEmpty (item)
+								) {
+									var _result = {};
+									_.each (item, function (v, i) {
+										if ( v in e.scope )
+											_result[v] = e.scope[v];
+									});
 
-							} else {
-								//Else all the scope
-								resolve (e);
-							}
-						}).catch (
-							reject
-						);
-					});
+									e.scope = _result;
+								}
+
+								// Call the resolve
+								resolve.call (
+									_self.modules[moduleId].instance, e
+								)
+							});
+						}
+					};
 				}
 			}
 		}
@@ -509,12 +511,7 @@
 			) {
 
 				//Execution
-				_self.modules[moduleId].instance.init (this.lib.get (_self.root));
-
-				//After execute
-				if ( _.isSet (_self.after) )
-					_self.after (this.lib.get (_self.root), moduleId);
-
+				_self.modules[moduleId].instance.init (_self.lib.get (_self.root));
 			}
 
 			// Bind listeners

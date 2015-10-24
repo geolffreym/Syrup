@@ -15,14 +15,17 @@
 
 
 <script>
-    //TODO PENDING END MODULES
+
     //Module
     App.module ('main', [
-        'Http'
+        'Http',
+        'Router'
 
     ]).spice ({
         MAX: 1
     }).cook (function ($) {
+        console.log(this)
+
         //Http Interceptors
         $.Http.intercept ({
             'request': function (c) {
@@ -42,12 +45,11 @@
     App.module ('main').blend ('index', ['Http']).recipe ('test', function (_, g) {
         return {
             init: function ($) {
-                console.log($.main.Http)
-                console.log($.Http)
+                console.log ($.main.Http)
+                //console.log ($.Http)
             }
         }
-    });
-
+    })
 
 
 </script>

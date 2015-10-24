@@ -137,7 +137,7 @@
 		if ( _.isGlobal (this.collection) )
 			this.collection.addEventListener (
 				"DOMContentLoaded",
-				callback
+				callback.bind(this)
 			);
 		return this;
 	});
@@ -147,7 +147,7 @@
 	 */
 	_$_.add ('load', function (callback) {
 		if ( _.isGlobal (this.collection) ) {
-			this.collection.onload = callback;
+			this.collection.onload = callback.bind(this);
 		}
 	});
 
@@ -171,9 +171,9 @@
 
 				if ( _.isSet (delegate) && !_.isFunction (delegate) ) {
 					_$ (_target).filter (delegate, function () {
-						_.callbackAudit (callback, e);
+						_.callbackAudit (callback.bind(_target), e);
 					});
-				} else { _.callbackAudit (callback, e); }
+				} else { _.callbackAudit (callback.bind(_target), e); }
 			};
 
 		// For each element
