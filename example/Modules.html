@@ -36,6 +36,12 @@
         });
 
 
+//        $.Router.intercept ({
+//            redirect: function (e) {
+//                console.log (e)
+//            }
+//        });
+
         //Http Interceptors
         $.Http.intercept ({
             'request': function (c) {
@@ -51,7 +57,7 @@
 
 <script>
 
-    //Apps
+    //Index App
     App.module ('main')
             .blend ('index', ['Http'])
             .recipe ('home2', function (_, g) {
@@ -70,12 +76,12 @@
     });
 
 
-
+    //Route App
     App.module ('main')
             .blend ('route', []).recipe ('router', function (_, g) {
         return {
             init    : function ($) {
-                console.log ('I am router')
+                console.log (this.uri);
                 //console.log ($.Http)
             },
             redirect: function ($) {

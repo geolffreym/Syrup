@@ -5823,6 +5823,9 @@ if ( !Object.observe ) {
 	Apps.add ('_taste', function (moduleId) {
 		var _self = this;
 
+		//Handle taste interceptor
+		_self._handleInterceptor ('taste', _self);
+
 		//No lazy execution?
 		//Module registered?
 		//Root exists?
@@ -5878,6 +5881,9 @@ if ( !Object.observe ) {
 				&& _.isFunction (_self.modules[moduleId].instance.init)
 			) {
 
+				//Handle taste interceptor
+				_self._handleInterceptor ('init', _self.modules[moduleId].instance);
+
 				//Execution
 				_self.modules[moduleId].instance.init (_self.lib.get (_self.root));
 			}
@@ -5909,6 +5915,33 @@ if ( !Object.observe ) {
 		});
 
 		return this;
+	});
+
+	/** Interceptors
+	 * @param  {object} interceptors
+	 * @return {object}
+	 * */
+	Apps.add ('intercept', function (interceptors) {
+		if ( _.isObject (interceptors) )
+			MiddleWare.intercept (this, interceptors);
+		return this;
+	});
+
+
+	/** Handle the interceptors
+	 * @param {string} type
+	 * @param {object} param
+	 * @return {void}
+	 * */
+	Apps.add ('_handleInterceptor', function (type, param) {
+		//Trigger Interceptors
+		MiddleWare.trigger (
+			MiddleWare.getInterceptors (this, type),
+			[param, this]
+		);
+
+		//Clean the interceptor
+		MiddleWare.cleanInterceptor (this, type);
 	});
 
 
@@ -5974,6 +6007,9 @@ if ( !Object.observe ) {
 					}, true);
 				}
 			}
+
+			//Intercept pop state
+			_self._handleInterceptor ('redirect', e);
 		});
 
 	}
@@ -6045,8 +6081,20 @@ if ( !Object.observe ) {
 			_self._handleSkull (conf, function () {
 				//On main tpl is handled, what to do?
 
-				if ( conf.app in _self.module.appCollection )
+				if ( conf.app in _self.module.appCollection ) {
+					//Intercept init
+					//Inject params
+					_self.module.appCollection[conf.app].intercept ({
+						'init': function (mod) {
+							mod.uri = {
+								params: state
+							}
+						}
+					});
+
+					//Taste recipes
 					_self.module.appCollection[conf.app].taste ();
+				}
 
 			}, [state, e])
 
@@ -6108,6 +6156,33 @@ if ( !Object.observe ) {
 
 
 		}));
+	});
+
+	/** Interceptors
+	 * @param  {object} interceptors
+	 * @return {object}
+	 * */
+	Router.add ('intercept', function (interceptors) {
+		if ( _.isObject (interceptors) )
+			MiddleWare.intercept (this, interceptors);
+		return this;
+	});
+
+
+	/** Handle the interceptors
+	 * @param {string} type
+	 * @param {object} param
+	 * @return {void}
+	 * */
+	Router.add ('_handleInterceptor', function (type, param) {
+		//Trigger Interceptors
+		MiddleWare.trigger (
+			MiddleWare.getInterceptors (this, type),
+			[param, this]
+		);
+
+		//Clean the interceptor
+		MiddleWare.cleanInterceptor (this, type);
 	});
 
 

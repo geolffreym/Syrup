@@ -468,6 +468,9 @@
 	Apps.add ('_taste', function (moduleId) {
 		var _self = this;
 
+		//Handle taste interceptor
+		_self._handleInterceptor ('taste', _self);
+
 		//No lazy execution?
 		//Module registered?
 		//Root exists?
@@ -523,6 +526,9 @@
 				&& _.isFunction (_self.modules[moduleId].instance.init)
 			) {
 
+				//Handle taste interceptor
+				_self._handleInterceptor ('init', _self.modules[moduleId].instance);
+
 				//Execution
 				_self.modules[moduleId].instance.init (_self.lib.get (_self.root));
 			}
@@ -554,6 +560,33 @@
 		});
 
 		return this;
+	});
+
+	/** Interceptors
+	 * @param  {object} interceptors
+	 * @return {object}
+	 * */
+	Apps.add ('intercept', function (interceptors) {
+		if ( _.isObject (interceptors) )
+			MiddleWare.intercept (this, interceptors);
+		return this;
+	});
+
+
+	/** Handle the interceptors
+	 * @param {string} type
+	 * @param {object} param
+	 * @return {void}
+	 * */
+	Apps.add ('_handleInterceptor', function (type, param) {
+		//Trigger Interceptors
+		MiddleWare.trigger (
+			MiddleWare.getInterceptors (this, type),
+			[param, this]
+		);
+
+		//Clean the interceptor
+		MiddleWare.cleanInterceptor (this, type);
 	});
 
 
