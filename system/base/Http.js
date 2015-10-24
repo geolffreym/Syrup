@@ -96,17 +96,18 @@
 					if ( _.isJson (_response) ) {
 						_response = JSON.parse (_response);
 					}
-					resolve (_response);
-
 					//Find a interceptor for success
 					_self._handleInterceptor ('success', _response);
+
+					resolve (_response);
+
 				}
 			});
 
 			//Progress
 			_self.xhr.addEventListener ('progress', function (e) {
 				//Find a interceptor for progress
-				_self._handleInterceptor ('request', e);
+				_self._handleInterceptor ('progress', e);
 
 			}, false);
 

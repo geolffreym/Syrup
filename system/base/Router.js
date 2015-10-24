@@ -44,7 +44,7 @@
 	 * @param {object} routes
 	 * @return {object}
 	 * */
-	Router.add ('route', function (to_route) {
+	Router.add ('handle', function (to_route) {
 		if ( !(to_route instanceof AppClass) )
 			_.error (WARNING_ROUTE.ERROR.BADINSTANCE, '(Router .route)');
 
@@ -130,10 +130,7 @@
 		});
 
 		//First action
-		if ( _.matchInArray (route_name, [
-				'home', 'default',
-				'init', 'initial'
-			]) ) {
+		if ( conf.default ) {
 			_self.redirect (route_name, {});
 		}
 

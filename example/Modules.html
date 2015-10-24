@@ -21,13 +21,14 @@
         MAX: 1
     }).cook (function ($) {
 
-        $.Router.route (this).set ({
+        $.Router.handle (this).set ({
             'home' : '/syrup/Modules.html',
             'route': '/route/:page/:user/'
         }).then (function (route) {
             route.when ('home', {
-                tpl: 'skull/home.html',
-                app: 'index'
+                tpl    : 'skull/home.html',
+                app    : 'index',
+                default: true
 
             }).when ('route', {
                 tpl: 'skull/route.html',

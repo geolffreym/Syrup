@@ -4634,17 +4634,18 @@ if ( !Object.observe ) {
 					if ( _.isJson (_response) ) {
 						_response = JSON.parse (_response);
 					}
-					resolve (_response);
-
 					//Find a interceptor for success
 					_self._handleInterceptor ('success', _response);
+
+					resolve (_response);
+
 				}
 			});
 
 			//Progress
 			_self.xhr.addEventListener ('progress', function (e) {
 				//Find a interceptor for progress
-				_self._handleInterceptor ('request', e);
+				_self._handleInterceptor ('progress', e);
 
 			}, false);
 
@@ -6024,9 +6025,10 @@ if ( !Object.observe ) {
 	 * @param {object} routes
 	 * @return {object}
 	 * */
-	Router.add ('route', function (to_route) {
+	Router.add ('handle', function (to_route) {
 		if ( !(to_route instanceof AppClass) )
 			_.error (WARNING_ROUTE.ERROR.BADINSTANCE, '(Router .route)');
+
 		this.module = to_route;
 		to_route.lazy = true;
 		return this;
@@ -6109,10 +6111,7 @@ if ( !Object.observe ) {
 		});
 
 		//First action
-		if ( _.matchInArray (route_name, [
-				'home', 'default',
-				'init', 'initial'
-			]) ) {
+		if ( conf.default ) {
 			_self.redirect (route_name, {});
 		}
 
