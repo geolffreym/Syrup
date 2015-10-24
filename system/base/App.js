@@ -9,6 +9,8 @@
 		this.scope = {}; // Global scope
 
 		this.app = {};
+		this.lazy = false; //Lazy execution?
+		this.interceptors = {};
 		this.appCollection = {};
 		this.modules = {}; // Modules list
 		this.onchange = {}; // Change handler
@@ -37,8 +39,10 @@
 	Apps.add ('blend', function (name, dependencies) {
 		var _self = new Apps;
 
-		_self.lib = new LibClass; //Is handled Lib by module? or recreate
-		_self.root = name; //Is handled root by module? or recreate
+		_self.lib = new LibClass; //
+		_self.root = name; //
+		_self.app = this.root && this || null; // Is module root set?
+		_self.lazy = this.lazy; // Lazy execution?
 		_self.scope = {};
 
 		//Is module
@@ -63,7 +67,9 @@
 	 *  @return object
 	 * */
 	Apps.add ('recipe', function (moduleId, module) {
-		if ( _.isSet (this.root) ) {
+
+		//Handled by blend?
+		if ( this.root ) {
 			if ( _.isSet (module) ) {
 				var _self = this;
 				_self.modules[moduleId] = {
@@ -74,6 +80,7 @@
 				//Constructor
 				//On document ready
 				_$ (function () {
+					//Handle request interceptor
 					_self._taste (moduleId);
 				});
 			}
@@ -458,11 +465,17 @@
 	 *@param moduleId
 	 * @return object
 	 */
-
 	Apps.add ('_taste', function (moduleId) {
 		var _self = this;
 
-		if ( moduleId in _self.modules && _.isSet (_self.root) ) {
+		//No lazy execution?
+		//Module registered?
+		//Root exists?
+		if (
+			!_self.lazy
+			&& moduleId in _self.modules
+			&& _.isSet (_self.root)
+		) {
 
 			// Initialize module
 			_self._add (moduleId);
@@ -520,6 +533,25 @@
 			// Observe scope
 			_self._watch (moduleId);
 		}
+
+		return this;
+	});
+
+	/** Execute All or One Module
+	 *@param moduleId
+	 * @return object
+	 */
+	Apps.add ('taste', function (moduleId) {
+		var _self = this,
+			_moduleId = moduleId && [moduleId]
+						|| _.getObjectKeys (_self.modules);
+		//Reset lazy exec
+		_self.lazy = false;
+
+		//Execute!!
+		_.each (_moduleId, function (v) {
+			_self._taste (v);
+		});
 
 		return this;
 	});

@@ -5364,6 +5364,8 @@ if ( !Object.observe ) {
 		this.scope = {}; // Global scope
 
 		this.app = {};
+		this.lazy = false; //Lazy execution?
+		this.interceptors = {};
 		this.appCollection = {};
 		this.modules = {}; // Modules list
 		this.onchange = {}; // Change handler
@@ -5392,8 +5394,10 @@ if ( !Object.observe ) {
 	Apps.add ('blend', function (name, dependencies) {
 		var _self = new Apps;
 
-		_self.lib = new LibClass; //Is handled Lib by module? or recreate
-		_self.root = name; //Is handled root by module? or recreate
+		_self.lib = new LibClass; //
+		_self.root = name; //
+		_self.app = this.root && this || null; // Is module root set?
+		_self.lazy = this.lazy; // Lazy execution?
 		_self.scope = {};
 
 		//Is module
@@ -5418,7 +5422,9 @@ if ( !Object.observe ) {
 	 *  @return object
 	 * */
 	Apps.add ('recipe', function (moduleId, module) {
-		if ( _.isSet (this.root) ) {
+
+		//Handled by blend?
+		if ( this.root ) {
 			if ( _.isSet (module) ) {
 				var _self = this;
 				_self.modules[moduleId] = {
@@ -5429,6 +5435,7 @@ if ( !Object.observe ) {
 				//Constructor
 				//On document ready
 				_$ (function () {
+					//Handle request interceptor
 					_self._taste (moduleId);
 				});
 			}
@@ -5813,11 +5820,17 @@ if ( !Object.observe ) {
 	 *@param moduleId
 	 * @return object
 	 */
-
 	Apps.add ('_taste', function (moduleId) {
 		var _self = this;
 
-		if ( moduleId in _self.modules && _.isSet (_self.root) ) {
+		//No lazy execution?
+		//Module registered?
+		//Root exists?
+		if (
+			!_self.lazy
+			&& moduleId in _self.modules
+			&& _.isSet (_self.root)
+		) {
 
 			// Initialize module
 			_self._add (moduleId);
@@ -5879,6 +5892,25 @@ if ( !Object.observe ) {
 		return this;
 	});
 
+	/** Execute All or One Module
+	 *@param moduleId
+	 * @return object
+	 */
+	Apps.add ('taste', function (moduleId) {
+		var _self = this,
+			_moduleId = moduleId && [moduleId]
+						|| _.getObjectKeys (_self.modules);
+		//Reset lazy exec
+		_self.lazy = false;
+
+		//Execute!!
+		_.each (_moduleId, function (v) {
+			_self._taste (v);
+		});
+
+		return this;
+	});
+
 
 	/**Drop a Module
 	 * @param moduleId
@@ -5929,6 +5961,7 @@ if ( !Object.observe ) {
 		this.history = window.history;
 		this.findParams = /(:[\w]+)/g;
 		this.onpopstate = {};
+		this.module = null;
 
 		var _self = this;
 
@@ -5945,6 +5978,15 @@ if ( !Object.observe ) {
 
 	}
 
+	/**Set the target
+	 * @param {object} routes
+	 * @return {object}
+	 * */
+	Router.add ('route', function (to_route) {
+		this.module = to_route;
+		to_route.lazy = true;
+		return this;
+	});
 
 	/**Set the routes
 	 * @param {object} routes
@@ -5964,11 +6006,11 @@ if ( !Object.observe ) {
 	 * @param {function} callback
 	 * @return {void}
 	 */
-	Router.add ('_handleSkull', function (tpl, callback, params) {
+	Router.add ('_handleSkull', function (conf, callback, params) {
 		var _view = new View;
 		//Clear cache
 		_view.clear ();
-		_view.seekTpl (tpl).then (function (view) {
+		_view.seekTpl (conf.tpl).then (function (view) {
 
 			// Find main
 			var _main = _$ ('[sp-app]');
@@ -5977,7 +6019,7 @@ if ( !Object.observe ) {
 				_main.html (view.getTpl ());
 
 			//Execute
-			callback.apply (null, params);
+			callback.apply (conf.app, params);
 		});
 	});
 
@@ -5989,36 +6031,36 @@ if ( !Object.observe ) {
 		_.assert (route_name, _.WARNING_SYRUP.ERROR.NOPARAM, '(Router .when)');
 		var _self = this;
 
-		return {
-			then: function (callback) {
-				//Is function callback?
-				if ( _.isFunction (callback) ) {
-					//Handle Route
+		//No app. Nothing to do!!
+		if ( !(conf && 'app' in conf) )
+			return;
 
-					//No route?
-					if ( !(route_name in _self.onpopstate) )
-						_self.onpopstate[route_name] = [];
+		//No route?
+		if ( !(route_name in _self.onpopstate) )
+			_self.onpopstate[route_name] = [];
 
-					//Append a new route
-					_self.onpopstate[route_name].push (function (state, e) {
-						//Handle tpl?
-						if ( conf && 'tpl' in conf ) {
-							_self._handleSkull (conf.tpl, callback, [state, e])
-						} else { callback (state, e); }
-					});
+		//Append a new route
+		_self.onpopstate[route_name].push (function (state, e) {
+			//Handle tpl?
+			_self._handleSkull (conf, function () {
+				//On main tpl is handled, what to do?
 
-					//First action
-					if ( _.matchInArray (route_name, [
-							'home', 'default',
-							'init', 'initial'
-						]) ) {
-						_self.redirect (route_name, {});
-					}
-				}
+				if ( conf.app in _self.module.appCollection )
+					_self.module.appCollection[conf.app].taste ();
 
-				return _self;
-			}
-		};
+			}, [state, e])
+
+		});
+
+		//First action
+		if ( _.matchInArray (route_name, [
+				'home', 'default',
+				'init', 'initial'
+			]) ) {
+			_self.redirect (route_name, {});
+		}
+
+		return _self;
 
 	});
 

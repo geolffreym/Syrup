@@ -14,6 +14,7 @@
 		this.history = window.history;
 		this.findParams = /(:[\w]+)/g;
 		this.onpopstate = {};
+		this.module = null;
 
 		var _self = this;
 
@@ -30,6 +31,15 @@
 
 	}
 
+	/**Set the target
+	 * @param {object} routes
+	 * @return {object}
+	 * */
+	Router.add ('route', function (to_route) {
+		this.module = to_route;
+		to_route.lazy = true;
+		return this;
+	});
 
 	/**Set the routes
 	 * @param {object} routes
@@ -49,11 +59,11 @@
 	 * @param {function} callback
 	 * @return {void}
 	 */
-	Router.add ('_handleSkull', function (tpl, callback, params) {
+	Router.add ('_handleSkull', function (conf, callback, params) {
 		var _view = new View;
 		//Clear cache
 		_view.clear ();
-		_view.seekTpl (tpl).then (function (view) {
+		_view.seekTpl (conf.tpl).then (function (view) {
 
 			// Find main
 			var _main = _$ ('[sp-app]');
@@ -62,7 +72,7 @@
 				_main.html (view.getTpl ());
 
 			//Execute
-			callback.apply (null, params);
+			callback.apply (conf.app, params);
 		});
 	});
 
@@ -74,36 +84,36 @@
 		_.assert (route_name, _.WARNING_SYRUP.ERROR.NOPARAM, '(Router .when)');
 		var _self = this;
 
-		return {
-			then: function (callback) {
-				//Is function callback?
-				if ( _.isFunction (callback) ) {
-					//Handle Route
+		//No app. Nothing to do!!
+		if ( !(conf && 'app' in conf) )
+			return;
 
-					//No route?
-					if ( !(route_name in _self.onpopstate) )
-						_self.onpopstate[route_name] = [];
+		//No route?
+		if ( !(route_name in _self.onpopstate) )
+			_self.onpopstate[route_name] = [];
 
-					//Append a new route
-					_self.onpopstate[route_name].push (function (state, e) {
-						//Handle tpl?
-						if ( conf && 'tpl' in conf ) {
-							_self._handleSkull (conf.tpl, callback, [state, e])
-						} else { callback (state, e); }
-					});
+		//Append a new route
+		_self.onpopstate[route_name].push (function (state, e) {
+			//Handle tpl?
+			_self._handleSkull (conf, function () {
+				//On main tpl is handled, what to do?
 
-					//First action
-					if ( _.matchInArray (route_name, [
-							'home', 'default',
-							'init', 'initial'
-						]) ) {
-						_self.redirect (route_name, {});
-					}
-				}
+				if ( conf.app in _self.module.appCollection )
+					_self.module.appCollection[conf.app].taste ();
 
-				return _self;
-			}
-		};
+			}, [state, e])
+
+		});
+
+		//First action
+		if ( _.matchInArray (route_name, [
+				'home', 'default',
+				'init', 'initial'
+			]) ) {
+			_self.redirect (route_name, {});
+		}
+
+		return _self;
 
 	});
 

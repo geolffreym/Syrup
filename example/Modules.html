@@ -7,11 +7,7 @@
 <body>
 <script src="/syrup/dist/init.js"></script>
 
-<a href="#" id="click" data-hi="1" class="a b c" data-tooltip="Hi!">
-    Test
-</a>
-
-<a href="#" id="unclick" data-hi="1" class="a b c">UCLick</a>
+<main sp-app></main>
 
 
 <script>
@@ -24,7 +20,21 @@
     ]).spice ({
         MAX: 1
     }).cook (function ($) {
-        console.log(this)
+
+        $.Router.route (this).set ({
+            'home' : '/syrup/Modules.html',
+            'route': '/route/:page/:user/'
+        }).then (function (route) {
+            route.when ('home', {
+                tpl: 'skull/home.html',
+                app: 'index'
+
+            }).when ('route', {
+                tpl: 'skull/route.html',
+                app: 'route'
+            })
+        });
+
 
         //Http Interceptors
         $.Http.intercept ({
@@ -42,11 +52,34 @@
 <script>
 
     //Apps
-    App.module ('main').blend ('index', ['Http']).recipe ('test', function (_, g) {
+    App.module ('main')
+            .blend ('index', ['Http'])
+            .recipe ('home2', function (_, g) {
         return {
-            init: function ($) {
-                console.log ($.main.Http)
+            init    : function ($) {
+                console.log ('i am index');
                 //console.log ($.Http)
+            },
+            redirect: function ($) {
+                $.main.Router.redirect ('route', {
+                    ':page': 1,
+                    ':user': 2
+                })
+            }
+        }
+    });
+
+
+
+    App.module ('main')
+            .blend ('route', []).recipe ('router', function (_, g) {
+        return {
+            init    : function ($) {
+                console.log ('I am router')
+                //console.log ($.Http)
+            },
+            redirect: function ($) {
+                $.main.Router.redirect ('home', {});
             }
         }
     })
