@@ -68,10 +68,9 @@ if ( typeof exports !== 'undefined' )
 	 * **/
 	nativeFunction.blend = function (child) {
 		var name = (
-			child.prototype.constructor.name
-			|| (
-				child.toString ().match (regexConstructor)[0]
-			).trim ()
+			child.__proto__.constructor.name ||
+			child.prototype.constructor.name ||
+			( child.toString ().match (regexConstructor)[0]).trim ()
 		);
 		this.prototype[name] = child;
 	};
@@ -85,7 +84,7 @@ if ( typeof exports !== 'undefined' )
 			new Function (
 				'return function ' + name + '(){}'
 			)
-		)
+		) ()
 	};
 
 
@@ -1839,16 +1838,17 @@ if ( typeof exports !== 'undefined' )
 	 * @return {object}
 	 * **/
 	Libs.add ('blend', function (name, dependencies) {
-		var _anonymous = (
-			Function.factory (name)
-		) ();
 
 		if ( !(name in this.breadcrumb) ) {
-			_.Syrup.blend (_anonymous);
+
+			//Factory
 			this.name = name;
-			this.object = _[name];
+			this.object = Function.factory (name);
 			this.breadcrumb[name] = this.object;
 			this._dependencies (dependencies);
+
+			//Blend global scope
+			_.Syrup.blend (new this.object);
 		}
 
 		return this;
@@ -1872,11 +1872,11 @@ if ( typeof exports !== 'undefined' )
 		if ( _.isArray (dependencies) && _.isSet (_self.object) ) {
 			_.each (dependencies, function (v) {
 
-				_self.object.__proto__[v] = !(v in _self.object)
+				_self.object.prototype[v] = !(v in _self.object)
 					? ( _[v] || (
 						_.isFunction (window[v]) && new window[v]
 						|| _.isFunction (window[v + 'Class']) && new window[v + 'Class']
-				)) : _self.object[v];
+				)) : _self.object.prototype[v];
 			})
 		}
 	});
@@ -1888,7 +1888,7 @@ if ( typeof exports !== 'undefined' )
 	Libs.add ('make', function (attributes) {
 		var _self = this;
 		_.each (attributes, function (v, i) {
-			_self.object[i] = v;
+			_[_self.name][i] = v;
 		});
 
 		return this;
@@ -1918,7 +1918,7 @@ if ( typeof exports !== 'undefined' )
 	 * */
 	Libs.add ('cook', function (name, callback) {
 		if ( _.isFunction (callback) )
-			this.object.__proto__[name] = callback;
+			this.object.prototype[name] = callback;
 		return this;
 	});
 
@@ -4964,7 +4964,7 @@ if ( !Object.observe ) {
 
 	function View () {
 		this.Http = new Http;
-		this.Storage = new Repo;
+		this.Repo = new Repo;
 		this.dir = null;
 		this.tpl = null;
 	}
@@ -4992,7 +4992,7 @@ if ( !Object.observe ) {
 	 * **/
 	View.add ('seekTpl', function (template) {
 		var _self = this,
-			_repo = _self.Storage,
+			_repo = _self.Repo,
 			_template = null, _save = {};
 
 		if ( !_.isSet (_repo.get ('templates')) ) {
@@ -5032,7 +5032,7 @@ if ( !Object.observe ) {
 	 * @return {object}
 	 * **/
 	View.add ('clear', function () {
-		this.Storage.clear ('templates');
+		this.Repo.clear ('templates');
 		return this;
 	});
 
@@ -5041,12 +5041,12 @@ if ( !Object.observe ) {
 	 * **/
 	View.add ('cleanCache', function () {
 		if ( this.dir ) {
-			var old_templates = this.Storage.get ('templates');
+			var old_templates = this.Repo.get ('templates');
 			if ( old_templates ) {
 				delete old_templates[this.dir]
 			}
 
-			this.Storage.set ('templates', old_templates);
+			this.Repo.set ('templates', old_templates);
 			this.dir = null;
 		}
 
@@ -5924,6 +5924,19 @@ if ( !Object.observe ) {
 		this.findParams = /(:[\w]+)/g;
 		this.onpopstate = {};
 
+		var _self = this;
+
+		//Set Pop State
+		window.addEventListener ('popstate', function (e) {
+			if ( _.isSet (e.state) && 'route_name' in e.state ) {
+				if ( e.state.route_name in _self.onpopstate ) {
+					_.each (_self.onpopstate[e.state.route_name], function (v, i) {
+						v (e.state, e);
+					}, true);
+				}
+			}
+		});
+
 	}
 
 
@@ -6070,16 +6083,7 @@ if ( !Object.observe ) {
 
 	//Global access
 	window.Router = new Router;
+	window.RouterClass = Router;
 
-	//Set Pop State
-	window.addEventListener ('popstate', function (e) {
-		if ( _.isSet (e.state) && 'route_name' in e.state ) {
-			if ( e.state.route_name in window.Router.onpopstate ) {
-				_.each (window.Router.onpopstate[e.state.route_name], function (v, i) {
-					v (e.state, e);
-				}, true);
-			}
-		}
-	});
 
 }) (window);

@@ -50,10 +50,9 @@
 	 * **/
 	nativeFunction.blend = function (child) {
 		var name = (
-			child.prototype.constructor.name
-			|| (
-				child.toString ().match (regexConstructor)[0]
-			).trim ()
+			child.__proto__.constructor.name ||
+			child.prototype.constructor.name ||
+			( child.toString ().match (regexConstructor)[0]).trim ()
 		);
 		this.prototype[name] = child;
 	};
@@ -67,7 +66,7 @@
 			new Function (
 				'return function ' + name + '(){}'
 			)
-		)
+		) ()
 	};
 
 

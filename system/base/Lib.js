@@ -16,16 +16,17 @@
 	 * @return {object}
 	 * **/
 	Libs.add ('blend', function (name, dependencies) {
-		var _anonymous = (
-			Function.factory (name)
-		) ();
 
 		if ( !(name in this.breadcrumb) ) {
-			_.Syrup.blend (_anonymous);
+
+			//Factory
 			this.name = name;
-			this.object = _[name];
+			this.object = Function.factory (name);
 			this.breadcrumb[name] = this.object;
 			this._dependencies (dependencies);
+
+			//Blend global scope
+			_.Syrup.blend (new this.object);
 		}
 
 		return this;
@@ -49,11 +50,11 @@
 		if ( _.isArray (dependencies) && _.isSet (_self.object) ) {
 			_.each (dependencies, function (v) {
 
-				_self.object.__proto__[v] = !(v in _self.object)
+				_self.object.prototype[v] = !(v in _self.object)
 					? ( _[v] || (
 						_.isFunction (window[v]) && new window[v]
 						|| _.isFunction (window[v + 'Class']) && new window[v + 'Class']
-				)) : _self.object[v];
+				)) : _self.object.prototype[v];
 			})
 		}
 	});
@@ -65,7 +66,7 @@
 	Libs.add ('make', function (attributes) {
 		var _self = this;
 		_.each (attributes, function (v, i) {
-			_self.object[i] = v;
+			_[_self.name][i] = v;
 		});
 
 		return this;
@@ -95,7 +96,7 @@
 	 * */
 	Libs.add ('cook', function (name, callback) {
 		if ( _.isFunction (callback) )
-			this.object.__proto__[name] = callback;
+			this.object.prototype[name] = callback;
 		return this;
 	});
 

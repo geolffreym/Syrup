@@ -15,7 +15,7 @@
 
 	function View () {
 		this.Http = new Http;
-		this.Storage = new Repo;
+		this.Repo = new Repo;
 		this.dir = null;
 		this.tpl = null;
 	}
@@ -43,7 +43,7 @@
 	 * **/
 	View.add ('seekTpl', function (template) {
 		var _self = this,
-			_repo = _self.Storage,
+			_repo = _self.Repo,
 			_template = null, _save = {};
 
 		if ( !_.isSet (_repo.get ('templates')) ) {
@@ -83,7 +83,7 @@
 	 * @return {object}
 	 * **/
 	View.add ('clear', function () {
-		this.Storage.clear ('templates');
+		this.Repo.clear ('templates');
 		return this;
 	});
 
@@ -92,12 +92,12 @@
 	 * **/
 	View.add ('cleanCache', function () {
 		if ( this.dir ) {
-			var old_templates = this.Storage.get ('templates');
+			var old_templates = this.Repo.get ('templates');
 			if ( old_templates ) {
 				delete old_templates[this.dir]
 			}
 
-			this.Storage.set ('templates', old_templates);
+			this.Repo.set ('templates', old_templates);
 			this.dir = null;
 		}
 

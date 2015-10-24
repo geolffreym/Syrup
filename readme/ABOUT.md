@@ -34,7 +34,7 @@ It is the representation of the information with which the system operates, ther
 such information, both queries and updates, also implementing access privileges have been described in the specifications of the application (business logic). 
 Renders the model into a form suitable for interaction, typically a user interface element. 
 
-In Syrup the views are locate in the folder "app/controller/{view_name}/{file}.js".
+In Syrup the views are locate in the folder "app/view/{view_name}/{file}.js".
 The views are handled by the "controller", and are an interface between the template and the controller. 
 
 Models
