@@ -47,10 +47,13 @@
 		if ( !(hash in _self.onhashchange) )
 			_self.onhashchange[hash] = [];
 
-		return new Promise (function (resolve) {
-			//Append a new route
-			_self.onhashchange[hash].push (resolve);
-		});
+		return {
+			then: function (resolve) {
+				//Append a new route
+				_self.onhashchange[hash].push (resolve);
+				return _self;
+			}
+		}
 
 	});
 
