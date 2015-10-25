@@ -5086,8 +5086,8 @@ if ( !Object.observe ) {
 			}).run ('/workers/setting/Parser').then (function (worker) {
 				//Worker running
 				worker.toWork ({
-					template: _template,
-					fields  : _fields
+					template: _template  || _.emptyStr,
+					fields  : _fields || {}
 				});
 			});
 		}));
@@ -5412,7 +5412,6 @@ if ( !Object.observe ) {
 		_self.parent = this.moduled && this || null; // Is module root set?
 		_self.lazy = this.lazy; // Lazy execution?
 		_self.scope = {}; // Main scope
-		_self.body = _$ ('body');
 		_self.blended = true; // Flag to handle blended app
 
 		//Is module?
@@ -5599,41 +5598,54 @@ if ( !Object.observe ) {
 	 * */
 	Apps.add ('_bindListener', function (moduleId) {
 		var enabled_events = [
-			'[sp-click], ', 'submit], ',
-			'change], ', 'dblclick], ',
-			'mousedown], ', 'mouseenter], ',
-			'mouseleave], ', 'mousemove], ',
-			'mouseover], ', 'mouseout], ', 'mouseup], ',
-			'keydown], ', 'keypress], ', 'keyup], ', 'blur], ',
-			'focus], ', 'input], ', 'select], ', 'reset]'
-		];
-
-		var _this = this, _dom = null,
-			_self = this.recipeCollection[moduleId].instance,
-			_the_filter = enabled_events.join (' [sp-'),
+				'click', 'submit',
+				'change', 'dblclick',
+				'mousedown', 'mouseenter',
+				'mouseleave', 'mousemove',
+				'mouseover', 'mouseout', 'mouseup',
+				'keydown', 'keypress', 'keyup', 'blur',
+				'focus', 'input', 'select', 'reset'
+			], _self = this, _recipe = this.recipeCollection[moduleId].instance,
 			_mod = _$ ('[sp-recipe="' + moduleId + '"]');
 
 		//Exist the module?
 		if ( _mod.exist ) {
-			//Find events listeners
-			_mod.find (_the_filter, function (dom_list) {
-				//Find the listener in attributes
-				_.each ((_dom = dom_list.get ()).attributes, function (v) {
-					if ( /sp-[a-z]+/.test (v.localName) ) {
-						var _event = _.replace (v.localName, 'sp-', _.emptyStr),
-							_attr = _dom.getAttribute (v.localName);
+			_.each (enabled_events, function (v) {
+				_mod.listen (v, function (e) {
+					var _event = 'sp-' + e.type,
+						_attr = e.target.getAttribute (_event);
 
-						//Is the attr value in module? and is Function the attr value?
-						if ( _attr in _self && _.isFunction (_self[_attr]) ) {
-							_mod.listen (_event, '[' + v.localName + '="' + _attr + '"]', function (e) {
-								//Param event and dependencies
-								e.preventDefault ();
-								_self[_attr] (_this.lib.get (_self.parent), e);
-							});
+					if ( _attr ) {
+						if ( _attr in _recipe && _.isFunction (_recipe[_attr]) ) {
+							e.preventDefault ();
+							_recipe[_attr] (_self.lib.get (_recipe.parent), e);
 						}
 					}
+
 				});
 			});
+
+			//
+			////Find the listeners
+			//_mod.find (_the_filter, function (dom_list) {
+			//	console.log(dom_list)
+			//	//Find the listener in attributes
+			//	_.each ((_dom = dom_list.get ()).attributes, function (v) {
+			//		if ( /sp-[a-z]+/.test (v.localName) ) {
+			//			var _event = _.replace (v.localName, 'sp-', _.emptyStr),
+			//				_attr = _dom.getAttribute (v.localName);
+			//
+			//			//Is the attr value in module? and is Function the attr value?
+			//			if ( _attr in _recipe && _.isFunction (_recipe[_attr]) ) {
+			//				_mod.listen (_event, '[' + v.localName + '="' + _attr + '"]', function (e) {
+			//					//Param event and dependencies
+			//					e.preventDefault ();
+			//					_recipe[_attr] (_self.lib.get (_recipe.parent), e);
+			//				});
+			//			}
+			//		}
+			//	});
+			//});
 		}
 	});
 
@@ -5827,12 +5839,10 @@ if ( !Object.observe ) {
 
 					//Exist inline tpl?
 				} else if ( _dom_template.exist ) {
-					var _parse = _dom_template.html ();
-					if ( _.isSet (_parse) ) {
-						_view.render (_parse, _scope).then (function (result) {
-							_dom.html (result);
-						});
-					}
+					_view.render (_dom_template.html (), _scope)
+						.then (function (result) {
+						_dom.html (result);
+					});
 				}
 			}
 		}

@@ -134,8 +134,8 @@
 			}).run ('/workers/setting/Parser').then (function (worker) {
 				//Worker running
 				worker.toWork ({
-					template: _template,
-					fields  : _fields
+					template: _template  || _.emptyStr,
+					fields  : _fields || {}
 				});
 			});
 		}));
