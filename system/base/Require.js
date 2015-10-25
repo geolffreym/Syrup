@@ -2106,9 +2106,14 @@
 
 		this.require = require;
 		this.define = define;
+		this.dependencies = [];
 
 	}
 
+	/** Set require conf
+	 * @param {object} conf
+	 * @return {void}
+	 * **/
 	Required.add ('setConf', function (conf) {
 		"use strict";
 		this.require.config (_.extend ({
@@ -2120,24 +2125,62 @@
 		}, conf || {}, true));
 	});
 
+	/** Return requirejs object
+	 * @return {object}
+	 * **/
+
 	Required.add ('getRequire', function () {
 		"use strict";
 		return this.require;
 	});
 
+
+	/** Return define requirejs
+	 * @return {object}
+	 * **/
 	Required.add ('getDefine', function () {
 		"use strict";
 		return this.define;
 	});
 
+	/** Lookup dependencies
+	 * @param {array} dependencies
+	 * @return {object}
+	 * **/
 	Required.add ('lookup', function (dependencies) {
 		"use strict";
 		var _self = this;
+		_self.dependencies = dependencies;
 		return (new Promise (function (resolve, reject) {
-			_self.require (dependencies, function () {
-				resolve ();
+			_self.require (_self, dependencies, function () {
+				resolve (_self);
 			});
 		}));
+	});
+
+	/** Return dependencies
+	 * @param {string} name
+	 * @return {object}
+	 * **/
+	Required.add ('getDependencies', function () {
+		return this.dependencies
+	});
+
+	/** Return cleaned dependencies, only dependencies name
+	 * @return {array}
+	 * **/
+	Required.add ('getCleanDependencies', function () {
+		var _res = this.dependencies;
+
+		_.each (_res, function (v, i) {
+			_res[i] = _.replace (
+				(v.split ('/').pop ()),
+				/\.(.*)/,
+				_.emptyStr
+			);
+		});
+
+		return _res;
 	});
 
 	//Global access

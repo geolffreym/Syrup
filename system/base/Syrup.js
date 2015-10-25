@@ -17,15 +17,14 @@
 		regexMail = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/,
 		WARNING_SYRUP = {
 			ERROR: {
-				NOPARAM              : 'Param needed',
-				NONETWORK            : 'Network Error',
-				NOOBJECT             : 'A object is needed.',
-				NOARRAY              : 'A array is needed.',
-				NOSTRING             : 'A string is needed',
-				NOFUNCTION           : 'A function is needed.',
-				NODATE               : 'Invalid Date',
-				NOURL                : 'URL is needed.',
-				NOOBJECTREPLACEREGEXP: 'A object replace param is needed to replace a regexp ex: {match:replace}'
+				NOPARAM   : 'Param needed',
+				NONETWORK : 'Network Error',
+				NOOBJECT  : 'A object is needed.',
+				NOARRAY   : 'A array is needed.',
+				NOSTRING  : 'A string is needed',
+				NOFUNCTION: 'A function is needed.',
+				NODATE    : 'Invalid Date',
+				NOURL     : 'URL is needed.'
 			}
 		};
 
@@ -83,9 +82,7 @@
 	 * @constructor
 	 */
 
-	function Syrup () {
-		this.recursiveStr = false;
-	}
+	function Syrup () { }
 
 	/**_$_
 	 * @constructor
@@ -137,7 +134,7 @@
 		if ( _.isGlobal (this.collection) )
 			this.collection.addEventListener (
 				"DOMContentLoaded",
-				callback.bind(this)
+				callback.bind (this)
 			);
 		return this;
 	});
@@ -147,7 +144,7 @@
 	 */
 	_$_.add ('load', function (callback) {
 		if ( _.isGlobal (this.collection) ) {
-			this.collection.onload = callback.bind(this);
+			this.collection.onload = callback.bind (this);
 		}
 	});
 
@@ -171,9 +168,9 @@
 
 				if ( _.isSet (delegate) && !_.isFunction (delegate) ) {
 					_$ (_target).filter (delegate, function () {
-						_.callbackAudit (callback.bind(_target), e);
+						_.callbackAudit (callback.bind (_target), e);
 					});
-				} else { _.callbackAudit (callback.bind(_target), e); }
+				} else { _.callbackAudit (callback.bind (_target), e); }
 			};
 
 		// For each element
@@ -1141,59 +1138,22 @@
 	 * @return String
 	 */
 	Syrup.add ('replace', function (_string, _find, _replace) {
-		var _self = this,
-			o = _string.toString (),
-			s = o.toLowerCase (),
-			r = _.emptyStr, b = 0, e = 1;
-
-
-		if ( !_.isRegexp (_find) ) {
-			_find = _find.toLowerCase ();
-		} else {
-			_find = o.match (_find);
-			_self.recursiveStr = s;
-		}
-
 
 		//Regexp result?
-		if ( _.isArray (_find) ) {
-			if ( _.isObject (_replace) ) {
+		if ( _.isRegexp (_find) && _.isObject (_replace) ) {
+			return _string.replace (_find, function (found) {
+				if ( found in _replace ) {
+					return _replace[found];
+				}
 
-				//For each match
-				_.each (_find, function (_tmp) {
-
-					//Search for the replace index
-					if ( _tmp in _replace )
-						_self.recursiveStr = _.replace (
-							_self.recursiveStr, _tmp,
-							_replace[_tmp]
-						);
-				})
-			} else {
-				_.error (WARNING_SYRUP.ERROR.NOOBJECTREPLACEREGEXP, '(Syrup .replace)');
-			}
+				return found;
+			})
 		} else {
-
-			while ( (
-				(
-					e = s.indexOf (_find)
-				) > -1
-			) ) {
-				r += o.substring (b, b + e) + _replace;
-				s = s.substring (e + _find.length, s.length);
-				b += e + _find.length;
-			}
-
-			if ( !_.isEmpty (s) > 0 ) {
-				r += o.substring (o.length - s.length, o.length);
-			}
-
-			if ( !_.isEmpty (r) ) {
-				_self.recursiveStr = r;
-			}
+			//Is String?
+			return _string.replace (
+				_find, _replace
+			)
 		}
-
-		return _self.recursiveStr;
 	});
 
 
@@ -1639,6 +1599,24 @@
 	Syrup.add ('matchInArray', function (find, haystack) {
 		var needle = new RegExp (haystack.join ('|'), 'g');
 		return needle.test (find);
+	});
+
+	/** Reemplaza elementos string en un arreglo por RegExp
+	 * @param {String} find
+	 * @param {Array} haystack
+	 * @returns {boolean}
+	 */
+	Syrup.add ('replaceInArray', function (find, replace, haystack) {
+
+		if ( this.matchInArray ([find], haystack) ) {
+			_.each (haystack, function (v, i) {
+				if ( _.isString (v) )
+					haystack[i] = _.replace (v, find, replace);
+			});
+
+		}
+
+		return haystack;
 	});
 
 	/**Crea un arreglo unico de valores

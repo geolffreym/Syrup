@@ -1174,7 +1174,15 @@ _.filterArray([1,2,3], function(v){
 ```js    
 _.matchInArray(/happy/g,['help','up','happy']) // Return TRUE
 ``` 
-   
+**Method `.replaceInArray(find, replace, haystack)`**
+
+*(Replace the string elements in array)*
+```js    
+_.replaceInArray('a','b', ['a','b']) // Return ['b','b']
+//Using regExp
+_.replaceInArray(/a|b/,{a:'z',b:'n'}, ['a','b']) // Return ['z','n']
+``` 
+ 
 **Method `.uniqueArray(array)`**
 
 *(Return unique array, with not repeated values)*

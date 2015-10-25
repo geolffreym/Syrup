@@ -522,8 +522,24 @@
 				//Handle taste interceptor
 				_self._handleInterceptor ('init', _self.recipeCollection[moduleId].instance);
 
-				//Execution
-				_self.recipeCollection[moduleId].instance.init (_self.lib.get (_self.root));
+				//Require Libs?
+				if (
+					'require' in _self.recipeCollection[moduleId].instance
+					&& _.isArray (_self.recipeCollection[moduleId].instance.require)
+				) {
+					Require.lookup (_self.recipeCollection[moduleId].instance.require).then (function (e) {
+						//Execution
+						_self.lib._dependencies (e.getCleanDependencies ());
+						_self.recipeCollection[moduleId].instance.init (
+							_self.lib.get (_self.root)
+						);
+					});
+				} else {
+					//Execution
+					_self.recipeCollection[moduleId].instance.init (
+						_self.lib.get (_self.root)
+					);
+				}
 			}
 
 			// Bind listeners

@@ -70,8 +70,9 @@
         //Index App
         _indexApp.recipe ('home1', function () {
             return {
-                init: function ($) {
-
+                require: ['system/lib/Geolocation'],
+                init   : function ($) {
+console.log($)
                     //Global Http
                     //console.log ($.main.Http);
 

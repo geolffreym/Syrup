@@ -6,7 +6,7 @@
 (function (window) {
 	function Libs () {
 		this.breadcrumb = {};
-		this.object = {};
+		this.object = null;
 		this.name = null;
 	}
 
@@ -51,7 +51,6 @@
 		var _self = this;
 		if ( _.isArray (dependencies) && _.isSet (_self.object) ) {
 			_.each (dependencies, function (v) {
-
 				_self.object.prototype[v] = !(v in _self.object)
 					? ( _[v] || (
 						_.isFunction (window[v]) && new window[v]
