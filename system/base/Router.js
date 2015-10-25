@@ -120,7 +120,9 @@
 					_self.module.appCollection[conf.app].intercept ({
 						'init': function (mod) {
 							mod.uri = {
-								params: state
+								params: state,
+								title : route_name,
+								route : _self.routes[route_name]
 							}
 						}
 					});

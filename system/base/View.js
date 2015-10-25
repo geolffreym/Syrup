@@ -25,6 +25,7 @@
 	 * @return {object}
 	 */
 	View.add ('lookup', function (template) {
+
 		//MiddleWare
 		this.Http.intercept ({
 			request: function (config) {
@@ -32,6 +33,7 @@
 			}
 		});
 
+		//The template request
 		return this.Http.request (
 			setting.app_path + '/templates/' + template
 		);

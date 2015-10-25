@@ -2602,8 +2602,8 @@ if ( !Object.observe ) {
 						config     : {}
 					},
 					registry = {},
-				//registry of just enabled modules, to speed
-				//cycle breaking code when lots of modules
+				//registry of just enabled recipeCollection, to speed
+				//cycle breaking code when lots of recipeCollection
 				//are registered, but not activated.
 					enabledRegistry = {},
 					undefEvents = {},
@@ -2992,7 +2992,7 @@ if ( !Object.observe ) {
 				};
 
 				function cleanRegistry (id) {
-					//Clean up machinery used for waiting modules.
+					//Clean up machinery used for waiting recipeCollection.
 					delete registry[id];
 					delete enabledRegistry[id];
 				}
@@ -3042,7 +3042,7 @@ if ( !Object.observe ) {
 
 					inCheckLoaded = true;
 
-					//Figure out the state of all the modules.
+					//Figure out the state of all the recipeCollection.
 					eachProp (enabledRegistry, function (mod) {
 						var map = mod.map,
 							modId = map.id;
@@ -3082,7 +3082,7 @@ if ( !Object.observe ) {
 					});
 
 					if ( expired && noLoads.length ) {
-						//If wait time expired, throw error of unloaded modules.
+						//If wait time expired, throw error of unloaded recipeCollection.
 						err = makeError ('timeout', 'Load timeout for modules: ' + noLoads, null, noLoads);
 						err.contextName = context.contextName;
 						return onError (err);
@@ -3256,7 +3256,7 @@ if ( !Object.observe ) {
 								if ( isFunction (factory) ) {
 									//If there is an error listener, favor passing
 									//to that instead of throwing an error. However,
-									//only do it for define()'d  modules. require
+									//only do it for define()'d  recipeCollection. require
 									//errbacks should not be called for failures in
 									//their callbacks (#699). However if a global
 									//onError is set, use that.
@@ -3403,7 +3403,7 @@ if ( !Object.observe ) {
 								this.error = err;
 								err.requireModules = [id];
 
-								//Remove temp unnormalized modules for this module,
+								//Remove temp unnormalized recipeCollection for this module,
 								//since they will never be resolved otherwise now.
 								eachProp (registry, function (mod) {
 									if ( mod.map.id.indexOf (id + '_unnormalized') === 0 ) {
@@ -3463,7 +3463,7 @@ if ( !Object.observe ) {
 								//resource
 								this.depMaps.push (moduleMap);
 
-								//Support anonymous modules.
+								//Support anonymous recipeCollection.
 								context.completeLoad (moduleName);
 
 								//Bind the value of that module to the value for this
@@ -3536,7 +3536,7 @@ if ( !Object.observe ) {
 							id = depMap.id;
 							mod = registry[id];
 
-							//Skip special modules like 'require', 'exports', 'module'
+							//Skip special recipeCollection like 'require', 'exports', 'module'
 							//Also, don't call enable if it is already enabled,
 							//important in circular dependency cases.
 							if ( !hasProp (handlers, id) && mod && !mod.enabled ) {
@@ -3580,7 +3580,7 @@ if ( !Object.observe ) {
 				};
 
 				function callGetModule (args) {
-					//Skip modules already defined.
+					//Skip recipeCollection already defined.
 					if ( !hasProp (defined, args[0]) ) {
 						getModule (makeModuleMap (args[0], null, true)).init (args[1], args[2]);
 					}
@@ -3626,7 +3626,7 @@ if ( !Object.observe ) {
 				function intakeDefines () {
 					var args;
 
-					//Any defined modules in the global queue, intake them now.
+					//Any defined recipeCollection in the global queue, intake them now.
 					takeGlobalQueue ();
 
 					//Make sure any remaining defQueue items get properly processed.
@@ -3742,7 +3742,7 @@ if ( !Object.observe ) {
 							});
 						}
 
-						//If there are any "waiting to execute" modules in the registry,
+						//If there are any "waiting to execute" recipeCollection in the registry,
 						//update the maps for them, since their info, like URLs to load,
 						//may have changed.
 						eachProp (registry, function (mod, id) {
@@ -4330,7 +4330,7 @@ if ( !Object.observe ) {
 						//reevaluated if other use cases become common.
 						importScripts (url);
 
-						//Account for anonymous modules
+						//Account for anonymous recipeCollection
 						context.completeLoad (moduleName);
 					} catch ( e ) {
 						context.onError (makeError ('importscripts',
@@ -4402,7 +4402,7 @@ if ( !Object.observe ) {
 			}
 
 			/**
-			 * The function that handles definitions of modules. Differs from
+			 * The function that handles definitions of recipeCollection. Differs from
 			 * require() in that a string for the module should be the first argument,
 			 * and the function to execute after dependencies are loaded should
 			 * return a value to define the module corresponding to the first argument's
@@ -4411,7 +4411,7 @@ if ( !Object.observe ) {
 			define = function (name, deps, callback) {
 				var node, context;
 
-				//Allow for anonymous modules
+				//Allow for anonymous recipeCollection
 				if ( typeof name !== 'string' ) {
 					//Adjust args appropriately
 					callback = deps;
@@ -4462,7 +4462,7 @@ if ( !Object.observe ) {
 				}
 
 				//Always save off evaluating the def call until the script onload handler.
-				//This allows multiple modules to be in a file without prematurely
+				//This allows multiple recipeCollection to be in a file without prematurely
 				//tracing dependencies, and allows for anonymous module support,
 				//where the module name is not known until the script onload event
 				//occurs. If no context, use the global queue, and get it processed
@@ -4482,7 +4482,7 @@ if ( !Object.observe ) {
 			/**
 			 * Executes the text. Normally just uses eval, but can be modified
 			 * to use a better, environment-specific call. Only used for transpiling
-			 * loader plugins, not for plain JS modules.
+			 * loader plugins, not for plain JS recipeCollection.
 			 * @param {String} text the text to execute/evaluate.
 			 */
 			req.exec = function (text) {
@@ -4977,6 +4977,7 @@ if ( !Object.observe ) {
 	 * @return {object}
 	 */
 	View.add ('lookup', function (template) {
+
 		//MiddleWare
 		this.Http.intercept ({
 			request: function (config) {
@@ -4984,6 +4985,7 @@ if ( !Object.observe ) {
 			}
 		});
 
+		//The template request
 		return this.Http.request (
 			setting.app_path + '/templates/' + template
 		);
@@ -5367,32 +5369,34 @@ if ( !Object.observe ) {
 	function Apps () {
 		this.root = null; // Root name
 		this.lib = null; // Lib handler
-		this.scope = {}; // Global scope
+		this.scope = null; // Global scope
 
-		this.app = {};
 		this.lazy = false; //Lazy execution?
-		this.interceptors = {};
-		this.appCollection = {};
-		this.modules = {}; // Modules list
+		this.interceptors = {}; //Interceptors
+
+		this.moduleCollection = {}; //Modules
+		this.appCollection = {}; //Apps
+		this.recipeCollection = {}; // Recipes
 		this.onchange = {}; // Change handler
 	}
 
-	/** Handle modules to Apps
+	/** Handle recipeCollection to Apps
 	 * @param name
 	 * @param dependencies []
 	 * @return object
 	 * **/
 	Apps.add ('module', function (name, dependencies) {
 		//No app registered?
-		if ( !(name in this.app) ) {
-			this.app[name] = new Apps;
-			this.app[name].root = name;
-			this.app[name].lib = new LibClass;
-			this.app[name].lib.blend (name, dependencies)
+		if ( !(name in this.moduleCollection) ) {
+			this.moduleCollection[name] = new Apps;
+			this.moduleCollection[name].root = name; // Root name
+			this.moduleCollection[name].moduled = true; // Flag to handle module app
+			this.moduleCollection[name].lib = new LibClass;
+			this.moduleCollection[name].lib.blend (name, dependencies)
 		}
 
 		//Return the app
-		return this.app[name];
+		return this.moduleCollection[name];
 	});
 
 	/** Blend a method in global Syrup object
@@ -5404,13 +5408,15 @@ if ( !Object.observe ) {
 		var _self = new Apps;
 
 		_self.lib = new LibClass; //
-		_self.root = name; //
-		_self.app = this.root && this || null; // Is module root set?
+		_self.root = name; // The root app name
+		_self.parent = this.moduled && this || null; // Is module root set?
 		_self.lazy = this.lazy; // Lazy execution?
-		_self.scope = {};
+		_self.scope = {}; // Main scope
+		_self.body = _$ ('body');
+		_self.blended = true; // Flag to handle blended app
 
-		//Is module
-		if ( this.root ) {
+		//Is module?
+		if ( this.moduled ) {
 			//Inherit
 			dependencies = dependencies || [];
 			dependencies.push (this.root);
@@ -5433,20 +5439,22 @@ if ( !Object.observe ) {
 	Apps.add ('recipe', function (moduleId, module) {
 
 		//Handled by blend?
-		if ( this.root ) {
+		//Not blend, not recipe.. simple!!!
+		if ( this.root && this.blended ) {
 			if ( _.isSet (module) ) {
 				var _self = this;
-				_self.modules[moduleId] = {
+				_self.recipeCollection[moduleId] = {
 					creator : module,
 					instance: null
 				};
 
 				//Constructor
 				//On document ready
-				_$ (function () {
-					//Handle request interceptor
-					_self._taste (moduleId);
-				});
+				//Not lazy execution?
+				if ( !this.lazy )
+					_$ (function () {
+						_self._taste (moduleId);
+					});
 			}
 		}
 		return this;
@@ -5464,7 +5472,7 @@ if ( !Object.observe ) {
 					 && moduleId === v.name
 				) {
 					_self.onchange[v.name].call (
-						_self.modules[moduleId].instance,
+						_self.recipeCollection[moduleId].instance,
 						{
 							name  : v.name,
 							old   : v.oldValue,
@@ -5494,8 +5502,8 @@ if ( !Object.observe ) {
 	 * @return void
 	 * **/
 	Apps.add ('_trigger', function (moduleId) {
-		if ( moduleId in this.modules )
-			return this.modules[moduleId].creator (_, this.scope);
+		if ( moduleId in this.recipeCollection )
+			return this.recipeCollection[moduleId].creator (_, this.scope);
 		return {}
 	});
 
@@ -5551,8 +5559,8 @@ if ( !Object.observe ) {
 	 * @return object
 	 * */
 	Apps.add ('_getRecipe', function (moduleId) {
-		if ( moduleId in this.modules && _.isSet (this.root) )
-			return this.modules[moduleId].instance;
+		if ( moduleId in this.recipeCollection && _.isSet (this.root) )
+			return this.recipeCollection[moduleId].instance;
 		return null;
 	});
 
@@ -5612,7 +5620,7 @@ if ( !Object.observe ) {
 		];
 
 		var _this = this, _dom = null,
-			_self = this.modules[moduleId].instance,
+			_self = this.recipeCollection[moduleId].instance,
 			_the_filter = enabled_events.join (' [sp-'),
 			_mod = _$ ('[sp-recipe="' + moduleId + '"]');
 
@@ -5650,12 +5658,12 @@ if ( !Object.observe ) {
 
 		//Exist the model?
 		if ( _resource.exist ) {
-			_self.modules[moduleId].instance.model = {
+			_self.recipeCollection[moduleId].instance.model = {
 				object  : _model,
 				resource: _resource,
 				set     : function (obj) {
 					_model.set (_resource, obj);
-					return _self.modules[moduleId].instance;
+					return _self.recipeCollection[moduleId].instance;
 				},
 				get     : function (item) {
 
@@ -5678,7 +5686,7 @@ if ( !Object.observe ) {
 
 								// Call the resolve
 								resolve.call (
-									_self.modules[moduleId].instance, e
+									_self.recipeCollection[moduleId].instance, e
 								)
 							});
 						}
@@ -5695,10 +5703,10 @@ if ( !Object.observe ) {
 	Apps.add ('_views', function (moduleId) {
 		// Render view
 		var _self = this;
-		_self.modules[moduleId].instance.view = {
+		_self.recipeCollection[moduleId].instance.view = {
 			render: function (_view, _cache) {
 				_self._serve (moduleId, _view || null, _cache || false);
-				return _self.modules[moduleId].instance;
+				return _self.recipeCollection[moduleId].instance;
 			}
 		};
 	});
@@ -5711,7 +5719,7 @@ if ( !Object.observe ) {
 		// Render view
 		var _self = this;
 
-		_self.modules[moduleId].instance.scope = {
+		_self.recipeCollection[moduleId].instance.scope = {
 			global: _self.scope,
 			object: _self.scope[moduleId],
 			set   : function (nModule, object) {
@@ -5723,7 +5731,7 @@ if ( !Object.observe ) {
 
 				if ( _.isObject (_object) ) {
 					_self._setScope (_moduleId, _object);
-					return _self.modules[moduleId].instance;
+					return _self.recipeCollection[moduleId].instance;
 				}
 			},
 			get   : function (nModule) {
@@ -5742,7 +5750,7 @@ if ( !Object.observe ) {
 		// Render view
 		var _self = this;
 
-		_self.modules[moduleId].instance.app = {
+		_self.recipeCollection[moduleId].instance.app = {
 			object: _$ ('[sp-app]'),
 			title : function (title) {
 				var _title = _$ ('title');
@@ -5760,7 +5768,7 @@ if ( !Object.observe ) {
 	Apps.add ('_recipes', function (moduleId) {
 		// Render view
 		var _self = this;
-		_self.modules[moduleId].instance.recipe = {
+		_self.recipeCollection[moduleId].instance.recipe = {
 			$   : _$ ('[sp-recipe="' + moduleId + '"]'),
 			get : function (nModule) {
 				var _moduleId = _.isString (nModule)
@@ -5773,7 +5781,7 @@ if ( !Object.observe ) {
 					? nModule : moduleId;
 
 				_self.drop (_moduleId);
-				return _self.modules[moduleId].instance;
+				return _self.recipeCollection[moduleId].instance;
 			}
 		};
 	});
@@ -5853,24 +5861,21 @@ if ( !Object.observe ) {
 		//Handle taste interceptor
 		_self._handleInterceptor ('taste', _self);
 
-		//No lazy execution?
 		//Module registered?
 		//Root exists?
-		if (
-			!_self.lazy
-			&& moduleId in _self.modules
-			&& _.isSet (_self.root)
+		if ( moduleId in _self.recipeCollection
+			 && _.isSet (_self.root)
 		) {
 
 			// Initialize module
 			_self._add (moduleId);
-			_self.modules[moduleId].instance = _self._trigger (moduleId);
-			_self.modules[moduleId].instance.name = moduleId;
-			_self.modules[moduleId].instance.parent = _self.root;
+			_self.recipeCollection[moduleId].instance = _self._trigger (moduleId);
+			_self.recipeCollection[moduleId].instance.name = moduleId;
+			_self.recipeCollection[moduleId].instance.parent = _self.root;
 
 			// Binding Methods
 			// Event handler
-			_self.modules[moduleId].instance.when = function (event) {
+			_self.recipeCollection[moduleId].instance.when = function (event) {
 				return _self.when (event, moduleId);
 			};
 
@@ -5891,15 +5896,15 @@ if ( !Object.observe ) {
 
 			// Init the module?
 			if (
-				'init' in _self.modules[moduleId].instance
-				&& _.isFunction (_self.modules[moduleId].instance.init)
+				'init' in _self.recipeCollection[moduleId].instance
+				&& _.isFunction (_self.recipeCollection[moduleId].instance.init)
 			) {
 
 				//Handle taste interceptor
-				_self._handleInterceptor ('init', _self.modules[moduleId].instance);
+				_self._handleInterceptor ('init', _self.recipeCollection[moduleId].instance);
 
 				//Execution
-				_self.modules[moduleId].instance.init (_self.lib.get (_self.root));
+				_self.recipeCollection[moduleId].instance.init (_self.lib.get (_self.root));
 			}
 
 			// Bind listeners
@@ -5919,7 +5924,7 @@ if ( !Object.observe ) {
 	Apps.add ('taste', function (moduleId) {
 		var _self = this,
 			_moduleId = moduleId && [moduleId]
-						|| _.getObjectKeys (_self.modules);
+						|| _.getObjectKeys (_self.recipeCollection);
 		//Reset lazy exec
 		_self.lazy = false;
 
@@ -5964,11 +5969,11 @@ if ( !Object.observe ) {
 	 * @return object
 	 * */
 	Apps.add ('drop', function (moduleId) {
-		if ( moduleId in this.modules ) {
-			if ( this.modules[moduleId].instance ) {
-				if ( 'destroy' in this.modules[moduleId].instance )
-					this.modules[moduleId].instance.destroy (this.lib.get (this.root));
-				this.modules[moduleId] = null;
+		if ( moduleId in this.recipeCollection ) {
+			if ( this.recipeCollection[moduleId].instance ) {
+				if ( 'destroy' in this.recipeCollection[moduleId].instance )
+					this.recipeCollection[moduleId].instance.destroy (this.lib.get (this.root));
+				this.recipeCollection[moduleId] = null;
 			}
 		}
 		return this;
@@ -5980,7 +5985,7 @@ if ( !Object.observe ) {
 	 * */
 	Apps.add ('dropAll', function () {
 		var _self = this;
-		_.each (this.modules, function (module, id) {
+		_.each (this.recipeCollection, function (module, id) {
 			_self.drop (id);
 		});
 		return this;
@@ -6114,7 +6119,9 @@ if ( !Object.observe ) {
 					_self.module.appCollection[conf.app].intercept ({
 						'init': function (mod) {
 							mod.uri = {
-								params: state
+								params: state,
+								title : route_name,
+								route : _self.routes[route_name]
 							}
 						}
 					});

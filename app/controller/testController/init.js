@@ -9,7 +9,7 @@ _$ (function () {
 		console.log (msg)
 	});
 
-	//The modules, templates, events, view are encapsulated in recipes
+	//The recipeCollection, templates, events, view are encapsulated in recipes
 	//Recipes are declared as sp-recipe and is associated with the recipe's name
 
 	//A new recipe for Hey

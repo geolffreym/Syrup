@@ -212,8 +212,8 @@
 						config     : {}
 					},
 					registry = {},
-				//registry of just enabled modules, to speed
-				//cycle breaking code when lots of modules
+				//registry of just enabled recipeCollection, to speed
+				//cycle breaking code when lots of recipeCollection
 				//are registered, but not activated.
 					enabledRegistry = {},
 					undefEvents = {},
@@ -602,7 +602,7 @@
 				};
 
 				function cleanRegistry (id) {
-					//Clean up machinery used for waiting modules.
+					//Clean up machinery used for waiting recipeCollection.
 					delete registry[id];
 					delete enabledRegistry[id];
 				}
@@ -652,7 +652,7 @@
 
 					inCheckLoaded = true;
 
-					//Figure out the state of all the modules.
+					//Figure out the state of all the recipeCollection.
 					eachProp (enabledRegistry, function (mod) {
 						var map = mod.map,
 							modId = map.id;
@@ -692,7 +692,7 @@
 					});
 
 					if ( expired && noLoads.length ) {
-						//If wait time expired, throw error of unloaded modules.
+						//If wait time expired, throw error of unloaded recipeCollection.
 						err = makeError ('timeout', 'Load timeout for modules: ' + noLoads, null, noLoads);
 						err.contextName = context.contextName;
 						return onError (err);
@@ -866,7 +866,7 @@
 								if ( isFunction (factory) ) {
 									//If there is an error listener, favor passing
 									//to that instead of throwing an error. However,
-									//only do it for define()'d  modules. require
+									//only do it for define()'d  recipeCollection. require
 									//errbacks should not be called for failures in
 									//their callbacks (#699). However if a global
 									//onError is set, use that.
@@ -1013,7 +1013,7 @@
 								this.error = err;
 								err.requireModules = [id];
 
-								//Remove temp unnormalized modules for this module,
+								//Remove temp unnormalized recipeCollection for this module,
 								//since they will never be resolved otherwise now.
 								eachProp (registry, function (mod) {
 									if ( mod.map.id.indexOf (id + '_unnormalized') === 0 ) {
@@ -1073,7 +1073,7 @@
 								//resource
 								this.depMaps.push (moduleMap);
 
-								//Support anonymous modules.
+								//Support anonymous recipeCollection.
 								context.completeLoad (moduleName);
 
 								//Bind the value of that module to the value for this
@@ -1146,7 +1146,7 @@
 							id = depMap.id;
 							mod = registry[id];
 
-							//Skip special modules like 'require', 'exports', 'module'
+							//Skip special recipeCollection like 'require', 'exports', 'module'
 							//Also, don't call enable if it is already enabled,
 							//important in circular dependency cases.
 							if ( !hasProp (handlers, id) && mod && !mod.enabled ) {
@@ -1190,7 +1190,7 @@
 				};
 
 				function callGetModule (args) {
-					//Skip modules already defined.
+					//Skip recipeCollection already defined.
 					if ( !hasProp (defined, args[0]) ) {
 						getModule (makeModuleMap (args[0], null, true)).init (args[1], args[2]);
 					}
@@ -1236,7 +1236,7 @@
 				function intakeDefines () {
 					var args;
 
-					//Any defined modules in the global queue, intake them now.
+					//Any defined recipeCollection in the global queue, intake them now.
 					takeGlobalQueue ();
 
 					//Make sure any remaining defQueue items get properly processed.
@@ -1352,7 +1352,7 @@
 							});
 						}
 
-						//If there are any "waiting to execute" modules in the registry,
+						//If there are any "waiting to execute" recipeCollection in the registry,
 						//update the maps for them, since their info, like URLs to load,
 						//may have changed.
 						eachProp (registry, function (mod, id) {
@@ -1940,7 +1940,7 @@
 						//reevaluated if other use cases become common.
 						importScripts (url);
 
-						//Account for anonymous modules
+						//Account for anonymous recipeCollection
 						context.completeLoad (moduleName);
 					} catch ( e ) {
 						context.onError (makeError ('importscripts',
@@ -2012,7 +2012,7 @@
 			}
 
 			/**
-			 * The function that handles definitions of modules. Differs from
+			 * The function that handles definitions of recipeCollection. Differs from
 			 * require() in that a string for the module should be the first argument,
 			 * and the function to execute after dependencies are loaded should
 			 * return a value to define the module corresponding to the first argument's
@@ -2021,7 +2021,7 @@
 			define = function (name, deps, callback) {
 				var node, context;
 
-				//Allow for anonymous modules
+				//Allow for anonymous recipeCollection
 				if ( typeof name !== 'string' ) {
 					//Adjust args appropriately
 					callback = deps;
@@ -2072,7 +2072,7 @@
 				}
 
 				//Always save off evaluating the def call until the script onload handler.
-				//This allows multiple modules to be in a file without prematurely
+				//This allows multiple recipeCollection to be in a file without prematurely
 				//tracing dependencies, and allows for anonymous module support,
 				//where the module name is not known until the script onload event
 				//occurs. If no context, use the global queue, and get it processed
@@ -2092,7 +2092,7 @@
 			/**
 			 * Executes the text. Normally just uses eval, but can be modified
 			 * to use a better, environment-specific call. Only used for transpiling
-			 * loader plugins, not for plain JS modules.
+			 * loader plugins, not for plain JS recipeCollection.
 			 * @param {String} text the text to execute/evaluate.
 			 */
 			req.exec = function (text) {

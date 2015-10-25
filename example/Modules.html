@@ -63,12 +63,23 @@
         //Index App
         _indexApp.recipe ('home1', function () {
             return {
-                init: function () {
+                init    : function ($) {
+                    //Global Http
+                    console.log ($.main.Http);
+
+                    //Own Http?
+                    console.log ($.Http);
+
                     this.scope.set ({
                         beatles: [
                             { firstName: 'Pedro', lastName: 'Perez' }
                         ]
-                    }).view.render ('Hey/You.html');
+                    }).view.render ('Hey/You.html', true);
+
+
+                },
+                redirect: function () {
+                    alert ('yeah')
                 }
             }
         }).recipe ('home2', function (_, g) {
@@ -85,14 +96,14 @@
     }) (App);
 
 
-
-
     //Route App
     App.module ('main')
             .blend ('route', [])
             .recipe ('router', function (_, g) {
         return {
             init    : function ($) {
+
+                //Get the uri data from router
                 console.log (this.uri);
                 //console.log ($.Http)
             },
