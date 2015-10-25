@@ -30,12 +30,16 @@
 				if ( e.state.route_name in _self.onpopstate ) {
 					_.each (_self.onpopstate[e.state.route_name], function (v, i) {
 						v (e.state, e);
+
+						//Intercept pop state
+						_self._handleInterceptor ('redirect', e);
 					}, true);
 				}
 			}
 
 			//Intercept pop state
-			_self._handleInterceptor ('redirect', e);
+			_self._handleInterceptor ('popstate', e);
+
 		});
 
 	}
@@ -74,7 +78,7 @@
 	Router.add ('_handleSkull', function (conf, callback, params) {
 		var _view = new View;
 		//Clear cache
-		_view.clear ();
+		_view.cleanCache (conf.tpl);
 		_view.seekTpl (conf.tpl).then (function (view) {
 
 			// Find main

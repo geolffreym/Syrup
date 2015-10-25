@@ -4968,7 +4968,6 @@ if ( !Object.observe ) {
 	function View () {
 		this.Http = new Http;
 		this.Repo = new Repo;
-		this.dir = null;
 		this.tpl = null;
 	}
 
@@ -5002,8 +5001,8 @@ if ( !Object.observe ) {
 			_repo.set ('templates', {});
 		}
 
+		//Find template in repo
 		_template = _repo.get ('templates');
-		_self.dir = template;
 
 		return (new Promise (function (resolve, reject) {
 			if ( template in _template ) {
@@ -5039,19 +5038,22 @@ if ( !Object.observe ) {
 		return this;
 	});
 
-	/**Clear View from Repo
+	/**Clear template from Repo
+	 * @param {string} template
 	 * @return {object}
 	 * **/
-	View.add ('cleanCache', function () {
-		if ( this.dir ) {
-			var old_templates = this.Repo.get ('templates');
-			if ( old_templates ) {
-				delete old_templates[this.dir]
-			}
+	View.add ('cleanCache', function (template) {
+		var old_templates = this.Repo.get ('templates');
 
-			this.Repo.set ('templates', old_templates);
-			this.dir = null;
+		if (
+			old_templates
+			&& template in old_templates
+		) {
+			delete old_templates[template]
 		}
+
+		//Update repo templates
+		this.Repo.set ('templates', old_templates);
 
 		return this;
 	});
@@ -5064,6 +5066,7 @@ if ( !Object.observe ) {
 	View.add ('render', function (_template, _fields) {
 		var _self = this,
 			_worker = new Workers;
+
 		return (new Promise (function (resolve, reject) {
 			_fields = _.isObject (_template) && _template || _fields;
 			_template = !_.isObject (_template) && _.isString (_template) && _template || _self.tpl;
@@ -5375,12 +5378,15 @@ if ( !Object.observe ) {
 	 * @return object
 	 * **/
 	Apps.add ('module', function (name, dependencies) {
+		//No app registered?
 		if ( !(name in this.app) ) {
 			this.app[name] = new Apps;
 			this.app[name].root = name;
 			this.app[name].lib = new LibClass;
 			this.app[name].lib.blend (name, dependencies)
 		}
+
+		//Return the app
 		return this.app[name];
 	});
 
@@ -5685,8 +5691,8 @@ if ( !Object.observe ) {
 		// Render view
 		var _self = this;
 		_self.modules[moduleId].instance.view = {
-			render: function (_view) {
-				_self._serve (moduleId, _view || null);
+			render: function (_view, _cache) {
+				_self._serve (moduleId, _view || null, _cache || false);
 				return _self.modules[moduleId].instance;
 			}
 		};
@@ -5772,7 +5778,7 @@ if ( !Object.observe ) {
 	 * @param view
 	 * @return object
 	 */
-	Apps.add ('_serve', function (moduleId, view) {
+	Apps.add ('_serve', function (moduleId, view, cleanCache) {
 		var _view = null,
 			_scope = this.scope[moduleId];
 
@@ -5789,15 +5795,33 @@ if ( !Object.observe ) {
 				//A view?
 				if ( _.isSet (view) && _.isString (view) ) {
 					var view_name = view.split ('/').pop (),
-						view_dir = _.replace (view, '/' + view_name, _.emptyStr);
+						view_dir = _.replace (view, '/' + view_name, _.emptyStr),
+						view_template_dir = 'layout/' + view_dir + '/' + view_name;
 
-					//Require the view if needed
-					Require.lookup (['view/' + view_dir]).then (function () {
-						if ( view_name in _view.__proto__ )
-							_view[view_name] (_, _scope, function (my_html) {
-								_dom.html (my_html);
+					//Handle template?
+					if ( /\.html$/.test (view_name) ) {
+
+						//Clean cache?
+						if ( cleanCache )
+							_view.cleanCache (view_template_dir);
+
+						//Seek for tpl
+						_view.seekTpl (view_template_dir)
+							.then (function (view) {
+							view.render (_scope).then (function (res) {
+								_dom.html (res);
 							})
-					});
+						})
+					} else {
+						//Handle view?
+						//Require the view if needed
+						Require.lookup (['view/' + view_dir]).then (function () {
+							if ( view_name in _view.__proto__ )
+								_view[view_name] (_, _scope, function (my_html) {
+									_dom.html (my_html);
+								})
+						});
+					}
 
 					//Exist inline tpl?
 				} else if ( _dom_template.exist ) {
@@ -5844,19 +5868,6 @@ if ( !Object.observe ) {
 			_self.modules[moduleId].instance.when = function (event) {
 				return _self.when (event, moduleId);
 			};
-			//
-			//// Custom listener for recipe
-			//_self.modules[moduleId].instance.listen = function (event, delegate) {
-			//	var _recipe = _$ ('[sp-recipe="' + moduleId + '"]');
-			//
-			//	return new Promise (function (resolve, reject) {
-			//		if ( _recipe.exist ) {
-			//			_recipe.listen (event, delegate, resolve);
-			//		} else {
-			//			reject (_recipe);
-			//		}
-			//	})
-			//};
 
 			// Recipes
 			_self._recipes (moduleId);
@@ -6008,12 +6019,16 @@ if ( !Object.observe ) {
 				if ( e.state.route_name in _self.onpopstate ) {
 					_.each (_self.onpopstate[e.state.route_name], function (v, i) {
 						v (e.state, e);
+
+						//Intercept pop state
+						_self._handleInterceptor ('redirect', e);
 					}, true);
 				}
 			}
 
 			//Intercept pop state
-			_self._handleInterceptor ('redirect', e);
+			_self._handleInterceptor ('popstate', e);
+
 		});
 
 	}
@@ -6052,7 +6067,7 @@ if ( !Object.observe ) {
 	Router.add ('_handleSkull', function (conf, callback, params) {
 		var _view = new View;
 		//Clear cache
-		_view.clear ();
+		_view.cleanCache (conf.tpl);
 		_view.seekTpl (conf.tpl).then (function (view) {
 
 			// Find main

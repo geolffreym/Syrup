@@ -24,7 +24,9 @@
         $.Router.connect (this).set ({
             'home' : '/syrup/Modules.html',
             'route': '/route/:page/:user/'
+
         }).then (function (route) {
+
             route.when ('home', {
                 tpl    : 'skull/home.html',
                 app    : 'index',
@@ -34,14 +36,8 @@
                 tpl: 'skull/route.html',
                 app: 'route'
             })
+
         });
-
-
-//        $.Router.intercept ({
-//            redirect: function (e) {
-//                console.log (e)
-//            }
-//        });
 
         //Http Interceptors
         $.Http.intercept ({
@@ -50,7 +46,6 @@
             }
         });
 
-        //Router
     })
 
 
@@ -58,28 +53,44 @@
 
 <script>
 
-    //Index App
-    App.module ('main')
-            .blend ('index', ['Http'])
-            .recipe ('home2', function (_, g) {
-        return {
-            init    : function ($) {
-                console.log ('i am index');
-                //console.log ($.Http)
-            },
-            redirect: function ($) {
-                $.main.Router.redirect ('route', {
-                    ':page': 1,
-                    ':user': 2
-                })
+    (function (App) {
+        //Encapsulate
+
+        var _main = App.module ('main'),
+                _indexApp = _main.blend ('index', []);
+
+
+        //Index App
+        _indexApp.recipe ('home1', function () {
+            return {
+                init: function () {
+                    this.scope.set ({
+                        beatles: [
+                            { firstName: 'Pedro', lastName: 'Perez' }
+                        ]
+                    }).view.render ('Hey/You.html');
+                }
             }
-        }
-    });
+        }).recipe ('home2', function (_, g) {
+            return {
+                redirect: function ($) {
+                    $.main.Router.redirect ('route', {
+                        ':page': 1,
+                        ':user': 2
+                    })
+                }
+            }
+        });
+
+    }) (App);
+
+
 
 
     //Route App
     App.module ('main')
-            .blend ('route', []).recipe ('router', function (_, g) {
+            .blend ('route', [])
+            .recipe ('router', function (_, g) {
         return {
             init    : function ($) {
                 console.log (this.uri);

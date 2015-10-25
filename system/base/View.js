@@ -16,7 +16,6 @@
 	function View () {
 		this.Http = new Http;
 		this.Repo = new Repo;
-		this.dir = null;
 		this.tpl = null;
 	}
 
@@ -50,8 +49,8 @@
 			_repo.set ('templates', {});
 		}
 
+		//Find template in repo
 		_template = _repo.get ('templates');
-		_self.dir = template;
 
 		return (new Promise (function (resolve, reject) {
 			if ( template in _template ) {
@@ -87,19 +86,22 @@
 		return this;
 	});
 
-	/**Clear View from Repo
+	/**Clear template from Repo
+	 * @param {string} template
 	 * @return {object}
 	 * **/
-	View.add ('cleanCache', function () {
-		if ( this.dir ) {
-			var old_templates = this.Repo.get ('templates');
-			if ( old_templates ) {
-				delete old_templates[this.dir]
-			}
+	View.add ('cleanCache', function (template) {
+		var old_templates = this.Repo.get ('templates');
 
-			this.Repo.set ('templates', old_templates);
-			this.dir = null;
+		if (
+			old_templates
+			&& template in old_templates
+		) {
+			delete old_templates[template]
 		}
+
+		//Update repo templates
+		this.Repo.set ('templates', old_templates);
 
 		return this;
 	});
@@ -112,6 +114,7 @@
 	View.add ('render', function (_template, _fields) {
 		var _self = this,
 			_worker = new Workers;
+
 		return (new Promise (function (resolve, reject) {
 			_fields = _.isObject (_template) && _template || _fields;
 			_template = !_.isObject (_template) && _.isString (_template) && _template || _self.tpl;

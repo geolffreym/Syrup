@@ -3,14 +3,14 @@
  */
 
 //The view name
-View.add ('myView', function (_, data, onReadyCallback) {
+View.add ('myView', function (_, scope, onReadyCallback) {
 	//The template as relative path of config app_path
 	//Hey/You in app/templates respects namespace
 
-	//this.clear()
+	this.clear();
 	this.seekTpl ('layout/Hey/You.html').then (function (view) {
-		//view.cleanCache();
-		view.render (data)
+
+		view.render (scope)
 			.then (onReadyCallback);
 
 	});

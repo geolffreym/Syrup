@@ -22,12 +22,15 @@
 	 * @return object
 	 * **/
 	Apps.add ('module', function (name, dependencies) {
+		//No app registered?
 		if ( !(name in this.app) ) {
 			this.app[name] = new Apps;
 			this.app[name].root = name;
 			this.app[name].lib = new LibClass;
 			this.app[name].lib.blend (name, dependencies)
 		}
+
+		//Return the app
 		return this.app[name];
 	});
 
@@ -332,8 +335,8 @@
 		// Render view
 		var _self = this;
 		_self.modules[moduleId].instance.view = {
-			render: function (_view) {
-				_self._serve (moduleId, _view || null);
+			render: function (_view, _cache) {
+				_self._serve (moduleId, _view || null, _cache || false);
 				return _self.modules[moduleId].instance;
 			}
 		};
@@ -419,7 +422,7 @@
 	 * @param view
 	 * @return object
 	 */
-	Apps.add ('_serve', function (moduleId, view) {
+	Apps.add ('_serve', function (moduleId, view, cleanCache) {
 		var _view = null,
 			_scope = this.scope[moduleId];
 
@@ -436,15 +439,33 @@
 				//A view?
 				if ( _.isSet (view) && _.isString (view) ) {
 					var view_name = view.split ('/').pop (),
-						view_dir = _.replace (view, '/' + view_name, _.emptyStr);
+						view_dir = _.replace (view, '/' + view_name, _.emptyStr),
+						view_template_dir = 'layout/' + view_dir + '/' + view_name;
 
-					//Require the view if needed
-					Require.lookup (['view/' + view_dir]).then (function () {
-						if ( view_name in _view.__proto__ )
-							_view[view_name] (_, _scope, function (my_html) {
-								_dom.html (my_html);
+					//Handle template?
+					if ( /\.html$/.test (view_name) ) {
+
+						//Clean cache?
+						if ( cleanCache )
+							_view.cleanCache (view_template_dir);
+
+						//Seek for tpl
+						_view.seekTpl (view_template_dir)
+							.then (function (view) {
+							view.render (_scope).then (function (res) {
+								_dom.html (res);
 							})
-					});
+						})
+					} else {
+						//Handle view?
+						//Require the view if needed
+						Require.lookup (['view/' + view_dir]).then (function () {
+							if ( view_name in _view.__proto__ )
+								_view[view_name] (_, _scope, function (my_html) {
+									_dom.html (my_html);
+								})
+						});
+					}
 
 					//Exist inline tpl?
 				} else if ( _dom_template.exist ) {
@@ -491,19 +512,6 @@
 			_self.modules[moduleId].instance.when = function (event) {
 				return _self.when (event, moduleId);
 			};
-			//
-			//// Custom listener for recipe
-			//_self.modules[moduleId].instance.listen = function (event, delegate) {
-			//	var _recipe = _$ ('[sp-recipe="' + moduleId + '"]');
-			//
-			//	return new Promise (function (resolve, reject) {
-			//		if ( _recipe.exist ) {
-			//			_recipe.listen (event, delegate, resolve);
-			//		} else {
-			//			reject (_recipe);
-			//		}
-			//	})
-			//};
 
 			// Recipes
 			_self._recipes (moduleId);
