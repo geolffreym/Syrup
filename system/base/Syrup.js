@@ -1758,7 +1758,7 @@
 		).$;
 	}) ();
 
-	_.VERSION = '1.0.0';
+	_.VERSION = '1.1.0';
 	_.$fn = _$_;
 	_.emptyStr = '';
 	_.Syrup = Syrup;
