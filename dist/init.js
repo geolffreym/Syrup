@@ -5759,6 +5759,7 @@ if ( !Object.observe ) {
 				if ( _title.exist ) {
 					_title.text (title)
 				}
+				return _self.recipeCollection[moduleId].instance;
 			}
 		};
 	});
