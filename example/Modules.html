@@ -46,6 +46,11 @@
             }
         });
 
+    }).service ({
+        test: function () {
+            console.log(this.MAX)
+           // alert ('yeah')
+        }
     })
 
 
@@ -64,6 +69,7 @@
         _indexApp.recipe ('home1', function () {
             return {
                 init    : function ($) {
+                    $.main.test()
                     //Global Http
                     console.log ($.main.Http);
 

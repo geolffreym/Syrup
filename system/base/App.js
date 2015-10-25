@@ -169,23 +169,12 @@
 	});
 
 
-	/** Append global service
-	 * @param {string }name
-	 * @param {function} callback
-	 * @return {void}
-	 *
-	 * */
-	Apps.add ('service', function (name, callback) {
-		this.lib.cook (name, callback);
-		return this;
-	});
-
 	/** Append global services
 	 * @param {object} object
 	 * @return {void}
 	 *
 	 * */
-	Apps.add ('services', function (object) {
+	Apps.add ('service', function (object) {
 		this.lib.supply (object);
 		return this;
 	});
