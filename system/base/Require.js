@@ -2174,9 +2174,7 @@
 
 		_.each (_res, function (v, i) {
 			_res[i] = _.replace (
-				(v.split ('/').pop ()),
-				/\.(.*)/,
-				_.emptyStr
+				(v.split ('/').pop ()), /\.(.*)/, _.emptyStr
 			);
 		});
 

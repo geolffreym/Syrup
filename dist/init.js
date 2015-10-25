@@ -4541,9 +4541,7 @@ if ( !Object.observe ) {
 
 		_.each (_res, function (v, i) {
 			_res[i] = _.replace (
-				(v.split ('/').pop ()),
-				/\.(.*)/,
-				_.emptyStr
+				(v.split ('/').pop ()), /\.(.*)/, _.emptyStr
 			);
 		});
 
@@ -5910,6 +5908,7 @@ if ( !Object.observe ) {
 					'require' in _self.recipeCollection[moduleId].instance
 					&& _.isArray (_self.recipeCollection[moduleId].instance.require)
 				) {
+					//LookUp for libs!!
 					Require.lookup (_self.recipeCollection[moduleId].instance.require).then (function (e) {
 						//Execution
 						_self.lib._dependencies (e.getCleanDependencies ());
