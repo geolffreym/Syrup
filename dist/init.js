@@ -1776,7 +1776,7 @@ if ( typeof exports !== 'undefined' )
 		).$;
 	}) ();
 
-	_.VERSION = '1.0.0';
+	_.VERSION = '1.1.0';
 	_.$fn = _$_;
 	_.emptyStr = '';
 	_.Syrup = Syrup;
@@ -5802,49 +5802,47 @@ if ( !Object.observe ) {
 			_dom_template = _$ ('[sp-recipe="' + moduleId + '"] [sp-tpl]');
 
 		if ( _dom.exist ) { //Exist?
-			if ( _.getObjectSize (_scope) > 0 ) {
 
-				//The view object
-				_view = new View;
+			//The view object
+			_view = new View;
 
-				//A view?
-				if ( _.isSet (view) && _.isString (view) ) {
-					var view_name = view.split ('/').pop (),
-						view_dir = _.replace (view, '/' + view_name, _.emptyStr),
-						view_template_dir = 'layout/' + view_dir + '/' + view_name;
+			//A view?
+			if ( _.isSet (view) && _.isString (view) ) {
+				var view_name = view.split ('/').pop (),
+					view_dir = _.replace (view, '/' + view_name, _.emptyStr),
+					view_template_dir = 'layout/' + view_dir + '/' + view_name;
 
-					//Handle template?
-					if ( /\.html$/.test (view_name) ) {
+				//Handle template?
+				if ( /\.html$/.test (view_name) ) {
 
-						//Clean cache?
-						if ( cleanCache )
-							_view.cleanCache (view_template_dir);
+					//Clean cache?
+					if ( cleanCache )
+						_view.cleanCache (view_template_dir);
 
-						//Seek for tpl
-						_view.seekTpl (view_template_dir)
-							.then (function (view) {
-							view.render (_scope).then (function (res) {
-								_dom.html (res);
-							})
+					//Seek for tpl
+					_view.seekTpl (view_template_dir)
+						.then (function (view) {
+						view.render (_scope).then (function (res) {
+							_dom.html (res);
 						})
-					} else {
-						//Handle view?
-						//Require the view if needed
-						Require.lookup (['view/' + view_dir]).then (function () {
-							if ( view_name in _view.__proto__ )
-								_view[view_name] (_, _scope, function (my_html) {
-									_dom.html (my_html);
-								})
-						});
-					}
-
-					//Exist inline tpl?
-				} else if ( _dom_template.exist ) {
-					_view.render (_dom_template.html (), _scope)
-						.then (function (result) {
-						_dom.html (result);
+					})
+				} else {
+					//Handle view?
+					//Require the view if needed
+					Require.lookup (['view/' + view_dir]).then (function () {
+						if ( view_name in _view.__proto__ )
+							_view[view_name] (_, _scope, function (my_html) {
+								_dom.html (my_html);
+							})
 					});
 				}
+
+				//Exist inline tpl?
+			} else if ( _dom_template.exist ) {
+				_view.render (_dom_template.html (), _scope)
+					.then (function (result) {
+					_dom.html (result);
+				});
 			}
 		}
 

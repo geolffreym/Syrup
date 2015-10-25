@@ -94,22 +94,6 @@
     }) (App);
 
 
-    //Route App
-    App.module ('main')
-            .blend ('route', [])
-            .recipe ('router', function (_, g) {
-        return {
-            init    : function ($) {
-
-                //Get the uri data from router
-                console.log (this.uri);
-                //console.log ($.Http)
-            },
-            redirect: function ($) {
-                $.main.Router.redirect ('home', {});
-            }
-        }
-    })
 
 
 </script>
