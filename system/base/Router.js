@@ -20,12 +20,16 @@
 		this.history = window.history;
 		this.findParams = /(:[\w]+)/g;
 		this.onpopstate = {};
+		this.interceptors = {};
 		this.module = null;
 
 		var _self = this;
 
 		//Set Pop State
 		window.addEventListener ('popstate', function (e) {
+			//Intercept pop state
+			_self._handleInterceptor ('popstate', e);
+
 			if ( _.isSet (e.state) && 'route_name' in e.state ) {
 				if ( e.state.route_name in _self.onpopstate ) {
 					_.each (_self.onpopstate[e.state.route_name], function (v, i) {
@@ -36,10 +40,6 @@
 					}, true);
 				}
 			}
-
-			//Intercept pop state
-			_self._handleInterceptor ('popstate', e);
-
 		});
 
 	}
@@ -92,8 +92,9 @@
 		});
 	});
 
-	/**Delega rutas
+	/**Delegate routes
 	 * @param {string} route_name
+	 * @param {object} conf
 	 * @returns {object}
 	 */
 	Router.add ('when', function (route_name, conf) {
@@ -121,7 +122,6 @@
 						'init': function (mod) {
 							mod.uri = {
 								params: state,
-								title : route_name,
 								route : _self.routes[route_name]
 							}
 						}

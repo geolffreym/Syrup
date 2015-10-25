@@ -21,6 +21,7 @@
         MAX: 1
     }).cook (function ($) {
 
+        //Provide conf to Router
         $.Router.connect (this).set ({
             'home' : '/syrup/Modules.html',
             'route': '/route/:page/:user/'
@@ -38,21 +39,7 @@
             })
 
         });
-
-        //Http Interceptors
-        $.Http.intercept ({
-            'request': function (c) {
-                console.log (c)
-            }
-        });
-
-    }).service ({
-        test: function () {
-            console.log(this.MAX)
-           // alert ('yeah')
-        }
     })
-
 
 </script>
 
@@ -62,14 +49,29 @@
         //Encapsulate
 
         var _main = App.module ('main'),
-                _indexApp = _main.blend ('index', []);
+                _indexApp = _main.blend ('index', ['Hash']);
 
+        _indexApp.cook (function ($) {
+
+            //Handling Hash..
+            $.Hash.when ('route').then (function (e) {
+                $.redirect ('route', {
+                    ':page': e.getIndex (0),
+                    ':user': e.getIndex (1)
+                });
+            })
+
+        }).service ({
+            'redirect': function (route, params) {
+                this.main.Router.redirect (route, params);
+            }
+        });
 
         //Index App
         _indexApp.recipe ('home1', function () {
             return {
-                init    : function ($) {
-                    //$.main.test()
+                init: function ($) {
+
                     //Global Http
                     //console.log ($.main.Http);
 
@@ -83,20 +85,10 @@
                     }).view.render ('Hey/You.html', true);
 
 
-                },
-                redirect: function () {
-                    alert ('yeah')
                 }
             }
         }).recipe ('home2', function (_, g) {
-            return {
-                redirect: function ($) {
-                    $.main.Router.redirect ('route', {
-                        ':page': 1,
-                        ':user': 2
-                    })
-                }
-            }
+            return {}
         });
 
     }) (App);

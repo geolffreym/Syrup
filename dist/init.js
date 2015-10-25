@@ -5610,12 +5610,17 @@ if ( !Object.observe ) {
 
 		//Exist the module?
 		if ( _mod.exist ) {
+
+			//Bind enabled events
 			_.each (enabled_events, function (v) {
+				//Listen the events
 				_mod.listen (v, function (e) {
 					var _event = 'sp-' + e.type,
 						_attr = e.target.getAttribute (_event);
 
+					//Has sp-'event'?
 					if ( _attr ) {
+						//Is in recipe?
 						if ( _attr in _recipe && _.isFunction (_recipe[_attr]) ) {
 							e.preventDefault ();
 							_recipe[_attr] (_self.lib.get (_recipe.parent), e);
@@ -5624,28 +5629,6 @@ if ( !Object.observe ) {
 
 				});
 			});
-
-			//
-			////Find the listeners
-			//_mod.find (_the_filter, function (dom_list) {
-			//	console.log(dom_list)
-			//	//Find the listener in attributes
-			//	_.each ((_dom = dom_list.get ()).attributes, function (v) {
-			//		if ( /sp-[a-z]+/.test (v.localName) ) {
-			//			var _event = _.replace (v.localName, 'sp-', _.emptyStr),
-			//				_attr = _dom.getAttribute (v.localName);
-			//
-			//			//Is the attr value in module? and is Function the attr value?
-			//			if ( _attr in _recipe && _.isFunction (_recipe[_attr]) ) {
-			//				_mod.listen (_event, '[' + v.localName + '="' + _attr + '"]', function (e) {
-			//					//Param event and dependencies
-			//					e.preventDefault ();
-			//					_recipe[_attr] (_self.lib.get (_recipe.parent), e);
-			//				});
-			//			}
-			//		}
-			//	});
-			//});
 		}
 	});
 
@@ -6018,12 +6001,16 @@ if ( !Object.observe ) {
 		this.history = window.history;
 		this.findParams = /(:[\w]+)/g;
 		this.onpopstate = {};
+		this.interceptors = {};
 		this.module = null;
 
 		var _self = this;
 
 		//Set Pop State
 		window.addEventListener ('popstate', function (e) {
+			//Intercept pop state
+			_self._handleInterceptor ('popstate', e);
+
 			if ( _.isSet (e.state) && 'route_name' in e.state ) {
 				if ( e.state.route_name in _self.onpopstate ) {
 					_.each (_self.onpopstate[e.state.route_name], function (v, i) {
@@ -6034,10 +6021,6 @@ if ( !Object.observe ) {
 					}, true);
 				}
 			}
-
-			//Intercept pop state
-			_self._handleInterceptor ('popstate', e);
-
 		});
 
 	}
@@ -6090,8 +6073,9 @@ if ( !Object.observe ) {
 		});
 	});
 
-	/**Delega rutas
+	/**Delegate routes
 	 * @param {string} route_name
+	 * @param {object} conf
 	 * @returns {object}
 	 */
 	Router.add ('when', function (route_name, conf) {
@@ -6119,7 +6103,6 @@ if ( !Object.observe ) {
 						'init': function (mod) {
 							mod.uri = {
 								params: state,
-								title : route_name,
 								route : _self.routes[route_name]
 							}
 						}
@@ -6237,6 +6220,125 @@ if ( !Object.observe ) {
 	//Global access
 	window.Router = new Router;
 	window.RouterClass = Router;
+
+
+}) (window);
+/**
+ * Created by gmena on 10-25-15.
+ */
+
+(function (window) {
+
+
+	'use strict';
+	/**Hash
+	 * @constructor
+	 */
+	function Hash () {
+		this.interceptors = {};
+		this.onhashchange = {};
+
+
+		var _self = this;
+		//Set Hash Change
+		window.addEventListener ('hashchange', function (e) {
+			//Intercept pop state
+			_self._handleInterceptor ('change', e);
+
+			//Clean # from hash
+			var _hash = _self._cleanHash (location.hash),
+				_params = _self._getParams (location.hash);
+
+
+			if ( _hash in _self.onhashchange ) {
+				_.each (_self.onhashchange[_hash], function (v) {
+					v (_params);
+				}, true);
+			}
+
+		});
+
+	}
+
+	/**Delegate hash
+	 * @param {string} hash
+	 * @returns {object}
+	 */
+	Hash.add ('when', function (hash) {
+		_.assert (hash, _.WARNING_SYRUP.ERROR.NOPARAM, '(Router .when)');
+		var _self = this;
+
+		//No route?
+		if ( !(hash in _self.onhashchange) )
+			_self.onhashchange[hash] = [];
+
+		return new Promise (function (resolve) {
+			//Append a new route
+			_self.onhashchange[hash].push (resolve);
+		});
+
+	});
+
+	/**Clean # hash
+	 * @param {string} hash
+	 * @returns {string}
+	 */
+	Hash.add ('_cleanHash', function (hash) {
+		return _.replace (hash, '#', _.emptyStr).split ('/')[0];
+	});
+
+	/**Clean # hash
+	 * @param {string} hash
+	 * @returns {object}
+	 */
+	Hash.add ('_getParams', function (hash) {
+		return _.toObject (hash.split ('/').splice (1));
+	});
+
+	/** Interceptors
+	 * @param  {object} interceptors
+	 * @return {object}
+	 * */
+	Hash.add ('intercept', function (interceptors) {
+		if ( _.isObject (interceptors) )
+			MiddleWare.intercept (this, interceptors);
+		return this;
+	});
+
+
+	/** Handle the interceptors
+	 * @param {string} type
+	 * @param {object} param
+	 * @return {void}
+	 * */
+	Hash.add ('_handleInterceptor', function (type, param) {
+		//Trigger Interceptors
+		MiddleWare.trigger (
+			MiddleWare.getInterceptors (this, type),
+			[param, this]
+		);
+
+		//Clean the interceptor
+		MiddleWare.cleanInterceptor (this, type);
+	});
+
+
+	/**Set the target
+	 * @param {object} routes
+	 * @return {object}
+	 * */
+	Hash.add ('connect', function (to_route) {
+		if ( !(to_route instanceof AppClass) )
+			_.error (WARNING_ROUTE.ERROR.BADINSTANCE, '(Router .route)');
+
+		this.module = to_route;
+		to_route.lazy = true;
+		return this;
+	});
+
+
+	//Global access
+	window.Hash = Hash;
 
 
 }) (window);

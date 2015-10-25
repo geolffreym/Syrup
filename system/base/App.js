@@ -247,12 +247,17 @@
 
 		//Exist the module?
 		if ( _mod.exist ) {
+
+			//Bind enabled events
 			_.each (enabled_events, function (v) {
+				//Listen the events
 				_mod.listen (v, function (e) {
 					var _event = 'sp-' + e.type,
 						_attr = e.target.getAttribute (_event);
 
+					//Has sp-'event'?
 					if ( _attr ) {
+						//Is in recipe?
 						if ( _attr in _recipe && _.isFunction (_recipe[_attr]) ) {
 							e.preventDefault ();
 							_recipe[_attr] (_self.lib.get (_recipe.parent), e);
