@@ -229,7 +229,7 @@
 		//Two times, for trigger "popstate"
 
 		if ( _config.trigger ) {
-			this.history.pushState (_params, route_name, _the_new_route);
+			this.history.replaceState (_params, route_name, _the_new_route);
 			this.history.pushState (_params, route_name, _the_new_route);
 			this.history.back ();
 		}
