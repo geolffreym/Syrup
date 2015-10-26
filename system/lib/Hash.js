@@ -24,7 +24,6 @@
 			var _hash = _self._cleanHash (location.hash),
 				_params = _self._getParams (location.hash);
 
-
 			if ( _hash in _self.onhashchange ) {
 				_.each (_self.onhashchange[_hash], function (v) {
 					v (_params);
@@ -70,7 +69,11 @@
 	 * @returns {object}
 	 */
 	Hash.add ('_getParams', function (hash) {
-		return _.toObject (hash.split ('/').splice (1));
+		var _split = hash.split ('/');
+		_split = (_split.length > 1 && _split || hash.split ('?')).splice (1);
+		return _.isString (hash)
+			   && _split.length
+			   && _.queryStringToJson (_split.pop ()) || {};
 	});
 
 	/** Interceptors

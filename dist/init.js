@@ -1136,7 +1136,7 @@ if ( typeof exports !== 'undefined' )
 		if ( str.indexOf (match) > -1 ) {
 			return str.split (match)
 		}
-		return str;
+		return [str];
 	});
 
 
@@ -1415,6 +1415,24 @@ if ( typeof exports !== 'undefined' )
 
 		return _return.lastIndexOf ('&') > -1
 			? _return.slice (0, -1) : _return;
+	});
+
+	/**Pasa Json a format URL
+	 * @param _object
+	 * @returns {string}
+	 */
+	Syrup.add ('queryStringToJson', function (_string) {
+		var _return = {};
+
+		//No '?' in query
+		_string = _.splitString (_.replace (_string, '?', _.emptyStr), '&');
+
+		_.each (_string, function (value) {
+			value = _.splitString (value, '=');
+			_return[value[0]] = value[1] || _.emptyStr;
+		});
+
+		return _return;
 	});
 
 	/**Pasa Json a String
@@ -1731,7 +1749,7 @@ if ( typeof exports !== 'undefined' )
 	 */
 	Syrup.add ('getElementIndex', function (node) {
 		//Is syrup object?
-		node = _.is$ (node) && node.get() || node;
+		node = _.is$ (node) && node.get () || node;
 
 		var i = 1,
 			prop = document.body.previousElementSibling
@@ -6297,7 +6315,6 @@ if ( !Object.observe ) {
 			var _hash = _self._cleanHash (location.hash),
 				_params = _self._getParams (location.hash);
 
-
 			if ( _hash in _self.onhashchange ) {
 				_.each (_self.onhashchange[_hash], function (v) {
 					v (_params);
@@ -6343,7 +6360,11 @@ if ( !Object.observe ) {
 	 * @returns {object}
 	 */
 	Hash.add ('_getParams', function (hash) {
-		return _.toObject (hash.split ('/').splice (1));
+		var _split = hash.split ('/');
+		_split = (_split.length > 1 && _split || hash.split ('?')).splice (1);
+		return _.isString (hash)
+			   && _split.length
+			   && _.queryStringToJson (_split.pop ()) || {};
 	});
 
 	/** Interceptors
