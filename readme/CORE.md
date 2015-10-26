@@ -865,7 +865,7 @@ _.cartesianPlane(my_selector);
 
 *(Return the index position in DOM tree)*
 ```js    
-var my_selector = _$('input[type="text"]').object();
+var my_selector = _$('input[type="text"]');
 
 _.getElementIndex(my_selector);
 //  return 5 assuming position

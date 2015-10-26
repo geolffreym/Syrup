@@ -1713,6 +1713,9 @@
 	 * @returns {number}
 	 */
 	Syrup.add ('getElementIndex', function (node) {
+		//Is syrup object?
+		node = _.is$ (node) && node.get() || node;
+
 		var i = 1,
 			prop = document.body.previousElementSibling
 				? 'previousElementSibling' : 'previousSibling';
