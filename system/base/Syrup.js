@@ -1529,9 +1529,8 @@
 		return true;
 	});
 
-	/**Elimina elementos falsos de un Array
+	/**Limpia el arreglo de elementos null, empty,
 	 * @param arr
-
 	 */
 	Syrup.add ('compactArray', function (arr) {
 		return _.filterArray (arr, function (i) {

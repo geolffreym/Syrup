@@ -1547,9 +1547,8 @@ if ( typeof exports !== 'undefined' )
 		return true;
 	});
 
-	/**Elimina elementos falsos de un Array
+	/**Limpia el arreglo de elementos null, empty,
 	 * @param arr
-
 	 */
 	Syrup.add ('compactArray', function (arr) {
 		return _.filterArray (arr, function (i) {
@@ -6110,6 +6109,14 @@ if ( !Object.observe ) {
 		});
 	});
 
+	/** Routing
+	 * @param {route_name} string
+	 * @return {void}
+	 */
+	Router.add ('_route', function (route_name) {
+		return (new RegExp (this.routes[route_name] + '$').test (location.pathname))
+	});
+
 	/**Delegate routes
 	 * @param {string} route_name
 	 * @param {object} conf
@@ -6157,8 +6164,9 @@ if ( !Object.observe ) {
 		});
 
 		//First action
-		if ( conf.default ) {
-			_self.redirect (route_name, {});
+		//Routing!!!
+		if ( _self._route (route_name) ) {
+			_self.redirect (route_name, []);
 		}
 
 		return _self;
