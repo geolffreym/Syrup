@@ -1307,6 +1307,15 @@ var _my_object = {a:1,b:2c:3};
 _.jsonToQueryString(_my_object); // Return a=1&b=2&c=3; 
 ```
 
+**Method `.queryStringToJson(object)`**
+ 
+*(Return a object from query string)*
+```js  
+var _my_object = 'a=3&b=6';    
+
+_.queryStringToJson(_my_object); // Return {a:3,b:6}; 
+
+
 **Method `.jsonToString(object)`**
 
 *(Parse object to string Shortcut for JSON.stringify)*
