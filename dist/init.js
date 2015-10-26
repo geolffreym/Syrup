@@ -6351,7 +6351,7 @@ if ( !Object.observe ) {
 		var _split = hash.split ('/');
 		_split = (_split.length > 1 && _split || hash.split ('?')).splice (1);
 		return _.isString (hash)
-			   && _split.length
+			   && _split.length > 0
 			   && _.queryStringToJson (_split.pop ()) || {};
 	});
 
