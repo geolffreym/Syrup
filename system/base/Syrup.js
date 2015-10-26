@@ -1110,18 +1110,6 @@
 		return _.replace (str, /<|>|&|"|'/g, match);
 	});
 
-	/**Split String
-	 * @param str
-	 * @returns {String}
-	 */
-	Syrup.add ('splitString', function (str, match) {
-		if ( str.indexOf (match) > -1 ) {
-			return str.split (match)
-		}
-		return [str];
-	});
-
-
 	/**Truncate String
 	 * @param string
 	 * @param limit
@@ -1407,10 +1395,10 @@
 		var _return = {};
 
 		//No '?' in query
-		_string = _.splitString (_.replace (_string, '?', _.emptyStr), '&');
+		_string = _.replace (_string, '?', _.emptyStr).split ('&');
 
 		_.each (_string, function (value) {
-			value = _.splitString (value, '=');
+			value = value.split ('=');
 			_return[value[0]] = value[1] || _.emptyStr;
 		});
 
