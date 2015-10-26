@@ -49,23 +49,7 @@
         //Encapsulate
 
         var _main = App.module ('main'),
-                _indexApp = _main.blend ('index', ['Hash']);
-
-        _indexApp.cook (function ($) {
-
-            //Handling Hash..
-            $.Hash.when ('route').then (function (e) {
-                $.redirect ('route', {
-                    ':page': e.getIndex (0),
-                    ':user': e.getIndex (1)
-                });
-            })
-
-        }).service ({
-            'redirect': function (route, params) {
-                this.main.Router.redirect (route, params);
-            }
-        });
+                _indexApp = _main.blend ('index', []);
 
         //Index App
         _indexApp.recipe ('home1', function () {

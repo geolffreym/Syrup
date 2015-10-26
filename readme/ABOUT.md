@@ -17,10 +17,9 @@ Controllers
 
 Controllers are an intermediary between models and views which are classically responsible for two tasks: 
 they both update the view when the model changes and update the model when the user manipulates the view. 
-In Syrup drivers are handled from a dedicated environment (application modules), not combined application.
+In Syrup drivers are handled from a dedicated environment.
 
-The Controllers are located in the folder "app/controller/{app_name}/{file}.is", and are called to our site with script tags right after call Syrup core,
-you should not use the controllers on the unification of files, it is a good idea to have separate it for each application.
+The Controllers are located in the folder "app/controller/{app_name}/{file}.js", and are called to our site with script tags right after call Syrup core.
 
 ```html
 <script src="YOUR PATH/Syrup/dist/init.min.js"></script>
