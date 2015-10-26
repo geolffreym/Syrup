@@ -1118,7 +1118,7 @@
 		if ( str.indexOf (match) > -1 ) {
 			return str.split (match)
 		}
-		return str;
+		return [str];
 	});
 
 
@@ -1397,6 +1397,24 @@
 
 		return _return.lastIndexOf ('&') > -1
 			? _return.slice (0, -1) : _return;
+	});
+
+	/**Pasa Json a format URL
+	 * @param _object
+	 * @returns {string}
+	 */
+	Syrup.add ('queryStringToJson', function (_string) {
+		var _return = {};
+
+		//No '?' in query
+		_string = _.splitString (_.replace (_string, '?', _.emptyStr), '&');
+
+		_.each (_string, function (value) {
+			value = _.splitString (value, '=');
+			_return[value[0]] = value[1] || _.emptyStr;
+		});
+
+		return _return;
 	});
 
 	/**Pasa Json a String
@@ -1713,7 +1731,7 @@
 	 */
 	Syrup.add ('getElementIndex', function (node) {
 		//Is syrup object?
-		node = _.is$ (node) && node.get() || node;
+		node = _.is$ (node) && node.get () || node;
 
 		var i = 1,
 			prop = document.body.previousElementSibling
