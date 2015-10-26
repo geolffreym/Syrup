@@ -6120,7 +6120,10 @@ if ( !Object.observe ) {
 		var _self = this;
 
 		//No app. Nothing to do!!
-		if ( !(conf && 'app' in conf) )
+		if (
+			!(conf && 'app' in conf)
+			|| !(route_name in _self.routes)
+		)
 			return;
 
 		//No route?
