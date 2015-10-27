@@ -1394,13 +1394,15 @@
 	Syrup.add ('queryStringToJson', function (_string) {
 		var _return = {};
 
-		//No '?' in query
-		_string = _.replace (_string, '?', _.emptyStr).split ('&');
+		if ( _.isString (_string) ) {
+			//No '?' in query
+			_string = _.replace (_string, '?', _.emptyStr).split ('&');
 
-		_.each (_string, function (value) {
-			value = value.split ('=');
-			_return[value[0]] = value[1] || _.emptyStr;
-		});
+			_.each (_string, function (value) {
+				value = value.split ('=');
+				_return[value[0]] = value[1] || _.emptyStr;
+			});
+		}
 
 		return _return;
 	});

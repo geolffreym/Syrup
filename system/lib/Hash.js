@@ -61,7 +61,10 @@
 	 * @returns {string}
 	 */
 	Hash.add ('_cleanHash', function (hash) {
-		return _.replace (hash, '#', _.emptyStr).split ('/')[0];
+		var _hash = _.replace (hash, '#', _.emptyStr),
+			_split = _hash.split ('/');
+
+		return (_split.length > 1 && _split || _hash.split ('?'))[0];
 	});
 
 	/**Clean # hash
@@ -71,9 +74,9 @@
 	Hash.add ('_getParams', function (hash) {
 		var _split = hash.split ('/');
 		_split = (_split.length > 1 && _split || hash.split ('?')).splice (1);
-		return _.isString (hash)
-			   && _split.length > 0
-			   && _.queryStringToJson (_split.pop ()) || {};
+
+		return _split.length > 0
+			   && _.queryStringToJson (_split[0]) || {};
 	});
 
 	/** Interceptors

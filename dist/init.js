@@ -1412,13 +1412,15 @@ if ( typeof exports !== 'undefined' )
 	Syrup.add ('queryStringToJson', function (_string) {
 		var _return = {};
 
-		//No '?' in query
-		_string = _.replace (_string, '?', _.emptyStr).split ('&');
+		if ( _.isString (_string) ) {
+			//No '?' in query
+			_string = _.replace (_string, '?', _.emptyStr).split ('&');
 
-		_.each (_string, function (value) {
-			value = value.split ('=');
-			_return[value[0]] = value[1] || _.emptyStr;
-		});
+			_.each (_string, function (value) {
+				value = value.split ('=');
+				_return[value[0]] = value[1] || _.emptyStr;
+			});
+		}
 
 		return _return;
 	});
@@ -6100,8 +6102,12 @@ if ( !Object.observe ) {
 	 */
 	Router.add ('_handleSkull', function (conf, callback, params) {
 		var _view = new View;
-		//Clear cache
-		_view.cleanCache (conf.tpl);
+
+		//Clear cache?
+		if ( conf.cache )
+			_view.cleanCache (conf.tpl);
+
+		//Get the tpl skull
 		_view.seekTpl (conf.tpl).then (function (view) {
 
 			// Find main
@@ -6340,7 +6346,10 @@ if ( !Object.observe ) {
 	 * @returns {string}
 	 */
 	Hash.add ('_cleanHash', function (hash) {
-		return _.replace (hash, '#', _.emptyStr).split ('/')[0];
+		var _hash = _.replace (hash, '#', _.emptyStr),
+			_split = _hash.split ('/');
+
+		return (_split.length > 1 && _split || _hash.split ('?'))[0];
 	});
 
 	/**Clean # hash
@@ -6350,9 +6359,9 @@ if ( !Object.observe ) {
 	Hash.add ('_getParams', function (hash) {
 		var _split = hash.split ('/');
 		_split = (_split.length > 1 && _split || hash.split ('?')).splice (1);
-		return _.isString (hash)
-			   && _split.length > 0
-			   && _.queryStringToJson (_split.pop ()) || {};
+
+		return _split.length > 0
+			   && _.queryStringToJson (_split[0]) || {};
 	});
 
 	/** Interceptors

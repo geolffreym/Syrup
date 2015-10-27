@@ -77,8 +77,12 @@
 	 */
 	Router.add ('_handleSkull', function (conf, callback, params) {
 		var _view = new View;
-		//Clear cache
-		_view.cleanCache (conf.tpl);
+
+		//Clear cache?
+		if ( !conf.cache )
+			_view.cleanCache (conf.tpl);
+
+		//Get the tpl skull
 		_view.seekTpl (conf.tpl).then (function (view) {
 
 			// Find main
