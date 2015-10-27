@@ -1350,7 +1350,9 @@
 		return _cookie;
 	});
 
-	/****/
+	/** Simple split directory from slash to dots
+	 * @param {string} slashDir
+	 * **/
 	Syrup.add ('simplifyDirectory', function (slashDir) {
 		if ( _.isString (slashDir) ) {
 			return slashDir.split ('/').join ('.')
@@ -1358,6 +1360,9 @@
 		return slashDir;
 	});
 
+	/** Simple split directory from dots to slash
+	 * @param {string} dotDir
+	 * **/
 	Syrup.add ('dotDirectory', function (dotDir) {
 		if ( _.isString (dotDir) ) {
 			return dotDir.split ('.').join ('/')
