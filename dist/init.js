@@ -1368,7 +1368,9 @@ if ( typeof exports !== 'undefined' )
 		return _cookie;
 	});
 
-	/****/
+	/** Simple split directory from slash to dots
+	 * @param {string} slashDir
+	 * **/
 	Syrup.add ('simplifyDirectory', function (slashDir) {
 		if ( _.isString (slashDir) ) {
 			return slashDir.split ('/').join ('.')
@@ -1376,6 +1378,9 @@ if ( typeof exports !== 'undefined' )
 		return slashDir;
 	});
 
+	/** Simple split directory from dots to slash
+	 * @param {string} dotDir
+	 * **/
 	Syrup.add ('dotDirectory', function (dotDir) {
 		if ( _.isString (dotDir) ) {
 			return dotDir.split ('.').join ('/')
@@ -6036,17 +6041,18 @@ if ( !Object.observe ) {
 		}
 	};
 
-	'use strict';
-	/**Router
-	 * @constructor
-	 */
-	function Router () {
-		this.routes = {};
-		this.history = window.history;
-		this.findParams = /(:[\w]+)/g;
-		this.onpopstate = {};
-		this.interceptors = {};
-		this.module = null;
+    'use strict';
+    /**Router
+     * @constructor
+     */
+    function Router() {
+        this.routes = {};
+        this.history = window.history;
+        this.findParams = /(:[\w]+)/g;
+        this.onpopstate = {};
+        this.interceptors = {};
+        this.module = null;
+        this.default = true;
 
 		var _self = this;
 
@@ -6104,7 +6110,7 @@ if ( !Object.observe ) {
 		var _view = new View;
 
 		//Clear cache?
-		if ( conf.cache )
+		if ( !conf.cache )
 			_view.cleanCache (conf.tpl);
 
 		//Get the tpl skull
@@ -6175,11 +6181,13 @@ if ( !Object.observe ) {
 
 		});
 
-		//First action
-		//Routing!!!
-		if ( _self._route (route_name) ) {
-			_self.redirect (route_name, []);
-		}
+        //First action
+        //Routing!!!
+        if (_self._route(route_name)) {
+            //No default
+            _self.default = false;
+            _self.redirect(route_name, _.queryStringToJson(location.search));
+        }
 
 		return _self;
 
@@ -6198,7 +6206,11 @@ if ( !Object.observe ) {
 				trigger: true
 			};
 
-		return (new Promise (function (resolve, reject) {
+        //Reset default
+        _self.default = true;
+
+        //Redirect
+        return (new Promise(function (resolve, reject) {
 
 			//Not routing
 			if ( !(route_name in _self.routes) ) {
@@ -6231,15 +6243,25 @@ if ( !Object.observe ) {
 		}));
 	});
 
-	/** Interceptors
-	 * @param  {object} interceptors
-	 * @return {object}
-	 * */
-	Router.add ('intercept', function (interceptors) {
-		if ( _.isObject (interceptors) )
-			MiddleWare.intercept (this, interceptors);
-		return this;
-	});
+    /** Default route
+     * @param  {object} interceptors
+     * @return {object}
+     * */
+    Router.add('otherwise', function (route_name, params) {
+        if (_.isString(route_name) && this.default)
+            this.redirect(route_name, params);
+        return this;
+    });
+
+    /** Interceptors
+     * @param  {object} interceptors
+     * @return {object}
+     * */
+    Router.add('intercept', function (interceptors) {
+        if (_.isObject(interceptors))
+            MiddleWare.intercept(this, interceptors);
+        return this;
+    });
 
 
 	/** Handle the interceptors
