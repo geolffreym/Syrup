@@ -1275,6 +1275,15 @@ var _string = 'I need be truncated until here'
 
 _.truncateString(_string, 9); // 'I need be'
 ```
+
+**Method `.oChars(str,find)`**
+
+*(Return 'find' occurrences in 'str')*
+```js     
+var _string = 'aaaaa'      
+
+_.oChars(_string, 'a'); // 5
+```
  
 **Method `.replace(string, search, replace)`**
 

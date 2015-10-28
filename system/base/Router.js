@@ -102,7 +102,7 @@
 	 * @return {void}
 	 */
 	Router.add ('_route', function (route_name) {
-		return (new RegExp (this.routes[route_name] + '$').test (location.pathname))
+		return (new RegExp ('^' + this.routes[route_name] + '$').test (location.pathname))
 	});
 
 	/**Delegate routes

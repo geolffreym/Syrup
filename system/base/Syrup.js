@@ -1350,6 +1350,16 @@
 		return _cookie;
 	});
 
+
+	/** Find the ocurrences count
+	 * @param {string} slashDir
+	 * **/
+	Syrup.add('oChars', function (string, find) {
+		if (_.isString(string))
+			return string.split(find).length - 1;
+		return 0;
+	});
+
 	/** Simple split directory from slash to dots
 	 * @param {string} slashDir
 	 * **/
