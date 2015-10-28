@@ -82,7 +82,8 @@
 	 * @constructor
 	 */
 
-	function Syrup () { }
+	function Syrup () {
+	}
 
 	/**_$_
 	 * @constructor
@@ -170,7 +171,9 @@
 					_$ (_target).filter (delegate, function () {
 						_.callbackAudit (callback.bind (_target), e);
 					});
-				} else { _.callbackAudit (callback.bind (_target), e); }
+				} else {
+					_.callbackAudit (callback.bind (_target), e);
+				}
 			};
 
 		// For each element
@@ -433,7 +436,9 @@
 	_$_.add ('html', function (html) {
 		if ( _.isHtml (html) || _.isString (html) ) {
 			this.prop ({ 'innerHTML': html });
-		} else { return this.prop ('innerHTML'); }
+		} else {
+			return this.prop ('innerHTML');
+		}
 		return this;
 	});
 
@@ -444,7 +449,9 @@
 	_$_.add ('text', function (text) {
 		if ( _.isString (text) ) {
 			this.prop ({ 'textContent': text });
-		} else { return this.prop ('textContent'); }
+		} else {
+			return this.prop ('textContent');
+		}
 		return this;
 	});
 
@@ -455,7 +462,9 @@
 	_$_.add ('val', function (text) {
 		if ( _.isString (text) ) {
 			this.prop ({ 'value': text });
-		} else { return this.prop ('value'); }
+		} else {
+			return this.prop ('value');
+		}
 		return this;
 	});
 
@@ -522,7 +531,9 @@
 					_sibling.filter (filter, function (elem) {
 						_.callbackAudit (callback, elem);
 					})
-				} else { _.callbackAudit (callback, _sibling); }
+				} else {
+					_.callbackAudit (callback, _sibling);
+				}
 			} while ( (
 				_sibling = _$ (_sibling.get (0).nextElementSibling)
 			).exist )
@@ -611,7 +622,9 @@
 			if ( !_$ (elem).hasClass (cls) ) {
 				if ( elem.classList ) {
 					elem.classList.add (cls)
-				} else { elem.className += ' ' + cls; }
+				} else {
+					elem.className += ' ' + cls;
+				}
 			}
 		});
 	});
@@ -754,7 +767,9 @@
 		return this.each (function (v) {
 			if ( v.remove ) {
 				v.remove ();
-			} else { v.parentNode.removeChild (v); }
+			} else {
+				v.parentNode.removeChild (v);
+			}
 		});
 	});
 
@@ -1007,7 +1022,7 @@
 	 * @param regex
 	 * @returns {boolean}
 	 */
-	Syrup.add ('isRegexp', function (regex) {
+	Syrup.add ('isRegExp', function (regex) {
 		return this.objectAsString (regex) === '[object RegExp]';
 	});
 
@@ -1128,7 +1143,7 @@
 	Syrup.add ('replace', function (_string, _find, _replace) {
 
 		//Regexp result?
-		if ( _.isRegexp (_find) && _.isObject (_replace) ) {
+		if ( _.isRegExp (_find) && _.isObject (_replace) ) {
 			return _string.replace (_find, function (found) {
 				if ( found in _replace ) {
 					return _replace[found];
@@ -1211,7 +1226,6 @@
 			platform: windowGlobal.navigator.platform.toLocaleLowerCase ()
 		} : false;
 	});
-
 
 	/**Genera un id
 	 * @param longitud
@@ -1350,15 +1364,34 @@
 		return _cookie;
 	});
 
+	/**Retorna un match asociado a grupos
+	 * @param {string} string
+	 * @param {string} regexp
+	 * @param {array} groups
+	 * @return (object)
+	 */
+	Syrup.add ('getRegExpGroup', function (string, regexp, groups) {
+		if ( _.isString (string) && _.isRegExp (regexp) ) {
+			return regexp.exec (string).reduce (function (v, m, i) {
+				if ( i > 0 ) {
+					v[groups[i - 1]] = m;
+				}
+
+				return v;
+			}, {})
+		}
+	});
 
 	/** Find the ocurrences count
 	 * @param {string} slashDir
+	 * @return {int}
 	 * **/
-	Syrup.add('oChars', function (string, find) {
-		if (_.isString(string))
-			return string.split(find).length - 1;
+	Syrup.add ('oChars', function (string, find) {
+		if ( _.isString (string) )
+			return string.split (find).length - 1;
 		return 0;
 	});
+
 
 	/** Simple split directory from slash to dots
 	 * @param {string} slashDir

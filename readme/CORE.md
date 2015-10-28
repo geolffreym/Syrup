@@ -1136,6 +1136,15 @@ _.extend(my_target, _my_source); //Return {a:1,b:5,c:3} not overwrite the target
 _.extend(my_target, _my_source, TRUE); //Return {a:1,b:2,c:3}
 ```    
 
+**Method `.getRegExpGroup(string, regexp, groups)`**
+
+*(Get named groups from regexp match)*
+```js    
+var _my_target = 'Hi Frank and Mary';
+
+_.getRegExpGroup(_my_target,'Hi ([a-z]+) and ([a-z]+)' , ['a','b']) // {a:'Frank',b:'Mary'}
+```    
+
 
 Array Tools
 ------------

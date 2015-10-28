@@ -102,7 +102,23 @@
 	 * @return {void}
 	 */
 	Router.add ('_route', function (route_name) {
-		return (new RegExp ('^' + this.routes[route_name] + '$').test (location.pathname))
+		var _uri_path = location.pathname,
+			_the_route = this.routes[route_name],
+			_uri_path_slash_index = _.oChars (_uri_path, '/'),
+			_the_route_slash_index = _.oChars (_the_route, '/');
+
+		//In route '/' slash not needed at end
+		if ( _uri_path_slash_index > _the_route_slash_index
+		) {
+			//Remove last slash from pathname
+			_uri_path = _.truncateString (_uri_path, -1);
+		} else if ( _the_route_slash_index > _uri_path_slash_index ) {
+			//In route '/' slash needed at end
+			//Append slash to route
+			_uri_path += '/';
+		}
+
+		return (new RegExp ('^' + _the_route + '$').test (_uri_path));
 	});
 
 	/**Delegate routes

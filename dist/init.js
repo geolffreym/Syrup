@@ -1368,6 +1368,16 @@ if ( typeof exports !== 'undefined' )
 		return _cookie;
 	});
 
+
+	/** Find the ocurrences count
+	 * @param {string} slashDir
+	 * **/
+	Syrup.add('oChars', function (string, find) {
+		if (_.isString(string))
+			return string.split(find).length - 1;
+		return 0;
+	});
+
 	/** Simple split directory from slash to dots
 	 * @param {string} slashDir
 	 * **/
@@ -6054,7 +6064,7 @@ if ( !Object.observe ) {
 	/**Router
 	 * @constructor
 	 */
-	function Router () {
+	function Router() {
 		this.routes = {};
 		this.history = window.history;
 		this.findParams = /(:[\w]+)/g;
@@ -6066,17 +6076,17 @@ if ( !Object.observe ) {
 		var _self = this;
 
 		//Set Pop State
-		window.addEventListener ('popstate', function (e) {
+		window.addEventListener('popstate', function (e) {
 			//Intercept pop state
-			_self._handleInterceptor ('popstate', e);
+			_self._handleInterceptor('popstate', e);
 
-			if ( _.isSet (e.state) && 'route_name' in e.state ) {
-				if ( e.state.route_name in _self.onpopstate ) {
-					_.each (_self.onpopstate[e.state.route_name], function (v, i) {
-						v (e.state, e);
+			if (_.isSet(e.state) && 'route_name' in e.state) {
+				if (e.state.route_name in _self.onpopstate) {
+					_.each(_self.onpopstate[e.state.route_name], function (v, i) {
+						v(e.state, e);
 
 						//Intercept pop state
-						_self._handleInterceptor ('redirect', e);
+						_self._handleInterceptor('redirect', e);
 					}, true);
 				}
 			}
@@ -6088,9 +6098,9 @@ if ( !Object.observe ) {
 	 * @param {object} routes
 	 * @return {object}
 	 * */
-	Router.add ('connect', function (to_route) {
-		if ( !(to_route instanceof AppClass) )
-			_.error (WARNING_ROUTE.ERROR.BADINSTANCE, '(Router .route)');
+	Router.add('connect', function (to_route) {
+		if (!(to_route instanceof AppClass))
+			_.error(WARNING_ROUTE.ERROR.BADINSTANCE, '(Router .route)');
 
 		this.module = to_route;
 		to_route.lazy = true;
@@ -6101,12 +6111,12 @@ if ( !Object.observe ) {
 	 * @param {object} routes
 	 * @return {object}
 	 * */
-	Router.add ('set', function (routes) {
+	Router.add('set', function (routes) {
 		var _self = this;
 
-		return (new Promise (function (resolve, reject) {
-			_self.routes = _.extend (_self.routes, routes);
-			resolve (_self);
+		return (new Promise(function (resolve, reject) {
+			_self.routes = _.extend(_self.routes, routes);
+			resolve(_self);
 		}))
 	});
 
@@ -6115,24 +6125,24 @@ if ( !Object.observe ) {
 	 * @param {function} callback
 	 * @return {void}
 	 */
-	Router.add ('_handleSkull', function (conf, callback, params) {
+	Router.add('_handleSkull', function (conf, callback, params) {
 		var _view = new View;
 
 		//Clear cache?
-		if ( !conf.cache )
-			_view.cleanCache (conf.tpl);
+		if (!conf.cache)
+			_view.cleanCache(conf.tpl);
 
 		//Get the tpl skull
-		_view.seekTpl (conf.tpl).then (function (view) {
+		_view.seekTpl(conf.tpl).then(function (view) {
 
 			// Find main
-			var _main = _$ ('[sp-app]');
+			var _main = _$('[sp-app]');
 			// Exist the skull?
-			if ( _main.exist )
-				_main.html (view.getTpl ());
+			if (_main.exist)
+				_main.html(view.getTpl());
 
 			//Execute
-			callback.apply (conf.app, params);
+			callback.apply(conf.app, params);
 		});
 	});
 
@@ -6140,8 +6150,24 @@ if ( !Object.observe ) {
 	 * @param {route_name} string
 	 * @return {void}
 	 */
-	Router.add ('_route', function (route_name) {
-		return (new RegExp (this.routes[route_name] + '$').test (location.pathname))
+	Router.add('_route', function (route_name) {
+		var _uri_path = location.pathname,
+			_the_route = this.routes[route_name],
+			_uri_path_slash_index = _.oChars(_uri_path, '/'),
+			_the_route_slash_index = _.oChars(_the_route, '/');
+
+		//In route '/' slash not needed at end
+		if (_uri_path_slash_index > _the_route_slash_index
+		) {
+			//Remove last slash from pathname
+			_uri_path = _.truncateString(_uri_path, -1);
+		} else if (_the_route_slash_index > _uri_path_slash_index) {
+			//In route '/' slash needed at end
+			//Append slash to route
+			_uri_path += '/';
+		}
+
+		return (new RegExp('^' + _the_route + '$').test(_uri_path));
 	});
 
 	/**Delegate routes
@@ -6149,8 +6175,8 @@ if ( !Object.observe ) {
 	 * @param {object} conf
 	 * @returns {object}
 	 */
-	Router.add ('when', function (route_name, conf) {
-		_.assert (route_name, _.WARNING_SYRUP.ERROR.NOPARAM, '(Router .when)');
+	Router.add('when', function (route_name, conf) {
+		_.assert(route_name, _.WARNING_SYRUP.ERROR.NOPARAM, '(Router .when)');
 		var _self = this;
 
 		//No app. Nothing to do!!
@@ -6161,29 +6187,29 @@ if ( !Object.observe ) {
 			return _self;
 
 		//No route?
-		if ( !(route_name in _self.onpopstate) )
+		if (!(route_name in _self.onpopstate))
 			_self.onpopstate[route_name] = [];
 
 		//Append a new route
-		_self.onpopstate[route_name].push (function (state, e) {
+		_self.onpopstate[route_name].push(function (state, e) {
 			//Handle tpl?
-			_self._handleSkull (conf, function () {
+			_self._handleSkull(conf, function () {
 				//On main tpl is handled, what to do?
 
-				if ( conf.app in _self.module.appCollection ) {
+				if (conf.app in _self.module.appCollection) {
 					//Intercept init
 					//Inject params
-					_self.module.appCollection[conf.app].intercept ({
+					_self.module.appCollection[conf.app].intercept({
 						'init': function (mod) {
 							mod.uri = {
 								params: state,
-								route : _self.routes[route_name]
+								route: _self.routes[route_name]
 							}
 						}
 					});
 
 					//Taste recipes
-					_self.module.appCollection[conf.app].taste ();
+					_self.module.appCollection[conf.app].taste();
 				}
 
 			}, [state, e])
@@ -6192,10 +6218,10 @@ if ( !Object.observe ) {
 
 		//First action
 		//Routing!!!
-		if ( _self._route (route_name) ) {
+		if (_self._route(route_name)) {
 			//No default
 			_self.default = false;
-			_self.redirect (route_name, _.queryStringToJson (location.search));
+			_self.redirect(route_name, _.queryStringToJson(location.search));
 		}
 
 		return _self;
@@ -6206,8 +6232,8 @@ if ( !Object.observe ) {
 	 * @param {string} route_name
 	 * @return {object}
 	 * */
-	Router.add ('redirect', function (route_name, params, config) {
-		_.assert (route_name, _.WARNING_SYRUP.ERROR.NOPARAM, '(Router .redirect)');
+	Router.add('redirect', function (route_name, params, config) {
+		_.assert(route_name, _.WARNING_SYRUP.ERROR.NOPARAM, '(Router .redirect)');
 
 		var _self = this,
 			_the_new_route = null,
@@ -6216,34 +6242,34 @@ if ( !Object.observe ) {
 			};
 
 		//Redirect
-		return (new Promise (function (resolve, reject) {
+		return (new Promise(function (resolve, reject) {
 
 			//Not routing
-			if ( !(route_name in _self.routes) ) {
-				reject (route_name);
+			if (!(route_name in _self.routes)) {
+				reject(route_name);
 				return;
 			}
 
 			//Params and config
-			_params = _.isObject (params)
+			_params = _.isObject(params)
 				? params : {};
 
-			_config = _.extend (_config, config || {}, true);
+			_config = _.extend(_config, config || {}, true);
 
 			//Set old regex in state object
 			_params['route_name'] = route_name;
 			_the_new_route = _self.routes[route_name];
 
 			//Replace params?
-			_the_new_route = _.isSet (params) && _.getObjectSize (params) > 0
-				? _.replace (_the_new_route, _self.findParams, params)
+			_the_new_route = _.isSet(params) && _.getObjectSize(params) > 0
+				? _.replace(_the_new_route, _self.findParams, params)
 				: _the_new_route;
 
 			//Set state in history
-			_self._triggerPopState (_params, route_name, _the_new_route, _config);
+			_self._triggerPopState(_params, route_name, _the_new_route, _config);
 
 			//Resolve Promise
-			resolve (_the_new_route);
+			resolve(_the_new_route);
 
 
 		}));
@@ -6253,14 +6279,14 @@ if ( !Object.observe ) {
 	 * @param  {object} interceptors
 	 * @return {object}
 	 * */
-	Router.add ('otherwise', function (route_name, conf) {
+	Router.add('otherwise', function (route_name, conf) {
 		if (
-			_.isString (route_name)
+			_.isString(route_name)
 			&& route_name in this.routes
 			&& this.default
 		) {
-			this.when (route_name, conf);
-			this.redirect (route_name, {});
+			this.when(route_name, conf);
+			this.redirect(route_name, {});
 		}
 
 		return this;
@@ -6270,9 +6296,9 @@ if ( !Object.observe ) {
 	 * @param  {object} interceptors
 	 * @return {object}
 	 * */
-	Router.add ('intercept', function (interceptors) {
-		if ( _.isObject (interceptors) )
-			MiddleWare.intercept (this, interceptors);
+	Router.add('intercept', function (interceptors) {
+		if (_.isObject(interceptors))
+			MiddleWare.intercept(this, interceptors);
 		return this;
 	});
 
@@ -6282,15 +6308,15 @@ if ( !Object.observe ) {
 	 * @param {object} param
 	 * @return {void}
 	 * */
-	Router.add ('_handleInterceptor', function (type, param) {
+	Router.add('_handleInterceptor', function (type, param) {
 		//Trigger Interceptors
-		MiddleWare.trigger (
-			MiddleWare.getInterceptors (this, type),
+		MiddleWare.trigger(
+			MiddleWare.getInterceptors(this, type),
 			[param, this]
 		);
 
 		//Clean the interceptor
-		MiddleWare.cleanInterceptor (this, type);
+		MiddleWare.cleanInterceptor(this, type);
 	});
 
 
@@ -6300,14 +6326,14 @@ if ( !Object.observe ) {
 	 * @param {string} _the_new_route
 	 * @return {void}
 	 * */
-	Router.add ('_triggerPopState', function (_params, route_name, _the_new_route, _config) {
+	Router.add('_triggerPopState', function (_params, route_name, _the_new_route, _config) {
 		//Set state in history
 		//Two times, for trigger "popstate"
 
-		if ( _config.trigger ) {
-			this.history.replaceState (_params, route_name, _the_new_route);
-			this.history.pushState (_params, route_name, _the_new_route);
-			this.history.back ();
+		if (_config.trigger) {
+			this.history.replaceState(_params, route_name, _the_new_route);
+			this.history.pushState(_params, route_name, _the_new_route);
+			this.history.back();
 		}
 
 	});
@@ -6317,7 +6343,7 @@ if ( !Object.observe ) {
 	window.RouterClass = Router;
 
 
-}) (window);
+})(window);
 /**
  * Created by gmena on 10-25-15.
  */
