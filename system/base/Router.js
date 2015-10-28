@@ -119,7 +119,7 @@
 			!(conf && 'app' in conf)
 			|| !(route_name in _self.routes)
 		)
-			return;
+			return _self;
 
 		//No route?
 		if ( !(route_name in _self.onpopstate) )
