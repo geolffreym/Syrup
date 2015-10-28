@@ -6262,8 +6262,6 @@ if ( !Object.observe ) {
 			this.redirect (route_name, params);
 		}
 
-		//Reset default
-		this.default = true;
 		return this;
 	});
 
