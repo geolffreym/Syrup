@@ -1220,12 +1220,16 @@ Object Tools
 _.inObject(5, {a:5,b:6}) //Return TRUE
 ```
     
-**Method `.toObject(String|Array)`**
+**Method `.toObject(String|Array, Array)`**
 
 *(Parse String or Array to Object)*
 ```js    
 _.toObject('Hola') // Return [0=>'H',1=>'o',2=>'l',3=>'a']
 _.toObject(['H','o','l','a']) // Return [0=>'H',1=>'o',2=>'l',3=>'a']
+
+//Mix arrays
+_.toObject(['a','b'],[1,2]) // {a:1,b:2}
+
 ```
 
 **Method `.objectDistribute(Object, index)`**

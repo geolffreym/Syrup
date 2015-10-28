@@ -1448,7 +1448,8 @@
 
 			_.each (_string, function (value) {
 				value = value.split ('=');
-				_return[value[0]] = value[1] || _.emptyStr;
+				if ( !_.isEmpty (value[0]) )
+					_return[value[0]] = value[1] || _.emptyStr;
 			});
 		}
 
@@ -1716,7 +1717,7 @@
 	 * @param element
 	 * @returns {Object}
 	 */
-	Syrup.add ('toObject', function (element) {
+	Syrup.add ('toObject', function (element, element2) {
 
 		if ( _.isJson (element) )
 			return JSON.parse (element);
@@ -1729,7 +1730,7 @@
 
 
 		return element.reduce (function (o, v, i) {
-			o[i] = v;
+			o[element2 && v || i] = element2 && element2[i] || v;
 			return o;
 		}, {});
 
