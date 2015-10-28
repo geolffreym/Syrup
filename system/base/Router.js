@@ -152,8 +152,8 @@
 		_self.onpopstate[route_name].push (function (state, e) {
 			//Handle tpl?
 			_self._handleSkull (conf, function () {
-				//On main tpl is handled, what to do?
 
+				//On main tpl is handled, what to do?
 				if ( conf.app in _self.module.appCollection ) {
 					//Intercept init
 					//Inject params
