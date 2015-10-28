@@ -485,17 +485,26 @@
 			 && _.isSet (_self.root)
 		) {
 
-			// Initialize module
-			_self._add (moduleId);
-			_self.recipeCollection[moduleId].instance = _self._trigger (moduleId);
-			_self.recipeCollection[moduleId].instance.name = moduleId;
-			_self.recipeCollection[moduleId].instance.parent = _self.root;
+            // Initialize module
+            _self._add(moduleId);
 
-			// Binding Methods
-			// Event handler
-			_self.recipeCollection[moduleId].instance.when = function (event) {
-				return _self.when (event, moduleId);
-			};
+            //Trigger creator
+            _self.recipeCollection[moduleId].instance = _self._trigger(moduleId);
+
+            //Not object return by creator?
+            //No instance. Break!!!
+            if (!_.isObject(_self.recipeCollection[moduleId].instance))
+                return;
+
+            //Recipe Name and Parent name
+            _self.recipeCollection[moduleId].instance.name = moduleId;
+            _self.recipeCollection[moduleId].instance.parent = _self.root;
+
+            // Binding Methods
+            // Event handler
+            _self.recipeCollection[moduleId].instance.when = function (event) {
+                return _self.when(event, moduleId);
+            };
 
 			// Recipes
 			_self._recipes (moduleId);
