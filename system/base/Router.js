@@ -176,9 +176,6 @@
 				trigger: true
 			};
 
-		//Reset default
-		_self.default = true;
-
 		//Redirect
 		return (new Promise (function (resolve, reject) {
 
@@ -225,6 +222,9 @@
 		) {
 			this.redirect (route_name, params);
 		}
+
+		//Reset default
+		this.default = true;
 		return this;
 	});
 
