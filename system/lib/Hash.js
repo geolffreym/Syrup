@@ -42,7 +42,7 @@
 		_.assert (hash, _.WARNING_SYRUP.ERROR.NOPARAM, '(Router .when)');
 		var _self = this;
 
-		//No route?
+		//No route?. Create it!!
 		if ( !(hash in _self.onhashchange) )
 			_self.onhashchange[hash] = [];
 
