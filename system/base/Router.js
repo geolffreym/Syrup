@@ -11,18 +11,18 @@
 		}
 	};
 
-    'use strict';
-    /**Router
-     * @constructor
-     */
-    function Router() {
-        this.routes = {};
-        this.history = window.history;
-        this.findParams = /(:[\w]+)/g;
-        this.onpopstate = {};
-        this.interceptors = {};
-        this.module = null;
-        this.default = true;
+	'use strict';
+	/**Router
+	 * @constructor
+	 */
+	function Router () {
+		this.routes = {};
+		this.history = window.history;
+		this.findParams = /(:[\w]+)/g;
+		this.onpopstate = {};
+		this.interceptors = {};
+		this.module = null;
+		this.default = true;
 
 		var _self = this;
 
@@ -151,13 +151,13 @@
 
 		});
 
-        //First action
-        //Routing!!!
-        if (_self._route(route_name)) {
-            //No default
-            _self.default = false;
-            _self.redirect(route_name, _.queryStringToJson(location.search));
-        }
+		//First action
+		//Routing!!!
+		if ( _self._route (route_name) ) {
+			//No default
+			_self.default = false;
+			_self.redirect (route_name, _.queryStringToJson (location.search));
+		}
 
 		return _self;
 
@@ -176,11 +176,11 @@
 				trigger: true
 			};
 
-        //Reset default
-        _self.default = true;
+		//Reset default
+		_self.default = true;
 
-        //Redirect
-        return (new Promise(function (resolve, reject) {
+		//Redirect
+		return (new Promise (function (resolve, reject) {
 
 			//Not routing
 			if ( !(route_name in _self.routes) ) {
@@ -213,25 +213,30 @@
 		}));
 	});
 
-    /** Default route
-     * @param  {object} interceptors
-     * @return {object}
-     * */
-    Router.add('otherwise', function (route_name, params) {
-        if (_.isString(route_name) && this.default)
-            this.redirect(route_name, params);
-        return this;
-    });
+	/** Default route
+	 * @param  {object} interceptors
+	 * @return {object}
+	 * */
+	Router.add ('otherwise', function (route_name, params) {
+		if (
+			_.isString (route_name)
+			&& route_name in this.routes
+			&& this.default
+		) {
+			this.redirect (route_name, params);
+		}
+		return this;
+	});
 
-    /** Interceptors
-     * @param  {object} interceptors
-     * @return {object}
-     * */
-    Router.add('intercept', function (interceptors) {
-        if (_.isObject(interceptors))
-            MiddleWare.intercept(this, interceptors);
-        return this;
-    });
+	/** Interceptors
+	 * @param  {object} interceptors
+	 * @return {object}
+	 * */
+	Router.add ('intercept', function (interceptors) {
+		if ( _.isObject (interceptors) )
+			MiddleWare.intercept (this, interceptors);
+		return this;
+	});
 
 
 	/** Handle the interceptors
