@@ -211,8 +211,7 @@
 
 
 			//Params and config
-			_params = _.isObject (params)
-				? params : {};
+			_params = _.isObject (params) && params || {};
 			_config = _.extend (_config, config || {}, true);
 
 			//Set old regex in state object
@@ -230,7 +229,6 @@
 
 			//Resolve Promise
 			resolve (_the_new_route);
-
 
 		}));
 	});

@@ -6171,8 +6171,9 @@ if ( !Object.observe ) {
 		//Get the tpl skull
 		_view.seekTpl (conf.tpl).then (function (view) {
 
-			// Find main
+			// Find main app dom container...!!!
 			var _main = _$ ('[sp-app]');
+
 			// Exist the skull?
 			if ( _main.exist )
 				_main.html (view.getTpl ());
@@ -6294,8 +6295,7 @@ if ( !Object.observe ) {
 
 
 			//Params and config
-			_params = _.isObject (params)
-				? params : {};
+			_params = _.isObject (params) && params || {};
 			_config = _.extend (_config, config || {}, true);
 
 			//Set old regex in state object
