@@ -6187,14 +6187,13 @@ if ( !Object.observe ) {
 	 * @return {void}
 	 */
 	Router.add('_route', function (route_name) {
-		var
-			_the_route = this.routes[route_name],
+		var _the_route = this.routes[route_name],
 			_query_params = _.queryStringToJson(location.search),
-			_uri_path = location.pathname,
+			_uri_path = this._rewriteRules(_the_route, _query_params) || location.pathname,
 			_uri_path_slash_index = _.oChars(_uri_path, '/'),
 			_the_route_slash_index = _.oChars(_the_route, '/');
 
-		console.log(this._rewriteRules(_the_route, _query_params));
+		//Clean param from route
 		_the_route = _.replace(_the_route, this.cleanParam, _.emptyStr);
 
 
@@ -6361,7 +6360,7 @@ if ( !Object.observe ) {
 		MiddleWare.cleanInterceptor(this, type);
 	});
 
-	/** Uri rewriter
+	/** Uri rewrite
 	 * @param {string} _the_new_route
 	 * @param {object} _params
 	 * @return {void}

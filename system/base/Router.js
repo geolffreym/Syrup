@@ -276,7 +276,7 @@
 		MiddleWare.cleanInterceptor(this, type);
 	});
 
-	/** Uri rewriter
+	/** Uri rewrite
 	 * @param {string} _the_new_route
 	 * @param {object} _params
 	 * @return {void}
