@@ -214,13 +214,14 @@
 	 * @param  {object} interceptors
 	 * @return {object}
 	 * */
-	Router.add ('otherwise', function (route_name, params) {
+	Router.add ('otherwise', function (route_name, conf) {
 		if (
 			_.isString (route_name)
 			&& route_name in this.routes
 			&& this.default
 		) {
-			this.redirect (route_name, params);
+			this.when (route_name, conf);
+			this.redirect (route_name, {});
 		}
 
 		return this;
