@@ -5881,17 +5881,26 @@ if ( !Object.observe ) {
 			 && _.isSet (_self.root)
 		) {
 
-			// Initialize module
-			_self._add (moduleId);
-			_self.recipeCollection[moduleId].instance = _self._trigger (moduleId);
-			_self.recipeCollection[moduleId].instance.name = moduleId;
-			_self.recipeCollection[moduleId].instance.parent = _self.root;
+            // Initialize module
+            _self._add(moduleId);
 
-			// Binding Methods
-			// Event handler
-			_self.recipeCollection[moduleId].instance.when = function (event) {
-				return _self.when (event, moduleId);
-			};
+            //Trigger creator
+            _self.recipeCollection[moduleId].instance = _self._trigger(moduleId);
+
+            //Not object return by creator?
+            //No instance. Break!!!
+            if (!_.isObject(_self.recipeCollection[moduleId].instance))
+                return;
+
+            //Recipe Name and Parent name
+            _self.recipeCollection[moduleId].instance.name = moduleId;
+            _self.recipeCollection[moduleId].instance.parent = _self.root;
+
+            // Binding Methods
+            // Event handler
+            _self.recipeCollection[moduleId].instance.when = function (event) {
+                return _self.when(event, moduleId);
+            };
 
 			// Recipes
 			_self._recipes (moduleId);
@@ -6041,18 +6050,18 @@ if ( !Object.observe ) {
 		}
 	};
 
-    'use strict';
-    /**Router
-     * @constructor
-     */
-    function Router() {
-        this.routes = {};
-        this.history = window.history;
-        this.findParams = /(:[\w]+)/g;
-        this.onpopstate = {};
-        this.interceptors = {};
-        this.module = null;
-        this.default = true;
+	'use strict';
+	/**Router
+	 * @constructor
+	 */
+	function Router () {
+		this.routes = {};
+		this.history = window.history;
+		this.findParams = /(:[\w]+)/g;
+		this.onpopstate = {};
+		this.interceptors = {};
+		this.module = null;
+		this.default = true;
 
 		var _self = this;
 
@@ -6149,7 +6158,7 @@ if ( !Object.observe ) {
 			!(conf && 'app' in conf)
 			|| !(route_name in _self.routes)
 		)
-			return;
+			return _self;
 
 		//No route?
 		if ( !(route_name in _self.onpopstate) )
@@ -6181,13 +6190,13 @@ if ( !Object.observe ) {
 
 		});
 
-        //First action
-        //Routing!!!
-        if (_self._route(route_name)) {
-            //No default
-            _self.default = false;
-            _self.redirect(route_name, _.queryStringToJson(location.search));
-        }
+		//First action
+		//Routing!!!
+		if ( _self._route (route_name) ) {
+			//No default
+			_self.default = false;
+			_self.redirect (route_name, _.queryStringToJson (location.search));
+		}
 
 		return _self;
 
@@ -6206,11 +6215,11 @@ if ( !Object.observe ) {
 				trigger: true
 			};
 
-        //Reset default
-        _self.default = true;
+		//Reset default
+		_self.default = true;
 
-        //Redirect
-        return (new Promise(function (resolve, reject) {
+		//Redirect
+		return (new Promise (function (resolve, reject) {
 
 			//Not routing
 			if ( !(route_name in _self.routes) ) {
@@ -6243,25 +6252,30 @@ if ( !Object.observe ) {
 		}));
 	});
 
-    /** Default route
-     * @param  {object} interceptors
-     * @return {object}
-     * */
-    Router.add('otherwise', function (route_name, params) {
-        if (_.isString(route_name) && this.default)
-            this.redirect(route_name, params);
-        return this;
-    });
+	/** Default route
+	 * @param  {object} interceptors
+	 * @return {object}
+	 * */
+	Router.add ('otherwise', function (route_name, params) {
+		if (
+			_.isString (route_name)
+			&& route_name in this.routes
+			&& this.default
+		) {
+			this.redirect (route_name, params);
+		}
+		return this;
+	});
 
-    /** Interceptors
-     * @param  {object} interceptors
-     * @return {object}
-     * */
-    Router.add('intercept', function (interceptors) {
-        if (_.isObject(interceptors))
-            MiddleWare.intercept(this, interceptors);
-        return this;
-    });
+	/** Interceptors
+	 * @param  {object} interceptors
+	 * @return {object}
+	 * */
+	Router.add ('intercept', function (interceptors) {
+		if ( _.isObject (interceptors) )
+			MiddleWare.intercept (this, interceptors);
+		return this;
+	});
 
 
 	/** Handle the interceptors
