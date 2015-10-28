@@ -6196,7 +6196,6 @@ if ( !Object.observe ) {
 		//Clean param from route
 		_the_route = _.replace (_the_route, this.cleanParam, _.emptyStr);
 
-
 		//In route '/' slash not needed at end
 		if ( _uri_path_slash_index > _the_route_slash_index
 		) {
