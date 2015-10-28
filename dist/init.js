@@ -6385,7 +6385,7 @@ if ( !Object.observe ) {
 					_.getObjectValues (_get_groups),
 					_.getObjectValues (_params)
 				)
-			) || null;
+			) || false;
 
 	});
 
