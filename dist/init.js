@@ -1671,10 +1671,10 @@ if ( typeof exports !== 'undefined' )
 	 * @param {Array} haystack
 	 * @returns {boolean}
 	 */
-	Syrup.add ('matchInArray', function (find, haystack) {
-		if ( _.isArray (haystack) ) {
-			var needle = new RegExp (haystack.join ('|'), 'g');
-			return needle.test (find);
+	Syrup.add('matchInArray', function (find, haystack) {
+		if (_.isArray(haystack)) {
+			var needle = new RegExp(haystack.join('|'), 'g');
+			return needle.test(find);
 		}
 		return false;
 	});
@@ -1684,18 +1684,18 @@ if ( typeof exports !== 'undefined' )
 	 * @param {Array} haystack
 	 * @returns {boolean}
 	 */
-	Syrup.add ('replaceInArray', function (find, replace, haystack) {
+	Syrup.add('replaceInArray', function (find, replace, haystack) {
 
-		if ( this.matchInArray ([find], haystack) ) {
-			_.each (haystack, function (v, i) {
-				if ( _.isString (v) )
-					haystack[i] = _.replace (v, find, replace);
+		if (this.matchInArray(haystack, find)) {
+			_.each(haystack, function (v, i) {
+				if (_.isString(v))
+					haystack[i] = _.replace(v, find, replace);
 			});
-
 		}
 
 		return haystack;
 	});
+
 
 	/**Crea un arreglo unico de valores
 	 * @param {Object} array
