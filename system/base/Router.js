@@ -199,10 +199,13 @@
 
 		//First action
 		//Routing!!!
-		if ( (_router = _self._route (route_name)) ) {
+		if (
+			_self.default
+			&& (_router = _self._route(route_name))
+		) {
 			//No default
 			_self.default = false;
-			_self.redirect (route_name, _router.query, _router);
+			_self.redirect(route_name, _router.query, _router);
 		}
 
 		return _self;
