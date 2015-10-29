@@ -6289,7 +6289,8 @@ if ( !Object.observe ) {
 			//Resolve params
 			_params = (_.getObjectSize (_params) > 0 && _params)
 					  || _self._reverseUriParams (
-					  _config.uri || _the_new_route, _the_route
+					  _config.uri || _the_new_route,
+					  _the_route, 'route' in _config && _config.route
 				) || {};
 
 			//Set state in history
@@ -6442,9 +6443,9 @@ if ( !Object.observe ) {
 	 * @param {string} _the_route
 	 * @return {string}
 	 */
-	Router.add ('_reverseUriParams', function (_the_uri, _the_route) {
+	Router.add ('_reverseUriParams', function (_the_uri, _the_route, clean_route) {
 		var _match = _.replaceInArray (':', _.emptyStr, _the_route.match (this.cleanParam)),
-			_route = this._cleanedUriParams (_the_route);
+			_route = clean_route || this._cleanedUriParams (_the_route);
 
 		return _match && _.toObject (
 				_match, _.compactArray (
