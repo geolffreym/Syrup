@@ -1672,8 +1672,11 @@ if ( typeof exports !== 'undefined' )
 	 * @returns {boolean}
 	 */
 	Syrup.add ('matchInArray', function (find, haystack) {
-		var needle = new RegExp (haystack.join ('|'), 'g');
-		return needle.test (find);
+		if ( _.isArray (haystack) ) {
+			var needle = new RegExp (haystack.join ('|'), 'g');
+			return needle.test (find);
+		}
+		return false;
 	});
 
 	/** Reemplaza elementos string en un arreglo por RegExp
