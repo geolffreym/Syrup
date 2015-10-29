@@ -1668,7 +1668,7 @@
 	 */
 	Syrup.add('replaceInArray', function (find, replace, haystack) {
 
-		if (this.matchInArray(haystack, find)) {
+		if (this.matchInArray(haystack, [find])) {
 			_.each(haystack, function (v, i) {
 				if (_.isString(v))
 					haystack[i] = _.replace(v, find, replace);
