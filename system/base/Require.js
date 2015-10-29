@@ -2183,6 +2183,7 @@
 
 	//Global access
 	window.Require = new Required;
+	window.RequireClass = Required;
 	Require.setConf ();
 
 }) (window);
