@@ -502,7 +502,7 @@
 
 			//Recipe Name and Parent name
 			_self.recipeCollection[moduleId].instance.name = moduleId;
-			_self.recipeCollection[moduleId].instance.parent = _self.root;
+			_self.recipeCollection[moduleId].instance.parent = _self;
 
 			// Binding Methods
 			// Event handler
