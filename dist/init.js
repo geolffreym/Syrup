@@ -5464,6 +5464,7 @@ if ( !Object.observe ) {
 
 		this.lazy = false; //Lazy execution?
 		this.interceptors = {}; //Interceptors
+		this.interceptClean = true; // Clan interceptors after execute?
 
 		this.moduleCollection = {}; //Modules
 		this.appCollection = {}; //Apps
@@ -5985,7 +5986,9 @@ if ( !Object.observe ) {
 			) {
 
 				//Handle taste interceptor
-				_self._handleInterceptor ('init', _self.recipeCollection[moduleId].instance);
+				_self._handleInterceptor (
+					'init', _self.recipeCollection[moduleId].instance
+				);
 
 				//Require Libs?
 				if (
@@ -6006,6 +6009,11 @@ if ( !Object.observe ) {
 						_self.lib.get (_self.root)
 					);
 				}
+
+				//Handle taste interceptor
+				_self._handleInterceptor (
+					'after', _self.recipeCollection[moduleId].instance
+				);
 			}
 
 			// Bind listeners
@@ -6026,13 +6034,19 @@ if ( !Object.observe ) {
 		var _self = this,
 			_moduleId = moduleId && [moduleId]
 						|| _.getObjectKeys (_self.recipeCollection);
+
 		//Reset lazy exec
 		_self.lazy = false;
+		//No clean interceptors
+		_self.interceptClean = false;
 
 		//Execute!!
 		_.each (_moduleId, function (v) {
 			_self._taste (v);
 		});
+
+		//After execute clean all
+		MiddleWare.cleanInterceptor (_self, 'init');
 
 		return this;
 	});
@@ -6061,7 +6075,9 @@ if ( !Object.observe ) {
 		);
 
 		//Clean the interceptor
-		//MiddleWare.cleanInterceptor(this, type);
+		if ( this.interceptClean ) {
+			MiddleWare.cleanInterceptor (this, type);
+		}
 	});
 
 
