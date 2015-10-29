@@ -5681,7 +5681,10 @@ if ( !Object.observe ) {
 						self.onchange[name] = resolve;
 					})
 				})
-			}[event] || { then: function () {} })
+			}[event] || {
+				then: function () {
+				}
+			})
 	});
 
 	/**Bind Listeners
@@ -5896,10 +5899,10 @@ if ( !Object.observe ) {
 					//Seek for tpl
 					_view.seekTpl (view_template_dir)
 						.then (function (view) {
-						view.render (_scope).then (function (res) {
-							_dom.html (res);
-						})
-					})
+								   view.render (_scope).then (function (res) {
+									   _dom.html (res);
+								   })
+							   })
 				} else {
 					//Handle view?
 					//Require the view if needed
@@ -5915,8 +5918,8 @@ if ( !Object.observe ) {
 			} else if ( _dom_template.exist ) {
 				_view.render (_dom_template.html (), _scope)
 					.then (function (result) {
-					_dom.html (result);
-				});
+							   _dom.html (result);
+						   });
 			}
 		}
 
@@ -5939,26 +5942,26 @@ if ( !Object.observe ) {
 			 && _.isSet (_self.root)
 		) {
 
-            // Initialize module
-            _self._add(moduleId);
+			// Initialize module
+			_self._add (moduleId);
 
-            //Trigger creator
-            _self.recipeCollection[moduleId].instance = _self._trigger(moduleId);
+			//Trigger creator
+			_self.recipeCollection[moduleId].instance = _self._trigger (moduleId);
 
-            //Not object return by creator?
-            //No instance. Break!!!
-            if (!_.isObject(_self.recipeCollection[moduleId].instance))
-                return;
+			//Not object return by creator?
+			//Break!!!
+			if ( !_.isObject (_self.recipeCollection[moduleId].instance) )
+				return;
 
-            //Recipe Name and Parent name
-            _self.recipeCollection[moduleId].instance.name = moduleId;
-            _self.recipeCollection[moduleId].instance.parent = _self.root;
+			//Recipe Name and Parent name
+			_self.recipeCollection[moduleId].instance.name = moduleId;
+			_self.recipeCollection[moduleId].instance.parent = _self.root;
 
-            // Binding Methods
-            // Event handler
-            _self.recipeCollection[moduleId].instance.when = function (event) {
-                return _self.when(event, moduleId);
-            };
+			// Binding Methods
+			// Event handler
+			_self.recipeCollection[moduleId].instance.when = function (event) {
+				return _self.when (event, moduleId);
+			};
 
 			// Recipes
 			_self._recipes (moduleId);
@@ -6058,7 +6061,7 @@ if ( !Object.observe ) {
 		);
 
 		//Clean the interceptor
-		MiddleWare.cleanInterceptor (this, type);
+		//MiddleWare.cleanInterceptor(this, type);
 	});
 
 
