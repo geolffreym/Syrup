@@ -4623,6 +4623,7 @@ if ( !Object.observe ) {
 
 	//Global access
 	window.Require = new Required;
+	window.RequireClass = Required;
 	Require.setConf ();
 
 }) (window);
@@ -5718,7 +5719,7 @@ if ( !Object.observe ) {
 						//Is in recipe?
 						if ( _attr in _recipe && _.isFunction (_recipe[_attr]) ) {
 							e.preventDefault ();
-							_recipe[_attr] (_self.lib.get (_recipe.parent), e);
+							_recipe[_attr] (_self.lib.get (_self.root), e);
 						}
 					}
 
