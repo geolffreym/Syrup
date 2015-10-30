@@ -432,6 +432,7 @@
 		var _dom = _$ ('[sp-recipe="' + moduleId + '"] [sp-view]'),
 			_dom_template = _$ ('[sp-recipe="' + moduleId + '"] [sp-tpl]');
 		return new Promise (function (resolve) {
+
 			if ( _dom.exist ) { //Exist?
 
 				//The view object
