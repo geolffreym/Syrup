@@ -290,13 +290,16 @@
 				return _$ ('[sp-recipe="' + moduleId + '"] [sp-model]');
 			},
 			set     : function (obj) {
+				//The resource (model)
 				var _resource = this.resource ();
+
 				//Exist resource?
 				if ( _resource.exist )
 					_model.set (_resource, obj);
 				return _self.recipeCollection[moduleId].instance;
 			},
 			get     : function (item) {
+				//The resource (model)
 				var _resource = this.resource ();
 
 				//Exist resource?
@@ -469,11 +472,11 @@
 						//Seek for tpl
 						_view.seekTpl (view_template_dir)
 							.then (function (view) {
-									   view.render (_scope).then (function (res) {
-										   _dom.html (res);
-										   resolve (res);
-									   })
-								   })
+							view.render (_scope).then (function (res) {
+								_dom.html (res);
+								resolve (res);
+							})
+						})
 					} else {
 						//Handle view?
 						//Require the view if needed
@@ -490,9 +493,9 @@
 				} else if ( _dom_template.exist ) {
 					_view.render (_dom_template.html (), _scope)
 						.then (function (result) {
-								   _dom.html (result);
-								   resolve (result)
-							   });
+						_dom.html (result);
+						resolve (result)
+					});
 				}
 			}
 		});
