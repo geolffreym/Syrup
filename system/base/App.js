@@ -290,37 +290,42 @@
 				return _$ ('[sp-recipe="' + moduleId + '"] [sp-model]');
 			},
 			set     : function (obj) {
-				_model.set (this.resource (), obj);
+				var _resource = this.resource ();
+				//Exist resource?
+				if ( _resource.exist )
+					_model.set (_resource, obj);
 				return _self.recipeCollection[moduleId].instance;
 			},
 			get     : function (item) {
+				var _resource = this.resource ();
 
-				return {
-					then: function (resolve) {
-						return _model.get (
-							this.resource ()
-						).then (function (e) {
-									if (
-										_.isSet (item)
-										&& _.isArray (item)
-										&& !_.isEmpty (item)
-									) {
-										var _result = {};
-										_.each (item, function (v, i) {
-											if ( v in e.scope )
-												_result[v] = e.scope[v];
-										});
+				//Exist resource?
+				if ( _resource.exist ) {
+					return {
+						then: function (resolve) {
+							return _model.get (_resource).then (function (e) {
+								if (
+									_.isSet (item)
+									&& _.isArray (item)
+									&& !_.isEmpty (item)
+								) {
+									var _result = {};
+									_.each (item, function (v, i) {
+										if ( v in e.scope )
+											_result[v] = e.scope[v];
+									});
 
-										e.scope = _result;
-									}
+									e.scope = _result;
+								}
 
-									// Call the resolve
-									resolve.call (
-										_self.recipeCollection[moduleId].instance, e
-									)
-								});
-					}
-				};
+								// Call the resolve
+								resolve.call (
+									_self.recipeCollection[moduleId].instance, e
+								)
+							});
+						}
+					};
+				}
 			}
 		}
 	});
