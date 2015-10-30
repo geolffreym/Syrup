@@ -333,16 +333,14 @@
 	/**Prepare Views
 	 * @param moduleId
 	 * */
-
 	Apps.add ('_views', function (moduleId) {
 		// Render view
 		var _self = this;
 		_self.recipeCollection[moduleId].instance.view = {
 			render: function (_view, _cache) {
-				_self._serve (moduleId, _view || null, _cache || false);
-				return _self.recipeCollection[moduleId].instance;
+				return _self._serve (moduleId, _view || null, _cache || false)
 			}
-		};
+		}
 	});
 
 
@@ -433,53 +431,56 @@
 		//Find the recipe
 		var _dom = _$ ('[sp-recipe="' + moduleId + '"] [sp-view]'),
 			_dom_template = _$ ('[sp-recipe="' + moduleId + '"] [sp-tpl]');
+		return new Promise (function (resolve) {
+			if ( _dom.exist ) { //Exist?
 
-		if ( _dom.exist ) { //Exist?
+				//The view object
+				_view = new View;
 
-			//The view object
-			_view = new View;
+				//A view?
+				if ( _.isSet (view) && _.isString (view) ) {
+					var view_name = view.split ('/').pop (),
+						view_dir = _.replace (view, '/' + view_name, _.emptyStr),
+						view_template_dir = 'layout/' + view_dir + '/' + view_name;
 
-			//A view?
-			if ( _.isSet (view) && _.isString (view) ) {
-				var view_name = view.split ('/').pop (),
-					view_dir = _.replace (view, '/' + view_name, _.emptyStr),
-					view_template_dir = 'layout/' + view_dir + '/' + view_name;
+					//Handle template?
+					if ( /\.html$/.test (view_name) ) {
 
-				//Handle template?
-				if ( /\.html$/.test (view_name) ) {
+						//Clean cache?
+						if ( cleanCache )
+							_view.cleanCache (view_template_dir);
 
-					//Clean cache?
-					if ( cleanCache )
-						_view.cleanCache (view_template_dir);
-
-					//Seek for tpl
-					_view.seekTpl (view_template_dir)
-						.then (function (view) {
-								   view.render (_scope).then (function (res) {
-									   _dom.html (res);
+						//Seek for tpl
+						_view.seekTpl (view_template_dir)
+							.then (function (view) {
+									   view.render (_scope).then (function (res) {
+										   _dom.html (res);
+										   resolve (res);
+									   })
 								   })
-							   })
-				} else {
-					//Handle view?
-					//Require the view if needed
-					Require.lookup (['view/' + view_dir]).then (function () {
-						if ( view_name in _view.__proto__ )
-							_view[view_name] (_, _scope, function (my_html) {
-								_dom.html (my_html);
-							})
-					});
+					} else {
+						//Handle view?
+						//Require the view if needed
+						Require.lookup (['view/' + view_dir]).then (function () {
+							if ( view_name in _view.__proto__ )
+								_view[view_name] (_, _scope, function (my_html) {
+									_dom.html (my_html);
+									resolve (my_html)
+								})
+						});
+					}
+
+					//Exist inline tpl?
+				} else if ( _dom_template.exist ) {
+					_view.render (_dom_template.html (), _scope)
+						.then (function (result) {
+								   _dom.html (result);
+								   resolve (result)
+							   });
 				}
-
-				//Exist inline tpl?
-			} else if ( _dom_template.exist ) {
-				_view.render (_dom_template.html (), _scope)
-					.then (function (result) {
-							   _dom.html (result);
-						   });
 			}
-		}
+		});
 
-		return this;
 	});
 
 	/** Execute Module
@@ -663,8 +664,9 @@
 		return this;
 	});
 
-	//The global object App
+//The global object App
 	window.App = new Apps;
 	window.AppClass = Apps;
 
-}) (window);
+})
+(window);
