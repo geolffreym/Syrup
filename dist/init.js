@@ -5295,7 +5295,12 @@ if ( !Object.observe ) {
 		var _self = this,
 			_formData = new FormData,
 			_files = [],
-			_field = !_.is$ (input) && _$ (input).get (0) || input;
+			_field = !_.is$ (input)
+					 && _$ (input).get (0) || input;
+
+		//Not model.. pass!!
+		if ( !_field.exist )
+			return;
 
 		return (new Promise (function (resolve, reject) {
 			if (
@@ -5326,6 +5331,10 @@ if ( !Object.observe ) {
 		var _self = this;
 		_self.model = !_.is$ (model) && _$ (model) || model;
 
+		//Not model.. pass!!
+		if ( !_self.model.exist )
+			return;
+
 		return (new Promise (function (resolve, reject) {
 			_self.model.find ('input[type="file"]', function (field) {
 				_self.file (field.get (0)).then (resolve);
@@ -5347,6 +5356,10 @@ if ( !Object.observe ) {
 		_self.model = !_.is$ (model)
 					  && _$ (model) || model;
 
+		//Not model.. pass!!
+		if ( !_self.model.exist )
+			return;
+
 		// For each input fill with data
 		_.each (object, function (v, i) {
 			_self.model.find ('input[name=' + i + ']', function (e) {
@@ -5362,7 +5375,12 @@ if ( !Object.observe ) {
 	 * @return {object}
 	 */
 	Model.add ('get', function (model) {
-		this.model = !_.is$ (model) && _$ (model) || model;
+		this.model = !_.is$ (model)
+					 && _$ (model) || model;
+
+		//Not model.. pass!!
+		if ( !this.model.exist )
+			return;
 
 		var _self = this,
 			_modelData = new FormData,
@@ -5719,7 +5737,10 @@ if ( !Object.observe ) {
 						//Is in recipe?
 						if ( _attr in _recipe && _.isFunction (_recipe[_attr]) ) {
 							e.preventDefault ();
-							_recipe[_attr] (_self.lib.get (_self.root), e);
+							_recipe[_attr].call (
+								_self.recipeCollection[moduleId].instance,
+								_self.lib.get (_self.root), e
+							);
 						}
 					}
 
@@ -5733,45 +5754,46 @@ if ( !Object.observe ) {
 	 */
 	Apps.add ('_models', function (moduleId) {
 		var _self = this,
-			_model = new Model,
-			_resource = _$ ('[sp-recipe="' + moduleId + '"] [sp-model]');
+			_model = new Model;
 
 		//Exist the model?
-		if ( _resource.exist ) {
-			_self.recipeCollection[moduleId].instance.model = {
-				object  : _model,
-				resource: _resource,
-				set     : function (obj) {
-					_model.set (_resource, obj);
-					return _self.recipeCollection[moduleId].instance;
-				},
-				get     : function (item) {
+		_self.recipeCollection[moduleId].instance.model = {
+			object  : _model,
+			resource: function () {
+				return _$ ('[sp-recipe="' + moduleId + '"] [sp-model]');
+			},
+			set     : function (obj) {
+				_model.set (this.resource (), obj);
+				return _self.recipeCollection[moduleId].instance;
+			},
+			get     : function (item) {
 
-					return {
-						then: function (resolve) {
-							return _model.get (_resource).then (function (e) {
-								if (
-									_.isSet (item)
-									&& _.isArray (item)
-									&& !_.isEmpty (item)
-								) {
-									var _result = {};
-									_.each (item, function (v, i) {
-										if ( v in e.scope )
-											_result[v] = e.scope[v];
-									});
+				return {
+					then: function (resolve) {
+						return _model.get (
+							this.resource ()
+						).then (function (e) {
+									if (
+										_.isSet (item)
+										&& _.isArray (item)
+										&& !_.isEmpty (item)
+									) {
+										var _result = {};
+										_.each (item, function (v, i) {
+											if ( v in e.scope )
+												_result[v] = e.scope[v];
+										});
 
-									e.scope = _result;
-								}
+										e.scope = _result;
+									}
 
-								// Call the resolve
-								resolve.call (
-									_self.recipeCollection[moduleId].instance, e
-								)
-							});
-						}
-					};
-				}
+									// Call the resolve
+									resolve.call (
+										_self.recipeCollection[moduleId].instance, e
+									)
+								});
+					}
+				};
 			}
 		}
 	});

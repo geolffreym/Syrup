@@ -264,7 +264,10 @@
 						//Is in recipe?
 						if ( _attr in _recipe && _.isFunction (_recipe[_attr]) ) {
 							e.preventDefault ();
-							_recipe[_attr] (_self.lib.get (_self.root), e);
+							_recipe[_attr].call (
+								_self.recipeCollection[moduleId].instance,
+								_self.lib.get (_self.root), e
+							);
 						}
 					}
 
@@ -278,45 +281,46 @@
 	 */
 	Apps.add ('_models', function (moduleId) {
 		var _self = this,
-			_model = new Model,
-			_resource = _$ ('[sp-recipe="' + moduleId + '"] [sp-model]');
+			_model = new Model;
 
 		//Exist the model?
-		if ( _resource.exist ) {
-			_self.recipeCollection[moduleId].instance.model = {
-				object  : _model,
-				resource: _resource,
-				set     : function (obj) {
-					_model.set (_resource, obj);
-					return _self.recipeCollection[moduleId].instance;
-				},
-				get     : function (item) {
+		_self.recipeCollection[moduleId].instance.model = {
+			object  : _model,
+			resource: function () {
+				return _$ ('[sp-recipe="' + moduleId + '"] [sp-model]');
+			},
+			set     : function (obj) {
+				_model.set (this.resource (), obj);
+				return _self.recipeCollection[moduleId].instance;
+			},
+			get     : function (item) {
 
-					return {
-						then: function (resolve) {
-							return _model.get (_resource).then (function (e) {
-								if (
-									_.isSet (item)
-									&& _.isArray (item)
-									&& !_.isEmpty (item)
-								) {
-									var _result = {};
-									_.each (item, function (v, i) {
-										if ( v in e.scope )
-											_result[v] = e.scope[v];
-									});
+				return {
+					then: function (resolve) {
+						return _model.get (
+							this.resource ()
+						).then (function (e) {
+									if (
+										_.isSet (item)
+										&& _.isArray (item)
+										&& !_.isEmpty (item)
+									) {
+										var _result = {};
+										_.each (item, function (v, i) {
+											if ( v in e.scope )
+												_result[v] = e.scope[v];
+										});
 
-									e.scope = _result;
-								}
+										e.scope = _result;
+									}
 
-								// Call the resolve
-								resolve.call (
-									_self.recipeCollection[moduleId].instance, e
-								)
-							});
-						}
-					};
-				}
+									// Call the resolve
+									resolve.call (
+										_self.recipeCollection[moduleId].instance, e
+									)
+								});
+					}
+				};
 			}
 		}
 	});

@@ -104,7 +104,12 @@
 		var _self = this,
 			_formData = new FormData,
 			_files = [],
-			_field = !_.is$ (input) && _$ (input).get (0) || input;
+			_field = !_.is$ (input)
+					 && _$ (input).get (0) || input;
+
+		//Not model.. pass!!
+		if ( !_field.exist )
+			return;
 
 		return (new Promise (function (resolve, reject) {
 			if (
@@ -135,6 +140,10 @@
 		var _self = this;
 		_self.model = !_.is$ (model) && _$ (model) || model;
 
+		//Not model.. pass!!
+		if ( !_self.model.exist )
+			return;
+
 		return (new Promise (function (resolve, reject) {
 			_self.model.find ('input[type="file"]', function (field) {
 				_self.file (field.get (0)).then (resolve);
@@ -156,6 +165,10 @@
 		_self.model = !_.is$ (model)
 					  && _$ (model) || model;
 
+		//Not model.. pass!!
+		if ( !_self.model.exist )
+			return;
+
 		// For each input fill with data
 		_.each (object, function (v, i) {
 			_self.model.find ('input[name=' + i + ']', function (e) {
@@ -171,7 +184,12 @@
 	 * @return {object}
 	 */
 	Model.add ('get', function (model) {
-		this.model = !_.is$ (model) && _$ (model) || model;
+		this.model = !_.is$ (model)
+					 && _$ (model) || model;
+
+		//Not model.. pass!!
+		if ( !this.model.exist )
+			return;
 
 		var _self = this,
 			_modelData = new FormData,
