@@ -338,7 +338,23 @@
 		var _self = this;
 		_self.recipeCollection[moduleId].instance.view = {
 			render: function (_view, _cache) {
-				return _self._serve (moduleId, _view || null, _cache || false)
+				//Rend
+				var _rend = _self._serve (
+					moduleId, _view || null,
+					_cache || false
+				);
+
+				//Async
+				return {
+					then: function (resolve) {
+						return _rend.then (function (m) {
+							// Call the resolve
+							resolve.call (
+								_self.recipeCollection[moduleId].instance, m
+							)
+						})
+					}
+				}
 			}
 		}
 	});
@@ -432,7 +448,6 @@
 		var _dom = _$ ('[sp-recipe="' + moduleId + '"] [sp-view]'),
 			_dom_template = _$ ('[sp-recipe="' + moduleId + '"] [sp-tpl]');
 		return new Promise (function (resolve) {
-
 			if ( _dom.exist ) { //Exist?
 
 				//The view object
@@ -454,11 +469,11 @@
 						//Seek for tpl
 						_view.seekTpl (view_template_dir)
 							.then (function (view) {
-							view.render (_scope).then (function (res) {
-								_dom.html (res);
-								resolve (res);
-							})
-						})
+									   view.render (_scope).then (function (res) {
+										   _dom.html (res);
+										   resolve (res);
+									   })
+								   })
 					} else {
 						//Handle view?
 						//Require the view if needed
@@ -475,9 +490,9 @@
 				} else if ( _dom_template.exist ) {
 					_view.render (_dom_template.html (), _scope)
 						.then (function (result) {
-						_dom.html (result);
-						resolve (result)
-					});
+								   _dom.html (result);
+								   resolve (result)
+							   });
 				}
 			}
 		});
