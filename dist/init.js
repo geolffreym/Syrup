@@ -5763,13 +5763,16 @@ if ( !Object.observe ) {
 				return _$ ('[sp-recipe="' + moduleId + '"] [sp-model]');
 			},
 			set     : function (obj) {
+				//The resource (model)
 				var _resource = this.resource ();
+
 				//Exist resource?
 				if ( _resource.exist )
 					_model.set (_resource, obj);
 				return _self.recipeCollection[moduleId].instance;
 			},
 			get     : function (item) {
+				//The resource (model)
 				var _resource = this.resource ();
 
 				//Exist resource?
@@ -5920,6 +5923,8 @@ if ( !Object.observe ) {
 		//Find the recipe
 		var _dom = _$ ('[sp-recipe="' + moduleId + '"] [sp-view]'),
 			_dom_template = _$ ('[sp-recipe="' + moduleId + '"] [sp-tpl]');
+
+		//Serve the view!!!
 		return new Promise (function (resolve) {
 			if ( _dom.exist ) { //Exist?
 
@@ -5942,11 +5947,11 @@ if ( !Object.observe ) {
 						//Seek for tpl
 						_view.seekTpl (view_template_dir)
 							.then (function (view) {
-									   view.render (_scope).then (function (res) {
-										   _dom.html (res);
-										   resolve (res);
-									   })
-								   })
+							view.render (_scope).then (function (res) {
+								_dom.html (res);
+								resolve (res);
+							})
+						})
 					} else {
 						//Handle view?
 						//Require the view if needed
@@ -5963,9 +5968,9 @@ if ( !Object.observe ) {
 				} else if ( _dom_template.exist ) {
 					_view.render (_dom_template.html (), _scope)
 						.then (function (result) {
-								   _dom.html (result);
-								   resolve (result)
-							   });
+						_dom.html (result);
+						resolve (result)
+					});
 				}
 			}
 		});

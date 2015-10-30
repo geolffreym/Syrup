@@ -450,6 +450,8 @@
 		//Find the recipe
 		var _dom = _$ ('[sp-recipe="' + moduleId + '"] [sp-view]'),
 			_dom_template = _$ ('[sp-recipe="' + moduleId + '"] [sp-tpl]');
+
+		//Serve the view!!!
 		return new Promise (function (resolve) {
 			if ( _dom.exist ) { //Exist?
 
