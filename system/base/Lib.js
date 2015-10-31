@@ -40,7 +40,7 @@
 	 * @return {object}
 	 * **/
 	Libs.add ('get', function (name) {
-		return (name in this.breadcrumb) && this.breadcrumb[name];
+		return (name in this.breadcrumb) && _[name];
 	});
 
 	/**Dependencies gestor

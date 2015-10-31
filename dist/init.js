@@ -1918,7 +1918,7 @@ if ( typeof exports !== 'undefined' )
 	 * @return {object}
 	 * **/
 	Libs.add ('get', function (name) {
-		return (name in this.breadcrumb) && this.breadcrumb[name];
+		return (name in this.breadcrumb) && _[name];
 	});
 
 	/**Dependencies gestor
@@ -5776,7 +5776,7 @@ if ( !Object.observe ) {
 							e.preventDefault ();
 							_recipe[_attr].call (
 								_self.recipeCollection[moduleId].instance,
-								_self.lib.get (_self.root), e
+								_self.lib.get (_recipe.parent.root), e
 							);
 						}
 					}
@@ -5800,18 +5800,14 @@ if ( !Object.observe ) {
 				return _$ ('[sp-recipe="' + moduleId + '"] [sp-model]');
 			},
 			set     : function (obj) {
-				//The resource (model)
 				var _resource = this.resource ();
-
 				//Exist resource?
 				if ( _resource.exist )
 					_model.set (_resource, obj);
 				return _self.recipeCollection[moduleId].instance;
 			},
 			get     : function (item) {
-				//The resource (model)
 				var _resource = this.resource ();
-
 				//Exist resource?
 				if ( _resource.exist ) {
 					return {
@@ -5960,8 +5956,6 @@ if ( !Object.observe ) {
 		//Find the recipe
 		var _dom = _$ ('[sp-recipe="' + moduleId + '"] [sp-view]'),
 			_dom_template = _$ ('[sp-recipe="' + moduleId + '"] [sp-tpl]');
-
-		//Serve the view!!!
 		return new Promise (function (resolve) {
 			if ( _dom.exist ) { //Exist?
 
@@ -5984,11 +5978,11 @@ if ( !Object.observe ) {
 						//Seek for tpl
 						_view.seekTpl (view_template_dir)
 							.then (function (view) {
-							view.render (_scope).then (function (res) {
-								_dom.html (res);
-								resolve (res);
-							})
-						})
+									   view.render (_scope).then (function (res) {
+										   _dom.html (res);
+										   resolve (res);
+									   })
+								   })
 					} else {
 						//Handle view?
 						//Require the view if needed
@@ -6005,9 +5999,9 @@ if ( !Object.observe ) {
 				} else if ( _dom_template.exist ) {
 					_view.render (_dom_template.html (), _scope)
 						.then (function (result) {
-						_dom.html (result);
-						resolve (result)
-					});
+								   _dom.html (result);
+								   resolve (result)
+							   });
 				}
 			}
 		});
