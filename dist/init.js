@@ -5360,13 +5360,44 @@ if ( !Object.observe ) {
 			return;
 
 		// For each input fill with data
-		_.each (object, function (v, i) {
-			_self.model.find ('input[name=' + i + ']', function (e) {
-				_self.scope[i] = v;
-				e.val (v);
-			})
-		})
+		_self.model.find ('input, select, textarea', function (e) {
 
+			//Get the index name on input
+			var _the_index = e.attr ('name'),
+				_option_din = null,
+				_select_out = _.emptyStr;
+
+			//Is the index in object?
+			if ( _the_index && _the_index in object ) {
+				//Update scope
+				_self.scope[_the_index] = object[_the_index];
+
+				//Is Select?
+				if ( e.name === 'select' ) {
+
+					//It's options data an array?
+					if ( _.isArray (_self.scope[_the_index]) ) {
+						//For Each options data
+						_.each (_self.scope[_the_index], function (v) {
+							//Dynamic option
+							_option_din = _$ ('<option/>');
+
+							_option_din.text ('content' in v && v.content || _.emptyStr);
+							_option_din.val ('value' in v && v.value || _.emptyStr);
+
+							//Just string!!
+							_select_out += _option_din.object ().outerHTML;
+						});
+
+						//Output!!
+						e.html (_select_out);
+					}
+				} else {
+					//Work normally!!
+					e.val (_self.scope[_the_index])
+				}
+			}
+		});
 	});
 
 	/**Pack the inputs in ModelData Object
