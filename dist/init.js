@@ -1854,7 +1854,7 @@ if ( typeof exports !== 'undefined' )
 		).$;
 	}) ();
 
-	_.VERSION = '1.1.6';
+	_.VERSION = '1.1.7';
 	_.$fn = _$_;
 	_.emptyStr = '';
 	_.Syrup = Syrup;
