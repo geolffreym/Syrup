@@ -91,7 +91,6 @@
 	function _$_ () {
 		this.collection = null;
 		this.exist = null;
-		this.state = null;
 	}
 
 	/**Dom Traversing
@@ -124,7 +123,7 @@
 		}
 
 		_self.exist = _.isSet (_self.collection);
-		_self.name = _dom;
+		_self.name = _dom.nodeName.toLowerCase () || _dom;
 		return _self;
 	});
 
@@ -1653,10 +1652,10 @@
 	 * @param {Array} haystack
 	 * @returns {boolean}
 	 */
-	Syrup.add('matchInArray', function (find, haystack) {
-		if (_.isArray(haystack)) {
-			var needle = new RegExp(haystack.join('|'), 'g');
-			return needle.test(find);
+	Syrup.add ('matchInArray', function (find, haystack) {
+		if ( _.isArray (haystack) ) {
+			var needle = new RegExp (haystack.join ('|'), 'g');
+			return needle.test (find);
 		}
 		return false;
 	});
@@ -1666,12 +1665,12 @@
 	 * @param {Array} haystack
 	 * @returns {boolean}
 	 */
-	Syrup.add('replaceInArray', function (find, replace, haystack) {
+	Syrup.add ('replaceInArray', function (find, replace, haystack) {
 
-		if (this.matchInArray(haystack, [find])) {
-			_.each(haystack, function (v, i) {
-				if (_.isString(v))
-					haystack[i] = _.replace(v, find, replace);
+		if ( this.matchInArray (haystack, [find]) ) {
+			_.each (haystack, function (v, i) {
+				if ( _.isString (v) )
+					haystack[i] = _.replace (v, find, replace);
 			});
 		}
 
@@ -1831,7 +1830,7 @@
 		).$;
 	}) ();
 
-	_.VERSION = '1.1.0';
+	_.VERSION = '1.1.6';
 	_.$fn = _$_;
 	_.emptyStr = '';
 	_.Syrup = Syrup;
