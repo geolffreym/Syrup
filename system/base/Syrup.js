@@ -123,7 +123,7 @@
 		}
 
 		_self.exist = _.isSet (_self.collection);
-		_self.name = _dom.nodeName.toLowerCase () || _dom;
+		_self.name = _dom.nodeName && _dom.nodeName.toLowerCase () || _dom;
 		return _self;
 	});
 
