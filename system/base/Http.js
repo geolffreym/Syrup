@@ -198,7 +198,7 @@
 	Http.add ('post', function (url, data) {
 
 		//MiddleWare
-		MiddleWare.intercept (this, {
+		this.intercept ({
 			request: function (config, xhr) {
 				config.method = 'POST';
 			}
@@ -217,7 +217,7 @@
 	Http.add ('put', function (url, data) {
 
 		//MiddleWare
-		MiddleWare.intercept (this, {
+		this.intercept ({
 			request: function (config, xhr) {
 				config.method = 'PUT';
 			}
@@ -237,7 +237,7 @@
 	Http.add ('delete', function (url, data) {
 
 		//MiddleWare
-		MiddleWare.intercept (this, {
+		this.intercept ({
 			request: function (config, xhr) {
 				config.method = 'DELETE';
 			}
