@@ -277,7 +277,6 @@
 			} else if ( _.isSet (_data_set[name]) ) {
 				_values.push (_data_set[name])
 			}
-
 		});
 
 		return _.specArray (_values);
