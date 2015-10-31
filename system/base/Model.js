@@ -104,8 +104,7 @@
 		var _self = this,
 			_formData = new FormData,
 			_files = [],
-			_field = !_.is$ (input)
-					 && _$ (input).get (0) || input;
+			_field = !_.is$ (input) && _$ (input).get (0) || input;
 
 		//Not model.. pass!!
 		if ( !_field.exist )
@@ -146,7 +145,7 @@
 
 		return (new Promise (function (resolve, reject) {
 			_self.model.find ('input[type="file"]', function (field) {
-				_self.file (field.get (0)).then (resolve);
+				_self.file (field).then (resolve);
 			});
 		}));
 
@@ -179,6 +178,7 @@
 
 			//Is the index in object?
 			if ( _the_index && _the_index in object ) {
+
 				//Update scope
 				_self.scope[_the_index] = object[_the_index];
 
@@ -202,6 +202,7 @@
 						//Output!!
 						e.html (_select_out);
 					}
+
 				} else {
 					//Work normally!!
 					e.val (_self.scope[_the_index])
@@ -215,8 +216,7 @@
 	 * @return {object}
 	 */
 	Model.add ('get', function (model) {
-		this.model = !_.is$ (model)
-					 && _$ (model) || model;
+		this.model = !_.is$ (model) && _$ (model) || model;
 
 		//Not model.. pass!!
 		if ( !this.model.exist )
