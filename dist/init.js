@@ -751,16 +751,18 @@ if ( typeof exports !== 'undefined' )
 	 * */
 	_$_.add ('is', function (context) {
 		_.assert (context, WARNING_SYRUP.ERROR.NOPARAM, '($ .is)');
-		var v = this.get (0),
-			_return = false;
 
-		_$ (v).filter (context, function () {
-			_return = true;
-		}, function () {
-			_return = v[context] || v['type'] === context;
-		});
 
-		return _return;
+		var _dom = this.get (0),
+			_match = (elem.matchesSelector ||
+					  elem.webkitMatchesSelector ||
+					  elem.mozMatchesSelector ||
+					  elem.oMatchesSelector ||
+					  elem.msMatchesSelector);
+
+		return (context in _dom || _dom['type'] === context)
+			   || _match.call (_dom, context);
+
 	});
 
 	/***Get Child Element
@@ -1560,9 +1562,7 @@ if ( typeof exports !== 'undefined' )
 	 * @returns {*}
 	 */
 	Syrup.add ('cartesianPlane', function (_dom, all) {
-		_dom = _.is$ (_dom)
-			? _$ (_dom).object ()
-			: _dom;
+		_dom = !_.is$ (_dom) && _$ (_dom).get () || _dom;
 
 		if ( _.isGlobal (_dom) ) {
 			return {
