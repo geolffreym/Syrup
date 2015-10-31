@@ -117,7 +117,7 @@ if ( typeof exports !== 'undefined' )
 	 * @returns {_$_}
 	 */
 	_$_.add ('$', function (dom) {
-		var _tmp,
+		var _tmp, _dom = dom,
 			_self = new _$_;
 
 		if ( _.isFunction (dom) ) {
@@ -142,7 +142,7 @@ if ( typeof exports !== 'undefined' )
 		}
 
 		_self.exist = _.isSet (_self.collection);
-		_self.name = dom;
+		_self.name = _dom;
 		return _self;
 	});
 
@@ -582,10 +582,10 @@ if ( typeof exports !== 'undefined' )
 		return this;
 	});
 
-	/**Find Elements
-	 * @param filter
-	 * @param callback
-	 * @return object
+	/**Find Elements recursive
+	 * @param {string} filter
+	 * @param {function} callback
+	 * @return {object}
 	 */
 	_$_.add ('find', function (filter, callback) {
 		return this.children (function (elem) {
