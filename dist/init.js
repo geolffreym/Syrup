@@ -5377,6 +5377,7 @@ if ( !Object.observe ) {
 
 					//It's options data an array?
 					if ( _.isArray (_self.scope[_the_index]) ) {
+
 						//For Each options data
 						_.each (_self.scope[_the_index], function (v) {
 							//Dynamic option
