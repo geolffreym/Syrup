@@ -602,24 +602,27 @@
 
 	});
 
-	/***Veriy Class
-	 * @param elem
-	 * @param cls
+	/***Verify Class
+	 * @param {string} cls
+	 * @return {bool}
 	 */
 	_$_.add ('hasClass', function (cls) {
 		_.assert (cls, WARNING_SYRUP.ERROR.NOPARAM, '($ .hasClass)');
+
+		//One at time!!
 		var elem = this.get (0);
+
 		//ClassList and hasClass?
 		return elem.classList
 			   && Array.prototype.indexOf.call (
-				elem.classList, cls
+				elem.classList, cls || _.emptyStr
 			) > -1;
 
 	});
 
 	/**AddClass Element
-	 * @param elem
-	 * @param cls
+	 * @param {string} cls
+	 * @return {object}
 	 */
 	_$_.add ('addClass', function (cls) {
 		return this.each (function (elem) {
@@ -653,7 +656,7 @@
 					elem.classList.remove (cls)
 				} else {
 					elem.className = _.replace (elem.className, (
-						new RegExp (cls, 'g')
+						_.toRegExp (cls, 'g')
 					), _.emptyStr)
 				}
 			}
@@ -1725,9 +1728,9 @@
 	 * @return string
 	 * */
 
-	Syrup.add ('toRegExp', function (element) {
+	Syrup.add ('toRegExp', function (element, det) {
 		if ( _.isString (element) )
-			return new RegExp (element);
+			return new RegExp (element, det || 'g');
 	});
 
 	/**Parse to Object
