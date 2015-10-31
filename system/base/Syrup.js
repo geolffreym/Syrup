@@ -251,13 +251,12 @@
 	 * @return array
 	 */
 	_$_.add ('clone', function (childs) {
-		childs = _.isSet (childs);
 		var _clones = [];
 		this.each (function (v) {
-			_clones.push (_$ (v.cloneNode (childs)));
+			_clones.push (_$ (v.cloneNode (childs || false)));
 		});
+		//Speculate Array
 		return _.specArray (_clones);
-
 	});
 
 

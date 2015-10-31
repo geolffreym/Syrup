@@ -184,10 +184,10 @@ if ( typeof exports !== 'undefined' )
 				e = e || windowGlobal.event;
 				_target = event.srcElement || e.target;
 
-				if ( _.isSet (delegate) && !_.isFunction (delegate) ) {
-					_$ (_target).filter (delegate, function () {
+				if ( _.isString (delegate) && !_.isFunction (delegate) ) {
+					if ( _$ (_target).is (delegate) ) {
 						_.callbackAudit (callback.bind (_target), e);
-					});
+					}
 				} else {
 					_.callbackAudit (callback.bind (_target), e);
 				}
@@ -242,14 +242,12 @@ if ( typeof exports !== 'undefined' )
 	 *@return Object
 	 */
 	_$_.add ('filter', function (filter, callback, e_handler) {
-		return this.each (function (elem) {
-			var match = elem.matchesSelector ||
-						elem.webkitMatchesSelector ||
-						elem.mozMatchesSelector ||
-						elem.oMatchesSelector ||
-						elem.msMatchesSelector;
+		//Not string.. pass!!
+		if ( !_.isString (filter) )
+			return this;
 
-			if ( match.call (elem, filter) ) {
+		return this.each (function (elem) {
+			if ( elem.is (filter) ) {
 				_.callbackAudit (callback, _$ (elem));
 			} else if ( _.isFunction (e_handler) ) {
 				_.callbackAudit (e_handler, _$ (elem));
@@ -271,13 +269,12 @@ if ( typeof exports !== 'undefined' )
 	 * @return array
 	 */
 	_$_.add ('clone', function (childs) {
-		childs = _.isSet (childs);
 		var _clones = [];
 		this.each (function (v) {
-			_clones.push (_$ (v.cloneNode (childs)));
+			_clones.push (_$ (v.cloneNode (childs || false)));
 		});
+		//Speculate Array
 		return _.specArray (_clones);
-
 	});
 
 
@@ -528,7 +525,9 @@ if ( typeof exports !== 'undefined' )
 	 */
 	_$_.add ('next', function (callback) {
 		return this.each (function (_elem) {
-			_.callbackAudit (callback, _$ (_elem.nextElementSibling));
+			if ( _elem.nextElementSibling ) {
+				_.callbackAudit (callback, _$ (_elem.nextElementSibling));
+			}
 		});
 
 	});
@@ -538,22 +537,20 @@ if ( typeof exports !== 'undefined' )
 	 */
 	_$_.add ('nexts', function (filter, callback) {
 		var _sibling = null;
-		callback = _.isFunction (filter)
-			? filter : callback;
+		callback = _.isFunction (filter) && filter || callback;
 
 		return this.next (function (elem) {
 			_sibling = elem;
 			do {
-				if ( _.isSet (filter) && !_.isFunction (filter) ) {
-					_sibling.filter (filter, function (elem) {
-						_.callbackAudit (callback, elem);
-					})
+				if ( _.isString (filter) && !_.isFunction (filter) ) {
+					if ( _sibling.is (filter) ) {
+						_.callbackAudit (callback, _sibling);
+					}
 				} else {
 					_.callbackAudit (callback, _sibling);
 				}
-			} while ( (
-				_sibling = _$ (_sibling.get (0).nextElementSibling)
-			).exist )
+			} while ( _sibling.get (0).nextElementSibling
+					  && (_sibling = _$ (_sibling.get (0).nextElementSibling)).exist )
 		});
 	});
 
@@ -587,12 +584,16 @@ if ( typeof exports !== 'undefined' )
 	 * @return {object}
 	 */
 	_$_.add ('find', function (filter, callback) {
+		//Not string.. pass!!
+		if ( !_.isString (filter) )
+			return this;
+
 		return this.children (function (elem) {
-			elem.filter (filter, function (e) {
-				_.callbackAudit (callback, e, filter);
-			}, function () {
+			if ( elem.is (filter) ) {
+				_.callbackAudit (callback, elem, filter);
+			} else {
 				elem.find (filter, callback);
-			})
+			}
 		});
 	});
 
@@ -603,13 +604,17 @@ if ( typeof exports !== 'undefined' )
 	 */
 	_$_.add ('parents', function (parent_class, callback) {
 
+		//Not string.. pass!!
+		if ( !_.isString (parent_class) )
+			return this;
+
 		return this.each (function (_elem) {
 			_$ (_elem).parent (function (_parent) {
-				_parent.filter (parent_class, function (parent) {
-					_.callbackAudit (callback, parent);
-				}, function () {
+				if ( _parent.is (parent_class) ) {
+					_.callbackAudit (callback, _parent);
+				} else {
 					_parent.parents (parent_class, callback);
-				});
+				}
 			});
 		});
 
@@ -622,12 +627,12 @@ if ( typeof exports !== 'undefined' )
 	_$_.add ('hasClass', function (cls) {
 		_.assert (cls, WARNING_SYRUP.ERROR.NOPARAM, '($ .hasClass)');
 		var elem = this.get (0);
-		if ( _.isSet (elem.classList) ) {
-			if ( Array.prototype.indexOf.call (elem.classList, cls) > -1 ) {
-				return true;
-			}
-		}
-		return false;
+		//ClassList and hasClass?
+		return elem.classList
+			   && Array.prototype.indexOf.call (
+				elem.classList, cls
+			) > -1;
+
 	});
 
 	/**AddClass Element
@@ -752,13 +757,12 @@ if ( typeof exports !== 'undefined' )
 	_$_.add ('is', function (context) {
 		_.assert (context, WARNING_SYRUP.ERROR.NOPARAM, '($ .is)');
 
-
 		var _dom = this.get (0),
-			_match = (elem.matchesSelector ||
-					  elem.webkitMatchesSelector ||
-					  elem.mozMatchesSelector ||
-					  elem.oMatchesSelector ||
-					  elem.msMatchesSelector);
+			_match = (_dom.matchesSelector ||
+					  _dom.webkitMatchesSelector ||
+					  _dom.mozMatchesSelector ||
+					  _dom.oMatchesSelector ||
+					  _dom.msMatchesSelector);
 
 		return (context in _dom || _dom['type'] === context)
 			   || _match.call (_dom, context);
