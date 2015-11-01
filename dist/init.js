@@ -1561,18 +1561,21 @@ if ( typeof exports !== 'undefined' )
 	 * @returns {boolean}
 	 */
 	Syrup.add ('each', function (_object, callback, noFilterF) {
-		var _p = { first: false, last: false };
+		//Positions!!
+		var _p = {
+			first: false,
+			last : false
+		};
 
-		//Array?
 		if ( _.isArray (_object) ) {
-			var i = 0,
-				max = _object.length;
+			//Array?
+			var i = 0, max = _object.length;
+
 			for ( ; i < max; i++ ) {
 				_p.first = i === 0;
-				_p.last = (
-							  i + 1
-						  ) === max;
+				_p.last = (i + 1) === max;
 
+				//Filter function ?
 				callback && noFilterF ? callback (_object[i], i, _p)
 					: _.callbackAudit (callback, _object[i], i, _p);
 
@@ -1584,11 +1587,10 @@ if ( typeof exports !== 'undefined' )
 				_tmp, _i = _tmp = _keys.length;
 
 			while ( _i-- ) {
-				_p.first = (
-							   _i + 1
-						   ) === _tmp;
+				_p.first = (_i + 1) === _tmp;
 				_p.last = _i === 0;
 
+				//Filter function ?
 				callback && noFilterF ? callback (_object[_keys[_i]], _keys[_i], _p)
 					: _.callbackAudit (callback, _object[_keys[_i]], _keys[_i], _p);
 
