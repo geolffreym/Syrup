@@ -5073,6 +5073,7 @@ if ( !Object.observe ) {
 	function View () {
 		this.Http = new Http;
 		this.Repo = new Repo;
+		this.Worker = new Workers;
 		this.key = '___templates';
 		this.tpl = null;
 	}
@@ -5176,8 +5177,7 @@ if ( !Object.observe ) {
 	 * @return {object}
 	 * **/
 	View.add ('render', function (_template, _fields) {
-		var _self = this,
-			_worker = new Workers;
+		var _self = this, _worker = _self.Worker;
 
 		return (new Promise (function (resolve) {
 			_fields = _.isObject (_template) && _template || _fields;
