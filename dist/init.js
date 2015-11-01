@@ -168,10 +168,10 @@ if ( typeof exports !== 'undefined' )
 
 
 	/**Event Listener
-	 * @param event
-	 * @param delegate
-	 * @param callback
-	 * @return object
+	 * @param {string} event
+	 * @param {string} delegate
+	 * @param {function} callback
+	 * @return {object}
 	 */
 	_$_.add ('listen', function (event, delegate, callback) {
 		if ( _.isFunction (delegate) ) {
@@ -213,14 +213,13 @@ if ( typeof exports !== 'undefined' )
 	});
 
 	/**Remove Event Listener
-	 * @param event
-	 * @param delegate
-	 * @param callback
-	 * @return object
+	 * @param {string} event
+	 * @return {object}
 	 */
 	_$_.add ('listenOff', function (event) {
 		return this.each (function (elem) {
-
+			//Dinamic propoerty litstener
+			//Exist property?
 			if ( _.isSet (elem.listListener) ) {
 
 				if ( event in elem.listListener ) {
@@ -237,9 +236,9 @@ if ( typeof exports !== 'undefined' )
 	});
 
 	/**Filter Pattern match
-	 *@param filter
-	 *@param callback
-	 *@return Object
+	 *@param {string} filter
+	 *@param {function} callback
+	 *@return {object}
 	 */
 	_$_.add ('filter', function (filter, callback, e_handler) {
 		//Not string.. pass!!
@@ -279,18 +278,22 @@ if ( typeof exports !== 'undefined' )
 
 
 	/***Data set
-	 * @param name
-	 * @param value
-	 * @return array
+	 * @param {string} name
+	 * @param {string|number} value
+	 * @return {array|object}
 	 */
 	_$_.add ('data', function (name, value) {
 		var _self = this,
-			_data_set,
+			_data_set = null,
 			_values = [];
 
+		//For each element!!
 		_self.each (function (dom, i) {
+			//Dataset
 			_data_set = dom.dataset;
-			if ( _.isSet (value) || _.isNumber (value) ) {
+
+			//Value?
+			if ( _.isString (value) || _.isNumber (value) ) {
 				_data_set[name] = _.isArray (value) ? value[i] : value;
 			} else if ( _.isSet (_data_set[name]) ) {
 				_values.push (_data_set[name])
@@ -298,8 +301,12 @@ if ( typeof exports !== 'undefined' )
 
 		});
 
-		return _.specArray (_values);
+		return (_.isString (value)
+			   || _.isNumber (value)
+				  && _.specArray (_values)
+			   ) || this;
 	});
+
 
 	/***Assign Properties
 	 * @param _prop
@@ -307,7 +314,11 @@ if ( typeof exports !== 'undefined' )
 	 */
 	_$_.add ('prop', function (_prop) {
 		var _props = [];
+
+		//For each element
 		this.each (function (v) {
+
+			//String?
 			if ( _.isString (_prop) ) {
 				_props.push (v[_prop]);
 			} else if ( _.isObject (_prop) ) {
@@ -318,19 +329,23 @@ if ( typeof exports !== 'undefined' )
 		});
 
 		return _.isString (_prop)
-			? _.specArray (_props) : this;
+			   && _.specArray (_props) || this;
 	});
 
 	/***Assign Atributes
-	 * @param _attr
-	 * @return array
+	 * @param {string|object} _attr
+	 * @return {array}
 	 */
 	_$_.add ('attr', function (attr) {
 		var _attr = [];
 		this.each (function (v) {
+
+			//String?
 			if ( _.isString (attr) ) {
 				_attr.push (v.getAttribute (attr));
+
 			} else if ( _.isObject (attr) ) {
+				//Object?
 				_.each (attr, function (value, index) {
 					v.setAttribute (index, value);
 				});
@@ -338,12 +353,13 @@ if ( typeof exports !== 'undefined' )
 		});
 
 		return _.isString (attr)
-			? _.specArray (_attr) : this;
+			   && _.specArray (_attr) || this;
+
 	});
 
-	/***Remove Atributes
-	 * @param _attr
-	 * @return object
+	/***Remove Attributes
+	 * @param {string} _attr
+	 * @return {object}
 	 */
 	_$_.add ('removeAttr', function (attr) {
 		return this.each (function (v) {
@@ -364,10 +380,14 @@ if ( typeof exports !== 'undefined' )
 			_self = this;
 
 		_self.each (function (dom) {
+
+			//String?
 			if ( _.isString (css) ) {
-				var _style = windowGlobal.getComputedStyle (dom, null);
-				_css.push (_style.getPropertyValue (css));
+				_css.push (windowGlobal.getComputedStyle (dom, null)
+							   .getPropertyValue (css));
+
 			} else if ( _.isObject (dom) ) {
+				//Object?
 				_.each (css, function (value, index) {
 					dom.style[index] = value;
 				});
@@ -375,7 +395,7 @@ if ( typeof exports !== 'undefined' )
 		});
 
 		return _.isString (css)
-			? _.specArray (_css) : this;
+			   && _.specArray (_css) || this;
 	});
 
 	/***Insert After
@@ -444,42 +464,42 @@ if ( typeof exports !== 'undefined' )
 	});
 
 	/**Inner HTML
-	 * @param html
-	 * @returns object
+	 * @param {string} html
+	 * @returns {object}
 	 */
 	_$_.add ('html', function (html) {
-		if ( _.isHtml (html) || _.isString (html) ) {
-			this.prop ({ 'innerHTML': html });
-		} else {
-			return this.prop ('innerHTML');
-		}
-		return this;
+
+		//Is Html?
+		return ((_.isHtml (html) || _.isString (html))
+				&& this.prop ({ 'innerHTML': html })
+				&& this
+			   ) || this.prop ('innerHTML');
 	});
 
 	/**Inner Text
-	 * @param html
-	 * @returns {_$_}
+	 * @param {string} text
+	 * @returns {object}
 	 */
 	_$_.add ('text', function (text) {
-		if ( _.isString (text) ) {
-			this.prop ({ 'textContent': text });
-		} else {
-			return this.prop ('textContent');
-		}
-		return this;
+
+		//Number or string?
+		return (_.isString (text)
+				&& this.prop ({ 'textContent': text })
+				&& this
+			   ) || this.prop ('textContent');
 	});
 
 	/**Set value
-	 * @param html
-	 * @returns {_$_}
+	 * @param {string} text
+	 * @returns {object}
 	 */
 	_$_.add ('val', function (text) {
-		if ( _.isString (text) ) {
-			this.prop ({ 'value': text });
-		} else {
-			return this.prop ('value');
-		}
-		return this;
+
+		//Number or string?
+		return (_.isString (text)
+				&& this.prop ({ 'value': text })
+				&& this
+			   ) || this.prop ('value');
 	});
 
 	/**Hide Element**/
@@ -739,12 +759,14 @@ if ( typeof exports !== 'undefined' )
 	 * @return object
 	 */
 	_$_.add ('width', function (width) {
+
 		if ( _.isSet (width) ) {
 			return this.css ({
 				'width': _.isNumber (width)
 					? width + 'px' : width
 			});
 		}
+
 		var _width = [];
 		this.each (function (elem) {
 			_width.push ((_.cartesianPlane (elem)).width);
@@ -819,13 +841,17 @@ if ( typeof exports !== 'undefined' )
 	});
 
 	/**Return and set offset of DOM
-	 * @param _object
-	 * @return object
+	 * @param {object} _object
+	 * @return {object}
 	 * */
 	_$_.add ('offset', function (_object) {
-		var _offset = [];
+		var _offset = [],
+			_cartesian = null;
+
+		//For each element
 		this.each (function (elem) {
-			var _cartesian = _.cartesianPlane (elem);
+
+			//To set?
 			if ( _.isObject (_object) ) {
 
 				if ( _.isSet (_object.top) )
@@ -847,17 +873,24 @@ if ( typeof exports !== 'undefined' )
 					elem.style.right = _.isNumber (_object.right)
 						? _object.right + 'px' : _object.right;
 
-			}
+			} else {
+				// To get?
+				//Find position
+				_cartesian = _.cartesianPlane (elem);
 
-			_offset.push ({
-				top   : _cartesian.top,
-				left  : _cartesian.left,
-				bottom: _cartesian.bottom,
-				right : _cartesian.right
-			})
+				// Push positions!!
+				_offset.push ({
+					top   : _cartesian.top,
+					left  : _cartesian.left,
+					bottom: _cartesian.bottom,
+					right : _cartesian.right
+				})
+			}
 		});
 
-		return _.specArray (_offset);
+		//Result or reference
+		return _.isObject (_object) && this ||
+			   _.specArray (_offset);
 	});
 
 
@@ -1529,6 +1562,8 @@ if ( typeof exports !== 'undefined' )
 	 */
 	Syrup.add ('each', function (_object, callback, noFilterF) {
 		var _p = { first: false, last: false };
+
+		//Array?
 		if ( _.isArray (_object) ) {
 			var i = 0,
 				max = _object.length;
@@ -1542,21 +1577,21 @@ if ( typeof exports !== 'undefined' )
 					: _.callbackAudit (callback, _object[i], i, _p);
 
 			}
-		} else {
-			if ( _.isObject (_object) ) {
-				var _keys = Object.keys (_object),
-					_tmp, _i = _tmp = _keys.length;
+		} else if ( _.isObject (_object) ) {
 
-				while ( _i-- ) {
-					_p.first = (
-								   _i + 1
-							   ) === _tmp;
-					_p.last = _i === 0;
+			//Object?
+			var _keys = Object.keys (_object),
+				_tmp, _i = _tmp = _keys.length;
 
-					callback && noFilterF ? callback (_object[_keys[_i]], _keys[_i], _p)
-						: _.callbackAudit (callback, _object[_keys[_i]], _keys[_i], _p);
+			while ( _i-- ) {
+				_p.first = (
+							   _i + 1
+						   ) === _tmp;
+				_p.last = _i === 0;
 
-				}
+				callback && noFilterF ? callback (_object[_keys[_i]], _keys[_i], _p)
+					: _.callbackAudit (callback, _object[_keys[_i]], _keys[_i], _p);
+
 			}
 		}
 
@@ -1844,7 +1879,7 @@ if ( typeof exports !== 'undefined' )
 	});
 
 
-	//Super Global Object Instance
+//Super Global Object Instance
 	windowGlobal._ = (function () {
 		return new Syrup ();
 	}) ();
@@ -1876,7 +1911,8 @@ if ( typeof exports !== 'undefined' )
 	_.nav.local = windowGlobal.navigator.userAgent.toLowerCase ();
 
 
-}) (window);
+})
+(window);
 /**
  * Created by gmena on 08-06-14.
  */
