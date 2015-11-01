@@ -6614,9 +6614,7 @@ if ( !Object.observe ) {
 	});
 
 	//Global access
-	window.Router = new Router;
-	window.RouterClass = Router;
-
+	window.Router = Router;
 
 }) (window);
 /**
