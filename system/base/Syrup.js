@@ -1590,11 +1590,10 @@
 	});
 
 	/**Retorna la pocision exacta de un elemento y sus caracteristicas
-	 * @param _dom
-	 * @param all
-	 * @returns {*}
+	 * @param {object} _dom
+	 * @returns {object}
 	 */
-	Syrup.add ('cartesianPlane', function (_dom, all) {
+	Syrup.add ('cartesianPlane', function (_dom) {
 		_dom = !_.is$ (_dom) && _$ (_dom).get () || _dom;
 
 		if ( _.isGlobal (_dom) ) {
@@ -1606,10 +1605,7 @@
 			}
 		}
 
-		return !!all
-			? _dom.getClientRects ()
-			: _dom.getBoundingClientRect ();
-
+		return _dom.getBoundingClientRect ();
 	});
 
 	/**Verifica el callback y sirve de auditor
