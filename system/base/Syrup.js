@@ -808,17 +808,24 @@
 	 * @return object
 	 */
 	_$_.add ('each', function (callback) {
+
+		//Nodes collection
 		var _element = this.collection;
+
+		//Child nodes
+		//Global nodes?
 		if ( 'childNodes' in _element
 			 || _.isGlobal (_element) ) {
 			_.callbackAudit (callback, _element, 0);
 		} else {
+			//For each node
 			_.each (_element, function (v, i, p) {
 				if ( _.isObject (v) && _.isSet (v) ) {
 					_.callbackAudit (callback, v, i, p);
 				}
 			});
 		}
+
 		return this;
 	});
 
