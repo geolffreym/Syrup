@@ -31,7 +31,6 @@
 		_http.intercept ({
 			request: function (config) {
 				config.headers['Content-Type'] = 'text/plain';
-				console.log ('yeah');
 			}
 		});
 

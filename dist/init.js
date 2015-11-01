@@ -5081,20 +5081,18 @@ if ( !Object.observe ) {
 	 * @return {object}
 	 */
 	View.add ('lookup', function (template) {
-
-		console.log (Http);
 		//Http handler!!
-		var Http = new Http;
+		var _http = new Http;
 
 		//MiddleWare
-		Http.intercept ({
+		_http.intercept ({
 			request: function (config) {
 				config.headers['Content-Type'] = 'text/plain';
 			}
 		});
 
 		//The template request
-		return Http.request (
+		return _http.request (
 			setting.app_path + '/templates/' + template
 		);
 	});
@@ -5181,7 +5179,6 @@ if ( !Object.observe ) {
 	View.add ('render', function (_template, _fields) {
 		var _self = this,
 			_worker = new Workers;
-
 
 		return (new Promise (function (resolve) {
 			_fields = _.isObject (_template) && _template || _fields;
