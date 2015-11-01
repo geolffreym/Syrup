@@ -6637,12 +6637,14 @@ if ( !Object.observe ) {
 		var _self = this;
 		//Set Hash Change
 		window.addEventListener ('hashchange', function (e) {
-			//Intercept pop state
-			_self._handleInterceptor ('change', e);
+
 
 			//Clean # from hash
 			var _hash = _self._cleanHash (location.hash),
 				_params = _self._getParams (location.hash);
+
+			//Intercept pop state
+			_self._handleInterceptor ('change', _params);
 
 			if ( _hash in _self.onhashchange ) {
 				_.each (_self.onhashchange[_hash], function (v) {
