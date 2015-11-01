@@ -1,162 +1,632 @@
 /**
- * Created by gmena on 07-26-14.
+ * Created by gmena on 07-31-14.
+ * Interceptor : ['init', 'taste', 'after']
  */
-
-'use strict';
-
-/**Http
- * @constructor
- */
+"use strict";
 (function (window) {
+	function Apps () {
+		this.root = null; // Root name
+		this.lib = null; // Lib handler
+		this.scope = null; // Global scope
 
-	function Http () {
-		this.xhr = new window.XMLHttpRequest
-				   || new window.ActiveXObject ("Microsoft.XMLHTTP");
-		this.xhr_list = [];
-		this.upload = null;
-		this.config = null;
-		this.interceptors = {};
+		this.lazy = false; //Lazy execution?
+		this.interceptors = {}; //Interceptors
+		this.interceptClean = true; // Clan interceptors after execute?
+
+		this.moduleCollection = {}; //Modules
+		this.appCollection = {}; //Apps
+		this.recipeCollection = {}; // Recipes
+		this.onchange = {}; // Change handler
 	}
 
-	/** Http Request
-	 * @param {string} url
-	 * @param {object} data
-	 * @return {object}
+	/** Handle recipeCollection to Apps
+	 * @param name
+	 * @param dependencies []
+	 * @return object
 	 * **/
-	Http.add ('request', function (url, data) {
-		var _self = this,
-			_query = _.emptyStr,
-			_data = data || null;
+	Apps.add ('module', function (name, dependencies) {
+		//No app registered?
+		if ( !(name in this.moduleCollection) ) {
+			this.moduleCollection[name] = new Apps;
+			this.moduleCollection[name].root = name; // Root name
+			this.moduleCollection[name].moduled = true; // Flag to handle module app
+			this.moduleCollection[name].lib = new LibClass;
+			this.moduleCollection[name].lib.blend (name, dependencies)
+		}
 
-		//Make global conf
-		_self.config = {
-			method : 'GET',
-			timeout: 0xFA0,
-			upload : false,
-			cors   : false,
-			headers: {
-				'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'
+		//Return the app
+		return this.moduleCollection[name];
+	});
+
+	/** Blend a method in global Syrup object
+	 * @param name
+	 * @param dependencies []
+	 * @return object
+	 * **/
+	Apps.add ('blend', function (name, dependencies) {
+		var _self = new Apps;
+
+		_self.lib = new LibClass; //
+		_self.root = name; // The root app name
+		_self.parent = this.moduled && this || null; // Is module root set?
+		_self.lazy = this.lazy; // Lazy execution?
+		_self.scope = {}; // Main scope
+		_self.blended = true; // Flag to handle blended app
+
+		//Is module?
+		if ( this.moduled ) {
+			//Inherit
+			dependencies = dependencies || [];
+			dependencies.push (this.root);
+
+			//History
+			this.appCollection[name] = _self;
+		}
+
+		//Blend the libs
+		_self.lib.blend (name, dependencies);
+
+		return _self;
+	});
+
+	/** Make a recipe for blend
+	 *  @param moduleId string
+	 *  @param module function
+	 *  @return object
+	 * */
+	Apps.add ('recipe', function (moduleId, module) {
+
+		//Handled by blend?
+		//Not blend, not recipe.. simple!!!
+		if ( this.root && this.blended ) {
+			if ( _.isSet (module) ) {
+				var _self = this;
+				_self.recipeCollection[moduleId] = {
+					creator : module,
+					instance: null
+				};
+
+				//Constructor
+				//On document ready
+				//Not lazy execution?
+				if ( !this.lazy )
+					_$ (function () {
+						_self._taste (moduleId);
+					});
+			}
+		}
+		return this;
+	});
+
+	/**Object Observer
+	 * @param moduleId
+	 * **/
+	Apps.add ('_watch', function (moduleId) {
+		var _self = this;
+		Object.observe (_self.scope, function (change) {
+			_.each (change, function (v) {
+				if ( (v.name in _self.onchange)
+					 && _.getObjectSize (v.object) > 0
+					 && moduleId === v.name
+				) {
+					_self.onchange[v.name].call (
+						_self.recipeCollection[moduleId].instance,
+						{
+							name  : v.name,
+							old   : v.oldValue,
+							type  : v.type,
+							object: v.object[v.name]
+						}
+					);
+					return false;
+				}
+			});
+		});
+
+	});
+
+	/**Add new child module
+	 * @param moduleId
+	 * @return void
+	 * **/
+	Apps.add ('_add', function (moduleId) {
+		if ( !_.isObject (this.scope[moduleId]) ) {
+			this.scope[moduleId] = {};
+		}
+	});
+
+	/**Trigger code execution
+	 * @param moduleId
+	 * @return void
+	 * **/
+	Apps.add ('_trigger', function (moduleId) {
+		if ( moduleId in this.recipeCollection )
+			return this.recipeCollection[moduleId].creator (_, this.scope);
+		return {}
+	});
+
+	/**Provide a global initial config
+	 * @param moduleId
+	 * @return void
+	 * **/
+	Apps.add ('cook', function (callback) {
+		if ( _.isFunction (callback) )
+			callback.call (
+				this,
+				this.lib.get (this.root),
+				_
+			);
+		return this;
+	});
+
+
+	/**Global attributes supplier
+	 * @param moduleList
+	 * @callback*/
+	Apps.add ('spice', function (object) {
+		if ( _.isObject (object) )
+			this.lib.make (object);
+		return this;
+	});
+
+
+	/** Append global services
+	 * @param {object} object
+	 * @return {void}
+	 *
+	 * */
+	Apps.add ('service', function (object) {
+		this.lib.supply (object);
+		return this;
+	});
+
+
+	/**Return a recipe by name
+	 * @param moduleId
+	 * @return object
+	 * */
+	Apps.add ('_getRecipe', function (moduleId) {
+		if ( moduleId in this.recipeCollection && _.isSet (this.root) )
+			return this.recipeCollection[moduleId].instance;
+		return null;
+	});
+
+	/**Set Scope
+	 * @param moduleId
+	 * @param object
+	 * @return void
+	 * **/
+	Apps.add ('_setScope', function (moduleId, object) {
+		if ( moduleId in this.scope ) {
+			this.scope[moduleId] = object;
+		}
+		return this;
+	});
+
+	/**Get Scope
+	 * @param moduleId
+	 * @return object
+	 * **/
+	Apps.add ('_getScope', function (moduleId) {
+		if ( moduleId in this.scope ) {
+			return this.scope[moduleId];
+		}
+		return {};
+	});
+
+	/**Event handler
+	 * @param event
+	 * @param name
+	 * @param callback
+	 * @return object
+	 */
+	Apps.add ('when', function (event, name) {
+		var self = this;
+		return event && (
+			{
+				change: ({
+					then: (function (resolve) {
+						self.onchange[name] = resolve;
+					})
+				})
+			}[event] || {
+				then: function () {
+				}
+			})
+	});
+
+	/**Bind Listeners
+	 * @param moduleId
+	 * */
+	Apps.add ('_bindListener', function (moduleId) {
+		var enabled_events = [
+				'click', 'submit',
+				'change', 'dblclick',
+				'mousedown', 'mouseenter',
+				'mouseleave', 'mousemove',
+				'mouseover', 'mouseout', 'mouseup',
+				'keydown', 'keypress', 'keyup', 'blur',
+				'focus', 'input', 'select', 'reset'
+			], _self = this, _recipe = this.recipeCollection[moduleId].instance,
+			_mod = _$ ('[sp-recipe="' + moduleId + '"]');
+
+		//Exist the module?
+		if ( _mod.exist ) {
+
+			//Bind enabled events
+			_.each (enabled_events, function (v) {
+				//Listen the events
+				_mod.listen (v, function (e) {
+					var _event = 'sp-' + e.type,
+						_attr = e.target.getAttribute (_event);
+
+					//Has sp-'event'?
+					if ( _attr ) {
+						//Is in recipe?
+						if ( _attr in _recipe && _.isFunction (_recipe[_attr]) ) {
+							_recipe[_attr].call (
+								_self.recipeCollection[moduleId].instance,
+								_self.lib.get (_recipe.parent.root), e
+							);
+						}
+					}
+
+				});
+			});
+		}
+	});
+
+	/** Prepare Model
+	 * @param moduleId
+	 */
+	Apps.add ('_models', function (moduleId) {
+		var _self = this,
+			_model = new Model;
+
+		//Exist the model?
+		_self.recipeCollection[moduleId].instance.model = {
+			object  : _model,
+			resource: function () {
+				return _$ ('[sp-recipe="' + moduleId + '"] [sp-model]');
+			},
+			set     : function (obj) {
+				var _resource = this.resource ();
+				//Exist resource?
+				if ( _resource.exist )
+					_model.set (_resource, obj);
+				return _self.recipeCollection[moduleId].instance;
+			},
+			get     : function (item) {
+				var _resource = this.resource ();
+				//Exist resource?
+				if ( _resource.exist ) {
+					return {
+						then: function (resolve) {
+							return _model.get (_resource).then (function (e) {
+								if (
+									_.isSet (item)
+									&& _.isArray (item)
+									&& !_.isEmpty (item)
+								) {
+									var _result = {};
+									_.each (item, function (v, i) {
+										if ( v in e.scope )
+											_result[v] = e.scope[v];
+									});
+
+									e.scope = _result;
+								}
+
+								// Call the resolve
+								resolve.call (
+									_self.recipeCollection[moduleId].instance, e
+								)
+							});
+						}
+					};
+				}
+			}
+		}
+	});
+
+	/**Prepare Views
+	 * @param moduleId
+	 * */
+	Apps.add ('_views', function (moduleId) {
+		// Render view
+		var _self = this;
+		_self.recipeCollection[moduleId].instance.view = {
+			render: function (_view, _cache) {
+				//Rend
+				var _rend = _self._serve (
+					moduleId, _view || null,
+					_cache || false
+				);
+
+				//Async
+				return {
+					then: function (resolve) {
+						return _rend.then (function (m) {
+							// Call the resolve
+							resolve.call (
+								_self.recipeCollection[moduleId].instance, m
+							)
+						})
+					}
+				}
+			}
+		}
+	});
+
+
+	/**Prepare Scopes
+	 * @param moduleId
+	 * */
+	Apps.add ('_scopes', function (moduleId) {
+		// Render view
+		var _self = this;
+
+		_self.recipeCollection[moduleId].instance.scope = {
+			global: _self.scope,
+			object: _self.scope[moduleId],
+			set   : function (nModule, object) {
+				var _moduleId = !_.isObject (nModule)
+								&& _.isString (nModule) && nModule
+								|| moduleId,
+					_object = _.isObject (nModule) && nModule
+							  || object;
+
+				if ( _.isObject (_object) ) {
+					_self._setScope (_moduleId, _object);
+					return _self.recipeCollection[moduleId].instance;
+				}
+			},
+			get   : function (nModule) {
+				var _moduleId = _.isString (nModule)
+					? nModule : moduleId;
+
+				return _self._getScope (_moduleId);
 			}
 		};
+	});
 
-		//Handle request interceptor
-		_self._handleInterceptor ('request', _self.config);
+	/**Prepare App
+	 * @param moduleId
+	 * */
+	Apps.add ('_app', function (moduleId) {
+		// Render view
+		var _self = this;
 
-		//Promise execution
-		return (new Promise (function (resolve, reject) {
-
-			if ( !_.isSet (url) )
-				_.error (_.WARNING_SYRUP.ERROR.NOURL, '(Http .request)');
-
-			//If is Object and not formData
-			//parse Object to querystring
-			if ( !_.isFormData (_data)
-				 && _.isObject (_data)
-				 && _.getObjectSize (_data) > 0
-			) {
-				_data = _.jsonToQueryString (_data);
+		_self.recipeCollection[moduleId].instance.app = {
+			object: _$ ('[sp-app]'),
+			title : function (title) {
+				var _title = _$ ('title');
+				if ( _title.exist ) {
+					_title.text (title)
+				}
+				return _self.recipeCollection[moduleId].instance;
 			}
+		};
+	});
 
-			//If method is GET and data exists
-			if ( _self.config.method === 'GET'
-				 && _.isString (_data)
-			) {
-				_query += '?' + _data;
+
+	/**Prepare Recipes
+	 * @param moduleId
+	 * */
+	Apps.add ('_recipes', function (moduleId) {
+		// Render view
+		var _self = this;
+		_self.recipeCollection[moduleId].instance.recipe = {
+			$   : _$ ('[sp-recipe="' + moduleId + '"]'),
+			get : function (nModule) {
+				var _moduleId = _.isString (nModule)
+					? nModule : moduleId;
+
+				return _self._getRecipe (_moduleId);
+			},
+			drop: function (nModule) {
+				var _moduleId = _.isString (nModule)
+					? nModule : moduleId;
+
+				_self.drop (_moduleId);
+				return _self.recipeCollection[moduleId].instance;
 			}
+		};
+	});
 
+	/** Render the View
+	 * @param moduleId
+	 * @param view
+	 * @return object
+	 */
+	Apps.add ('_serve', function (moduleId, view, cleanCache) {
+		var _view = null,
+			_scope = this.scope[moduleId];
 
-			//Process url
-			_query = url + (_query);
-			_self.xhr.open (_self.config.method, _query, true);
-			_self.xhr.timeout = _self.config.timeout;
+		//Find the recipe
+		var _dom = _$ ('[sp-recipe="' + moduleId + '"] [sp-view]'),
+			_dom_template = _$ ('[sp-recipe="' + moduleId + '"] [sp-tpl]');
+		return new Promise (function (resolve) {
+			if ( _dom.exist ) { //Exist?
 
-			//Setting Headers
-			if ( !_.isFormData (_data) ) {
-				_.each (_self.config.headers, function (value, header) {
-					_self._requestHeader (header, value);
-				});
-			}
+				//The view object
+				_view = new View;
 
-			//Cors?
-			_self.xhr.withCredentials = !!_self.config.cors;
+				//A view?
+				if ( _.isSet (view) && _.isString (view) ) {
+					var view_name = view.split ('/').pop (),
+						view_dir = _.replace (view, '/' + view_name, _.emptyStr),
+						view_template_dir = 'layout/' + view_dir + '/' + view_name;
 
-			//If upload needed
-			if ( _.isSet (_self.config.upload)
-				 && _.isBoolean (_self.config.upload)
-			) {
-				_self.upload = _self.xhr.upload;
-				_self.xhr = _self.upload;
-			}
+					//Handle template?
+					if ( /\.html$/.test (view_name) ) {
 
-			//Event Listeners
-			//Success
-			_self.xhr.addEventListener ('load', function (e) {
-				if ( this.status >= 0xC8 && this.status < 0x190 ) {
-					var _response = this.response || this.responseText;
-					if ( _.isJson (_response) ) {
-						_response = JSON.parse (_response);
+						//Clean cache?
+						if ( cleanCache )
+							_view.cleanCache (view_template_dir);
+
+						//Seek for tpl
+						_view.seekTpl (view_template_dir)
+							.then (function (view) {
+									   view.render (_scope).then (function (res) {
+										   _dom.html (res);
+										   resolve (res);
+									   })
+								   })
+					} else {
+						//Handle view?
+						//Require the view if needed
+						Require.lookup (['view/' + view_dir]).then (function () {
+							if ( view_name in _view.__proto__ )
+								_view[view_name] (_, _scope, function (my_html) {
+									_dom.html (my_html);
+									resolve (my_html)
+								})
+						});
 					}
-					//Find a interceptor for success
-					_self._handleInterceptor ('success', _response);
 
-					resolve (_response);
-
+					//Exist inline tpl?
+				} else if ( _dom_template.exist ) {
+					_view.render (_dom_template.html (), _scope)
+						.then (function (result) {
+								   _dom.html (result);
+								   resolve (result)
+							   });
 				}
-			});
+			}
+		});
 
-			//Progress
-			_self.xhr.addEventListener ('progress', function (e) {
-				//Find a interceptor for progress
-				_self._handleInterceptor ('progress', e);
+	});
 
-			}, false);
+	/** Execute Module
+	 *@param moduleId
+	 * @return object
+	 */
+	Apps.add ('_taste', function (moduleId) {
+		var _self = this;
 
-			//State
-			_self.xhr.addEventListener ('readystatechange', function (e) {
-				if ( this.readyState ) {
-					//Find a interceptor for state
-					_self._handleInterceptor ('state', e);
+		//Handle taste interceptor
+		_self._handleInterceptor ('taste', _self);
+
+		//Module registered?
+		//Root exists?
+		if ( moduleId in _self.recipeCollection
+			 && _.isSet (_self.root)
+		) {
+
+			// Initialize module
+			_self._add (moduleId);
+
+			//Trigger creator
+			_self.recipeCollection[moduleId].instance = _self._trigger (moduleId);
+
+			//Not object return by creator?
+			//Break!!!
+			if ( !_.isObject (_self.recipeCollection[moduleId].instance) )
+				return;
+
+			//Recipe Name and Parent name
+			_self.recipeCollection[moduleId].instance.name = moduleId;
+			_self.recipeCollection[moduleId].instance.parent = _self;
+
+			// Binding Methods
+			// Event handler
+			_self.recipeCollection[moduleId].instance.when = function (event) {
+				return _self.when (event, moduleId);
+			};
+
+			// Recipes
+			_self._recipes (moduleId);
+
+			// Scoping
+			_self._scopes (moduleId);
+
+			// Handle Model
+			_self._models (moduleId);
+
+			// Handle App
+			_self._app (moduleId);
+
+			// Handle Views
+			_self._views (moduleId);
+
+			// Init the module?
+			if (
+				'init' in _self.recipeCollection[moduleId].instance
+				&& _.isFunction (_self.recipeCollection[moduleId].instance.init)
+			) {
+
+				//Handle taste interceptor
+				_self._handleInterceptor (
+					'init', _self.recipeCollection[moduleId].instance
+				);
+
+				//Require Libs?
+				if (
+					'require' in _self.recipeCollection[moduleId].instance
+					&& _.isArray (_self.recipeCollection[moduleId].instance.require)
+				) {
+					//LookUp for libs!!
+					Require.lookup (_self.recipeCollection[moduleId].instance.require).then (function (e) {
+						//Execution
+						_self.lib._dependencies (e.getCleanDependencies ());
+						_self.recipeCollection[moduleId].instance.init (
+							_self.lib.get (_self.root)
+						);
+					});
+				} else {
+					//Execution
+					_self.recipeCollection[moduleId].instance.init (
+						_self.lib.get (_self.root)
+					);
 				}
-			});
 
-			//Abort
-			_self.xhr.addEventListener ('abort', function (e) {
-				//Find a interceptor for abort
-				_self._handleInterceptor ('abort', e);
+				//Handle taste interceptor
+				_self._handleInterceptor (
+					'after', _self.recipeCollection[moduleId].instance
+				);
+			}
 
-			});
+			// Bind listeners
+			_self._bindListener (moduleId);
 
-			//Complete
-			_self.xhr.addEventListener ('loadend', function (e) {
-				//Find a interceptor for complete
-				_self._handleInterceptor ('complete', e);
+			// Observe scope
+			_self._watch (moduleId);
+		}
 
-			});
+		return this;
+	});
 
-			_self.xhr.addEventListener ('loadstart', function (e) {
-				//Find a interceptor for  before
-				_self._handleInterceptor ('before', e);
-			});
+	/** Execute All or One Module
+	 *@param moduleId
+	 * @return object
+	 */
+	Apps.add ('taste', function (moduleId) {
+		var _self = this,
+			_moduleId = moduleId && [moduleId]
+						|| _.getObjectKeys (_self.recipeCollection);
 
-			_self.xhr.addEventListener ('error', function (e) {
-				reject (e);
+		//Reset lazy exec
+		_self.lazy = false;
+		//No clean interceptors
+		_self.interceptClean = false;
 
-				//Find a interceptor for success
-				_self._handleInterceptor ('error', e);
-			});
+		//Execute!!
+		_.each (_moduleId, function (v) {
+			_self._taste (v);
+		});
 
-			//Send
-			_self.xhr_list.push (_self.xhr);
-			_self.xhr.send (_self.config.method !== 'GET' ? _data : null);
-		}));
+		//After execute clean all
+		MiddleWare.cleanInterceptor (_self, 'init');
 
+		return this;
 	});
 
 	/** Interceptors
 	 * @param  {object} interceptors
 	 * @return {object}
 	 * */
-	Http.add ('intercept', function (interceptors) {
+	Apps.add ('intercept', function (interceptors) {
 		if ( _.isObject (interceptors) )
 			MiddleWare.intercept (this, interceptors);
 		return this;
@@ -168,7 +638,7 @@
 	 * @param {object} param
 	 * @return {void}
 	 * */
-	Http.add ('_handleInterceptor', function (type, param) {
+	Apps.add ('_handleInterceptor', function (type, param) {
 		//Trigger Interceptors
 		MiddleWare.trigger (
 			MiddleWare.getInterceptors (this, type),
@@ -176,102 +646,42 @@
 		);
 
 		//Clean the interceptor
-		MiddleWare.cleanInterceptor (this, type);
-	});
-
-	/**Get request
-	 * @param {string} url
-	 * @param {object} data
-	 * @return {object}
-	 * */
-	Http.add ('get', function (url, data) {
-		this.kill ();
-		return this.request (url, data);
+		if ( this.interceptClean ) {
+			MiddleWare.cleanInterceptor (this, type);
+		}
 	});
 
 
-	/**Post request
-	 * @param {string} url
-	 * @param {object} data
-	 * @return {object}
+	/**Drop a Module
+	 * @param moduleId
+	 * @return object
 	 * */
-	Http.add ('post', function (url, data) {
-
-		//MiddleWare
-		this.intercept ({
-			request: function (config, xhr) {
-				config.method = 'POST';
+	Apps.add ('drop', function (moduleId) {
+		if ( moduleId in this.recipeCollection ) {
+			if ( this.recipeCollection[moduleId].instance ) {
+				if ( 'destroy' in this.recipeCollection[moduleId].instance )
+					this.recipeCollection[moduleId].instance.destroy (this.lib.get (this.root));
+				this.recipeCollection[moduleId] = null;
 			}
-		});
-
-		this.kill ();
-		return this.request (url, data);
-	});
-
-
-	/**Put request
-	 * @param {string} url
-	 * @param {object} data
-	 * @return {object}
-	 * */
-	Http.add ('put', function (url, data) {
-
-		//MiddleWare
-		this.intercept ({
-			request: function (config, xhr) {
-				config.method = 'PUT';
-			}
-		});
-
-
-		this.kill ();
-		return this.request (url, data);
-	});
-
-
-	/**Delete request
-	 * @param {string} url
-	 * @param {object} data
-	 * @return {object}
-	 * */
-	Http.add ('delete', function (url, data) {
-
-		//MiddleWare
-		this.intercept ({
-			request: function (config, xhr) {
-				config.method = 'DELETE';
-			}
-		});
-
-		this.kill ();
-		return this.request (url, data);
-	});
-
-
-	/** Set Request Header
-	 * @param {string} header
-	 * @param {string} type
-	 * @return {object}
-	 * **/
-	Http.add ('_requestHeader', function (header, type) {
-		this.xhr.setRequestHeader (header, type);
+		}
 		return this;
 	});
 
-	/** Kill Http request
-	 * @return {object}
-	 * */
-	Http.add ('kill', function () {
-		_.each (this.xhr_list, function (xhr) {
-			xhr.abort ();
-		});
 
-		this.xhr_list.length = 0;
+	/**Drop all Modules
+	 * @return object
+	 * */
+	Apps.add ('dropAll', function () {
+		var _self = this;
+		_.each (this.recipeCollection, function (module, id) {
+			_self.drop (id);
+		});
 		return this;
 	});
 
-	//Global access
-	window.Http = Http;
+//The global object App
+	window.App = new Apps;
+	window.AppClass = Apps;
 
-
-}) (window);
+})
+(window);

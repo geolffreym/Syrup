@@ -62,12 +62,12 @@
 
     //The App with dependencies
     var my_App = App.blend ('Hey', ['Http']);
-
+    console.log (my_App);
     //A global service
     my_App.spice ({
         //Provide constant
         MAX: 3
-    }).services ({
+    }).service ({
         'myConsole': function (msg) {
             console.log (this.MAX)
         }

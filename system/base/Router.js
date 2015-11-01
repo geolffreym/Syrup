@@ -1,5 +1,6 @@
 /**
  * Created by gmena on 07-26-14.
+ * Interceptor: ['redirect']
  */
 
 
@@ -29,9 +30,8 @@
 
 		//Set Pop State
 		window.addEventListener ('popstate', function (e) {
-			//Intercept pop state
-			_self._handleInterceptor ('popstate', e);
 
+			//Get the route name
 			if ( _.isSet (e.state) && 'route_name' in e.state ) {
 				if ( e.state.route_name in _self.onpopstate ) {
 					_.each (_self.onpopstate[e.state.route_name], function (v, i) {
@@ -301,7 +301,7 @@
 		);
 
 		//Clean the interceptor
-		MiddleWare.cleanInterceptor (this, type);
+		//MiddleWare.cleanInterceptor(this, type);
 	});
 
 	/** Match the uri
