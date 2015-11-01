@@ -1607,7 +1607,8 @@ if ( typeof exports !== 'undefined' )
 		return this;
 	});
 
-	/**Retorna la pocision exacta de un elemento y sus caracteristicas
+	/**Retorna la posicion relativa a la pantalla,
+	 *  de un elemento y sus caracteristicas
 	 * @param {object} _dom
 	 * @returns {object}
 	 */
@@ -1622,6 +1623,7 @@ if ( typeof exports !== 'undefined' )
 				height: _dom.outerHeight
 			}
 		}
+
 
 		return _dom.getBoundingClientRect ();
 	});
