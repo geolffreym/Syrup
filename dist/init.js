@@ -5075,13 +5075,6 @@ if ( !Object.observe ) {
 		this.Repo = new Repo;
 		this.key = '___templates';
 		this.tpl = null;
-
-		//MiddleWare
-		this.Http.intercept ({
-			request: function (config) {
-				config.headers['Content-Type'] = 'text/plain';
-			}
-		});
 	}
 
 	/**Search for the template
@@ -5089,7 +5082,14 @@ if ( !Object.observe ) {
 	 * @return {object}
 	 */
 	View.add ('lookup', function (template) {
-		
+
+		//MiddleWare
+		this.Http.intercept ({
+			request: function (config) {
+				config.headers['Content-Type'] = 'text/plain';
+			}
+		});
+
 		//The template request
 		return this.Http.request (
 			setting.app_path + '/templates/' + template
