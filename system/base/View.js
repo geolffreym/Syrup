@@ -14,9 +14,7 @@
 	 */
 
 	function View () {
-		this.Http = new Http;
 		this.Repo = new Repo;
-		this.Worker = new Workers;
 		this.key = '___templates';
 		this.tpl = null;
 	}
@@ -26,16 +24,18 @@
 	 * @return {object}
 	 */
 	View.add ('lookup', function (template) {
+		//Http handler!!
+		var Http = new Http;
 
 		//MiddleWare
-		this.Http.intercept ({
+		Http.intercept ({
 			request: function (config) {
 				config.headers['Content-Type'] = 'text/plain';
 			}
 		});
 
 		//The template request
-		return this.Http.request (
+		return Http.request (
 			setting.app_path + '/templates/' + template
 		);
 	});
@@ -120,7 +120,9 @@
 	 * @return {object}
 	 * **/
 	View.add ('render', function (_template, _fields) {
-		var _self = this, _worker = _self.Worker;
+		var _self = this,
+			_worker = new Workers;
+
 
 		return (new Promise (function (resolve) {
 			_fields = _.isObject (_template) && _template || _fields;
