@@ -260,8 +260,8 @@
 					reject (_self.fail (field, 'empty'));
 					break;
 					//isMail?
-				} else if ( _$ (field).data ('mail') && !_.isMail (fieldValue) ) {
-					reject (_self.fail (field, 'invalid_mail'));
+				} else if ( _$ (field).data ('email') && !_.isMail (fieldValue) ) {
+					reject (_self.fail (field, 'invalid_email'));
 					break;
 					//Overflow down?
 				} else if ( _$ (field).data ('min') && (
