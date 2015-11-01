@@ -277,6 +277,7 @@
 			} else if ( _.isSet (_data_set[name]) ) {
 				_values.push (_data_set[name])
 			}
+
 		});
 
 		return _.specArray (_values);
@@ -1324,7 +1325,7 @@
 		//Interceptor
 		_worker.intercept ({
 			'message': function (e) {
-				_.callbackAudit (callback, e.data);
+				_worker.interceptClean ('message');
 			}
 		}).run ('/workers/setting/Interval').then (function (_worker) {
 			//Worker Running
@@ -1836,7 +1837,7 @@
 		).$;
 	}) ();
 
-	_.VERSION = '1.1.7';
+	_.VERSION = '1.1.6';
 	_.$fn = _$_;
 	_.emptyStr = '';
 	_.Syrup = Syrup;

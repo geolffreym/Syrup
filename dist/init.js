@@ -295,6 +295,7 @@ if ( typeof exports !== 'undefined' )
 			} else if ( _.isSet (_data_set[name]) ) {
 				_values.push (_data_set[name])
 			}
+
 		});
 
 		return _.specArray (_values);
@@ -1342,7 +1343,7 @@ if ( typeof exports !== 'undefined' )
 		//Interceptor
 		_worker.intercept ({
 			'message': function (e) {
-				_.callbackAudit (callback, e.data);
+				_worker.interceptClean ('message');
 			}
 		}).run ('/workers/setting/Interval').then (function (_worker) {
 			//Worker Running
@@ -1854,7 +1855,7 @@ if ( typeof exports !== 'undefined' )
 		).$;
 	}) ();
 
-	_.VERSION = '1.1.7';
+	_.VERSION = '1.1.6';
 	_.$fn = _$_;
 	_.emptyStr = '';
 	_.Syrup = Syrup;
@@ -5015,6 +5016,16 @@ if ( !Object.observe ) {
 		return this;
 	});
 
+	/** Clean Interceptors
+	 * @param  {string} type
+	 * @return {object}
+	 * */
+	Workers.add ('interceptClean', function (type) {
+		//Clean the interceptor
+		MiddleWare.cleanInterceptor (this, type);
+		return this;
+	});
+
 	/** Handle the interceptors
 	 * @param {string} type
 	 * @param {object} param
@@ -5028,7 +5039,7 @@ if ( !Object.observe ) {
 		);
 
 		//Clean the interceptor
-		MiddleWare.cleanInterceptor (this, type);
+		//MiddleWare.cleanInterceptor (this, type);
 	});
 
 
@@ -5193,7 +5204,7 @@ if ( !Object.observe ) {
 			}).run ('/workers/setting/Parser').then (function (worker) {
 				//Worker running
 				worker.toWork ({
-					template: _template  || _.emptyStr,
+					template: _template || _.emptyStr,
 					fields  : _fields || {}
 				});
 			});
@@ -5988,11 +5999,11 @@ if ( !Object.observe ) {
 						//Seek for tpl
 						_view.seekTpl (view_template_dir)
 							.then (function (view) {
-									   view.render (_scope).then (function (res) {
-										   _dom.html (res);
-										   resolve (res);
-									   })
-								   })
+							view.render (_scope).then (function (res) {
+								_dom.html (res);
+								resolve (res);
+							})
+						})
 					} else {
 						//Handle view?
 						//Require the view if needed
@@ -6009,9 +6020,9 @@ if ( !Object.observe ) {
 				} else if ( _dom_template.exist ) {
 					_view.render (_dom_template.html (), _scope)
 						.then (function (result) {
-								   _dom.html (result);
-								   resolve (result)
-							   });
+						_dom.html (result);
+						resolve (result)
+					});
 				}
 			}
 		});
@@ -6149,6 +6160,16 @@ if ( !Object.observe ) {
 	Apps.add ('intercept', function (interceptors) {
 		if ( _.isObject (interceptors) )
 			MiddleWare.intercept (this, interceptors);
+		return this;
+	});
+
+	/** Clean Interceptors
+	 * @param  {string} type
+	 * @return {object}
+	 * */
+	Apps.add ('interceptClean', function (type) {
+		//Clean the interceptor
+		MiddleWare.cleanInterceptor (this, type);
 		return this;
 	});
 
