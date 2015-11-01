@@ -6430,7 +6430,7 @@ if ( !Object.observe ) {
 	 * */
 	Router.add ('reverse', function (route_name, params) {
 		if ( route_name in this.routes )
-			return this._rewriteRules (this.routes[route_name], params)
+			return this._rewriteRules (this.routes[route_name], params || {})
 				   || this.routes[route_name];
 
 		return _.emptyStr;
