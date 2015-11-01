@@ -118,6 +118,16 @@
 		//MiddleWare.cleanInterceptor(this, type);
 	});
 
+	/** Clean Interceptors
+	 * @param  {string} type
+	 * @return {object}
+	 * */
+	Hash.add ('interceptClean', function (type) {
+		//Clean the interceptor
+		MiddleWare.cleanInterceptor (this, type);
+		return this;
+	});
+
 
 	/**Set the target
 	 * @param {object} routes
