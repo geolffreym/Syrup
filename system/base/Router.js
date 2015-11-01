@@ -228,6 +228,16 @@
 		return this;
 	});
 
+	/** Clean Interceptors
+	 * @param  {string} type
+	 * @return {object}
+	 * */
+	Router.add ('interceptClean', function (type) {
+		//Clean the interceptor
+		MiddleWare.cleanInterceptor (this, type);
+		return this;
+	});
+
 	/** Routing
 	 * @param {string} route_name
 	 * @return {void}
