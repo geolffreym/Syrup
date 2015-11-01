@@ -25,17 +25,18 @@
 	 */
 	View.add ('lookup', function (template) {
 		//Http handler!!
-		var Http = new Http;
+		var _http = new Http;
 
 		//MiddleWare
-		Http.intercept ({
+		_http.intercept ({
 			request: function (config) {
 				config.headers['Content-Type'] = 'text/plain';
+				console.log ('yeah');
 			}
 		});
 
 		//The template request
-		return Http.request (
+		return _http.request (
 			setting.app_path + '/templates/' + template
 		);
 	});
@@ -122,7 +123,6 @@
 	View.add ('render', function (_template, _fields) {
 		var _self = this,
 			_worker = new Workers;
-
 
 		return (new Promise (function (resolve) {
 			_fields = _.isObject (_template) && _template || _fields;

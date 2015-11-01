@@ -5081,6 +5081,8 @@ if ( !Object.observe ) {
 	 * @return {object}
 	 */
 	View.add ('lookup', function (template) {
+
+		console.log (Http);
 		//Http handler!!
 		var Http = new Http;
 
