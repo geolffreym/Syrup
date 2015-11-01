@@ -89,6 +89,16 @@
 		return this;
 	});
 
+	/** Clean Interceptors
+	 * @param  {string} type
+	 * @return {object}
+	 * */
+	Hash.add ('interceptClean', function (type) {
+		//Clean the interceptor
+		MiddleWare.cleanInterceptor (this, type);
+		return this;
+	});
+
 
 	/** Handle the interceptors
 	 * @param {string} type
@@ -103,7 +113,7 @@
 		);
 
 		//Clean the interceptor
-		MiddleWare.cleanInterceptor (this, type);
+		//MiddleWare.cleanInterceptor(this, type);
 	});
 
 

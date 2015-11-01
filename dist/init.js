@@ -6709,6 +6709,16 @@ if ( !Object.observe ) {
 		return this;
 	});
 
+	/** Clean Interceptors
+	 * @param  {string} type
+	 * @return {object}
+	 * */
+	Hash.add ('interceptClean', function (type) {
+		//Clean the interceptor
+		MiddleWare.cleanInterceptor (this, type);
+		return this;
+	});
+
 
 	/** Handle the interceptors
 	 * @param {string} type
@@ -6723,7 +6733,7 @@ if ( !Object.observe ) {
 		);
 
 		//Clean the interceptor
-		MiddleWare.cleanInterceptor (this, type);
+		//MiddleWare.cleanInterceptor(this, type);
 	});
 
 
