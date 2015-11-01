@@ -276,7 +276,7 @@
 
 			//Value?
 			if ( _.isString (value) || _.isNumber (value) ) {
-				_data_set[name] = _.isArray (value) ? value[i] : value;
+				_data_set[name] = value;
 			} else if ( _.isSet (_data_set[name]) ) {
 				_values.push (_data_set[name])
 			}
@@ -284,9 +284,8 @@
 		});
 
 		return (_.isString (value)
-			   || _.isNumber (value)
-				  && _.specArray (_values)
-			   ) || this;
+				&& _.isNumber (value)
+				&& this) || _.specArray (_values);
 	});
 
 
