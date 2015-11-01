@@ -653,7 +653,7 @@ if ( typeof exports !== 'undefined' )
 		//ClassList and hasClass?
 		return elem.classList
 			   && Array.prototype.indexOf.call (
-				elem.classList, cls || _.emptyStr
+				elem.classList, (cls || _.emptyStr)
 			) > -1;
 
 	});
