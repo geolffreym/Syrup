@@ -15,7 +15,7 @@
 				   || new window.ActiveXObject ("Microsoft.XMLHTTP");
 		this.xhr_list = [];
 		this.upload = null;
-		this.config = null;
+		this.config = {};
 		this.interceptors = {};
 	}
 
@@ -30,7 +30,7 @@
 			_data = data || null;
 
 		//Make global conf
-		_self.config = {
+		_self.config = _.extend ({
 			method : 'GET',
 			timeout: 0xFA0,
 			upload : false,
@@ -38,7 +38,7 @@
 			headers: {
 				'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'
 			}
-		};
+		}, _self.config, true);
 
 		//Handle request interceptor
 		_self._handleInterceptor ('request', _self.config);
@@ -206,14 +206,10 @@
 	 * @return {object}
 	 * */
 	Http.add ('post', function (url, data, kill) {
+		//The method!!
+		this.config.method = 'POST';
 
-		//MiddleWare
-		this.intercept ({
-			request: function (config, xhr) {
-				config.method = 'POST';
-			}
-		});
-
+		//Kill other request?
 		kill && this.kill ();
 		return this.request (url, data);
 	});
@@ -225,15 +221,10 @@
 	 * @return {object}
 	 * */
 	Http.add ('put', function (url, data, kill) {
+		//The method!!
+		this.config.method = 'PUT';
 
-		//MiddleWare
-		this.intercept ({
-			request: function (config, xhr) {
-				config.method = 'PUT';
-			}
-		});
-
-
+		//Kill other request?
 		kill && this.kill ();
 		return this.request (url, data);
 	});
@@ -245,14 +236,10 @@
 	 * @return {object}
 	 * */
 	Http.add ('delete', function (url, data, kill) {
+		//The method!!
+		this.config.method = 'DELETE';
 
-		//MiddleWare
-		this.intercept ({
-			request: function (config, xhr) {
-				config.method = 'DELETE';
-			}
-		});
-
+		//Kill other request?
 		kill && this.kill ();
 		return this.request (url, data);
 	});
