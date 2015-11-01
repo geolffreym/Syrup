@@ -1325,7 +1325,7 @@
 		//Interceptor
 		_worker.intercept ({
 			'message': function (e) {
-				_worker.interceptClean ('message');
+				_.callbackAudit (callback, e.data);
 			}
 		}).run ('/workers/setting/Interval').then (function (_worker) {
 			//Worker Running

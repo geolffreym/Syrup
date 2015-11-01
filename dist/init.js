@@ -1343,7 +1343,7 @@ if ( typeof exports !== 'undefined' )
 		//Interceptor
 		_worker.intercept ({
 			'message': function (e) {
-				_worker.interceptClean ('message');
+				_.callbackAudit (callback, e.data);
 			}
 		}).run ('/workers/setting/Interval').then (function (_worker) {
 			//Worker Running
@@ -1919,7 +1919,7 @@ if ( typeof exports !== 'undefined' )
 	 * @return {object}
 	 * **/
 	Libs.add ('get', function (name) {
-		return (name in this.breadcrumb) && _[name];
+		return (name in this.breadcrumb) && this.breadcrumb[name];
 	});
 
 	/**Dependencies gestor
