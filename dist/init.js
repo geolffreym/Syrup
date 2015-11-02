@@ -1570,11 +1570,13 @@ if ( typeof exports !== 'undefined' )
 		//Positions!!
 		var _p = {
 			first: false,
-			last : false
+			last : false,
+			break: false
 		};
 
 		if ( _.isArray (_object) ) {
 			//Array?
+
 			var i = 0, max = _object.length;
 
 			for ( ; i < max; i++ ) {
@@ -1584,6 +1586,10 @@ if ( typeof exports !== 'undefined' )
 				//Filter function ?
 				callback && noFilterF ? callback (_object[i], i, _p)
 					: _.callbackAudit (callback, _object[i], i, _p);
+
+				//Break?
+				if ( _p.break )
+					break;
 
 			}
 		} else if ( _.isObject (_object) ) {
@@ -1599,6 +1605,10 @@ if ( typeof exports !== 'undefined' )
 				//Filter function ?
 				callback && noFilterF ? callback (_object[_keys[_i]], _keys[_i], _p)
 					: _.callbackAudit (callback, _object[_keys[_i]], _keys[_i], _p);
+
+				//Break?
+				if ( _p.break )
+					break;
 
 			}
 		}
@@ -5275,19 +5285,10 @@ if ( !Object.observe ) {
 	}
 
 
-	/**Set method request
-	 * @param method
-	 * @return object
-	 */
-	Model.add ('method', function (method) {
-		this.type = method.toUpperCase ();
-		return this;
-	});
-
 	/**Attach additional data to request
-	 * @param name
-	 * @param attach
-	 * @return object
+	 * @param {string} name
+	 * @param {object} attach
+	 * @return {object}
 	 */
 	Model.add ('attach', function (name, attach) {
 		var self = this;
@@ -5297,8 +5298,8 @@ if ( !Object.observe ) {
 	});
 
 	/**Getting a array of values name="input[]"
-	 * @param name
-	 * @return array
+	 * @param {string} name
+	 * @return {array}
 	 */
 	Model.add ('multiple', function (name) {
 		var _return = [],
@@ -5314,15 +5315,16 @@ if ( !Object.observe ) {
 	});
 
 	/**Model fail what to do?
-	 * @param field
-	 * @param error
-	 *
+	 * @param {object} field
+	 * @param {object} error
+	 * @return {object}
 	 */
 	Model.add ('fail', function (field, error) {
 		this.failed = true;
 		return {
 			field : field,
-			error : error,
+			code  : error.code,
+			error : error.error,
 			coords: _.cartesianPlane (field)
 		};
 	});
@@ -5349,8 +5351,7 @@ if ( !Object.observe ) {
 	 * */
 	Model.add ('file', function (input) {
 		var _self = this,
-			_formData = new FormData,
-			_files = [],
+			_formData = new FormData, _files = [],
 			_field = !_.is$ (input) && _$ (input).get (0) || input;
 
 		//Not model.. pass!!
@@ -5462,7 +5463,17 @@ if ( !Object.observe ) {
 	/**Pack the inputs in ModelData Object
 	 * @param {object|string } model
 	 * @return {object}
-	 */
+
+	 * CODES:
+	 * 001: Required
+	 * 002: Type error
+	 * 003: Overflow Length
+	 * 004: Bad step
+	 * 005: Underflow value
+	 * 006: Overflow value
+	 * 007: Bad pattern
+	 * */
+
 	Model.add ('get', function (model) {
 		this.model = !_.is$ (model) && _$ (model) || model;
 
@@ -5474,7 +5485,7 @@ if ( !Object.observe ) {
 			_modelData = new FormData,
 			_field_array, _model_obj = _self.model.get (0),
 			_fields = _model_obj.querySelectorAll ('input, textarea, select'),
-			x = _fields.length;
+			x = _fields.length, _codes = null;
 
 		_self.failed = false;
 
@@ -5502,49 +5513,51 @@ if ( !Object.observe ) {
 				var field = _fields[x],
 					fieldValue = field.value;
 
-				//Skip?
-				if ( !( _$ (field).data ('skip')) && _.isEmpty (fieldValue) ) {
-					reject (_self.fail (field, 'empty'));
-					break;
-					//isMail?
-				} else if ( _$ (field).data ('email') && !_.isMail (fieldValue) ) {
-					reject (_self.fail (field, 'invalid_email'));
-					break;
-					//Overflow down?
-				} else if ( _$ (field).data ('min') && (
-						+_$ (field).data ('min') > fieldValue.length
-					) ) {
-					reject (_self.fail (field, 'minim_chars'));
-					break;
-					//Overflow?
-				} else if ( _$ (field).data ('max') && (
-						+_$ (field).data ('max') < fieldValue.length
-					) ) {
-					reject (_self.fail (field, 'overflow_chars'));
-					break;
-				} else {
-					//Custom validation
-					if ( _$ (field).data ('custom') ) {
-						var Regex = new RegExp (_$ (field).data ('custom'), "g");
-						if ( !Regex.test (fieldValue) ) {
-							reject (_self.fail (field, 'invalid_custom'));
-							break;
+				//Valid field?
+				if ( !field.checkValidity () ) {
+
+					//Codes List
+					_codes = {
+						'valueMissing'   : '001',
+						'typeMismatch'   : '002',
+						'tooLong'        : '003',
+						'stepMismatch'   : '004',
+						'rangeUnderFlow' : '005',
+						'rangeOverFlow'  : '006',
+						'patternMismatch': '007'
+					};
+
+					//Find the error code!!
+					_.each (_codes, function (v, i, loop) {
+						if ( i in field.validity && field.validity[i] ) {
+							//Break loop
+							loop.break = true;
+
+							//Reject!!! Error found..
+							reject (_self.fail (field, {
+								code: v, error: field.validationMessage
+							}));
+
 						}
-					}
 
-					//The field has name?
-					if ( _.isSet (field.name) ) {
+					});
 
-						//Has multiple?
-						if ( !!(_field_array = _self.multiple (field.name)) )
-							fieldValue = _field_array;
-
-						//Append Data
-						_modelData.append (field.name, fieldValue);
-						_self.scope[field.name] = fieldValue;
-					}
-
+					//Error? .. Pass!!
+					return;
 				}
+
+				//The field has name?
+				if ( _.isSet (field.name) ) {
+
+					//Has multiple?
+					if ( !!(_field_array = _self.multiple (field.name)) )
+						fieldValue = _field_array;
+
+					//Append Data
+					_modelData.append (field.name, fieldValue);
+					_self.scope[field.name] = fieldValue;
+				}
+
 			}
 
 			//The model data

@@ -1551,38 +1551,34 @@
 	Syrup.add ('each', function (_object, callback, noFilterF) {
 		//Positions!!
 		var _p = {
-			first: false,
-			last : false
-		};
+				first: false,
+				last : false,
+				break: false
+			}, _i = 0, _keys = null,
+			_max = _object.length || _.getObjectSize (_object);
 
-		if ( _.isArray (_object) ) {
-			//Array?
-			var i = 0, max = _object.length;
 
-			for ( ; i < max; i++ ) {
-				_p.first = i === 0;
-				_p.last = (i + 1) === max;
+		//Is object? get the keys!!
+		if ( _.isObject (_object) )
+			_keys = _.getObjectKeys (_object);
 
-				//Filter function ?
-				callback && noFilterF ? callback (_object[i], i, _p)
-					: _.callbackAudit (callback, _object[i], i, _p);
 
-			}
-		} else if ( _.isObject (_object) ) {
+		//While object has elements!!
+		while ( (_i++) < _max ) {
+			_p.first = ((_i - 1) == 0);
+			_p.last = (_i == _max);
 
-			//Object?
-			var _keys = Object.keys (_object),
-				_tmp, _i = _tmp = _keys.length;
+			//Filter function ?
+			callback && noFilterF ? callback (
+				_keys && _object[_keys[_i - 1]] || _object[_i - 1], _keys && _keys[_i - 1] || _i - 1, _p
+			) : _.callbackAudit (callback,
+								 _keys && _object[_keys[_i - 1]] || _object[_i - 1], _keys && _keys[_i - 1] || _i - 1, _p
+			);
 
-			while ( _i-- ) {
-				_p.first = (_i + 1) === _tmp;
-				_p.last = _i === 0;
+			//If Break!!
+			if ( _p.break )
+				break;
 
-				//Filter function ?
-				callback && noFilterF ? callback (_object[_keys[_i]], _keys[_i], _p)
-					: _.callbackAudit (callback, _object[_keys[_i]], _keys[_i], _p);
-
-			}
 		}
 
 		return this;
