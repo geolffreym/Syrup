@@ -271,13 +271,12 @@
 					};
 
 					//Find the error code!!
-					_.each (_codes, function (v, i, loop) {
-
+					_.each (_codes, function (v, i) {
 						//Validity found?
 						//Invalid?
 						if ( i in field.validity && field.validity[i] ) {
 							//Break loop
-							loop.break = true;
+							this.break = true;
 
 							//Reject!!! Error found..
 							reject (_self.fail (field, {
