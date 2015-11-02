@@ -80,7 +80,7 @@
 	Libs.add ('supply', function (supplier) {
 		var _self = this;
 
-		//Each elemento of supplier
+		//Each element of supplier
 		_.each (supplier, function (v, i) {
 			if ( _.isFunction (v) )
 				_self.cook (i, v);

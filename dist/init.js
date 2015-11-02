@@ -1993,7 +1993,7 @@ if ( typeof exports !== 'undefined' )
 	Libs.add ('supply', function (supplier) {
 		var _self = this;
 
-		//Each elemento of supplier
+		//Each element of supplier
 		_.each (supplier, function (v, i) {
 			if ( _.isFunction (v) )
 				_self.cook (i, v);
@@ -2017,6 +2017,7 @@ if ( typeof exports !== 'undefined' )
 	//The global object Lib
 	window.Lib = new Libs;
 	window.LibClass = Libs;
+
 }) (window);
 
 /**
@@ -2101,6 +2102,7 @@ if ( typeof exports !== 'undefined' )
 			});
 	});
 
+	//The global object MiddleWare
 	window.MiddleWare = new MiddleWare;
 	window.MiddleWareClass = MiddleWare;
 
