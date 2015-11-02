@@ -5665,13 +5665,13 @@ if ( !Object.observe ) {
 	Apps.add ('_watch', function (moduleId) {
 		var _self = this;
 		Object.observe (_self.scope, function (change) {
-			_.each (change, function (v, i, loop) {
+			_.each (change, function (v, i) {
 				if ( (v.name in _self.onchange)
 					 && _.getObjectSize (v.object) > 0
 					 && moduleId === v.name
 				) {
 					//Break the loop
-					loop.break = true;
+					this.break = true;
 
 					//Event trigger!!
 					_self.onchange[v.name].call (
