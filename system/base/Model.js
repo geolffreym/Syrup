@@ -272,6 +272,9 @@
 
 					//Find the error code!!
 					_.each (_codes, function (v, i, loop) {
+
+						//Validity found?
+						//Invalid?
 						if ( i in field.validity && field.validity[i] ) {
 							//Break loop
 							loop.break = true;
