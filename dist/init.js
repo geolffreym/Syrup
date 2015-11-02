@@ -1569,48 +1569,34 @@ if ( typeof exports !== 'undefined' )
 	Syrup.add ('each', function (_object, callback, noFilterF) {
 		//Positions!!
 		var _p = {
-			first: false,
-			last : false,
-			break: false
-		};
+				first: false,
+				last : false,
+				break: false
+			}, _i = 0, _keys = null,
+			_max = _object.length || _.getObjectSize (_object);
 
-		if ( _.isArray (_object) ) {
-			//Array?
 
-			var i = 0, max = _object.length;
+		//Is object? get the keys!!
+		if ( _.isObject (_object) )
+			_keys = _.getObjectKeys (_object);
 
-			for ( ; i < max; i++ ) {
-				_p.first = i === 0;
-				_p.last = (i + 1) === max;
 
-				//Filter function ?
-				callback && noFilterF ? callback (_object[i], i, _p)
-					: _.callbackAudit (callback, _object[i], i, _p);
+		//While object has elements!!
+		while ( (_i++) < _max ) {
+			_p.first = ((_i - 1) == 0);
+			_p.last = (_i == _max);
 
-				//Break?
-				if ( _p.break )
-					break;
+			//Filter function ?
+			callback && noFilterF ? callback (
+				_keys && _object[_keys[_i - 1]] || _object[_i - 1], _keys && _keys[_i - 1] || _i - 1, _p
+			) : _.callbackAudit (callback,
+								 _keys && _object[_keys[_i - 1]] || _object[_i - 1], _keys && _keys[_i - 1] || _i - 1, _p
+			);
 
-			}
-		} else if ( _.isObject (_object) ) {
+			//If Break!!
+			if ( _p.break )
+				break;
 
-			//Object?
-			var _keys = Object.keys (_object),
-				_tmp, _i = _tmp = _keys.length;
-
-			while ( _i-- ) {
-				_p.first = (_i + 1) === _tmp;
-				_p.last = _i === 0;
-
-				//Filter function ?
-				callback && noFilterF ? callback (_object[_keys[_i]], _keys[_i], _p)
-					: _.callbackAudit (callback, _object[_keys[_i]], _keys[_i], _p);
-
-				//Break?
-				if ( _p.break )
-					break;
-
-			}
 		}
 
 		return this;
@@ -1646,15 +1632,8 @@ if ( typeof exports !== 'undefined' )
 			if ( !_.isSet (callback) ) {
 				return false;
 			}
-
-			var _args = _.toArray (arguments);
-			_args = _.filterArray (_args, function (v, i) {
-				return !_.isFunction (v);
-			});
-
-			callback.apply (null, _args.length > 0
-				? _args : null);
-
+			//Apply params!!
+			callback.apply (null, (_.toArray (arguments)).splice (1));
 		}
 		catch ( e ) {
 			_.error (e);
@@ -5529,6 +5508,9 @@ if ( !Object.observe ) {
 
 					//Find the error code!!
 					_.each (_codes, function (v, i, loop) {
+
+						//Validity found?
+						//Invalid?
 						if ( i in field.validity && field.validity[i] ) {
 							//Break loop
 							loop.break = true;

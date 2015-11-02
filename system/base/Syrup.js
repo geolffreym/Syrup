@@ -1614,15 +1614,8 @@
 			if ( !_.isSet (callback) ) {
 				return false;
 			}
-
-			var _args = _.toArray (arguments);
-			_args = _.filterArray (_args, function (v, i) {
-				return !_.isFunction (v);
-			});
-
-			callback.apply (null, _args.length > 0
-				? _args : null);
-
+			//Apply params!!
+			callback.apply (null, (_.toArray (arguments)).splice (1));
 		}
 		catch ( e ) {
 			_.error (e);
@@ -1737,13 +1730,15 @@
 	});
 
 	/**Parse to Array
-	 * @param element
-	 * @returns {Array}
+	 * @param {object} element
+	 * @returns {array}
 	 */
 	Syrup.add ('toArray', function (element) {
 
+		//Object?
 		if ( _.isObject (element) ) {
 			return [].slice.apply (element);
+			//String?
 		} else if ( _.isString (element) ) {
 			return _.toObject (element);
 		}
