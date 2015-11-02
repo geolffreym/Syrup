@@ -818,9 +818,9 @@
 			_.callbackAudit (callback, _element, 0);
 		} else {
 			//For each node
-			_.each (_element, function (v, i, p) {
+			_.each (_element, function (v, i) {
 				if ( _.isObject (v) && _.isSet (v) ) {
-					_.callbackAudit (callback, v, i, p);
+					_.callbackAudit (callback.bind (this), v, i);
 				}
 			});
 		}
