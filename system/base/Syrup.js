@@ -1739,9 +1739,10 @@
 		if ( _.isObject (element) ) {
 			return [].slice.apply (element);
 			//String?
-		} else if ( _.isString (element) ) {
-			return _.toObject (element);
 		}
+
+		//To object!!
+		return _.toObject (element);
 	});
 
 
@@ -1774,7 +1775,7 @@
 		if ( _.isJson (element) )
 			return JSON.parse (element);
 
-		if ( _.isString (element) )
+		if ( _.isString (element) || _.isNumber (element) )
 			return nativeObject.valueOf.call (element);
 
 		if ( !_.isArray (element) )

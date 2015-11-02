@@ -1748,16 +1748,19 @@ if ( typeof exports !== 'undefined' )
 	});
 
 	/**Parse to Array
-	 * @param element
-	 * @returns {Array}
+	 * @param {object} element
+	 * @returns {array}
 	 */
 	Syrup.add ('toArray', function (element) {
 
+		//Object?
 		if ( _.isObject (element) ) {
 			return [].slice.apply (element);
-		} else if ( _.isString (element) ) {
-			return _.toObject (element);
+			//String?
 		}
+
+		//To object!!
+		return _.toObject (element);
 	});
 
 
@@ -1790,7 +1793,7 @@ if ( typeof exports !== 'undefined' )
 		if ( _.isJson (element) )
 			return JSON.parse (element);
 
-		if ( _.isString (element) )
+		if ( _.isString (element) || _.isNumber (element) )
 			return nativeObject.valueOf.call (element);
 
 		if ( !_.isArray (element) )
