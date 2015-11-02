@@ -1039,7 +1039,7 @@ _.isMail(my_mail) // Return TRUE
 *(Validate if param is JSON.)*
 ```js 
 var no_json = {a:1,b:2}, 
- my_json = '{"a":"1","b":"2"}';
+    my_json = '{"a":"1","b":"2"}';
   
 _.isJson(no_json) // Return FALSE
 _.isJson(my_json) // Return TRUE
@@ -1337,6 +1337,7 @@ var _my_object = 'a=3&b=6';
 
 _.queryStringToJson(_my_object); // Return {a:3,b:6}; 
 
+```
 
 **Method `.jsonToString(object)`**
 
@@ -1345,6 +1346,7 @@ _.queryStringToJson(_my_object); // Return {a:3,b:6};
    var a = {a:1,b:2};
    _.jsonToString(a); // '{"a":"1", "b":"2"}'
 ```
+
 
 **Method `.repeatString(str, times)`**
  
