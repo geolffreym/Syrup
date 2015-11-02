@@ -695,18 +695,25 @@ my_selectot.get() // [<li>A</li>, <li>B</li>, <li>C</li>]
 ```js    
 var my_selector = _$('.parent');
 
-my_selector.each(function(v,i,p){
+my_selector.each(function(v,i){
     v // Element
     i // Index
-    p // Loop Control { p.last or p.first}
+    this // Loop Control { this.last or this.first}
     
     v (.child)
     i (0)
-    p (p.first is TRUE)
+    this (this.first is TRUE)
     
     v (.child2)
     i (1)
-    p (p.first is FALSE and p.last is TRUE)
+    this (this.first is FALSE and this.last is TRUE)
+    
+    //Break?
+    //Loop break
+    if(1==1){
+        this.break = true;
+    }
+        
     
 })
 ```
