@@ -293,7 +293,7 @@ my_selector.data('id', 10); // Assign 10.
 var my_selector = _$('#my_button');
 
 my_selector.prop('textContent'); // Returns My Example
-my_selector.data({'textContent': My Other Example}); // Assign My Other Example. 
+my_selector.prop({'textContent': My Other Example}); // Assign My Other Example. 
 ```
 ```html
 <button id="my_button">My Other Example</button>
