@@ -1086,39 +1086,37 @@ _.interval(function (x) {
      }, conf);
 ```
      
-**Method `.each(object || array, callback, noFilter(optional))`**
+**Method `.each(object || array, callback)`**
 
 *(Intuitive objects or tour arrangements)*
 ```js        
    
    
-_.each([1,2,3], function(v,i,p){
+_.each([1,2,3], function(v,i){
     v // Element
     i // Index or Key
-    p // Loop Control { p.last or p.first}
+    this // Loop Control { p.last or p.first}
     
     v (1)
     i (0)
-    p (p.first is TRUE)
+    this (this.first is TRUE)
     
     v (2)
     i (1)
-    p (p.first is FALSE and p.last is FALSE)
+    this (this.first is FALSE and this.last is FALSE)
     
     v (3)
     i (2)
-    p (p.first is FALSE and p.last is TRUE)
+    this (this.first is FALSE and this.last is TRUE)
     
     
     //Break?
     //Break the loop
     if(1==1){
-        p.break = true;
+        this.break = true;
     }    
     
-},(optional param noFilter))
-// If 'noFilter' is 'true', the object or array will not being filtered,  
-// for default it filter the functions contained in objects or array
+})
 
 ```
 **Method `.callbackAudit(callback, param1, param2, ..)`**

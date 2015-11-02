@@ -1566,7 +1566,7 @@ if ( typeof exports !== 'undefined' )
 	 * @param callback
 	 * @returns {boolean}
 	 */
-	Syrup.add ('each', function (_object, callback, noFilterF) {
+	Syrup.add ('each', function (_object, callback) {
 		//Positions!!
 		var _p = {
 				first: false,
@@ -1587,10 +1587,10 @@ if ( typeof exports !== 'undefined' )
 			_p.last = (_i == _max);
 
 			//Filter function ?
-			callback && noFilterF ? callback (
-				_keys && _object[_keys[_i - 1]] || _object[_i - 1], _keys && _keys[_i - 1] || _i - 1, _p
-			) : _.callbackAudit (callback,
-								 _keys && _object[_keys[_i - 1]] || _object[_i - 1], _keys && _keys[_i - 1] || _i - 1, _p
+			_.callbackAudit (
+				callback.bind(_p),
+				_keys && _object[_keys[_i - 1]] || _object[_i - 1],
+				_keys && _keys[_i - 1] || _i - 1
 			);
 
 			//If Break!!
@@ -1997,7 +1997,7 @@ if ( typeof exports !== 'undefined' )
 		_.each (supplier, function (v, i) {
 			if ( _.isFunction (v) )
 				_self.cook (i, v);
-		}, true);
+		});
 
 		return this;
 	});
@@ -2049,7 +2049,7 @@ if ( typeof exports !== 'undefined' )
 					if ( _.isFunction (v) )
 						intercepted.interceptors[k].push (v);
 
-				}, true);
+				});
 
 				//Resolve
 				resolve (intercepted);
@@ -2098,11 +2098,12 @@ if ( typeof exports !== 'undefined' )
 			_.each (interceptors, function (v) {
 				if ( _.isFunction (v) )
 					v.apply (null, params || []);
-			}, true);
+			});
 	});
 
 	window.MiddleWare = new MiddleWare;
 	window.MiddleWareClass = MiddleWare;
+
 }) (window);
 /*
  Tested against Chromium build with Object.observe and acts EXACTLY the same,
@@ -5663,11 +5664,15 @@ if ( !Object.observe ) {
 	Apps.add ('_watch', function (moduleId) {
 		var _self = this;
 		Object.observe (_self.scope, function (change) {
-			_.each (change, function (v) {
+			_.each (change, function (v, i, loop) {
 				if ( (v.name in _self.onchange)
 					 && _.getObjectSize (v.object) > 0
 					 && moduleId === v.name
 				) {
+					//Break the loop
+					loop.break = true;
+
+					//Event trigger!!
 					_self.onchange[v.name].call (
 						_self.recipeCollection[moduleId].instance,
 						{
@@ -5677,7 +5682,6 @@ if ( !Object.observe ) {
 							object: v.object[v.name]
 						}
 					);
-					return false;
 				}
 			});
 		});
@@ -5873,6 +5877,7 @@ if ( !Object.observe ) {
 											_result[v] = e.scope[v];
 									});
 
+									//Scope
 									e.scope = _result;
 								}
 
@@ -6296,7 +6301,7 @@ if ( !Object.observe ) {
 
 						//Intercept pop state
 						_self._handleInterceptor ('redirect', e);
-					}, true);
+					});
 				}
 			}
 		});

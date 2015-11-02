@@ -28,7 +28,7 @@
 					if ( _.isFunction (v) )
 						intercepted.interceptors[k].push (v);
 
-				}, true);
+				});
 
 				//Resolve
 				resolve (intercepted);
@@ -77,9 +77,10 @@
 			_.each (interceptors, function (v) {
 				if ( _.isFunction (v) )
 					v.apply (null, params || []);
-			}, true);
+			});
 	});
 
 	window.MiddleWare = new MiddleWare;
 	window.MiddleWareClass = MiddleWare;
+
 }) (window);

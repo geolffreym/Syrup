@@ -39,7 +39,7 @@
 
 						//Intercept pop state
 						_self._handleInterceptor ('redirect', e);
-					}, true);
+					});
 				}
 			}
 		});

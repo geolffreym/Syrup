@@ -1548,7 +1548,7 @@
 	 * @param callback
 	 * @returns {boolean}
 	 */
-	Syrup.add ('each', function (_object, callback, noFilterF) {
+	Syrup.add ('each', function (_object, callback) {
 		//Positions!!
 		var _p = {
 				first: false,
@@ -1569,10 +1569,10 @@
 			_p.last = (_i == _max);
 
 			//Filter function ?
-			callback && noFilterF ? callback (
-				_keys && _object[_keys[_i - 1]] || _object[_i - 1], _keys && _keys[_i - 1] || _i - 1, _p
-			) : _.callbackAudit (callback,
-								 _keys && _object[_keys[_i - 1]] || _object[_i - 1], _keys && _keys[_i - 1] || _i - 1, _p
+			_.callbackAudit (
+				callback.bind(_p),
+				_keys && _object[_keys[_i - 1]] || _object[_i - 1],
+				_keys && _keys[_i - 1] || _i - 1
 			);
 
 			//If Break!!

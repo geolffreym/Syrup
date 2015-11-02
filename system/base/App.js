@@ -104,11 +104,15 @@
 	Apps.add ('_watch', function (moduleId) {
 		var _self = this;
 		Object.observe (_self.scope, function (change) {
-			_.each (change, function (v) {
+			_.each (change, function (v, i, loop) {
 				if ( (v.name in _self.onchange)
 					 && _.getObjectSize (v.object) > 0
 					 && moduleId === v.name
 				) {
+					//Break the loop
+					loop.break = true;
+
+					//Event trigger!!
 					_self.onchange[v.name].call (
 						_self.recipeCollection[moduleId].instance,
 						{
@@ -118,7 +122,6 @@
 							object: v.object[v.name]
 						}
 					);
-					return false;
 				}
 			});
 		});
@@ -314,6 +317,7 @@
 											_result[v] = e.scope[v];
 									});
 
+									//Scope
 									e.scope = _result;
 								}
 

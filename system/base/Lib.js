@@ -84,7 +84,7 @@
 		_.each (supplier, function (v, i) {
 			if ( _.isFunction (v) )
 				_self.cook (i, v);
-		}, true);
+		});
 
 		return this;
 	});
