@@ -118,31 +118,6 @@
 		//MiddleWare.cleanInterceptor(this, type);
 	});
 
-	/** Clean Interceptors
-	 * @param  {string} type
-	 * @return {object}
-	 * */
-	Hash.add ('interceptClean', function (type) {
-		//Clean the interceptor
-		MiddleWare.cleanInterceptor (this, type);
-		return this;
-	});
-
-
-	/**Set the target
-	 * @param {object} routes
-	 * @return {object}
-	 * */
-	Hash.add ('connect', function (to_route) {
-		if ( !(to_route instanceof AppClass) )
-			_.error (WARNING_ROUTE.ERROR.BADINSTANCE, '(Router .route)');
-
-		this.module = to_route;
-		to_route.lazy = true;
-		return this;
-	});
-
-
 	//Global access
 	window.Hash = Hash;
 
