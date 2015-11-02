@@ -1588,7 +1588,7 @@ if ( typeof exports !== 'undefined' )
 
 			//Filter function ?
 			_.callbackAudit (
-				callback.bind(_p),
+				callback.bind (_p),
 				_keys && _object[_keys[_i - 1]] || _object[_i - 1],
 				_keys && _keys[_i - 1] || _i - 1
 			);
@@ -1846,7 +1846,7 @@ if ( typeof exports !== 'undefined' )
 		var i = 1,
 			prop = document.body.previousElementSibling
 				? 'previousElementSibling' : 'previousSibling';
-		while ( node = node[prop] ) {
+		while ( (node = node[prop]) ) {
 			++i
 		}
 		return i;
