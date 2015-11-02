@@ -80,6 +80,7 @@
 			});
 	});
 
+	//The global object MiddleWare
 	window.MiddleWare = new MiddleWare;
 	window.MiddleWareClass = MiddleWare;
 

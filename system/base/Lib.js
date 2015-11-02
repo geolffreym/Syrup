@@ -104,4 +104,5 @@
 	//The global object Lib
 	window.Lib = new Libs;
 	window.LibClass = Libs;
+
 }) (window);
