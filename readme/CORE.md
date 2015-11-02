@@ -1108,6 +1108,14 @@ _.each([1,2,3], function(v,i,p){
     v (3)
     i (2)
     p (p.first is FALSE and p.last is TRUE)
+    
+    
+    //Break?
+    //Break the loop
+    if(1==1){
+        p.break = true;
+    }    
+    
 },(optional param noFilter))
 // If 'noFilter' is 'true', the object or array will not being filtered,  
 // for default it filter the functions contained in objects or array
