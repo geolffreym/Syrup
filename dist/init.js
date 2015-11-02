@@ -1612,7 +1612,7 @@ if ( typeof exports !== 'undefined' )
 	 * @returns {object}
 	 */
 	Syrup.add ('cartesianPlane', function (_dom) {
-		_dom = !_.is$ (_dom) && _$ (_dom).get () || _dom;
+		_dom = !_.is$ (_dom) && _$ (_dom).get (0) || _dom;
 
 		if ( _.isGlobal (_dom) ) {
 			return {
@@ -1849,7 +1849,7 @@ if ( typeof exports !== 'undefined' )
 	 */
 	Syrup.add ('getElementIndex', function (node) {
 		//Is syrup object?
-		node = _.is$ (node) && node.get () || node;
+		node = _.is$ (node) && node.get (0) || node;
 
 		var i = 1,
 			prop = document.body.previousElementSibling
