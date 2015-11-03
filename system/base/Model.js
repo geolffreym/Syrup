@@ -298,7 +298,6 @@
 					//if (!!(_field_array = _self.multiple(field.name)))
 					//    fieldValue = _field_array;
 
-					console.log (fieldValue);
 					//Append Data
 					_modelData.append (field.name, fieldValue);
 					_self.scope[field.name] = fieldValue;
