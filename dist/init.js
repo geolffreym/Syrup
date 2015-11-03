@@ -4672,11 +4672,10 @@ if ( !Object.observe ) {
 (function (window) {
 
 	function Http () {
-		this.xhr = new window.XMLHttpRequest
-				   || new window.ActiveXObject ("Microsoft.XMLHTTP");
-		this.xhr_list = [];
+		this.xhr = null;
 		this.upload = null;
 		this.config = {};
+		this.name = 'default';
 		this.interceptors = {};
 	}
 
@@ -4689,6 +4688,10 @@ if ( !Object.observe ) {
 		var _self = this,
 			_query = _.emptyStr,
 			_data = data || null;
+
+		//New XHR Object
+		_self.xhr = new window.XMLHttpRequest
+					|| new window.ActiveXObject ("Microsoft.XMLHTTP");
 
 		//Make global conf
 		_self.config = _.extend ({
@@ -4801,15 +4804,18 @@ if ( !Object.observe ) {
 			});
 
 			_self.xhr.addEventListener ('error', function (e) {
-				reject (e);
-
 				//Find a interceptor for success
 				_self._handleInterceptor ('error', e);
+
+				reject (e);
+
 			});
 
 			//Send
-			_self.xhr_list.push (_self.xhr);
 			_self.xhr.send (_self.config.method !== 'GET' ? _data : null);
+
+			//Release name
+			_self.name = 'default';
 		}));
 
 	});
@@ -4855,9 +4861,8 @@ if ( !Object.observe ) {
 	 * @param {object} data
 	 * @return {object}
 	 * */
-	Http.add ('get', function (url, data, kill) {
-		kill && this.kill ();
-		return this.request (url, data);
+	Http.add ('get', function (url, data, naming) {
+		return this._rest (url, 'GET', data, naming);
 	});
 
 
@@ -4866,13 +4871,8 @@ if ( !Object.observe ) {
 	 * @param {object} data
 	 * @return {object}
 	 * */
-	Http.add ('post', function (url, data, kill) {
-		//The method!!
-		this.config.method = 'POST';
-
-		//Kill other request?
-		kill && this.kill ();
-		return this.request (url, data);
+	Http.add ('post', function (url, data, naming) {
+		return this._rest (url, 'POST', data, naming);
 	});
 
 
@@ -4881,13 +4881,8 @@ if ( !Object.observe ) {
 	 * @param {object} data
 	 * @return {object}
 	 * */
-	Http.add ('put', function (url, data, kill) {
-		//The method!!
-		this.config.method = 'PUT';
-
-		//Kill other request?
-		kill && this.kill ();
-		return this.request (url, data);
+	Http.add ('put', function (url, data, naming) {
+		return this._rest (url, 'PUT', data, naming);
 	});
 
 
@@ -4896,15 +4891,34 @@ if ( !Object.observe ) {
 	 * @param {object} data
 	 * @return {object}
 	 * */
-	Http.add ('delete', function (url, data, kill) {
-		//The method!!
-		this.config.method = 'DELETE';
-
-		//Kill other request?
-		kill && this.kill ();
-		return this.request (url, data);
+	Http.add ('delete', function (url, data, naming) {
+		return this._rest (url, 'DELETE', data, naming);
 	});
 
+
+	/**Abort request
+	 * @return {void}
+	 * */
+	Http.add ('abort', function () {
+		this.xhr && this.xhr.abort ();
+	});
+
+	/** Rest handler
+	 * @param {string} header
+	 * @param {string} type
+	 * @param {object} data
+	 * @param {string} naming
+	 * @return {object}
+	 * **/
+	Http.add ('_rest', function (url, type, data, naming) {
+
+		this.config.method = type;//The method!!
+		this.name = _.isString (data) && data
+					|| naming || 'default'; // Naming request!!
+
+		//The request
+		return this.request (url, _.isObject (data) && data || {});
+	});
 
 	/** Set Request Header
 	 * @param {string} header
@@ -4916,17 +4930,6 @@ if ( !Object.observe ) {
 		return this;
 	});
 
-	/** Kill Http request
-	 * @return {object}
-	 * */
-	Http.add ('kill', function () {
-		_.each (this.xhr_list, function (xhr) {
-			xhr.abort ();
-		});
-
-		this.xhr_list.length = 0;
-		return this;
-	});
 
 	//Global access
 	window.Http = Http;

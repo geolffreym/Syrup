@@ -143,10 +143,11 @@
 			});
 
 			_self.xhr.addEventListener ('error', function (e) {
-				reject (e);
-
 				//Find a interceptor for success
 				_self._handleInterceptor ('error', e);
+
+				reject (e);
+
 			});
 
 			//Send
