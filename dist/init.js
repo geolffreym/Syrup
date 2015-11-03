@@ -552,9 +552,7 @@ if ( typeof exports !== 'undefined' )
 	});
 
 	/**Nexts Node
-	 * @param {string} filter
-	 * @param {function} callback
-	 * @return {object}
+	 * @param callback
 	 */
 	_$_.add ('nexts', function (filter, callback) {
 		var _sibling = null;
@@ -571,14 +569,12 @@ if ( typeof exports !== 'undefined' )
 					_.callbackAudit (callback, _sibling);
 				}
 			} while ( _sibling.get (0).nextElementSibling
-					  && (_sibling = _$ (_sibling.get (0).nextElementSibling)).exist
-				)
+					  && (_sibling = _$ (_sibling.get (0).nextElementSibling)).exist )
 		});
 	});
 
 	/**Trigger
-	 * @param {string} event
-	 * @param {function} callback
+	 * @param event
 	 */
 	_$_.add ('trigger', function (event, callback) {
 		var _event = new CustomEvent (event, {
@@ -1526,17 +1522,6 @@ if ( typeof exports !== 'undefined' )
 		return _return;
 	});
 
-	/**Pasa Json a String
-	 * @param json object
-	 * @return string | null
-	 * */
-	Syrup.add ('jsonToString', function (json) {
-		if ( _.isObject (json) )
-			return JSON.stringify (json);
-		return null;
-	});
-
-
 	/**Get Script
 	 * @param url
 	 * @param callback
@@ -1774,8 +1759,7 @@ if ( typeof exports !== 'undefined' )
 	 * */
 
 	Syrup.add ('toString', function (element) {
-		if ( _.isObject (element) )
-			return JSON.stringify (element);
+		return JSON.stringify (element);
 	});
 
 	/** Parse to RegExp

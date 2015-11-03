@@ -1352,12 +1352,12 @@ _.queryStringToJson(_my_object); // Return {a:3,b:6};
 
 ```
 
-**Method `.jsonToString(object)`**
+**Method `.toString(object)`**
 
-*(Parse object to string Shortcut for JSON.stringify)*
+*(Parse to string)*
 ```js
 var a = {a:1,b:2};
-_.jsonToString(a); // '{"a":"1", "b":"2"}'
+_.toString({a:1,b:2}); // '{"a":"1", "b":"2"}'
 ```
 
 
