@@ -16,6 +16,7 @@
 		this.xhr_list = [];
 		this.upload = null;
 		this.config = {};
+		this.name = 'default';
 		this.interceptors = {};
 	}
 
@@ -149,6 +150,9 @@
 			//Send
 			_self.xhr_list.push (_self.xhr);
 			_self.xhr.send (_self.config.method !== 'GET' ? _data : null);
+
+			//Release name
+			_self.name = 'default';
 		}));
 
 	});
@@ -194,9 +198,8 @@
 	 * @param {object} data
 	 * @return {object}
 	 * */
-	Http.add ('get', function (url, data, kill) {
-		kill && this.kill ();
-		return this.request (url, data);
+	Http.add ('get', function (url, data, naming) {
+		return this._rest (url, 'GET', data, naming);
 	});
 
 
@@ -205,13 +208,8 @@
 	 * @param {object} data
 	 * @return {object}
 	 * */
-	Http.add ('post', function (url, data, kill) {
-		//The method!!
-		this.config.method = 'POST';
-
-		//Kill other request?
-		kill && this.kill ();
-		return this.request (url, data);
+	Http.add ('post', function (url, data, naming) {
+		return this._rest (url, 'POST', data, naming);
 	});
 
 
@@ -220,13 +218,8 @@
 	 * @param {object} data
 	 * @return {object}
 	 * */
-	Http.add ('put', function (url, data, kill) {
-		//The method!!
-		this.config.method = 'PUT';
-
-		//Kill other request?
-		kill && this.kill ();
-		return this.request (url, data);
+	Http.add ('put', function (url, data, naming) {
+		return this._rest (url, 'PUT', data, naming);
 	});
 
 
@@ -235,15 +228,27 @@
 	 * @param {object} data
 	 * @return {object}
 	 * */
-	Http.add ('delete', function (url, data, kill) {
-		//The method!!
-		this.config.method = 'DELETE';
-
-		//Kill other request?
-		kill && this.kill ();
-		return this.request (url, data);
+	Http.add ('delete', function (url, data, naming) {
+		return this._rest (url, 'DELETE', data, naming);
 	});
 
+
+	/** Rest handler
+	 * @param {string} header
+	 * @param {string} type
+	 * @param {object} data
+	 * @param {string} naming
+	 * @return {object}
+	 * **/
+	Http.add ('_rest', function (url, type, data, naming) {
+
+		this.config.method = type;//The method!!
+		this.name = _.isString (data) && data
+					|| naming || 'default'; // Naming request!!
+
+		//The request
+		return this.request (url, _.isObject (data) && data || {});
+	});
 
 	/** Set Request Header
 	 * @param {string} header
