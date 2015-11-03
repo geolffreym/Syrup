@@ -11,9 +11,7 @@
 (function (window) {
 
 	function Http () {
-		this.xhr = new window.XMLHttpRequest
-				   || new window.ActiveXObject ("Microsoft.XMLHTTP");
-		this.xhr_list = [];
+		this.xhr = null;
 		this.upload = null;
 		this.config = {};
 		this.name = 'default';
@@ -29,6 +27,10 @@
 		var _self = this,
 			_query = _.emptyStr,
 			_data = data || null;
+
+		//New XHR Object
+		_self.xhr = new window.XMLHttpRequest
+					|| new window.ActiveXObject ("Microsoft.XMLHTTP");
 
 		//Make global conf
 		_self.config = _.extend ({
@@ -148,7 +150,6 @@
 			});
 
 			//Send
-			_self.xhr_list.push (_self.xhr);
 			_self.xhr.send (_self.config.method !== 'GET' ? _data : null);
 
 			//Release name
@@ -233,6 +234,13 @@
 	});
 
 
+	/**Abort request
+	 * @return {void}
+	 * */
+	Http.add ('abort', function () {
+		this.xhr && this.xhr.abort ();
+	});
+
 	/** Rest handler
 	 * @param {string} header
 	 * @param {string} type
@@ -260,17 +268,6 @@
 		return this;
 	});
 
-	/** Kill Http request
-	 * @return {object}
-	 * */
-	Http.add ('kill', function () {
-		_.each (this.xhr_list, function (xhr) {
-			xhr.abort ();
-		});
-
-		this.xhr_list.length = 0;
-		return this;
-	});
 
 	//Global access
 	window.Http = Http;
