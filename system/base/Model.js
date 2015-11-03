@@ -274,7 +274,7 @@
 					_.each (_codes, function (v, i) {
 						//Validity found?
 						//Invalid?
-						if ( i in field.validity && field.validity[i] ) {
+						if ( field.validity[i] ) {
 							//Break loop
 							this.break = true;
 
