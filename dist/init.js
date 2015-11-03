@@ -5569,9 +5569,9 @@ if ( !Object.observe ) {
 	}
 
 	/** Handle recipeCollection to Apps
-	 * @param name
-	 * @param dependencies []
-	 * @return object
+	 * @param {string} name
+	 * @param {array} dependencies
+	 * @return {object}
 	 * **/
 	Apps.add ('module', function (name, dependencies) {
 		//No app registered?
@@ -5588,9 +5588,9 @@ if ( !Object.observe ) {
 	});
 
 	/** Blend a method in global Syrup object
-	 * @param name
-	 * @param dependencies []
-	 * @return object
+	 * @param {string} name
+	 * @param {array} dependencies
+	 * @return {object}
 	 * **/
 	Apps.add ('blend', function (name, dependencies) {
 		var _self = new Apps;
@@ -5619,9 +5619,9 @@ if ( !Object.observe ) {
 	});
 
 	/** Make a recipe for blend
-	 *  @param moduleId string
-	 *  @param module function
-	 *  @return object
+	 *  @param {string} moduleId
+	 *  @param {function} module
+	 *  @return {object}
 	 * */
 	Apps.add ('recipe', function (moduleId, module) {
 
@@ -5648,7 +5648,8 @@ if ( !Object.observe ) {
 	});
 
 	/**Object Observer
-	 * @param moduleId
+	 * @param {string} moduleId
+	 * @return {void}
 	 * **/
 	Apps.add ('_watch', function (moduleId) {
 		var _self = this;
@@ -5678,8 +5679,8 @@ if ( !Object.observe ) {
 	});
 
 	/**Add new child module
-	 * @param moduleId
-	 * @return void
+	 * @param {string} moduleId
+	 * @return {void}
 	 * **/
 	Apps.add ('_add', function (moduleId) {
 		if ( !_.isObject (this.scope[moduleId]) ) {
@@ -5688,18 +5689,17 @@ if ( !Object.observe ) {
 	});
 
 	/**Trigger code execution
-	 * @param moduleId
-	 * @return void
+	 * @param {string} moduleId
+	 * @return {object}
 	 * **/
 	Apps.add ('_trigger', function (moduleId) {
 		if ( moduleId in this.recipeCollection )
 			return this.recipeCollection[moduleId].creator (_, this.scope);
-		return {}
 	});
 
 	/**Provide a global initial config
-	 * @param moduleId
-	 * @return void
+	 * @param {string} moduleId
+	 * @return {object}
 	 * **/
 	Apps.add ('cook', function (callback) {
 		if ( _.isFunction (callback) )
@@ -5711,10 +5711,9 @@ if ( !Object.observe ) {
 		return this;
 	});
 
-
 	/**Global attributes supplier
-	 * @param moduleList
-	 * @callback*/
+	 * @param {object} moduleList
+	 * @return {object} */
 	Apps.add ('spice', function (object) {
 		if ( _.isObject (object) )
 			this.lib.make (object);
@@ -5734,8 +5733,9 @@ if ( !Object.observe ) {
 
 
 	/**Return a recipe by name
-	 * @param moduleId
-	 * @return object
+	 * @param {string} moduleId
+	 * @param {object} object
+	 * @return {object}
 	 * */
 	Apps.add ('_getRecipe', function (moduleId) {
 		if ( moduleId in this.recipeCollection && _.isSet (this.root) )
@@ -5744,9 +5744,9 @@ if ( !Object.observe ) {
 	});
 
 	/**Set Scope
-	 * @param moduleId
-	 * @param object
-	 * @return void
+	 * @param {string} moduleId
+	 * @param {object} object
+	 * @return {object}
 	 * **/
 	Apps.add ('_setScope', function (moduleId, object) {
 		if ( moduleId in this.scope ) {
@@ -5756,8 +5756,8 @@ if ( !Object.observe ) {
 	});
 
 	/**Get Scope
-	 * @param moduleId
-	 * @return object
+	 * @param {string} moduleId
+	 * @return {object}
 	 * **/
 	Apps.add ('_getScope', function (moduleId) {
 		if ( moduleId in this.scope ) {
@@ -5767,10 +5767,10 @@ if ( !Object.observe ) {
 	});
 
 	/**Event handler
-	 * @param event
-	 * @param name
-	 * @param callback
-	 * @return object
+	 * @param {string} event
+	 * @param {string} name
+	 * @param {function} resolve
+	 * @return {object}
 	 */
 	Apps.add ('when', function (event, name) {
 		var self = this;
@@ -5788,7 +5788,8 @@ if ( !Object.observe ) {
 	});
 
 	/**Bind Listeners
-	 * @param moduleId
+	 * @param {string} moduleId
+	 * @return {void}
 	 * */
 	Apps.add ('_bindListener', function (moduleId) {
 		var enabled_events = [
@@ -5829,13 +5830,15 @@ if ( !Object.observe ) {
 	});
 
 	/** Prepare Model
-	 * @param moduleId
+	 * @param {string} moduleId
+	 * @return {void}
 	 */
 	Apps.add ('_models', function (moduleId) {
+		//Self and Model Object
 		var _self = this,
 			_model = new Model;
 
-		//Exist the model?
+		//The model Object?
 		_self.recipeCollection[moduleId].instance.model = {
 			object  : _model,
 			resource: function () {
@@ -5883,11 +5886,14 @@ if ( !Object.observe ) {
 	});
 
 	/**Prepare Views
-	 * @param moduleId
+	 * @param {string} moduleId
+	 * @return {void}
 	 * */
 	Apps.add ('_views', function (moduleId) {
 		// Render view
 		var _self = this;
+
+		//The view object
 		_self.recipeCollection[moduleId].instance.view = {
 			render: function (_view, _cache) {
 				//Rend
@@ -5913,15 +5919,16 @@ if ( !Object.observe ) {
 
 
 	/**Prepare Scopes
-	 * @param moduleId
+	 * @param {string} moduleId
+	 * @return {void}
 	 * */
 	Apps.add ('_scopes', function (moduleId) {
-		// Render view
+		// Self
 		var _self = this;
 
+		//The scope object
 		_self.recipeCollection[moduleId].instance.scope = {
-			global: _self.scope,
-			object: _self.scope[moduleId],
+			global: _self.scope, object: _self.scope[moduleId],
 			set   : function (nModule, object) {
 				var _moduleId = !_.isObject (nModule)
 								&& _.isString (nModule) && nModule
@@ -5944,15 +5951,17 @@ if ( !Object.observe ) {
 	});
 
 	/**Prepare App
-	 * @param moduleId
+	 * @param {string} moduleId
+	 * @return {void}
 	 * */
 	Apps.add ('_app', function (moduleId) {
-		// Render view
+		// Self
 		var _self = this;
 
+		//The app object
 		_self.recipeCollection[moduleId].instance.app = {
-			object: _$ ('[sp-app]'),
-			title : function (title) {
+			$    : _$, object: _$ ('[sp-app]'),
+			title: function (title) {
 				var _title = _$ ('title');
 				if ( _title.exist ) {
 					_title.text (title)
@@ -5964,11 +5973,14 @@ if ( !Object.observe ) {
 
 
 	/**Prepare Recipes
-	 * @param moduleId
+	 * @param {string} moduleId
+	 * @return {void}
 	 * */
 	Apps.add ('_recipes', function (moduleId) {
-		// Render view
+		// Self
 		var _self = this;
+
+		//The recipe object
 		_self.recipeCollection[moduleId].instance.recipe = {
 			$   : _$ ('[sp-recipe="' + moduleId + '"]'),
 			get : function (nModule) {
@@ -5988,9 +6000,10 @@ if ( !Object.observe ) {
 	});
 
 	/** Render the View
-	 * @param moduleId
-	 * @param view
-	 * @return object
+	 * @param {string} moduleId
+	 * @param {string} view
+	 * @param {bool} cleanCache
+	 * @return {object}
 	 */
 	Apps.add ('_serve', function (moduleId, view, cleanCache) {
 		var _view = null,
@@ -5999,6 +6012,8 @@ if ( !Object.observe ) {
 		//Find the recipe
 		var _dom = _$ ('[sp-recipe="' + moduleId + '"] [sp-view]'),
 			_dom_template = _$ ('[sp-recipe="' + moduleId + '"] [sp-tpl]');
+
+		//The render
 		return new Promise (function (resolve) {
 			if ( _dom.exist ) { //Exist?
 
@@ -6021,11 +6036,11 @@ if ( !Object.observe ) {
 						//Seek for tpl
 						_view.seekTpl (view_template_dir)
 							.then (function (view) {
-							view.render (_scope).then (function (res) {
-								_dom.html (res);
-								resolve (res);
-							})
-						})
+									   view.render (_scope).then (function (res) {
+										   _dom.html (res);
+										   resolve (res);
+									   })
+								   })
 					} else {
 						//Handle view?
 						//Require the view if needed
@@ -6042,9 +6057,9 @@ if ( !Object.observe ) {
 				} else if ( _dom_template.exist ) {
 					_view.render (_dom_template.html (), _scope)
 						.then (function (result) {
-						_dom.html (result);
-						resolve (result)
-					});
+								   _dom.html (result);
+								   resolve (result)
+							   });
 				}
 			}
 		});
@@ -6052,8 +6067,8 @@ if ( !Object.observe ) {
 	});
 
 	/** Execute Module
-	 *@param moduleId
-	 * @return object
+	 * @param {string} moduleId
+	 * @return {object}
 	 */
 	Apps.add ('_taste', function (moduleId) {
 		var _self = this;
@@ -6067,7 +6082,7 @@ if ( !Object.observe ) {
 			 && _.isSet (_self.root)
 		) {
 
-			// Initialize module
+			// Initialize module in scope
 			_self._add (moduleId);
 
 			//Trigger creator
@@ -6151,8 +6166,8 @@ if ( !Object.observe ) {
 	});
 
 	/** Execute All or One Module
-	 *@param moduleId
-	 * @return object
+	 * @param {string} moduleId
+	 * @return {object}
 	 */
 	Apps.add ('taste', function (moduleId) {
 		var _self = this,
