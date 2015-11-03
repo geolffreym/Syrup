@@ -18,7 +18,6 @@
 		//Set Hash Change
 		window.addEventListener ('hashchange', function (e) {
 
-
 			//Clean # from hash
 			var _hash = _self._cleanHash (location.hash),
 				_params = _self._getParams (location.hash);
