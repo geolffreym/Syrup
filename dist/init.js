@@ -4984,6 +4984,7 @@ if ( !Object.observe ) {
 }) (window);
 /**
  * Created by gmena on 07-26-14.
+ * Interceptor: ['message']
  */
 
 
@@ -5270,22 +5271,22 @@ if ( !Object.observe ) {
 		return this;
 	});
 
-	/**Getting a array of values name="input[]"
-	 * @param {string} name
-	 * @return {array}
-	 */
-	Model.add ('multiple', function (name) {
-		var _return = [],
-			_model_obj = this.model.get (0);
-
-		if ( name in _model_obj.elements ) {
-			_.each (_model_obj.elements[name], function (v, i) {
-				_return.push (v.value);
-			});
-		}
-
-		return _return.length > 0 ? _return : false;
-	});
+	///**Getting a array of values name="input[]"
+	// * @param {string} name
+	// * @return {array}
+	// */
+	//Model.add('multiple', function (name) {
+	//    var _return = [],
+	//        _model_obj = this.model.get(0);
+	//
+	//    if (name in _model_obj.elements) {
+	//        _.each(_model_obj.elements[name], function (v, i) {
+	//            _return.push(v.value);
+	//        });
+	//    }
+	//
+	//    return _return.length > 0 ? _return : false;
+	//});
 
 	/**Model fail what to do?
 	 * @param {object} field
@@ -5525,9 +5526,10 @@ if ( !Object.observe ) {
 				if ( _.isSet (field.name) ) {
 
 					//Has multiple?
-					if ( !!(_field_array = _self.multiple (field.name)) )
-						fieldValue = _field_array;
+					//if (!!(_field_array = _self.multiple(field.name)))
+					//    fieldValue = _field_array;
 
+					console.log (fieldValue);
 					//Append Data
 					_modelData.append (field.name, fieldValue);
 					_self.scope[field.name] = fieldValue;
@@ -6669,6 +6671,7 @@ if ( !Object.observe ) {
 }) (window);
 /**
  * Created by gmena on 10-25-15.
+ * Interceptor: ['change']
  */
 
 (function (window) {
@@ -6686,7 +6689,6 @@ if ( !Object.observe ) {
 		var _self = this;
 		//Set Hash Change
 		window.addEventListener ('hashchange', function (e) {
-
 
 			//Clean # from hash
 			var _hash = _self._cleanHash (location.hash),
