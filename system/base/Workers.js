@@ -1,5 +1,6 @@
 /**
  * Created by gmena on 07-26-14.
+ * Interceptor: ['message']
  */
 
 
