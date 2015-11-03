@@ -552,7 +552,9 @@ if ( typeof exports !== 'undefined' )
 	});
 
 	/**Nexts Node
-	 * @param callback
+	 * @param {string} filter
+	 * @param {function} callback
+	 * @return {object}
 	 */
 	_$_.add ('nexts', function (filter, callback) {
 		var _sibling = null;
@@ -569,12 +571,14 @@ if ( typeof exports !== 'undefined' )
 					_.callbackAudit (callback, _sibling);
 				}
 			} while ( _sibling.get (0).nextElementSibling
-					  && (_sibling = _$ (_sibling.get (0).nextElementSibling)).exist )
+					  && (_sibling = _$ (_sibling.get (0).nextElementSibling)).exist
+				)
 		});
 	});
 
 	/**Trigger
-	 * @param event
+	 * @param {string} event
+	 * @param {function} callback
 	 */
 	_$_.add ('trigger', function (event, callback) {
 		var _event = new CustomEvent (event, {
@@ -6783,31 +6787,6 @@ if ( !Object.observe ) {
 		//Clean the interceptor
 		//MiddleWare.cleanInterceptor(this, type);
 	});
-
-	/** Clean Interceptors
-	 * @param  {string} type
-	 * @return {object}
-	 * */
-	Hash.add ('interceptClean', function (type) {
-		//Clean the interceptor
-		MiddleWare.cleanInterceptor (this, type);
-		return this;
-	});
-
-
-	/**Set the target
-	 * @param {object} routes
-	 * @return {object}
-	 * */
-	Hash.add ('connect', function (to_route) {
-		if ( !(to_route instanceof AppClass) )
-			_.error (WARNING_ROUTE.ERROR.BADINSTANCE, '(Router .route)');
-
-		this.module = to_route;
-		to_route.lazy = true;
-		return this;
-	});
-
 
 	//Global access
 	window.Hash = Hash;
