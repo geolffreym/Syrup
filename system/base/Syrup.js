@@ -534,7 +534,9 @@
 	});
 
 	/**Nexts Node
-	 * @param callback
+	 * @param {string} filter
+	 * @param {function} callback
+	 * @return {object}
 	 */
 	_$_.add ('nexts', function (filter, callback) {
 		var _sibling = null;
@@ -551,12 +553,14 @@
 					_.callbackAudit (callback, _sibling);
 				}
 			} while ( _sibling.get (0).nextElementSibling
-					  && (_sibling = _$ (_sibling.get (0).nextElementSibling)).exist )
+					  && (_sibling = _$ (_sibling.get (0).nextElementSibling)).exist
+				)
 		});
 	});
 
 	/**Trigger
-	 * @param event
+	 * @param {string} event
+	 * @param {function} callback
 	 */
 	_$_.add ('trigger', function (event, callback) {
 		var _event = new CustomEvent (event, {
