@@ -119,7 +119,10 @@
 			_self.xhr.addEventListener ('readystatechange', function (e) {
 				if ( this.readyState ) {
 					//Find a interceptor for state
-					_self._handleInterceptor ('state', e);
+					_self._handleInterceptor ('state', {
+						state : this.readyState,
+						status: this.status
+					});
 				}
 			});
 
@@ -128,7 +131,7 @@
 				//Find a interceptor for abort
 				_self._handleInterceptor ('abort', e);
 
-			});
+			}, true);
 
 			//Complete
 			_self.xhr.addEventListener ('loadend', function (e) {
