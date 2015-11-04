@@ -18,14 +18,22 @@ var setting = {
 
 -->
 
-
+<!-- The main app container -->
 <main sp-app></main>
-
 
 <script>
 
+    /**
+     * The 'MODULES' are considered the entire site, the 'BLEND' is the different pages of the site,
+     * and the 'RECIPES' are different modules or portions that make up the pages, this allows much more precise
+     * control over every element of the page ...
+     *
+     * */
+
+
+
     (function (App) {
-        //Module
+        //Creating new Module
         App.module ('main', [
             'Router',
             'Hash'
@@ -44,29 +52,32 @@ var setting = {
                 route.when ('home', {
                     tpl  : 'skull/index/home.html',
                     app  : 'index', //App blend name
-                    cache: true
+                    cache: true //Cache skull?
 
                 }).when ('categories', {
                     tpl  : 'skull/index/home.html',
                     app  : 'categories',
-                    cache: true
+                    cache: true //Cache skull?
 
                 }).otherwise ('error404', {
                     tpl  : 'skull/error/404.html',
                     app  : 'error404', //App blend name
-                    cache: true
+                    cache: true //Cache skull?
                 })
 
             });
 
             //Handling Hash..
             $.Hash.when ('home').then (function (e) {
+                //#home
                 $.redirect ('home', e);
             }).when ('categories').then (function (e) {
+                //#categories
                 $.redirect ('categories', e);
             })
 
         }).service ({
+            //New Service for module
             //Redirect service
             'redirect': function (route, params) {
                 this.Router.redirect (route, params);
@@ -80,16 +91,40 @@ var setting = {
 
 <script>
 
-    //Index App
-    (function (App) {
-        //Encapsulate
+    /**
+     * Each container has a controlled environment, which has predefined as the 'init' and 'destroy' methods ..
+     * init: constructor
+     * destroy: destructor
+     *
+     * Each container has tools
+     * All tools refer to the recipe environment
 
+     * Ex:
+     * this.app: The app control
+     * this.recipe: The recipe control
+     * this.model: The model control
+     * this.view: The view control
+     * this.scope: The scope control
+     *
+     * Each recipe has access to their own environment:
+     *  $:  It means dependencies, services, providers, etc.
+     *
+     *  ex:
+     *  $.checkField()
+     *  S.main.Router //Access to the parent module using namespace
+     *
+     * **/
+
+        //Index blend App
+    (function (App) {
+
+        //Encapsulate
         var _main = App.module ('main'),
                 _indexApp = _main.blend ('index', ['Http']);
 
         //CSRF token !!
         _indexApp.cook (function ($) {
-
+            //Conf Provider!!
             //Intercept request!!
             $.Http.intercept ({
                 'request': function (conf) {
@@ -98,10 +133,15 @@ var setting = {
                 }
             });
 
+        }).service ('checkField', function () {
+            //Adding a service to environment
+            alert ('checked')
+
         }).recipe ('header', function (at, g) {
             //Index App
             //HEADER
             return {
+                //Initialize recipe!!
                 init: function ($) {
                     this.app.title ('Call me and Askme')
                             .view.render ('index/index/header.html');
@@ -121,12 +161,12 @@ var setting = {
                     _self.view.render ('index/index/main.html', true);
                     //});
 
-
                 }
             }
         }).recipe ('footer', function (_, g) {
             //FOOTER
             return {
+                //Initialize recipe!!
                 init: function ($) {
                     this.view.render (
                             'index/index/footer.html', true
@@ -147,6 +187,7 @@ var setting = {
         //Route App
         _indexApp.recipe ('header', function (_, g) {
             return {
+                //Initialize recipe!!
                 init: function ($) {
                     this.app.title ('Categories')
                             .view.render ('index/categories/header.html');
@@ -154,6 +195,7 @@ var setting = {
             }
         }).recipe ('middle', function (_, g) {
             return {
+                //Initialize recipe!!
                 init: function ($) {
                     var _self = this;
 
@@ -165,6 +207,7 @@ var setting = {
             }
         }).recipe ('footer', function (_, g) {
             return {
+                //Initialize recipe!!
                 init: function ($) {
                     this.view.render (
                             'index/index/footer.html'
