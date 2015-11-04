@@ -72,9 +72,16 @@ Config
 ------
 Configuration is very simple, you just have to access the folder /config/ and edit the file init.js 
 
-You need to set the APP_PATH, is who is responsible for setting the relative directory of your application, the default is '/' and finally the environment, which can be either development or production.
+You need to set the 'app_path' and 'system_path', which is responsible for establishing relative directories. The default is '/' and finally, the environment which can be either development or production.
 
-*Example APP_PATH: (/assets/)*  
+```js
+//config
+var setting = {
+	app_path   : '/syrup/app',
+	system_path: '/syrup/system',
+	env        : 'development'
+};
+```
 
   
 Joining files
