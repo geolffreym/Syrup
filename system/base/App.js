@@ -4,7 +4,7 @@
  */
 "use strict";
 (function (window) {
-	function Apps() {
+	function Apps () {
 		this.root = null; // Root name
 		this.lib = null; // Lib handler
 		this.scope = null; // Global scope
@@ -24,14 +24,14 @@
 	 * @param {array} dependencies
 	 * @return {object}
 	 * **/
-	Apps.add('module', function (name, dependencies) {
+	Apps.add ('module', function (name, dependencies) {
 		//No app registered?
-		if (!(name in this.moduleCollection)) {
+		if ( !(name in this.moduleCollection) ) {
 			this.moduleCollection[name] = new Apps;
 			this.moduleCollection[name].root = name; // Root name
 			this.moduleCollection[name].moduled = true; // Flag to handle module app
 			this.moduleCollection[name].lib = new LibClass;
-			this.moduleCollection[name].lib.blend(name, dependencies)
+			this.moduleCollection[name].lib.blend (name, dependencies)
 		}
 
 		//Return the app
@@ -43,7 +43,7 @@
 	 * @param {array} dependencies
 	 * @return {object}
 	 * **/
-	Apps.add('blend', function (name, dependencies) {
+	Apps.add ('blend', function (name, dependencies) {
 		var _self = new Apps;
 
 		_self.lib = new LibClass; //
@@ -54,17 +54,17 @@
 		_self.blended = true; // Flag to handle blended app
 
 		//Is module?
-		if (this.moduled) {
+		if ( this.moduled ) {
 			//Inherit
 			dependencies = dependencies || [];
-			dependencies.push(this.root);
+			dependencies.push (this.root);
 
 			//History
 			this.appCollection[name] = _self;
 		}
 
 		//Blend the libs
-		_self.lib.blend(name, dependencies);
+		_self.lib.blend (name, dependencies);
 
 		return _self;
 	});
@@ -74,24 +74,24 @@
 	 *  @param {function} module
 	 *  @return {object}
 	 * */
-	Apps.add('recipe', function (moduleId, module) {
+	Apps.add ('recipe', function (moduleId, module) {
 
 		//Handled by blend?
 		//Not blend, not recipe.. simple!!!
-		if (this.root && this.blended) {
-			if (_.isSet(module)) {
+		if ( this.root && this.blended ) {
+			if ( _.isSet (module) ) {
 				var _self = this;
 				_self.recipeCollection[moduleId] = {
-					creator: module,
+					creator : module,
 					instance: null
 				};
 
 				//Constructor
 				//On document ready
 				//Not lazy execution?
-				if (!this.lazy)
-					_$(function () {
-						_self._taste(moduleId);
+				if ( !this.lazy )
+					_$ (function () {
+						_self._taste (moduleId);
 					});
 			}
 		}
@@ -102,24 +102,24 @@
 	 * @param {string} moduleId
 	 * @return {void}
 	 * **/
-	Apps.add('_watch', function (moduleId) {
+	Apps.add ('_watch', function (moduleId) {
 		var _self = this;
-		Object.observe(_self.scope, function (change) {
-			_.each(change, function (v, i) {
-				if ((v.name in _self.onchange)
-					&& _.getObjectSize(v.object) > 0
-					&& moduleId === v.name
+		Object.observe (_self.scope, function (change) {
+			_.each (change, function (v, i) {
+				if ( (v.name in _self.onchange)
+					 && _.getObjectSize (v.object) > 0
+					 && moduleId === v.name
 				) {
 					//Break the loop
 					this.break = true;
 
 					//Event trigger!!
-					_self.onchange[v.name].call(
+					_self.onchange[v.name].call (
 						_self.recipeCollection[moduleId].instance,
 						{
-							name: v.name,
-							old: v.oldValue,
-							type: v.type,
+							name  : v.name,
+							old   : v.oldValue,
+							type  : v.type,
 							object: v.object[v.name]
 						}
 					);
@@ -133,8 +133,8 @@
 	 * @param {string} moduleId
 	 * @return {void}
 	 * **/
-	Apps.add('_add', function (moduleId) {
-		if (!_.isObject(this.scope[moduleId])) {
+	Apps.add ('_add', function (moduleId) {
+		if ( !_.isObject (this.scope[moduleId]) ) {
 			this.scope[moduleId] = {};
 		}
 	});
@@ -143,20 +143,20 @@
 	 * @param {string} moduleId
 	 * @return {object}
 	 * **/
-	Apps.add('_trigger', function (moduleId) {
-		if (moduleId in this.recipeCollection)
-			return this.recipeCollection[moduleId].creator(_, this.scope);
+	Apps.add ('_trigger', function (moduleId) {
+		if ( moduleId in this.recipeCollection )
+			return this.recipeCollection[moduleId].creator (_, this.scope);
 	});
 
 	/**Provide a global initial config
 	 * @param {string} moduleId
 	 * @return {object}
 	 * **/
-	Apps.add('cook', function (callback) {
-		if (_.isFunction(callback))
-			callback.call(
+	Apps.add ('cook', function (callback) {
+		if ( _.isFunction (callback) )
+			callback.call (
 				this,
-				this.lib.get(this.root),
+				this.lib.get (this.root),
 				_
 			);
 		return this;
@@ -165,9 +165,9 @@
 	/**Global attributes supplier
 	 * @param {object} moduleList
 	 * @return {object} */
-	Apps.add('spice', function (object) {
-		if (_.isObject(object))
-			this.lib.make(object);
+	Apps.add ('spice', function (object) {
+		if ( _.isObject (object) )
+			this.lib.make (object);
 		return this;
 	});
 
@@ -177,8 +177,8 @@
 	 * @return {object}
 	 *
 	 * */
-	Apps.add('provider', function (name, callback) {
-		this.lib.provider(name, callback);
+	Apps.add ('provider', function (name, callback) {
+		this.lib.provider (name, callback);
 		return this;
 	});
 
@@ -189,15 +189,15 @@
 	 * @return {object}
 	 *
 	 * */
-	Apps.add('service', function (name, callback) {
+	Apps.add ('service', function (name, callback) {
 		//Service supplier
-		if (_.isObject(name)) {
-			this.lib.supply(name);
+		if ( _.isObject (name) ) {
+			this.lib.supply (name);
 		}
 
 		//Cook service
-		if (_.isString(name) && _.isFunction(callback)) {
-			this.lib.cook(name, callback)
+		if ( _.isString (name) && _.isFunction (callback) ) {
+			this.lib.cook (name, callback)
 		}
 
 		return this;
@@ -209,8 +209,8 @@
 	 * @param {object} object
 	 * @return {object}
 	 * */
-	Apps.add('_getRecipe', function (moduleId) {
-		if (moduleId in this.recipeCollection && _.isSet(this.root))
+	Apps.add ('_getRecipe', function (moduleId) {
+		if ( moduleId in this.recipeCollection && _.isSet (this.root) )
 			return this.recipeCollection[moduleId].instance;
 		return null;
 	});
@@ -220,8 +220,8 @@
 	 * @param {object} object
 	 * @return {object}
 	 * **/
-	Apps.add('_setScope', function (moduleId, object) {
-		if (moduleId in this.scope) {
+	Apps.add ('_setScope', function (moduleId, object) {
+		if ( moduleId in this.scope ) {
 			this.scope[moduleId] = object;
 		}
 		return this;
@@ -231,8 +231,8 @@
 	 * @param {string} moduleId
 	 * @return {object}
 	 * **/
-	Apps.add('_getScope', function (moduleId) {
-		if (moduleId in this.scope) {
+	Apps.add ('_getScope', function (moduleId) {
+		if ( moduleId in this.scope ) {
 			return this.scope[moduleId];
 		}
 		return {};
@@ -244,7 +244,7 @@
 	 * @param {function} resolve
 	 * @return {object}
 	 */
-	Apps.add('when', function (event, name) {
+	Apps.add ('when', function (event, name) {
 		var self = this;
 		return event && (
 			{
@@ -263,7 +263,7 @@
 	 * @param {string} moduleId
 	 * @return {void}
 	 * */
-	Apps.add('_bindListener', function (moduleId) {
+	Apps.add ('_bindListener', function (moduleId) {
 		var enabled_events = [
 				'click', 'submit',
 				'change', 'dblclick',
@@ -273,25 +273,25 @@
 				'keydown', 'keypress', 'keyup', 'blur',
 				'focus', 'input', 'select', 'reset'
 			], _self = this, _recipe = this.recipeCollection[moduleId].instance,
-			_mod = _$('[sp-recipe="' + moduleId + '"]');
+			_mod = _$ ('[sp-recipe="' + moduleId + '"]');
 
 		//Exist the module?
-		if (_mod.exist) {
+		if ( _mod.exist ) {
 
 			//Bind enabled events
-			_.each(enabled_events, function (v) {
+			_.each (enabled_events, function (v) {
 				//Listen the events
-				_mod.listen(v, function (e) {
+				_mod.listen (v, function (e) {
 					var _event = 'sp-' + e.type,
-						_attr = e.target.getAttribute(_event);
+						_attr = e.target.getAttribute (_event);
 
 					//Has sp-'event'?
-					if (_attr) {
+					if ( _attr ) {
 						//Is in recipe?
-						if (_attr in _recipe && _.isFunction(_recipe[_attr])) {
-							_recipe[_attr].call(
+						if ( _attr in _recipe && _.isFunction (_recipe[_attr]) ) {
+							_recipe[_attr].call (
 								_self.recipeCollection[moduleId].instance,
-								_self.lib.get(_recipe.parent.root), e
+								_self.lib.get (_recipe.parent.root), e
 							);
 						}
 					}
@@ -305,39 +305,39 @@
 	 * @param {string} moduleId
 	 * @return {void}
 	 */
-	Apps.add('_models', function (moduleId) {
+	Apps.add ('_models', function (moduleId) {
 		//Self and Model Object
 		var _self = this,
 			_model = new Model;
 
 		//The model Object?
 		_self.recipeCollection[moduleId].instance.model = {
-			object: _model,
+			object  : _model,
 			resource: function () {
-				return _$('[sp-recipe="' + moduleId + '"] [sp-model]');
+				return _$ ('[sp-recipe="' + moduleId + '"] [sp-model]');
 			},
-			set: function (obj) {
-				var _resource = this.resource();
+			set     : function (obj) {
+				var _resource = this.resource ();
 				//Exist resource?
-				if (_resource.exist)
-					_model.set(_resource, obj);
+				if ( _resource.exist )
+					_model.set (_resource, obj);
 				return _self.recipeCollection[moduleId].instance;
 			},
-			get: function (item) {
-				var _resource = this.resource();
+			get     : function (item) {
+				var _resource = this.resource ();
 				//Exist resource?
-				if (_resource.exist) {
+				if ( _resource.exist ) {
 					return {
 						then: function (resolve) {
-							return _model.get(_resource).then(function (e) {
+							return _model.get (_resource).then (function (e) {
 								if (
-									_.isSet(item)
-									&& _.isArray(item)
-									&& !_.isEmpty(item)
+									_.isSet (item)
+									&& _.isArray (item)
+									&& !_.isEmpty (item)
 								) {
 									var _result = {};
-									_.each(item, function (v, i) {
-										if (v in e.scope)
+									_.each (item, function (v, i) {
+										if ( v in e.scope )
 											_result[v] = e.scope[v];
 									});
 
@@ -346,7 +346,7 @@
 								}
 
 								// Call the resolve
-								resolve.call(
+								resolve.call (
 									_self.recipeCollection[moduleId].instance, e
 								)
 							});
@@ -361,7 +361,7 @@
 	 * @param {string} moduleId
 	 * @return {void}
 	 * */
-	Apps.add('_views', function (moduleId) {
+	Apps.add ('_views', function (moduleId) {
 		// Render view
 		var _self = this;
 
@@ -369,7 +369,7 @@
 		_self.recipeCollection[moduleId].instance.view = {
 			render: function (_view, _cache) {
 				//Rend
-				var _rend = _self._serve(
+				var _rend = _self._serve (
 					moduleId, _view || null,
 					_cache || false
 				);
@@ -377,9 +377,9 @@
 				//Async
 				return {
 					then: function (resolve) {
-						return _rend.then(function (m) {
+						return _rend.then (function (m) {
 							// Call the resolve
-							resolve.call(
+							resolve.call (
 								_self.recipeCollection[moduleId].instance, m
 							)
 						})
@@ -394,30 +394,30 @@
 	 * @param {string} moduleId
 	 * @return {void}
 	 * */
-	Apps.add('_scopes', function (moduleId) {
+	Apps.add ('_scopes', function (moduleId) {
 		// Self
 		var _self = this;
 
 		//The scope object
 		_self.recipeCollection[moduleId].instance.scope = {
 			global: _self.scope, object: _self.scope[moduleId],
-			set: function (nModule, object) {
-				var _moduleId = !_.isObject(nModule)
-								&& _.isString(nModule) && nModule
+			set   : function (nModule, object) {
+				var _moduleId = !_.isObject (nModule)
+								&& _.isString (nModule) && nModule
 								|| moduleId,
-					_object = _.isObject(nModule) && nModule
+					_object = _.isObject (nModule) && nModule
 							  || object;
 
-				if (_.isObject(_object)) {
-					_self._setScope(_moduleId, _object);
+				if ( _.isObject (_object) ) {
+					_self._setScope (_moduleId, _object);
 					return _self.recipeCollection[moduleId].instance;
 				}
 			},
-			get: function (nModule) {
-				var _moduleId = _.isString(nModule)
+			get   : function (nModule) {
+				var _moduleId = _.isString (nModule)
 					? nModule : moduleId;
 
-				return _self._getScope(_moduleId);
+				return _self._getScope (_moduleId);
 			}
 		};
 	});
@@ -426,17 +426,17 @@
 	 * @param {string} moduleId
 	 * @return {void}
 	 * */
-	Apps.add('_app', function (moduleId) {
+	Apps.add ('_app', function (moduleId) {
 		// Self
 		var _self = this;
 
 		//The app object
 		_self.recipeCollection[moduleId].instance.app = {
-			$: _$, object: _$('[sp-app]'),
+			$    : _$, object: _$ ('[sp-app]'),
 			title: function (title) {
-				var _title = _$('title');
-				if (_title.exist) {
-					_title.text(title)
+				var _title = _$ ('title');
+				if ( _title.exist ) {
+					_title.text (title)
 				}
 				return _self.recipeCollection[moduleId].instance;
 			}
@@ -448,24 +448,27 @@
 	 * @param {string} moduleId
 	 * @return {void}
 	 * */
-	Apps.add('_recipes', function (moduleId) {
+	Apps.add ('_recipes', function (moduleId) {
 		// Self
 		var _self = this;
 
 		//The recipe object
 		_self.recipeCollection[moduleId].instance.recipe = {
-			$: _$('[sp-recipe="' + moduleId + '"]'),
-			get: function (nModule) {
-				var _moduleId = _.isString(nModule)
-					? nModule : moduleId;
-
-				return _self._getRecipe(_moduleId);
+			$      : _$ ('[sp-recipe="' + moduleId + '"]'),
+			element: function (elem) {
+				return _$ ()
 			},
-			drop: function (nModule) {
-				var _moduleId = _.isString(nModule)
+			get    : function (nModule) {
+				var _moduleId = _.isString (nModule)
 					? nModule : moduleId;
 
-				_self.drop(_moduleId);
+				return _self._getRecipe (_moduleId);
+			},
+			drop   : function (nModule) {
+				var _moduleId = _.isString (nModule)
+					? nModule : moduleId;
+
+				_self.drop (_moduleId);
 				return _self.recipeCollection[moduleId].instance;
 			}
 		};
@@ -477,61 +480,61 @@
 	 * @param {bool} cleanCache
 	 * @return {object}
 	 */
-	Apps.add('_serve', function (moduleId, view, cleanCache) {
+	Apps.add ('_serve', function (moduleId, view, cleanCache) {
 		var _view = null,
 			_scope = this.scope[moduleId];
 
 		//Find the recipe
-		var _dom = _$('[sp-recipe="' + moduleId + '"] [sp-view]'),
-			_dom_template = _$('[sp-recipe="' + moduleId + '"] [sp-tpl]');
+		var _dom = _$ ('[sp-recipe="' + moduleId + '"] [sp-view]'),
+			_dom_template = _$ ('[sp-recipe="' + moduleId + '"] [sp-tpl]');
 
 		//The render
-		return new Promise(function (resolve) {
-			if (_dom.exist) { //Exist?
+		return new Promise (function (resolve) {
+			if ( _dom.exist ) { //Exist?
 
 				//The view object
 				_view = new View;
 
 				//A view?
-				if (_.isSet(view) && _.isString(view)) {
-					var view_name = view.split('/').pop(),
-						view_dir = _.replace(view, '/' + view_name, _.emptyStr),
+				if ( _.isSet (view) && _.isString (view) ) {
+					var view_name = view.split ('/').pop (),
+						view_dir = _.replace (view, '/' + view_name, _.emptyStr),
 						view_template_dir = 'layout/' + view_dir + '/' + view_name;
 
 					//Handle template?
-					if (/\.html$/.test(view_name)) {
+					if ( /\.html$/.test (view_name) ) {
 
 						//Clean cache?
-						if (cleanCache)
-							_view.cleanCache(view_template_dir);
+						if ( cleanCache )
+							_view.cleanCache (view_template_dir);
 
 						//Seek for tpl
-						_view.seekTpl(view_template_dir)
-							.then(function (view) {
-									  view.render(_scope).then(function (res) {
-										  _dom.html(res);
-										  resolve(res);
-									  })
-								  })
+						_view.seekTpl (view_template_dir)
+							.then (function (view) {
+							view.render (_scope).then (function (res) {
+								_dom.html (res);
+								resolve (res);
+							})
+						})
 					} else {
 						//Handle view?
 						//Require the view if needed
-						Require.lookup(['view/' + view_dir]).then(function () {
-							if (view_name in _view.__proto__)
-								_view[view_name](_, _scope, function (my_html) {
-									_dom.html(my_html);
-									resolve(my_html)
+						Require.lookup (['view/' + view_dir]).then (function () {
+							if ( view_name in _view.__proto__ )
+								_view[view_name] (_, _scope, function (my_html) {
+									_dom.html (my_html);
+									resolve (my_html)
 								})
 						});
 					}
 
 					//Exist inline tpl?
-				} else if (_dom_template.exist) {
-					_view.render(_dom_template.html(), _scope)
-						.then(function (result) {
-								  _dom.html(result);
-								  resolve(result)
-							  });
+				} else if ( _dom_template.exist ) {
+					_view.render (_dom_template.html (), _scope)
+						.then (function (result) {
+						_dom.html (result);
+						resolve (result)
+					});
 				}
 			}
 		});
@@ -542,27 +545,27 @@
 	 * @param {string} moduleId
 	 * @return {object}
 	 */
-	Apps.add('_taste', function (moduleId) {
+	Apps.add ('_taste', function (moduleId) {
 		var _self = this;
 
 		//Handle taste interceptor
-		_self._handleInterceptor('taste', _self);
+		_self._handleInterceptor ('taste', _self);
 
 		//Module registered?
 		//Root exists?
-		if (moduleId in _self.recipeCollection
-			&& _.isSet(_self.root)
+		if ( moduleId in _self.recipeCollection
+			 && _.isSet (_self.root)
 		) {
 
 			// Initialize module in scope
-			_self._add(moduleId);
+			_self._add (moduleId);
 
 			//Trigger creator
-			_self.recipeCollection[moduleId].instance = _self._trigger(moduleId);
+			_self.recipeCollection[moduleId].instance = _self._trigger (moduleId);
 
 			//Not object return by creator?
 			//Break!!!
-			if (!_.isObject(_self.recipeCollection[moduleId].instance))
+			if ( !_.isObject (_self.recipeCollection[moduleId].instance) )
 				return;
 
 			//Recipe Name and Parent name
@@ -572,66 +575,66 @@
 			// Binding Methods
 			// Event handler
 			_self.recipeCollection[moduleId].instance.when = function (event) {
-				return _self.when(event, moduleId);
+				return _self.when (event, moduleId);
 			};
 
 			// Recipes
-			_self._recipes(moduleId);
+			_self._recipes (moduleId);
 
 			// Scoping
-			_self._scopes(moduleId);
+			_self._scopes (moduleId);
 
 			// Handle Model
-			_self._models(moduleId);
+			_self._models (moduleId);
 
 			// Handle App
-			_self._app(moduleId);
+			_self._app (moduleId);
 
 			// Handle Views
-			_self._views(moduleId);
+			_self._views (moduleId);
 
 			// Init the module?
 			if (
 				'init' in _self.recipeCollection[moduleId].instance
-				&& _.isFunction(_self.recipeCollection[moduleId].instance.init)
+				&& _.isFunction (_self.recipeCollection[moduleId].instance.init)
 			) {
 
 				//Handle taste interceptor
-				_self._handleInterceptor(
+				_self._handleInterceptor (
 					'init', _self.recipeCollection[moduleId].instance
 				);
 
 				//Require Libs?
 				if (
 					'require' in _self.recipeCollection[moduleId].instance
-					&& _.isArray(_self.recipeCollection[moduleId].instance.require)
+					&& _.isArray (_self.recipeCollection[moduleId].instance.require)
 				) {
 					//LookUp for libs!!
-					Require.lookup(_self.recipeCollection[moduleId].instance.require).then(function (e) {
+					Require.lookup (_self.recipeCollection[moduleId].instance.require).then (function (e) {
 						//Execution
-						_self.lib._dependencies(e.getCleanDependencies());
-						_self.recipeCollection[moduleId].instance.init(
-							_self.lib.get(_self.root)
+						_self.lib._dependencies (e.getCleanDependencies ());
+						_self.recipeCollection[moduleId].instance.init (
+							_self.lib.get (_self.root)
 						);
 					});
 				} else {
 					//Execution
-					_self.recipeCollection[moduleId].instance.init(
-						_self.lib.get(_self.root)
+					_self.recipeCollection[moduleId].instance.init (
+						_self.lib.get (_self.root)
 					);
 				}
 
 				//Handle taste interceptor
-				_self._handleInterceptor(
+				_self._handleInterceptor (
 					'after', _self.recipeCollection[moduleId].instance
 				);
 			}
 
 			// Bind listeners
-			_self._bindListener(moduleId);
+			_self._bindListener (moduleId);
 
 			// Observe scope
-			_self._watch(moduleId);
+			_self._watch (moduleId);
 		}
 
 		return this;
@@ -641,10 +644,10 @@
 	 * @param {string} moduleId
 	 * @return {object}
 	 */
-	Apps.add('taste', function (moduleId) {
+	Apps.add ('taste', function (moduleId) {
 		var _self = this,
 			_moduleId = moduleId && [moduleId]
-						|| _.getObjectKeys(_self.recipeCollection);
+						|| _.getObjectKeys (_self.recipeCollection);
 
 		//Reset lazy exec
 		_self.lazy = false;
@@ -652,12 +655,12 @@
 		//_self.interceptClean = false;
 
 		//Execute!!
-		_.each(_moduleId, function (v) {
-			_self._taste(v);
+		_.each (_moduleId, function (v) {
+			_self._taste (v);
 		});
 
 		//After execute clean all
-		MiddleWare.cleanInterceptor(_self, 'init');
+		MiddleWare.cleanInterceptor (_self, 'init');
 
 		return this;
 	});
@@ -666,9 +669,9 @@
 	 * @param  {object} interceptors
 	 * @return {object}
 	 * */
-	Apps.add('intercept', function (interceptors) {
-		if (_.isObject(interceptors))
-			MiddleWare.intercept(this, interceptors);
+	Apps.add ('intercept', function (interceptors) {
+		if ( _.isObject (interceptors) )
+			MiddleWare.intercept (this, interceptors);
 		return this;
 	});
 
@@ -676,9 +679,9 @@
 	 * @param  {string} type
 	 * @return {object}
 	 * */
-	Apps.add('interceptClean', function (type) {
+	Apps.add ('interceptClean', function (type) {
 		//Clean the interceptor
-		MiddleWare.cleanInterceptor(this, type);
+		MiddleWare.cleanInterceptor (this, type);
 		return this;
 	});
 
@@ -688,10 +691,10 @@
 	 * @param {object} param
 	 * @return {void}
 	 * */
-	Apps.add('_handleInterceptor', function (type, param) {
+	Apps.add ('_handleInterceptor', function (type, param) {
 		//Trigger Interceptors
-		MiddleWare.trigger(
-			MiddleWare.getInterceptors(this, type),
+		MiddleWare.trigger (
+			MiddleWare.getInterceptors (this, type),
 			[param, this]
 		);
 
@@ -706,11 +709,11 @@
 	 * @param moduleId
 	 * @return object
 	 * */
-	Apps.add('drop', function (moduleId) {
-		if (moduleId in this.recipeCollection) {
-			if (this.recipeCollection[moduleId].instance) {
-				if ('destroy' in this.recipeCollection[moduleId].instance)
-					this.recipeCollection[moduleId].instance.destroy(this.lib.get(this.root));
+	Apps.add ('drop', function (moduleId) {
+		if ( moduleId in this.recipeCollection ) {
+			if ( this.recipeCollection[moduleId].instance ) {
+				if ( 'destroy' in this.recipeCollection[moduleId].instance )
+					this.recipeCollection[moduleId].instance.destroy (this.lib.get (this.root));
 				this.recipeCollection[moduleId] = null;
 			}
 		}
@@ -721,10 +724,10 @@
 	/**Drop all Modules
 	 * @return object
 	 * */
-	Apps.add('dropAll', function () {
+	Apps.add ('dropAll', function () {
 		var _self = this;
-		_.each(this.recipeCollection, function (module, id) {
-			_self.drop(id);
+		_.each (this.recipeCollection, function (module, id) {
+			_self.drop (id);
 		});
 		return this;
 	});
