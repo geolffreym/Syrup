@@ -157,8 +157,6 @@
 			//Send
 			_self.xhr.send (_self.config.method !== 'GET' ? _data : null);
 
-			//Release name
-			_self.name = 'default';
 		}));
 
 	});
