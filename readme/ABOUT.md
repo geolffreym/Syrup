@@ -1,3 +1,27 @@
+Description
+===========
+
+**With the help of**
+
+* Templating [Mustache](https://github.com/janl/mustache.js)
+* Web Dependencies [Requirejs](http://requirejs.org/docs/api.html)
+
+
+**Based**
+
+*MVC Pattern:*
+
+* Model
+* View
+* Controller
+ 
+*MTV Pattern:*
+
+* Model
+* View
+* Template
+
+
 Features
 ========
 
@@ -9,7 +33,7 @@ Features
 * [DRY](http://c2.com/cgi/wiki?DontRepeatYourself)
 
 
-MVC or MTV
+MVC + T
 ==========
 
 Controllers

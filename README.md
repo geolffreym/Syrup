@@ -12,30 +12,6 @@ Content
 * [About Design and Features] (https://github.com/geolffreym/Syrup/blob/master/readme/ABOUT.md)
 
 
-Description
-===========
-
-**With the help of**
-
-* Templating [Mustache](https://github.com/janl/mustache.js)
-* Web Dependencies [Requirejs](http://requirejs.org/docs/api.html)
-
-
-**Based**
-
-*MVC Pattern:*
-
-* Model
-* View
-* Controller
- 
-*MTV Pattern:*
-
-* Model
-* View
-* Template
-
-
 Compatibility with browsers
 ---------------------------
     
