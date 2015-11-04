@@ -11,6 +11,7 @@ Content
 * [Syrup Core](https://github.com/geolffreym/Syrup/blob/master/readme/CORE.md)
 * [About Design and Features] (https://github.com/geolffreym/Syrup/blob/master/readme/ABOUT.md)
 
+(Pending Documentation)
 
 Compatibility with browsers
 ---------------------------
