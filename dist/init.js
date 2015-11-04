@@ -4894,6 +4894,7 @@ if ( !Object.observe ) {
 			//Success
 			_self.xhr.addEventListener ('load', function (e) {
 				if ( this.status >= 0xC8 && this.status < 0x190 ) {
+
 					//The response
 					var _response = this.response || this.responseText;
 					_response = _.isJson (_response) && _.toObject (_response) || _response;
@@ -4927,25 +4928,25 @@ if ( !Object.observe ) {
 			//Abort
 			_self.xhr.addEventListener ('abort', function (e) {
 				//Find a interceptor for abort
-				_self._handleInterceptor ('abort', e);
+				_self._handleInterceptor ('abort', this);
 
 			}, true);
 
 			//Complete
 			_self.xhr.addEventListener ('loadend', function (e) {
 				//Find a interceptor for complete
-				_self._handleInterceptor ('complete', e);
+				_self._handleInterceptor ('complete', this);
 
 			});
 
 			_self.xhr.addEventListener ('loadstart', function (e) {
 				//Find a interceptor for  before
-				_self._handleInterceptor ('before', e);
+				_self._handleInterceptor ('before', this);
 			});
 
 			_self.xhr.addEventListener ('error', function (e) {
 				//Find a interceptor for success
-				_self._handleInterceptor ('error', e);
+				_self._handleInterceptor ('error', this);
 
 				reject (e);
 
