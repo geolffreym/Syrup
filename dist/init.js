@@ -6149,7 +6149,7 @@ if ( !Object.observe ) {
 		_self.recipeCollection[moduleId].instance.recipe = {
 			$   : _$ ('[sp-recipe="' + moduleId + '"]'),
 			node: function (node) {
-				return this.$.find ('[sp-node=' + node + ']')
+				return _$ ('[sp-recipe="' + moduleId + '"] [sp-node=' + node + ']');
 			},
 			get : function (nModule) {
 				var _moduleId = _.isString (nModule)
