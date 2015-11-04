@@ -5,7 +5,19 @@
     <title></title>
 </head>
 <body>
+
+<!-- If you have problems please change directories in /dist/init.js and writes concerning your application
 <script src="/syrup/dist/init.js"></script>
+//Basic Config
+
+var setting = {
+	app_path   : '/syrup/app',
+	system_path: '/syrup/system',
+	env        : 'development'
+};
+
+-->
+
 
 <main sp-app></main>
 
@@ -21,10 +33,11 @@
         ]).cook (function ($) {
             //Conf Provider!!
             //Provide conf to Router
+            //The route must match with the uri !IMPORTANT
             $.Router.connect (this).set ({
-                'home'    : '/syrup/Modules.html',
+                'home'      : '/syrup/Modules.html',
                 'categories': '/categories',
-                'error404': '/404'
+                'error404'  : '/404'
 
             }).then (function (route) {
 
@@ -33,9 +46,9 @@
                     app  : 'index', //App blend name
                     cache: true
 
-                }).when('categories', {
-                    tpl: 'skull/index/home.html',
-                    app: 'categories',
+                }).when ('categories', {
+                    tpl  : 'skull/index/home.html',
+                    app  : 'categories',
                     cache: true
 
                 }).otherwise ('error404', {
@@ -166,9 +179,9 @@
     //Error
     (function (App) {
         //Encapsulate
-        App.module('main').blend('error404', []);
+        App.module ('main').blend ('error404', []);
 
-    })(App);
+    }) (App);
 </script>
 </body>
 </html>
