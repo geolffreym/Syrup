@@ -67,9 +67,22 @@
 	Libs.add ('make', function (attributes) {
 		var _self = this;
 		_.each (attributes, function (v, i) {
-			_[_self.name][i] = v;
+			if ( !_.isFunction (v) && !_.isObject (v) )
+				_[_self.name][i] = v;
 		});
 
+		return this;
+	});
+
+	/**Object provider
+	 * @param {function} callback
+	 * @return {object}
+	 * */
+	Libs.add ('provider', function (name, callback) {
+		if ( _.isFunction (callback) )
+			_[this.name][name] = (callback.call (
+				_[this.name], _[this.name]
+			));
 		return this;
 	});
 
@@ -104,5 +117,4 @@
 	//The global object Lib
 	window.Lib = new Libs;
 	window.LibClass = Libs;
-
 }) (window);
