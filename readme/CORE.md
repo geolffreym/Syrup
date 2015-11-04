@@ -194,7 +194,7 @@ if(my_selector.exist){
 ```js    
 var my_selector = _$('.$_to_get');
 
-my_selector.object(); //Return $ object
+my_selector.object(); //Return Node or NodeList
 ```
 
 **Method `.ready()`**
