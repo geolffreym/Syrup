@@ -98,12 +98,13 @@
 				if ( this.status >= 0xC8 && this.status < 0x190 ) {
 
 					//The response
-					var _response = this.response || this.responseText;
+					var _response = this.response || this.responseText || this.responseXML;
 					_response = _.isJson (_response) && _.toObject (_response) || _response;
 
 					//Find a interceptor for success
 					_self._handleInterceptor ('success', this);
 
+					//Resolve
 					resolve (_response);
 
 				}
@@ -263,6 +264,7 @@
 		//The request
 		return this.request (url, _.isObject (data) && data || {});
 	});
+
 
 	/** Set Request Header
 	 * @param {string} header
