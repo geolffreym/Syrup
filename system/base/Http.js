@@ -114,7 +114,7 @@
 				//Find a interceptor for progress
 				_self._handleInterceptor ('progress', e);
 
-			}, false);
+			});
 
 			//State
 			_self.xhr.addEventListener ('readystatechange', function (e) {
@@ -132,7 +132,7 @@
 				//Find a interceptor for abort
 				_self._handleInterceptor ('abort', this);
 
-			}, true);
+			});
 
 			//Complete
 			_self.xhr.addEventListener ('loadend', function (e) {
