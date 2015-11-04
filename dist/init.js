@@ -5600,7 +5600,7 @@ if ( !Object.observe ) {
 
 		var _self = this,
 			_modelData = new FormData,
-			_field_array, _model_obj = _self.model.get (0),
+			_model_obj = _self.model.get (0),
 			_fields = _model_obj.querySelectorAll ('input, textarea, select'),
 			x = _fields.length, _codes = null;
 
