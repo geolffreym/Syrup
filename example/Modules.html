@@ -22,7 +22,8 @@
             //Conf Provider!!
             //Provide conf to Router
             $.Router.connect (this).set ({
-                'home'    : '/',
+                'home'    : '/syrup/Modules.html',
+                'categories': '/categories',
                 'error404': '/404'
 
             }).then (function (route) {
@@ -30,6 +31,11 @@
                 route.when ('home', {
                     tpl  : 'skull/index/home.html',
                     app  : 'index', //App blend name
+                    cache: true
+
+                }).when('categories', {
+                    tpl: 'skull/index/home.html',
+                    app: 'categories',
                     cache: true
 
                 }).otherwise ('error404', {
@@ -43,6 +49,8 @@
             //Handling Hash..
             $.Hash.when ('home').then (function (e) {
                 $.redirect ('home', e);
+            }).when ('categories').then (function (e) {
+                $.redirect ('categories', e);
             })
 
         }).service ({
@@ -96,10 +104,9 @@
                     var _self = this;
 
                     ////Request categories..
-                    $.Http.get ('/categories/', 'get_categories').then (function (r) {
-                        _self.scope.set ({ categories: r.data })
-                                .view.render ('index/index/main.html', true)
-                    });
+                    //$.Http.get ('/categories/', 'get_categories').then (function (r) {
+                    _self.view.render ('index/index/main.html', true);
+                    //});
 
 
                 }
@@ -109,7 +116,7 @@
             return {
                 init: function ($) {
                     this.view.render (
-                            'index/index/footer.html'
+                            'index/index/footer.html', true
                     )
                 }
             }
@@ -118,7 +125,45 @@
     }) (App);
 
 
-    //404 Error
+    //Categories
+    (function (App) {
+        var _main = App.module ('main'),
+                _indexApp = _main.blend ('categories', ['Http']);
+
+
+        //Route App
+        _indexApp.recipe ('header', function (_, g) {
+            return {
+                init: function ($) {
+                    this.app.title ('Categories')
+                            .view.render ('index/categories/header.html');
+                }
+            }
+        }).recipe ('middle', function (_, g) {
+            return {
+                init: function ($) {
+                    var _self = this;
+
+                    // $.Http.get ('/categories/').then (function (r) {
+                    _self.scope.set ({ 'categories': [{ pk: 1, name: 'Test' }] })
+                            .view.render ('index/categories/main.html');
+                    // });
+                }
+            }
+        }).recipe ('footer', function (_, g) {
+            return {
+                init: function ($) {
+                    this.view.render (
+                            'index/index/footer.html'
+                    );
+                }
+            }
+        })
+
+    }) (App);
+
+
+    //Error
     (function (App) {
         //Encapsulate
         App.module('main').blend('error404', []);
