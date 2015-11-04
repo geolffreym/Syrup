@@ -28,6 +28,11 @@ var setting = {
      * and the 'RECIPES' are different modules or portions that make up the pages, this allows much more precise
      * control over every element of the page ...
      *
+     * The documentation lacks many features for detail, and must take into account that it is an alpha version
+     * of the project and there is only one person working.
+     * Thank you and please write to my email if you want to collaborate with the project ..
+     * gmena <gmjun2000@gmail.com>
+     *
      * */
 
 
@@ -49,6 +54,7 @@ var setting = {
 
             }).then (function (route) {
 
+                //Loose coupling
                 route.when ('home', {
                     tpl  : 'skull/index/home.html',
                     app  : 'index', //App blend name
