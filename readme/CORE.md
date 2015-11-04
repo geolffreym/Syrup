@@ -1084,13 +1084,14 @@ _.error('No param'); // 04:12:05 PM -> No param
 
 *(Set interval function based in thread process)*
 ```js           
-var conf = {
-              delay: 0x32, // Time to wait between each loop 
-              limit: 0xA // max iterations if negative value is passed it is descendant
-            }
+
+            
 _.interval(function (x) {
          x // each value since 0 to limit
-     }, conf);
+     }, {
+         delay: 0x32, // Time to wait between each loop 
+         limit: 0xA // max iterations if negative value is passed it is descendant          
+     });
 ```
      
 **Method `.each(object || array, callback)`**
