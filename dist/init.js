@@ -4900,7 +4900,7 @@ if ( !Object.observe ) {
 					_response = _.isJson (_response) && _.toObject (_response) || _response;
 
 					//Find a interceptor for success
-					_self._handleInterceptor ('success', _response);
+					_self._handleInterceptor ('success', this);
 
 					resolve (_response);
 
