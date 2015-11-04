@@ -17,7 +17,7 @@ Controllers
 
 Controllers are an intermediary between models and views which are classically responsible for two tasks: 
 they both update the view when the model changes and update the model when the user manipulates the view. 
-In Syrup drivers are handled from a dedicated environment.
+In Syrup the controllers are handled from a dedicated environment..
 
 The Controllers are located in the folder "app/controller/{app_name}/{file}.js", and are called to our site with script tags right after call Syrup core.
 
@@ -51,8 +51,7 @@ Templates
 This layer contains presentation-related decisions: how something should be displayed on a Web page or other type of document.
 
 In Syrup, the templates are handled with the help of [Mustache](https://mustache.github.io/). 
-The templates are related to views, they make use of the templates to display data.
-
+The templates are related to 'views', that they make use of the templates to display data.
 
 
 
