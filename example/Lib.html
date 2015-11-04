@@ -8,39 +8,34 @@
 <script src="../syrup/dist/init.js"></script>
 <script>
 
+    //Require the dependencies
+    Require.lookup (['lib/myTestLib.min']).then (function () {
 
-    _$ (function () {
+        //Blend a Lib to Syrup
+        var my_Lib = Lib.blend ('Hey', ['Http', 'myTestLib']);
 
-        //Require the dependencies
-        Require.lookup (['lib/myTestLib.min']).then (function () {
+        //Constructor
+        my_Lib.make ({ user: 'Pedro' });
 
-            //Blend a Lib to Syrup
-            var my_Lib = Lib.blend ('Hey', ['Http', 'myTestLib']);
-
-            //Constructor
-            my_Lib.make ({ user: 'Pedro' });
-
-            //Methods
-            my_Lib.supply ({
-                sayHi: function () {
-                    console.log(this)
-                    console.log ('Hey i\'m ' + this.user);
-                    //Http in dependencies
-                    _.warning ('Calling Http');
-                    console.log (this.Http);
-                    //myTestLib dependencies
-                    _.warning ('Calling myTestLib');
-                    console.log (this.myTestLib);
+        //Methods
+        my_Lib.supply ({
+            sayHi: function () {
+                console.log (this);
+                console.log ('Hey i\'m ' + this.user);
+                //Http in dependencies
+                _.warning ('Calling Http');
+                console.log (this.Http);
+                //myTestLib dependencies
+                _.warning ('Calling myTestLib');
+                console.log (this.myTestLib);
 
 
-                }
-            });
-
-            _.Hey.sayHi()
-
+            }
         });
 
-    })
+        _.Hey.sayHi ()
+
+    });
 
 </script>
 </body>

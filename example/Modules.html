@@ -12,70 +12,118 @@
 
 <script>
 
-    //Module
-    App.module ('main', [
-        'Http',
-        'Router'
+    (function (App) {
+        //Module
+        App.module ('main', [
+            'Router',
+            'Hash'
+            //Dependencies
+        ]).cook (function ($) {
+            //Conf Provider!!
+            //Provide conf to Router
+            $.Router.connect (this).set ({
+                'home'    : '/',
+                'error404': '/404'
 
-    ]).spice ({
-        MAX: 1
-    }).cook (function ($) {
+            }).then (function (route) {
 
-        //Provide conf to Router
-        $.Router.connect (this).set ({
-            'home' : '/syrup/Modules.html',
-            'route': '/route/:page/:user/'
+                route.when ('home', {
+                    tpl  : 'skull/index/home.html',
+                    app  : 'index', //App blend name
+                    cache: true
 
-        }).then (function (route) {
+                }).otherwise ('error404', {
+                    tpl  : 'skull/error/404.html',
+                    app  : 'error404', //App blend name
+                    cache: true
+                })
 
-            route.when ('home', {
-                tpl    : 'skull/home.html',
-                app    : 'index'
+            });
 
+            //Handling Hash..
+            $.Hash.when ('home').then (function (e) {
+                $.redirect ('home', e);
             })
 
-        });
-    })
-
-</script>
-
-<script>
-
-    (function (App) {
-        //Encapsulate
-
-        var _main = App.module ('main'),
-                _indexApp = _main.blend ('index', []);
-
-        //Index App
-        _indexApp.recipe ('home1', function () {
-            return {
-                init   : function ($) {
-
-                    //Global Http
-                    //console.log ($.main.Http);
-
-                    //Own Http?
-                    //console.log ($.Http);
-
-                    this.scope.set ({
-                        beatles: [
-                            { firstName: 'Pedro', lastName: 'Perez' }
-                        ]
-                    }).view.render ('Hey/You.html', true);
-
-
-                }
+        }).service ({
+            //Redirect service
+            'redirect': function (route, params) {
+                this.Router.redirect (route, params);
             }
-        }).recipe ('home2', function (_, g) {
-            return {}
         });
 
     }) (App);
 
 
+</script>
+
+<script>
+
+    //Index App
+    (function (App) {
+        //Encapsulate
+
+        var _main = App.module ('main'),
+                _indexApp = _main.blend ('index', ['Http']);
+
+        //CSRF token !!
+        _indexApp.cook (function ($) {
+
+            //Intercept request!!
+            $.Http.intercept ({
+                'request': function (conf) {
+                    if ( conf.method == 'POST' )
+                        conf.headers['X-CSRFToken'] = _.getCookie ('csrftoken');
+                }
+            });
+
+        }).recipe ('header', function (at, g) {
+            //Index App
+            //HEADER
+            return {
+                init: function ($) {
+                    this.app.title ('Call me and Askme')
+                            .view.render ('index/index/header.html');
+                }
+            }
+
+        }).recipe ('middle', function (at, g) {
+            //MIDDLE
+            return {
+                //Initialize recipe!!
+                init: function ($) {
+                    //Recipe object
+                    var _self = this;
+
+                    ////Request categories..
+                    $.Http.get ('/categories/', 'get_categories').then (function (r) {
+                        _self.scope.set ({ categories: r.data })
+                                .view.render ('index/index/main.html', true)
+                    });
 
 
+                }
+            }
+        }).recipe ('footer', function (_, g) {
+            //FOOTER
+            return {
+                init: function ($) {
+                    this.view.render (
+                            'index/index/footer.html'
+                    )
+                }
+            }
+        })
+
+    }) (App);
+
+
+    //404 Error
+    (function (App) {
+        //Encapsulate
+        App.module('main').blend('error404', []);
+
+    })(App);
 </script>
 </body>
 </html>

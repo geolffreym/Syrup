@@ -62,7 +62,7 @@
 
     //The App with dependencies
     var my_App = App.blend ('Hey', ['Http']);
-    console.log (my_App);
+
     //A global service
     my_App.spice ({
         //Provide constant
@@ -133,6 +133,7 @@
 
             },
             method : function ($) {
+                //On click sp-click
                 this.scope.set ('Hey.You', {
                     "firstName": "John",
                     "lastName" : "Pasa"
