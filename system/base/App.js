@@ -171,13 +171,24 @@
 		return this;
 	});
 
+	/** Append global service
+	 * @param {name} string
+	 * @param {callback} function
+	 * @return {object}
+	 *
+	 * */
+	Apps.add ('service', function (name, callback) {
+		this.lib.cook (name, callback);
+		return this;
+	});
+
 
 	/** Append global services
 	 * @param {object} object
-	 * @return {void}
+	 * @return {object}
 	 *
 	 * */
-	Apps.add ('service', function (object) {
+	Apps.add ('services', function (object) {
 		this.lib.supply (object);
 		return this;
 	});
