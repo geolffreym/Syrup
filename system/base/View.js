@@ -132,7 +132,7 @@
 				'message': function (e) {
 					resolve (e.data);
 				}
-			}).run ('/workers/setting/Parser').then (function (worker) {
+			}).run ('/workers/setting/Parser.min').then (function (worker) {
 				//Worker running
 				worker.toWork ({
 					template: _template || _.emptyStr,

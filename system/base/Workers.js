@@ -19,7 +19,7 @@
 	Workers.add ('run', function (url) {
 		var self = this;
 		return (new Promise (function (resolve, reject) {
-			self.Worker = (new Worker (setting.system_path + url + '.min.js'));
+			self.Worker = (new Worker (setting.system_path + url + '.js'));
 			self.Worker.addEventListener ('message', function (e) {
 				//Intercept message
 				self._handleInterceptor ('message', e);

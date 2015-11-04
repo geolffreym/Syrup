@@ -200,7 +200,7 @@
 	 */
 	_$_.add ('listenOff', function (event) {
 		return this.each (function (elem) {
-			//Dinamic propoerty litstener
+			//Dynamic property listener
 			//Exist property?
 			if ( _.isSet (elem.listListener) ) {
 
@@ -227,13 +227,31 @@
 		if ( !_.isString (filter) )
 			return this;
 
-		return this.each (function (elem) {
+		//Result return
+		var _result = [];
+
+		//For Each element
+		this.each (function (elem) {
+			//The filtered element
+			elem = _$ (elem);
+			//Found?
 			if ( elem.is (filter) ) {
-				_.callbackAudit (callback, _$ (elem));
+				// Push on list
+				if ( !_.isFunction (callback) )
+					_result.push (elem);
+
+				//Callback if needed
+				_.callbackAudit (callback, elem);
+
 			} else if ( _.isFunction (e_handler) ) {
-				_.callbackAudit (e_handler, _$ (elem));
+				//Throw error
+				_.callbackAudit (e_handler, elem);
 			}
 		});
+
+		//Output
+		return _.isFunction (callback)
+			   && this || _.specArray (_result)
 	});
 
 	/**Empty Dom
@@ -271,7 +289,7 @@
 
 		//For each element!!
 		_self.each (function (dom, i) {
-			//Dataset
+			//Data set
 			_data_set = dom.dataset;
 
 			//Value?
@@ -290,8 +308,8 @@
 
 
 	/***Assign Properties
-	 * @param _prop
-	 * @return array
+	 * @param {string|object} _prop
+	 * @return {array}
 	 */
 	_$_.add ('prop', function (_prop) {
 		var _props = [];
@@ -501,35 +519,93 @@
 	 * @param callback
 	 */
 	_$_.add ('parent', function (callback) {
-		return this.each (function (_elem) {
-			if ( _elem.parentNode )
-				_.callbackAudit (callback, _$ (_elem.parentNode))
+		//Result return
+		var _result = [],
+			_parent = null;
+
+		this.each (function (_elem) {
+			if ( _elem.parentNode ) {
+				//The parent
+				_parent = _$ (_elem.parentNode);
+
+				// Push on list
+				if ( !_.isFunction (callback) )
+					_result.push (_parent);
+
+				//Callback if needed
+				_.callbackAudit (
+					callback, _parent
+				)
+			}
+
 		});
+
+		//Output
+		return _.isFunction (callback)
+			   && this || _.specArray (_result)
 	});
 
 	/**Childs Nodes
 	 * @param callback
 	 */
 	_$_.add ('children', function (callback) {
-		return this.each (function (_elem) {
+		//Result return
+		var _result = [],
+			_child = null;
+
+		//For each children
+		this.each (function (_elem) {
 			if ( _elem.children.length > 0 ) {
 				_.each (_elem.children, function (v, i) {
-					if ( _.isNumber (i) )
-						_.callbackAudit (callback, _$ (v))
+					if ( _.isNumber (i) ) {
+						//The child
+						_child = _$ (v);
+
+						// Push on list
+						if ( !_.isFunction (callback) )
+							_result.push (_child);
+
+						//Callback if needed
+						_.callbackAudit (
+							callback, _child
+						)
+					}
 				})
 			}
 		});
+
+		//Output
+		return _.isFunction (callback)
+			   && this || _.specArray (_result)
 	});
 
 	/**Next Node
 	 * @param callback
 	 */
 	_$_.add ('next', function (callback) {
-		return this.each (function (_elem) {
+		//Result return
+		var _result = [],
+			_sibling = null;
+
+		this.each (function (_elem) {
 			if ( _elem.nextElementSibling ) {
-				_.callbackAudit (callback, _$ (_elem.nextElementSibling));
+				//The sibling
+				_sibling = _$ (_elem.nextElementSibling);
+
+				// Push on list
+				if ( !_.isFunction (callback) )
+					_result.push (_sibling);
+
+				//Callback if needed
+				_.callbackAudit (
+					callback, _sibling
+				);
 			}
 		});
+
+		//Output
+		return _.isFunction (callback)
+			   && this || _.specArray (_result)
 
 	});
 
@@ -537,22 +613,40 @@
 	 * @param callback
 	 */
 	_$_.add ('nexts', function (filter, callback) {
-		var _sibling = null;
+		var _sibling = null, _result = [];
 		callback = _.isFunction (filter) && filter || callback;
 
-		return this.next (function (elem) {
+		this.next (function (elem) {
 			_sibling = elem;
 			do {
 				if ( _.isString (filter) && !_.isFunction (filter) ) {
 					if ( _sibling.is (filter) ) {
-						_.callbackAudit (callback, _sibling);
+						// Push on list
+						if ( !_.isFunction (callback) )
+							_result.push (_sibling);
+
+						//Callback if needed
+						_.callbackAudit (
+							callback, _sibling
+						);
 					}
 				} else {
-					_.callbackAudit (callback, _sibling);
+					// Push on list
+					if ( !_.isFunction (callback) )
+						_result.push (_sibling);
+
+					//Callback if needed
+					_.callbackAudit (
+						callback, _sibling
+					);
 				}
 			} while ( _sibling.get (0).nextElementSibling
 					  && (_sibling = _$ (_sibling.get (0).nextElementSibling)).exist )
 		});
+
+		//Output
+		return _.isFunction (callback)
+			   && this || _.specArray (_result)
 	});
 
 	/**Trigger
@@ -589,35 +683,71 @@
 		if ( !_.isString (filter) )
 			return this;
 
-		return this.children (function (elem) {
+		//Result return
+		var _result = [];
+
+		//For each children
+		this.children (function (elem) {
 			if ( elem.is (filter) ) {
-				_.callbackAudit (callback, elem, filter);
+
+				// Push on list
+				if ( !_.isFunction (callback) )
+					_result.push (elem);
+
+				//Callback if needed
+				_.callbackAudit (
+					callback, elem, filter
+				);
+
 			} else {
+				// Keep searching
 				elem.find (filter, callback);
 			}
 		});
+
+		//Output
+		return _.isFunction (callback)
+			   && this || _.specArray (_result)
+
 	});
 
 	/**Full Parent
-	 * @param parent_class
-	 * @param callback
-	 * @return object
+	 * @param {string} parent_class
+	 * @param {function} callback
+	 * @return {object}
 	 */
 	_$_.add ('parents', function (parent_class, callback) {
-
 		//Not string.. pass!!
 		if ( !_.isString (parent_class) )
 			return this;
 
-		return this.each (function (_elem) {
+		//Result return
+		var _result = [];
+
+		//For each element
+		this.each (function (_elem) {
 			_$ (_elem).parent (function (_parent) {
 				if ( _parent.is (parent_class) ) {
-					_.callbackAudit (callback, _parent);
+
+					// Push on list
+					if ( !_.isFunction (callback) )
+						_result.push (_parent);
+
+					//Callback if needed
+					_.isFunction (callback) && _.callbackAudit (
+						callback, _parent
+					);
+
 				} else {
+					// Keep searching
 					_parent.parents (parent_class, callback);
 				}
 			});
 		});
+
+		//Output
+		return _.isFunction (callback)
+			   && this || _.specArray (_result)
 
 	});
 
