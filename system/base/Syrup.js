@@ -546,7 +546,8 @@
 	});
 
 	/**Childs Nodes
-	 * @param callback
+	 * @param {function} callback
+	 * @return {object}
 	 */
 	_$_.add ('children', function (callback) {
 		//Result return
@@ -910,15 +911,9 @@
 	 * @return array
 	 * */
 	_$_.add ('get', function (find) {
-		if (
-			_.objectAsString (this.collection) == '[object NodeList]'
-			&& _.isNumber (find)
-		) {
-			if ( _.isSet (this.collection[find]) )
-				return this.collection[find];
-		}
-
-		return this.collection
+		return _.objectAsString (this.collection) == '[object NodeList]'
+			   && find in this.collection && this.collection[find]
+			   || this.collection;
 	});
 
 	/***Remove Element*/
