@@ -111,7 +111,7 @@ var setting = {
      *
      *  ex:
      *  $.checkField()
-     *  S.main.Router //Access to the parent module using namespace
+     *  S.main.Router //Access to the parent module dependencies, using namespace
      *
      * **/
 
@@ -153,6 +153,9 @@ var setting = {
             return {
                 //Initialize recipe!!
                 init: function ($) {
+                    //Parent
+                    //$.main
+
                     //Recipe object
                     var _self = this;
 
