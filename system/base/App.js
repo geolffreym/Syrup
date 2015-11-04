@@ -454,17 +454,17 @@
 
 		//The recipe object
 		_self.recipeCollection[moduleId].instance.recipe = {
-			$      : _$ ('[sp-recipe="' + moduleId + '"]'),
-			element: function (elem) {
-				return _$ ()
+			$   : _$ ('[sp-recipe="' + moduleId + '"]'),
+			node: function (node) {
+				return this.$.find ('[sp-element=' + node + ']')
 			},
-			get    : function (nModule) {
+			get : function (nModule) {
 				var _moduleId = _.isString (nModule)
 					? nModule : moduleId;
 
 				return _self._getRecipe (_moduleId);
 			},
-			drop   : function (nModule) {
+			drop: function (nModule) {
 				var _moduleId = _.isString (nModule)
 					? nModule : moduleId;
 
@@ -511,11 +511,11 @@
 						//Seek for tpl
 						_view.seekTpl (view_template_dir)
 							.then (function (view) {
-							view.render (_scope).then (function (res) {
-								_dom.html (res);
-								resolve (res);
-							})
-						})
+									   view.render (_scope).then (function (res) {
+										   _dom.html (res);
+										   resolve (res);
+									   })
+								   })
 					} else {
 						//Handle view?
 						//Require the view if needed
@@ -532,9 +532,9 @@
 				} else if ( _dom_template.exist ) {
 					_view.render (_dom_template.html (), _scope)
 						.then (function (result) {
-						_dom.html (result);
-						resolve (result)
-					});
+								   _dom.html (result);
+								   resolve (result)
+							   });
 				}
 			}
 		});
