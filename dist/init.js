@@ -4757,10 +4757,10 @@ if ( !Object.observe ) {
 			//Success
 			_self.xhr.addEventListener ('load', function (e) {
 				if ( this.status >= 0xC8 && this.status < 0x190 ) {
+					//The response
 					var _response = this.response || this.responseText;
-					if ( _.isJson (_response) ) {
-						_response = JSON.parse (_response);
-					}
+					_response = _.isJson (_response) && _.toObject (_response) || _response;
+
 					//Find a interceptor for success
 					_self._handleInterceptor ('success', _response);
 
