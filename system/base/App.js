@@ -456,7 +456,7 @@
 		_self.recipeCollection[moduleId].instance.recipe = {
 			$   : _$ ('[sp-recipe="' + moduleId + '"]'),
 			node: function (node) {
-				return this.$.find ('[sp-element=' + node + ']')
+				return this.$.find ('[sp-node=' + node + ']')
 			},
 			get : function (nModule) {
 				var _moduleId = _.isString (nModule)
