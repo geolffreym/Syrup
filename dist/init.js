@@ -4917,10 +4917,7 @@ if ( !Object.observe ) {
 			_self.xhr.addEventListener ('readystatechange', function (e) {
 				if ( this.readyState ) {
 					//Find a interceptor for state
-					_self._handleInterceptor ('state', {
-						state : this.readyState,
-						status: this.status
-					});
+					_self._handleInterceptor ('state', this);
 				}
 			});
 
