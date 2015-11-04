@@ -96,16 +96,14 @@
 			//Success
 			_self.xhr.addEventListener ('load', function (e) {
 				if ( this.status >= 0xC8 && this.status < 0x190 ) {
-
 					//The response
-					var _response = this.response || this.responseText || this.responseXML;
-					_response = _.isJson (_response) && _.toObject (_response) || _response;
+					this.responseClean = _self._response (this);
 
 					//Find a interceptor for success
 					_self._handleInterceptor ('success', this);
 
 					//Resolve
-					resolve (_response);
+					resolve (this.responseClean);
 
 				}
 			});
@@ -137,9 +135,11 @@
 
 			//Complete
 			_self.xhr.addEventListener ('loadend', function (e) {
+				//The response
+				this.responseClean = _self._response (this);
+
 				//Find a interceptor for complete
 				_self._handleInterceptor ('complete', this);
-
 			});
 
 			_self.xhr.addEventListener ('loadstart', function (e) {
@@ -265,6 +265,14 @@
 		return this.request (url, _.isObject (data) && data || {});
 	});
 
+	/** Handle response
+	 * @param {object} xhr
+	 * @return {object|string}
+	 * **/
+	Http.add ('_response', function (xhr) {
+		var _response = xhr.response || xhr.responseText || xhr.responseXML;
+		return _.isJson (_response) && _.toObject (_response) || _response;
+	});
 
 	/** Set Request Header
 	 * @param {string} header
