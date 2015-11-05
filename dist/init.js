@@ -2194,8 +2194,9 @@ if ( typeof exports !== 'undefined' )
 	MiddleWare.add ('extend', function (intercepted, to, extend) {
 		//For each extension!!
 		_.each (extend, function (v) {
-			if ( v in intercepted ) {
-				//V in intercepted?
+			//v in intercepted?
+			//v is not the same as target?
+			if ( v !== to && v in intercepted ) {
 				intercepted[to] = _.extend (
 					intercepted[to],
 					intercepted[v]
