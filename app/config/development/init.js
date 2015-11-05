@@ -20,9 +20,9 @@ exports.files = {
 			'system/base/View',
 			'system/base/Model',
 			'system/base/App',
-			'system/base/Router',
 			// Until here the core do not change
 			// Add all the necessary libs from here
+			'system/lib/Router',
 			'system/lib/Hash'
 		]
 	}
