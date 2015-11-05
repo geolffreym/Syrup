@@ -446,8 +446,8 @@
 
 		//The app object
 		_self.recipeCollection[moduleId].instance.app = {
-			$    : _$, object: _$ ('[sp-app]'),
-			title: function (title) {
+			window: window, $: _$, object: _$ ('[sp-app]'),
+			title : function (title) {
 				var _title = _$ ('title');
 				if ( _title.exist ) {
 					_title.text (title)
@@ -525,11 +525,11 @@
 						//Seek for tpl
 						_view.seekTpl (view_template_dir)
 							.then (function (view) {
-							view.render (_scope).then (function (res) {
-								_dom.html (res);
-								resolve (res);
-							})
-						})
+									   view.render (_scope).then (function (res) {
+										   _dom.html (res);
+										   resolve (res);
+									   })
+								   })
 					} else {
 						//Handle view?
 						//Require the view if needed
@@ -546,9 +546,9 @@
 				} else if ( _dom_template.exist ) {
 					_view.render (_dom_template.html (), _scope)
 						.then (function (result) {
-						_dom.html (result);
-						resolve (result)
-					});
+								   _dom.html (result);
+								   resolve (result)
+							   });
 				}
 			}
 		});
@@ -750,4 +750,5 @@
 	window.App = new Apps;
 	window.AppClass = Apps;
 
-}) (window);
+})
+(window);
