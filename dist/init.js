@@ -4965,9 +4965,11 @@ if ( !Object.observe ) {
 	 * @param  {object} interceptors
 	 * @return {object}
 	 * */
-	Http.add ('intercept', function (interceptors, named) {
+	Http.add ('intercept', function (named, interceptors) {
+
 		//Naming interceptors!!
-		named = named || this.name;
+		interceptors = _.isObject (named) && named || interceptors || {};
+		named = !_.isObject (named) && _.isString (named) && named || this.name;
 
 		//New named interceptor!!
 		if ( !(named in this.interceptors) )
