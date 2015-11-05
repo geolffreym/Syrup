@@ -44,7 +44,7 @@
 	 * @return {object}
 	 * */
 	MiddleWare.add ('getInterceptors', function (intercepted, find) {
-		if ( 'interceptors' in intercepted ) {
+		if ( intercepted && 'interceptors' in intercepted ) {
 			if (
 				find in intercepted.interceptors
 				&& _.isArray (intercepted.interceptors[find])
@@ -61,7 +61,7 @@
 	 * @param {string} find
 	 * */
 	MiddleWare.add ('cleanInterceptor', function (intercepted, find) {
-		if ( 'interceptors' in intercepted ) {
+		if ( intercepted && 'interceptors' in intercepted ) {
 			if ( find in intercepted.interceptors ) {
 				delete intercepted.interceptors[find];
 			}
@@ -73,14 +73,13 @@
 	 * @param {string} find
 	 * */
 	MiddleWare.add ('trigger', function (interceptors, params) {
-		if (interceptors.length > 0)
+		if ( _.isArray (interceptors) && interceptors.length > 0 )
 			_.each (interceptors, function (v) {
 				if ( _.isFunction (v) )
 					v.apply (null, params || []);
 			});
 	});
 
-	//The global object MiddleWare
 	window.MiddleWare = new MiddleWare;
 	window.MiddleWareClass = MiddleWare;
 
