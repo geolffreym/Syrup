@@ -178,8 +178,22 @@
 	 *
 	 * */
 	Apps.add ('provider', function (name, callback) {
-		this.lib.provider (name, callback);
-		return this;
+		//Self
+		var _self = this;
+
+		//Service supplier
+		if ( _.isObject (name) ) {
+			_.each (name, function (v, i) {
+				_self.lib.provider (i, v);
+			})
+		}
+
+		//Cook service
+		if ( _.isString (name) && _.isFunction (callback) ) {
+			_self.lib.provider (name, callback);
+		}
+
+		return _self;
 	});
 
 
@@ -511,11 +525,11 @@
 						//Seek for tpl
 						_view.seekTpl (view_template_dir)
 							.then (function (view) {
-									   view.render (_scope).then (function (res) {
-										   _dom.html (res);
-										   resolve (res);
-									   })
-								   })
+							view.render (_scope).then (function (res) {
+								_dom.html (res);
+								resolve (res);
+							})
+						})
 					} else {
 						//Handle view?
 						//Require the view if needed
@@ -532,9 +546,9 @@
 				} else if ( _dom_template.exist ) {
 					_view.render (_dom_template.html (), _scope)
 						.then (function (result) {
-								   _dom.html (result);
-								   resolve (result)
-							   });
+						_dom.html (result);
+						resolve (result)
+					});
 				}
 			}
 		});
@@ -736,5 +750,4 @@
 	window.App = new Apps;
 	window.AppClass = Apps;
 
-})
-(window);
+}) (window);
