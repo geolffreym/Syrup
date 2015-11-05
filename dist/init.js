@@ -2185,6 +2185,25 @@ if ( typeof exports !== 'undefined' )
 		})
 	});
 
+	/** Extend interceptors!!
+	 * @param {object} intercepted
+	 * @param {string} to
+	 * @param {array} extend
+	 * @return {object}
+	 * */
+	MiddleWare.add ('extend', function (intercepted, to, extend) {
+		//For each extension!!
+		_.each (extend, function (v) {
+			if ( v in intercepted ) {
+				//V in intercepted?
+				intercepted[to] = _.extend (
+					intercepted[to],
+					intercepted[v]
+				)
+			}
+		});
+	});
+
 	/** Find signals in object
 	 * @param {object} intercepted
 	 * @param {string} find
@@ -4965,19 +4984,33 @@ if ( !Object.observe ) {
 	 * @param  {object} interceptors
 	 * @return {object}
 	 * */
-	Http.add ('intercept', function (named, interceptors) {
+	Http.add ('intercept', function (named, interceptors, extend) {
+		var _self = this;
 
 		//Naming interceptors!!
-		interceptors = _.isObject (named) && named || interceptors || {};
-		named = !_.isObject (named) && _.isString (named) && named || this.name;
+		extend = _.isArray (interceptors) && interceptors || _.isArray (extend) && extend || null;
+		interceptors = _.isObject (named) && named || _.isObject (interceptors) && interceptors || {};
+		named = !_.isObject (named) && _.isString (named) && named || _self.name;
+
 
 		//New named interceptor!!
-		if ( !(named in this.interceptors) )
-			this.interceptors[named] = {};
+		if ( !(named in _self.interceptors) )
+			_self.interceptors[named] = {};
+
+		//Extend interceptors?
+		if ( extend ) {
+			MiddleWare.extend (
+				_self.interceptors,
+				named, extend
+			);
+		}
 
 		//Intercept!!!
 		if ( _.isObject (interceptors) )
-			MiddleWare.intercept (this.interceptors[named], interceptors);
+			MiddleWare.intercept (
+				_self.interceptors[named],
+				interceptors
+			);
 
 		return this;
 	});

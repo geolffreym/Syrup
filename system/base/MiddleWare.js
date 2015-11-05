@@ -38,6 +38,25 @@
 		})
 	});
 
+	/** Extend interceptors!!
+	 * @param {object} intercepted
+	 * @param {string} to
+	 * @param {array} extend
+	 * @return {object}
+	 * */
+	MiddleWare.add ('extend', function (intercepted, to, extend) {
+		//For each extension!!
+		_.each (extend, function (v) {
+			if ( v in intercepted ) {
+				//V in intercepted?
+				intercepted[to] = _.extend (
+					intercepted[to],
+					intercepted[v]
+				)
+			}
+		});
+	});
+
 	/** Find signals in object
 	 * @param {object} intercepted
 	 * @param {string} find
