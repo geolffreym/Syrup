@@ -2191,7 +2191,7 @@ if ( typeof exports !== 'undefined' )
 	 * @return {object}
 	 * */
 	MiddleWare.add ('getInterceptors', function (intercepted, find) {
-		if ( 'interceptors' in intercepted ) {
+		if ( intercepted && 'interceptors' in intercepted ) {
 			if (
 				find in intercepted.interceptors
 				&& _.isArray (intercepted.interceptors[find])
@@ -2208,7 +2208,7 @@ if ( typeof exports !== 'undefined' )
 	 * @param {string} find
 	 * */
 	MiddleWare.add ('cleanInterceptor', function (intercepted, find) {
-		if ( 'interceptors' in intercepted ) {
+		if ( intercepted && 'interceptors' in intercepted ) {
 			if ( find in intercepted.interceptors ) {
 				delete intercepted.interceptors[find];
 			}
@@ -2220,14 +2220,13 @@ if ( typeof exports !== 'undefined' )
 	 * @param {string} find
 	 * */
 	MiddleWare.add ('trigger', function (interceptors, params) {
-		if (interceptors.length > 0)
+		if ( _.isArray (interceptors) && interceptors.length > 0 )
 			_.each (interceptors, function (v) {
 				if ( _.isFunction (v) )
 					v.apply (null, params || []);
 			});
 	});
 
-	//The global object MiddleWare
 	window.MiddleWare = new MiddleWare;
 	window.MiddleWareClass = MiddleWare;
 
@@ -4813,7 +4812,9 @@ if ( !Object.observe ) {
 		this.upload = null;
 		this.config = {};
 		this.name = 'default';
-		this.interceptors = {};
+		this.interceptors = {
+			default: {}
+		};
 	}
 
 	/** Http Request
@@ -4964,9 +4965,18 @@ if ( !Object.observe ) {
 	 * @param  {object} interceptors
 	 * @return {object}
 	 * */
-	Http.add ('intercept', function (interceptors) {
+	Http.add ('intercept', function (interceptors, named) {
+		//Naming interceptors!!
+		named = named || this.name;
+
+		//New named interceptor!!
+		if ( !(named in this.interceptors) )
+			this.interceptors[named] = {};
+
+		//Intercept!!!
 		if ( _.isObject (interceptors) )
-			MiddleWare.intercept (this, interceptors);
+			MiddleWare.intercept (this.interceptors[named], interceptors);
+
 		return this;
 	});
 
@@ -4974,9 +4984,12 @@ if ( !Object.observe ) {
 	 * @param  {string} type
 	 * @return {object}
 	 * */
-	Http.add ('interceptClean', function (type) {
+	Http.add ('interceptClean', function (type, named) {
+		//Naming interceptors!!
+		named = named || this.name;
+
 		//Clean the interceptor
-		MiddleWare.cleanInterceptor (this, type);
+		MiddleWare.cleanInterceptor (this.interceptors[named], type);
 		return this;
 	});
 
@@ -4986,12 +4999,17 @@ if ( !Object.observe ) {
 	 * @return {void}
 	 * */
 	Http.add ('_handleInterceptor', function (type, param) {
-		//Trigger Interceptors
-		MiddleWare.trigger (
-			MiddleWare.getInterceptors (this, type),
-			[param, this]
-		);
 
+		//Has interceptors?
+		if ( this.name in this.interceptors ) {
+			//Trigger Interceptors
+			MiddleWare.trigger (
+				MiddleWare.getInterceptors (
+					this.interceptors[this.name], type
+				),
+				[param, this]
+			);
+		}
 		//Clean the interceptor
 		//MiddleWare.cleanInterceptor (this, type);
 	});

@@ -15,7 +15,9 @@
 		this.upload = null;
 		this.config = {};
 		this.name = 'default';
-		this.interceptors = {};
+		this.interceptors = {
+			default: {}
+		};
 	}
 
 	/** Http Request
@@ -166,9 +168,18 @@
 	 * @param  {object} interceptors
 	 * @return {object}
 	 * */
-	Http.add ('intercept', function (interceptors) {
+	Http.add ('intercept', function (interceptors, named) {
+		//Naming interceptors!!
+		named = named || this.name;
+
+		//New named interceptor!!
+		if ( !(named in this.interceptors) )
+			this.interceptors[named] = {};
+
+		//Intercept!!!
 		if ( _.isObject (interceptors) )
-			MiddleWare.intercept (this, interceptors);
+			MiddleWare.intercept (this.interceptors[named], interceptors);
+
 		return this;
 	});
 
@@ -176,9 +187,12 @@
 	 * @param  {string} type
 	 * @return {object}
 	 * */
-	Http.add ('interceptClean', function (type) {
+	Http.add ('interceptClean', function (type, named) {
+		//Naming interceptors!!
+		named = named || this.name;
+
 		//Clean the interceptor
-		MiddleWare.cleanInterceptor (this, type);
+		MiddleWare.cleanInterceptor (this.interceptors[named], type);
 		return this;
 	});
 
@@ -188,12 +202,17 @@
 	 * @return {void}
 	 * */
 	Http.add ('_handleInterceptor', function (type, param) {
-		//Trigger Interceptors
-		MiddleWare.trigger (
-			MiddleWare.getInterceptors (this, type),
-			[param, this]
-		);
 
+		//Has interceptors?
+		if ( this.name in this.interceptors ) {
+			//Trigger Interceptors
+			MiddleWare.trigger (
+				MiddleWare.getInterceptors (
+					this.interceptors[this.name], type
+				),
+				[param, this]
+			);
+		}
 		//Clean the interceptor
 		//MiddleWare.cleanInterceptor (this, type);
 	});
