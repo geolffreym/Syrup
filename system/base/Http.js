@@ -97,7 +97,7 @@
 			//Event Listeners
 			//Success
 			_self.xhr.addEventListener ('load', function (e) {
-				if ( this.status >= 0xC8 && this.status < 0x190 ) {
+				if ( this.status >= 0xC8 && this.status < 0x190 || this.status == 0 ) {
 					//The response
 					this.responseClean = _self._response (this);
 

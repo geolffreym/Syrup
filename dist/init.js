@@ -4914,7 +4914,7 @@ if ( !Object.observe ) {
 			//Event Listeners
 			//Success
 			_self.xhr.addEventListener ('load', function (e) {
-				if ( this.status >= 0xC8 && this.status < 0x190 ) {
+				if ( this.status >= 0xC8 && this.status < 0x190 || this.status == 0 ) {
 					//The response
 					this.responseClean = _self._response (this);
 
@@ -6059,6 +6059,7 @@ if ( !Object.observe ) {
 					if ( _attr ) {
 						//Is in recipe?
 						if ( _attr in _recipe && _.isFunction (_recipe[_attr]) ) {
+							e.preventDefault();
 							_recipe[_attr].call (
 								_self.recipeCollection[moduleId].instance,
 								_self.lib.get (_recipe.parent.root), e
