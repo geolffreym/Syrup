@@ -824,7 +824,7 @@
 		], {
 			delay   : 0,
 			duration: _.isNumber (delay) ? delay : 50
-		}, _.isFunction (delay) ? delay : callback);
+		}, _.isFunction (delay) ? delay.bind (this) : callback.bind (this));
 
 		return this;
 	});
@@ -840,7 +840,7 @@
 		], {
 			delay   : 0,
 			duration: _.isNumber (delay) ? delay : 50
-		}, _.isFunction (delay) ? delay : callback);
+		}, _.isFunction (delay) ? delay.bind (this) : callback.bind (this));
 		return this;
 	});
 
