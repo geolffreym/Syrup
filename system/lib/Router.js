@@ -30,7 +30,6 @@
 
 		//Set Pop State
 		window.addEventListener ('popstate', function (e) {
-
 			//Get the route name
 			if ( _.isSet (e.state) && 'route_name' in e.state ) {
 				if ( e.state.route_name in _self.onpopstate ) {
@@ -39,7 +38,8 @@
 
 						//Intercept pop state
 						_self._handleInterceptor ('redirect', e);
-					});
+
+					}, true);
 				}
 			}
 		});
@@ -98,6 +98,7 @@
 			//Handle tpl?
 			_self._handleSkull (conf, function () {
 				//On main tpl is handled, what to do?
+
 
 				if ( conf.app in _self.module.appCollection ) {
 					//Intercept init
@@ -253,7 +254,6 @@
 		//Clean param from route
 		_the_route = this._cleanedUriParams (_the_route);
 
-
 		//In route '/' slash not needed at end
 		if ( _uri_path_slash_index > _the_route_slash_index
 		) {
@@ -287,7 +287,6 @@
 
 		//Get the tpl skull
 		_view.seekTpl (conf.tpl).then (function (view) {
-
 			// Find main
 			var _main = _$ ('[sp-app]');
 			// Exist the skull?
@@ -378,6 +377,11 @@
 
 	});
 
+	//Go back
+	Router.add ('goBack', function () {
+		this.history.back ();
+	});
+
 
 	/** Trigger the pop state
 	 * @param {object} _params
@@ -390,7 +394,7 @@
 		//Two times, for trigger "popstate"
 
 		if ( _config.trigger ) {
-			this.history.replaceState (_params, route_name, _the_new_route);
+			this.history.pushState (_params, route_name, _the_new_route);
 			this.history.pushState (_params, route_name, _the_new_route);
 			this.history.back ();
 		}
