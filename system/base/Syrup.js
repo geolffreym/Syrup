@@ -696,7 +696,7 @@
 					_result.push (elem);
 
 				//Callback if needed
-				_.callbackAudit (
+				_.isFunction (callback) && _.callbackAudit (
 					callback, elem, filter
 				);
 
