@@ -524,7 +524,10 @@
 			_parent = null;
 
 		this.each (function (_elem) {
-			if ( _elem.parentNode ) {
+			if (
+				_elem.parentNode
+				&& !_.isGlobal (_elem.parentNode)
+			) {
 				//The parent
 				_parent = _$ (_elem.parentNode);
 
@@ -533,7 +536,7 @@
 					_result.push (_parent);
 
 				//Callback if needed
-				_.callbackAudit (
+				_.isFunction (callback) && _.callbackAudit (
 					callback, _parent
 				)
 			}
@@ -559,6 +562,7 @@
 			if ( _elem.children.length > 0 ) {
 				_.each (_elem.children, function (v, i) {
 					if ( _.isNumber (i) ) {
+
 						//The child
 						_child = _$ (v);
 
@@ -729,8 +733,7 @@
 		this.each (function (_elem) {
 			_$ (_elem).parent (function (_parent) {
 				if ( _parent.is (parent_class) ) {
-
-					// Push on list
+					//Push on list
 					if ( !_.isFunction (callback) )
 						_result.push (_parent);
 
@@ -1725,7 +1728,10 @@
 	 */
 	Syrup.add ('callbackAudit', function (callback) {
 		try {
-			if ( !_.isSet (callback) || !_.isFunction (callback) ) {
+			if (
+				!_.isSet (callback)
+				|| !_.isFunction (callback)
+			) {
 				return false;
 			}
 			//Apply params!!
