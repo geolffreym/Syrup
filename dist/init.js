@@ -701,13 +701,13 @@ if ( typeof exports !== 'undefined' )
 	 * @param {function} callback
 	 * @return {object}
 	 */
-	_$_.add ('find', function (filter, callback) {
+	_$_.add ('find', function (filter, callback, find) {
 		//Not string.. pass!!
 		if ( !_.isString (filter) )
 			return this;
 		
 		//Result return
-		var _result = [];
+		var _result = find || [];
 		
 		//For each children
 		this.children (function (elem) {
@@ -724,7 +724,7 @@ if ( typeof exports !== 'undefined' )
 				
 			} else {
 				// Keep searching
-				elem.find (filter, callback);
+				elem.find (filter, callback, _result);
 			}
 		});
 		
@@ -739,18 +739,19 @@ if ( typeof exports !== 'undefined' )
 	 * @param {function} callback
 	 * @return {object}
 	 */
-	_$_.add ('parents', function (parent_class, callback) {
+	_$_.add ('parents', function (parent_class, callback, parents) {
 		//Not string.. pass!!
 		if ( !_.isString (parent_class) )
 			return this;
 		
 		//Result return
-		var _result = [];
+		var _result = parents || [];
 		
 		//For each element
 		this.each (function (_elem) {
 			_$ (_elem).parent (function (_parent) {
 				if ( _parent.is (parent_class) ) {
+					
 					//Push on list
 					if ( !_.isFunction (callback) )
 						_result.push (_parent);
@@ -762,7 +763,7 @@ if ( typeof exports !== 'undefined' )
 					
 				} else {
 					// Keep searching
-					_parent.parents (parent_class, callback);
+					_parent.parents (parent_class, callback, _result);
 				}
 			});
 		});
@@ -1780,7 +1781,7 @@ if ( typeof exports !== 'undefined' )
 		}
 		
 		return arr.length > 1
-			? arr : _.isSet (arr[0])
+			? arr : 0 in arr
 			? arr[0] : null;
 	});
 	
