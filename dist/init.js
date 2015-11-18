@@ -6054,7 +6054,6 @@ if ( !Object.observe ) {
 
 		//Exist the module?
 		if ( _mod.exist ) {
-
 			//Bind enabled events
 			_.each (enabled_events, function (v) {
 				//Listen the events
@@ -6066,7 +6065,11 @@ if ( !Object.observe ) {
 					if ( _attr ) {
 						//Is in recipe?
 						if ( _attr in _recipe && _.isFunction (_recipe[_attr]) ) {
-							e.preventDefault();
+							//No prevent to keyboard
+							if ( !(/key/.test (e.type)) )
+								e.preventDefault ();
+
+							//Call method
 							_recipe[_attr].call (
 								_self.recipeCollection[moduleId].instance,
 								_self.lib.get (_recipe.parent.root), e
@@ -6151,7 +6154,6 @@ if ( !Object.observe ) {
 					moduleId, _view || null,
 					_cache || false
 				);
-
 				//Async
 				return {
 					then: function (resolve) {
@@ -6289,11 +6291,11 @@ if ( !Object.observe ) {
 						//Seek for tpl
 						_view.seekTpl (view_template_dir)
 							.then (function (view) {
-									   view.render (_scope).then (function (res) {
-										   _dom.html (res);
-										   resolve (res);
-									   })
-								   })
+							view.render (_scope).then (function (res) {
+								_dom.html (res);
+								resolve (res);
+							})
+						})
 					} else {
 						//Handle view?
 						//Require the view if needed
@@ -6310,9 +6312,9 @@ if ( !Object.observe ) {
 				} else if ( _dom_template.exist ) {
 					_view.render (_dom_template.html (), _scope)
 						.then (function (result) {
-								   _dom.html (result);
-								   resolve (result)
-							   });
+						_dom.html (result);
+						resolve (result)
+					});
 				}
 			}
 		});
