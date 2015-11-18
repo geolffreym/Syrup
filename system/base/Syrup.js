@@ -1725,7 +1725,7 @@
 	 */
 	Syrup.add ('callbackAudit', function (callback) {
 		try {
-			if ( !_.isSet (callback) ) {
+			if ( !_.isSet (callback) || !_.isFunction (callback) ) {
 				return false;
 			}
 			//Apply params!!
