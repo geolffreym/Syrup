@@ -5466,7 +5466,6 @@ if ( !Object.observe ) {
 		this.data = null;
 		this.blob = null;
 		this.scope = {};
-		this.type = 'POST';
 		this.model = null;
 		this.failed = null;
 	}
