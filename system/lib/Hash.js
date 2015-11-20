@@ -41,7 +41,7 @@
 	 * @returns {object}
 	 */
 	Hash.add ('reset', function (hash) {
-		location.hash = '#';
+		location.hash = hash || '#';
 		return this;
 	});
 
