@@ -5985,7 +5985,7 @@ if ( !Object.observe ) {
 	 * @param {object} object
 	 * @return {object}
 	 * */
-	Apps.add ('_getRecipe', function (moduleId) {
+	Apps.add ('getRecipe', function (moduleId) {
 		if ( moduleId in this.recipeCollection && _.isSet (this.root) )
 			return this.recipeCollection[moduleId].instance;
 		return null;
@@ -5996,7 +5996,7 @@ if ( !Object.observe ) {
 	 * @param {object} object
 	 * @return {object}
 	 * **/
-	Apps.add ('_setScope', function (moduleId, object) {
+	Apps.add ('setScope', function (moduleId, object) {
 		if ( moduleId in this.scope ) {
 			this.scope[moduleId] = object;
 		}
@@ -6007,7 +6007,7 @@ if ( !Object.observe ) {
 	 * @param {string} moduleId
 	 * @return {object}
 	 * **/
-	Apps.add ('_getScope', function (moduleId) {
+	Apps.add ('getScope', function (moduleId) {
 		if ( moduleId in this.scope ) {
 			return this.scope[moduleId];
 		}
@@ -6065,7 +6065,7 @@ if ( !Object.observe ) {
 						//Is in recipe?
 						if ( _attr in _recipe && _.isFunction (_recipe[_attr]) ) {
 							//No prevent to keyboard
-							if ( !(/key/.test (e.type)) )
+							if( !(/key/.test(e.type)))
 								e.preventDefault ();
 
 							//Call method
@@ -6188,7 +6188,7 @@ if ( !Object.observe ) {
 							  || object;
 
 				if ( _.isObject (_object) ) {
-					_self._setScope (_moduleId, _object);
+					_self.setScope (_moduleId, _object);
 					return _self.recipeCollection[moduleId].instance;
 				}
 			},
@@ -6196,7 +6196,7 @@ if ( !Object.observe ) {
 				var _moduleId = _.isString (nModule)
 					? nModule : moduleId;
 
-				return _self._getScope (_moduleId);
+				return _self.getScope (_moduleId);
 			}
 		};
 	});
@@ -6241,7 +6241,7 @@ if ( !Object.observe ) {
 				var _moduleId = _.isString (nModule)
 					? nModule : moduleId;
 
-				return _self._getRecipe (_moduleId);
+				return _self.getRecipe (_moduleId);
 			},
 			drop: function (nModule) {
 				var _moduleId = _.isString (nModule)
@@ -6290,11 +6290,11 @@ if ( !Object.observe ) {
 						//Seek for tpl
 						_view.seekTpl (view_template_dir)
 							.then (function (view) {
-							view.render (_scope).then (function (res) {
-								_dom.html (res);
-								resolve (res);
-							})
-						})
+									   view.render (_scope).then (function (res) {
+										   _dom.html (res);
+										   resolve (res);
+									   })
+								   })
 					} else {
 						//Handle view?
 						//Require the view if needed
@@ -6311,9 +6311,9 @@ if ( !Object.observe ) {
 				} else if ( _dom_template.exist ) {
 					_view.render (_dom_template.html (), _scope)
 						.then (function (result) {
-						_dom.html (result);
-						resolve (result)
-					});
+								   _dom.html (result);
+								   resolve (result)
+							   });
 				}
 			}
 		});

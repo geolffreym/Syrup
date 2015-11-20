@@ -223,7 +223,7 @@
 	 * @param {object} object
 	 * @return {object}
 	 * */
-	Apps.add ('_getRecipe', function (moduleId) {
+	Apps.add ('getRecipe', function (moduleId) {
 		if ( moduleId in this.recipeCollection && _.isSet (this.root) )
 			return this.recipeCollection[moduleId].instance;
 		return null;
@@ -234,7 +234,7 @@
 	 * @param {object} object
 	 * @return {object}
 	 * **/
-	Apps.add ('_setScope', function (moduleId, object) {
+	Apps.add ('setScope', function (moduleId, object) {
 		if ( moduleId in this.scope ) {
 			this.scope[moduleId] = object;
 		}
@@ -245,7 +245,7 @@
 	 * @param {string} moduleId
 	 * @return {object}
 	 * **/
-	Apps.add ('_getScope', function (moduleId) {
+	Apps.add ('getScope', function (moduleId) {
 		if ( moduleId in this.scope ) {
 			return this.scope[moduleId];
 		}
@@ -303,7 +303,7 @@
 						//Is in recipe?
 						if ( _attr in _recipe && _.isFunction (_recipe[_attr]) ) {
 							//No prevent to keyboard
-							if ( !(/key/.test (e.type)) )
+							if( !(/key/.test(e.type)))
 								e.preventDefault ();
 
 							//Call method
@@ -426,7 +426,7 @@
 							  || object;
 
 				if ( _.isObject (_object) ) {
-					_self._setScope (_moduleId, _object);
+					_self.setScope (_moduleId, _object);
 					return _self.recipeCollection[moduleId].instance;
 				}
 			},
@@ -434,7 +434,7 @@
 				var _moduleId = _.isString (nModule)
 					? nModule : moduleId;
 
-				return _self._getScope (_moduleId);
+				return _self.getScope (_moduleId);
 			}
 		};
 	});
@@ -479,7 +479,7 @@
 				var _moduleId = _.isString (nModule)
 					? nModule : moduleId;
 
-				return _self._getRecipe (_moduleId);
+				return _self.getRecipe (_moduleId);
 			},
 			drop: function (nModule) {
 				var _moduleId = _.isString (nModule)
@@ -528,11 +528,11 @@
 						//Seek for tpl
 						_view.seekTpl (view_template_dir)
 							.then (function (view) {
-							view.render (_scope).then (function (res) {
-								_dom.html (res);
-								resolve (res);
-							})
-						})
+									   view.render (_scope).then (function (res) {
+										   _dom.html (res);
+										   resolve (res);
+									   })
+								   })
 					} else {
 						//Handle view?
 						//Require the view if needed
@@ -549,9 +549,9 @@
 				} else if ( _dom_template.exist ) {
 					_view.render (_dom_template.html (), _scope)
 						.then (function (result) {
-						_dom.html (result);
-						resolve (result)
-					});
+								   _dom.html (result);
+								   resolve (result)
+							   });
 				}
 			}
 		});
