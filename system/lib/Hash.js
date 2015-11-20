@@ -36,6 +36,16 @@
 
 	}
 
+	/**Reset hash
+	 * @param {string} hash
+	 * @returns {object}
+	 */
+	Hash.add ('reset', function (hash) {
+		location.hash = '#';
+		return this;
+	});
+
+
 	/**Delegate hash
 	 * @param {string} hash
 	 * @returns {object}
