@@ -28,7 +28,7 @@
 
 			if ( _hash in _self.onhashchange ) {
 				_.each (_self.onhashchange[_hash], function (v) {
-					v (_params);
+					v.call (_self, _params);
 				});
 			}
 
