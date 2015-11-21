@@ -2199,17 +2199,30 @@ if ( typeof exports !== 'undefined' )
 	 * @return {object}
 	 * */
 	MiddleWare.add ('extend', function (intercepted, to, extend) {
+
+		//Not interceptors?
+		if ( !( 'interceptors' in intercepted[to] ) )
+			intercepted[to]['interceptors'] = {};
+
 		//For each extension!!
 		_.each (extend, function (v) {
 			//v in intercepted?
 			//v is not the same as target?
 			if ( v !== to && v in intercepted ) {
-				intercepted[to] = _.extend (
-					intercepted[to],
-					intercepted[v]
-				)
+				if ( 'interceptors' in intercepted[v] ) {
+					_.each (intercepted[v].interceptors, function (r, i) {
+						if ( !(i in intercepted[to].interceptors) )
+							intercepted[to].interceptors[i] = [];
+
+						//Extend interceptors
+						intercepted[to].interceptors[i] = _.extend (
+							intercepted[to].interceptors[i], r
+						)
+					})
+				}
 			}
 		});
+
 	});
 
 	/** Find signals in object
@@ -4838,7 +4851,6 @@ if ( !Object.observe ) {
 		this.xhr = null;
 		this.upload = null;
 		this.config = {};
-		this.name = 'default';
 		this.interceptors = {
 			default: {}
 		};
@@ -4849,7 +4861,7 @@ if ( !Object.observe ) {
 	 * @param {object} data
 	 * @return {object}
 	 * **/
-	Http.add ('request', function (url, data) {
+	Http.add ('request', function (url, data, naming) {
 		var _self = this,
 			_query = _.emptyStr,
 			_data = data || null;
@@ -4870,7 +4882,7 @@ if ( !Object.observe ) {
 		}, _self.config, true);
 
 		//Handle request interceptor
-		_self._handleInterceptor ('request', _self.config);
+		_self._handleInterceptor ('request', _self.config, naming);
 
 		//Promise execution
 		return (new Promise (function (resolve, reject) {
@@ -4926,7 +4938,7 @@ if ( !Object.observe ) {
 					this.responseClean = _self._response (this);
 
 					//Find a interceptor for success
-					_self._handleInterceptor ('success', this);
+					_self._handleInterceptor ('success', this, naming);
 
 					//Resolve
 					resolve (this.responseClean);
@@ -4937,7 +4949,7 @@ if ( !Object.observe ) {
 			//Progress
 			_self.xhr.addEventListener ('progress', function (e) {
 				//Find a interceptor for progress
-				_self._handleInterceptor ('progress', e);
+				_self._handleInterceptor ('progress', e, naming);
 
 			});
 
@@ -4945,14 +4957,14 @@ if ( !Object.observe ) {
 			_self.xhr.addEventListener ('readystatechange', function (e) {
 				if ( this.readyState ) {
 					//Find a interceptor for state
-					_self._handleInterceptor ('state', this);
+					_self._handleInterceptor ('state', this, naming);
 				}
 			});
 
 			//Abort
 			_self.xhr.addEventListener ('abort', function (e) {
 				//Find a interceptor for abort
-				_self._handleInterceptor ('abort', this);
+				_self._handleInterceptor ('abort', this, naming);
 
 			});
 
@@ -4962,17 +4974,17 @@ if ( !Object.observe ) {
 				this.responseClean = _self._response (this);
 
 				//Find a interceptor for complete
-				_self._handleInterceptor ('complete', this);
+				_self._handleInterceptor ('complete', this, naming);
 			});
 
 			_self.xhr.addEventListener ('loadstart', function (e) {
 				//Find a interceptor for  before
-				_self._handleInterceptor ('before', this);
+				_self._handleInterceptor ('before', this, naming);
 			});
 
 			_self.xhr.addEventListener ('error', function (e) {
 				//Find a interceptor for success
-				_self._handleInterceptor ('error', this);
+				_self._handleInterceptor ('error', this, naming);
 
 				reject (e);
 
@@ -4998,8 +5010,7 @@ if ( !Object.observe ) {
 		//Naming interceptors!!
 		extend = _.isArray (interceptors) && interceptors || _.isArray (extend) && extend || null;
 		interceptors = _.isObject (named) && named || _.isObject (interceptors) && interceptors || {};
-		named = !_.isObject (named) && _.isString (named) && named || _self.name;
-
+		named = !_.isObject (named) && _.isString (named) && named || 'default';
 
 		//New named interceptor!!
 		if ( !(named in _self.interceptors) )
@@ -5027,12 +5038,17 @@ if ( !Object.observe ) {
 	 * @param  {string} type
 	 * @return {object}
 	 * */
-	Http.add ('interceptClean', function (type, named) {
+	Http.add ('interceptClean', function (named, type) {
 		//Naming interceptors!!
-		named = named || this.name;
+		named = named || 'default';
 
 		//Clean the interceptor
-		MiddleWare.cleanInterceptor (this.interceptors[named], type);
+		if ( type ) {
+			MiddleWare.cleanInterceptor (this.interceptors[named], type);
+		} else {
+			if ( named in  this.interceptors )
+				delete this.interceptors[named];
+		}
 		return this;
 	});
 
@@ -5041,14 +5057,14 @@ if ( !Object.observe ) {
 	 * @param {object} param
 	 * @return {void}
 	 * */
-	Http.add ('_handleInterceptor', function (type, param) {
+	Http.add ('_handleInterceptor', function (type, param, naming) {
 
 		//Has interceptors?
-		if ( this.name in this.interceptors ) {
+		if ( naming in this.interceptors ) {
 			//Trigger Interceptors
 			MiddleWare.trigger (
 				MiddleWare.getInterceptors (
-					this.interceptors[this.name], type
+					this.interceptors[naming], type
 				),
 				[param, this]
 			);
@@ -5112,13 +5128,14 @@ if ( !Object.observe ) {
 	 * @return {object}
 	 * **/
 	Http.add ('_rest', function (url, type, data, naming) {
-
-		this.config.method = type;//The method!!
-		this.name = _.isString (data) && data
-					|| naming || 'default'; // Naming request!!
+		//The method!!
+		this.config.method = type;
 
 		//The request
-		return this.request (url, _.isObject (data) && data || {});
+		return this.request (
+			url, _.isObject (data) && data || {},
+			_.isString (data) && data || naming || 'default'
+		);
 	});
 
 	/** Handle response
