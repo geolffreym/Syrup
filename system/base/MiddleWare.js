@@ -45,17 +45,30 @@
 	 * @return {object}
 	 * */
 	MiddleWare.add ('extend', function (intercepted, to, extend) {
+
+		//Not interceptors?
+		if ( !( 'interceptors' in intercepted[to] ) )
+			intercepted[to]['interceptors'] = {};
+
 		//For each extension!!
 		_.each (extend, function (v) {
 			//v in intercepted?
 			//v is not the same as target?
 			if ( v !== to && v in intercepted ) {
-				intercepted[to] = _.extend (
-					intercepted[to],
-					intercepted[v]
-				)
+				if ( 'interceptors' in intercepted[v] ) {
+					_.each (intercepted[v].interceptors, function (r, i) {
+						if ( !(i in intercepted[to].interceptors) )
+							intercepted[to].interceptors[i] = [];
+
+						//Extend interceptors
+						intercepted[to].interceptors[i] = _.extend (
+							intercepted[to].interceptors[i], r
+						)
+					})
+				}
 			}
 		});
+
 	});
 
 	/** Find signals in object
