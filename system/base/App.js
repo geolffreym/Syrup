@@ -303,7 +303,7 @@
 						//Is in recipe?
 						if ( _attr in _recipe && _.isFunction (_recipe[_attr]) ) {
 							//No prevent to keyboard
-							if( !(/key/.test(e.type)))
+							if ( !(/key/.test (e.type)) )
 								e.preventDefault ();
 
 							//Call method
@@ -331,20 +331,28 @@
 		//The model Object?
 		_self.recipeCollection[moduleId].instance.model = {
 			object  : _model,
-			resource: function () {
-				return _$ ('[sp-recipe="' + moduleId + '"] [sp-model]');
+			resource: function (_model) {
+				return _$ ('[sp-recipe="' + moduleId + '"] [' + _model || 'sp-model' + ']');
 			},
-			set     : function (obj) {
-				var _resource = this.resource ();
+			set     : function (obj, _model) {
+				//Resource model
+				var _resource = this.resource (_model);
+
 				//Exist resource?
 				if ( _resource.exist )
 					_model.set (_resource, obj);
+
+				//Return object reference
 				return _self.recipeCollection[moduleId].instance;
 			},
-			get     : function (item) {
-				var _resource = this.resource ();
+			get     : function (item, _model) {
+				//Resource model
+				var _resource = this.resource (_model);
+
 				//Exist resource?
 				if ( _resource.exist ) {
+
+					//Return object reference
 					return {
 						then: function (resolve) {
 							return _model.get (_resource).then (function (e) {
@@ -528,11 +536,11 @@
 						//Seek for tpl
 						_view.seekTpl (view_template_dir)
 							.then (function (view) {
-									   view.render (_scope).then (function (res) {
-										   _dom.html (res);
-										   resolve (res);
-									   })
-								   })
+							view.render (_scope).then (function (res) {
+								_dom.html (res);
+								resolve (res);
+							})
+						})
 					} else {
 						//Handle view?
 						//Require the view if needed
@@ -547,11 +555,10 @@
 
 					//Exist inline tpl?
 				} else if ( _dom_template.exist ) {
-					_view.render (_dom_template.html (), _scope)
-						.then (function (result) {
-								   _dom.html (result);
-								   resolve (result)
-							   });
+					_view.render (_dom_template.html (), _scope).then (function (result) {
+						_dom.html (result);
+						resolve (result)
+					});
 				}
 			}
 		});
