@@ -23,6 +23,7 @@
 		this.findParams = /([\w]+:[\w\[\]\-\+\(\)]+)/g;
 		this.onpopstate = {};
 		this.interceptors = {};
+		this.breadcrumbs = [];
 		this.module = null;
 		this.default = true;
 
@@ -106,8 +107,9 @@
 					_self.module.appCollection[conf.app].intercept ({
 						'init': function (mod) {
 							mod.uri = {
-								params: state,
-								route : _self.routes[route_name]
+								params     : state,
+								breadcrumbs: _self.breadcrumbs,
+								route      : _self.routes[route_name]
 							}
 						}
 					});
@@ -379,7 +381,17 @@
 
 	//Go back
 	Router.add ('goBack', function () {
-		this.history.back ();
+		//pop last
+		this.breadcrumbs.pop (); //actual
+		var _previous = this.breadcrumbs.pop (); //previuos
+
+		//Set state in history
+		this._triggerPopState (
+			_previous.params,
+			_previous.route,
+			_previous.new_route,
+			{ trigger: true }
+		);
 	});
 
 
@@ -394,10 +406,13 @@
 		//Two times, for trigger "popstate"
 
 		if ( _config.trigger ) {
+			//Push states
+			this.breadcrumbs.push ({ params: _params, route: route_name, new_route: _the_new_route });
 			this.history.pushState (_params, route_name, _the_new_route);
 			this.history.pushState (_params, route_name, _the_new_route);
 			this.history.back ();
 		}
+
 
 	});
 
