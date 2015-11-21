@@ -6903,7 +6903,7 @@ if ( !Object.observe ) {
 	Router.add ('goBack', function () {
 		//pop last
 		this.breadcrumbs.pop (); //actual
-		var _previous = this.breadcrumbs.pop (); //previuos
+		var _previous = this.breadcrumbs.pop (); //previous
 
 		//Set state in history
 		this._triggerPopState (
