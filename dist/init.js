@@ -6085,10 +6085,13 @@ if ( !Object.observe ) {
 							if ( !(/key/.test (e.type)) )
 								e.preventDefault ();
 
+							//Object
+							this.event = e;
+
 							//Call method
 							_recipe[_attr].call (
 								_self.recipeCollection[moduleId].instance,
-								_self.lib.get (_recipe.parent.root), e
+								_self.lib.get (_recipe.parent.root), this
 							);
 						}
 					}
