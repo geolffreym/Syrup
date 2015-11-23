@@ -4848,7 +4848,6 @@ if ( !Object.observe ) {
 (function (window) {
 
 	function Http () {
-		this.xhr = null;
 		this.upload = null;
 		this.config = {};
 		this.interceptors = {
@@ -4864,11 +4863,10 @@ if ( !Object.observe ) {
 	Http.add ('request', function (url, data, naming) {
 		var _self = this,
 			_query = _.emptyStr,
-			_data = data || null;
-
+			_data = data || null,
 		//New XHR Object
-		_self.xhr = new window.XMLHttpRequest
-					|| new window.ActiveXObject ("Microsoft.XMLHTTP");
+			_xhr = new window.XMLHttpRequest
+				   || new window.ActiveXObject ("Microsoft.XMLHTTP");
 
 		//Make global conf
 		_self.config = _.extend ({
@@ -4883,6 +4881,7 @@ if ( !Object.observe ) {
 
 		//Handle request interceptor
 		_self._handleInterceptor ('request', _self.config, naming);
+		_xhr.method = _self.config.method;
 
 		//Promise execution
 		return (new Promise (function (resolve, reject) {
@@ -4909,30 +4908,30 @@ if ( !Object.observe ) {
 
 			//Process url
 			_query = url + (_query);
-			_self.xhr.open (_self.config.method, _query, true);
-			_self.xhr.timeout = _self.config.timeout;
+			_xhr.open (_self.config.method, _query, true);
+			_xhr.timeout = _self.config.timeout;
 
 			//Setting Headers
 			if ( !_.isFormData (_data) ) {
 				_.each (_self.config.headers, function (value, header) {
-					_self._requestHeader (header, value);
+					_xhr.setRequestHeader (header, value);
 				});
 			}
 
 			//Cors?
-			_self.xhr.withCredentials = !!_self.config.cors;
+			_xhr.withCredentials = !!_self.config.cors;
 
 			//If upload needed
 			if ( _.isSet (_self.config.upload)
 				 && _.isBoolean (_self.config.upload)
 			) {
-				_self.upload = _self.xhr.upload;
-				_self.xhr = _self.upload;
+				_self.upload = _xhr.upload;
+				_xhr = _self.upload;
 			}
 
 			//Event Listeners
 			//Success
-			_self.xhr.addEventListener ('load', function (e) {
+			_xhr.addEventListener ('load', function (e) {
 				if ( this.status >= 0xC8 && this.status < 0x190 || this.status == 0 ) {
 					//The response
 					this.responseClean = _self._response (this);
@@ -4947,14 +4946,14 @@ if ( !Object.observe ) {
 			});
 
 			//Progress
-			_self.xhr.addEventListener ('progress', function (e) {
+			_xhr.addEventListener ('progress', function (e) {
 				//Find a interceptor for progress
 				_self._handleInterceptor ('progress', e, naming);
 
 			});
 
 			//State
-			_self.xhr.addEventListener ('readystatechange', function (e) {
+			_xhr.addEventListener ('readystatechange', function (e) {
 				if ( this.readyState ) {
 					//Find a interceptor for state
 					_self._handleInterceptor ('state', this, naming);
@@ -4962,14 +4961,14 @@ if ( !Object.observe ) {
 			});
 
 			//Abort
-			_self.xhr.addEventListener ('abort', function (e) {
+			_xhr.addEventListener ('abort', function (e) {
 				//Find a interceptor for abort
 				_self._handleInterceptor ('abort', this, naming);
 
 			});
 
 			//Complete
-			_self.xhr.addEventListener ('loadend', function (e) {
+			_xhr.addEventListener ('loadend', function (e) {
 				//The response
 				this.responseClean = _self._response (this);
 
@@ -4977,12 +4976,12 @@ if ( !Object.observe ) {
 				_self._handleInterceptor ('complete', this, naming);
 			});
 
-			_self.xhr.addEventListener ('loadstart', function (e) {
+			_xhr.addEventListener ('loadstart', function (e) {
 				//Find a interceptor for  before
 				_self._handleInterceptor ('before', this, naming);
 			});
 
-			_self.xhr.addEventListener ('error', function (e) {
+			_xhr.addEventListener ('error', function (e) {
 				//Find a interceptor for success
 				_self._handleInterceptor ('error', this, naming);
 
@@ -4991,7 +4990,7 @@ if ( !Object.observe ) {
 			});
 
 			//Send
-			_self.xhr.send (
+			_xhr.send (
 				_self.config.method !== 'GET'
 					? _data : null
 			);
@@ -5112,14 +5111,6 @@ if ( !Object.observe ) {
 		return this._rest (url, 'DELETE', data, naming);
 	});
 
-
-	/**Abort request
-	 * @return {void}
-	 * */
-	Http.add ('abort', function () {
-		this.xhr && this.xhr.abort ();
-	});
-
 	/** Rest handler
 	 * @param {string} header
 	 * @param {string} type
@@ -5145,16 +5136,6 @@ if ( !Object.observe ) {
 	Http.add ('_response', function (xhr) {
 		var _response = xhr.response || xhr.responseText || xhr.responseXML;
 		return _.isJson (_response) && _.toObject (_response) || _response;
-	});
-
-	/** Set Request Header
-	 * @param {string} header
-	 * @param {string} type
-	 * @return {object}
-	 * **/
-	Http.add ('_requestHeader', function (header, type) {
-		this.xhr.setRequestHeader (header, type);
-		return this;
 	});
 
 
