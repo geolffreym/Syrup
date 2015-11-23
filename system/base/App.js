@@ -66,6 +66,11 @@
 		//Blend the libs
 		_self.lib.blend (name, dependencies);
 
+		//Provide lib with tools
+		_self.lib.provider (name, function () {
+			return _self;
+		});
+
 		return _self;
 	});
 
@@ -340,7 +345,7 @@
 			},
 			set     : function (obj, _res) {
 				//Resource model
-				var _resource = _.is$(_res) && _res || this.resource (_res);
+				var _resource = _.is$ (_res) && _res || this.resource (_res);
 
 				//Exist resource?
 				if ( _resource.exist )
@@ -351,7 +356,7 @@
 			},
 			get     : function (item, _res) {
 				//Resource model
-				var _resource = _.is$(_res) && _res || this.resource (_res);
+				var _resource = _.is$ (_res) && _res || this.resource (_res);
 
 				//Exist resource?
 				if ( _resource.exist ) {
