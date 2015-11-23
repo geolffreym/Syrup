@@ -4937,7 +4937,7 @@ if ( !Object.observe ) {
 					this.responseClean = _self._response (this);
 
 					//Find a interceptor for success
-					_self._handleInterceptor ('success', this, naming);
+					_self._handleInterceptor ('success', _xhr, naming);
 
 					//Resolve
 					resolve (this.responseClean);
@@ -4956,14 +4956,14 @@ if ( !Object.observe ) {
 			_xhr.addEventListener ('readystatechange', function (e) {
 				if ( this.readyState ) {
 					//Find a interceptor for state
-					_self._handleInterceptor ('state', this, naming);
+					_self._handleInterceptor ('state', _xhr, naming);
 				}
 			});
 
 			//Abort
 			_xhr.addEventListener ('abort', function (e) {
 				//Find a interceptor for abort
-				_self._handleInterceptor ('abort', this, naming);
+				_self._handleInterceptor ('abort', _xhr, naming);
 
 			});
 
@@ -4973,17 +4973,17 @@ if ( !Object.observe ) {
 				this.responseClean = _self._response (this);
 
 				//Find a interceptor for complete
-				_self._handleInterceptor ('complete', this, naming);
+				_self._handleInterceptor ('complete', _xhr, naming);
 			});
 
 			_xhr.addEventListener ('loadstart', function (e) {
 				//Find a interceptor for  before
-				_self._handleInterceptor ('before', this, naming);
+				_self._handleInterceptor ('before', _xhr, naming);
 			});
 
 			_xhr.addEventListener ('error', function (e) {
 				//Find a interceptor for success
-				_self._handleInterceptor ('error', this, naming);
+				_self._handleInterceptor ('error', _xhr, naming);
 
 				reject (e);
 
