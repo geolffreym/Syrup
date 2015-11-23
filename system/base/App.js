@@ -296,7 +296,7 @@
 				//Listen the events
 				_mod.listen (v, function (e) {
 					var _event = 'sp-' + e.type,
-						_attr = e.target.getAttribute (_event);
+						_dom = null, _attr = e.target.getAttribute (_event);
 
 					//Has sp-'event'?
 					if ( _attr ) {
@@ -307,12 +307,13 @@
 								e.preventDefault ();
 
 							//Object
-							this.event = e;
+							_dom = _$ (this);
+							_dom.event = e;
 
 							//Call method
 							_recipe[_attr].call (
 								_self.recipeCollection[moduleId].instance,
-								_self.lib.get (_recipe.parent.root), this
+								_self.lib.get (_recipe.parent.root), _dom
 							);
 						}
 					}
