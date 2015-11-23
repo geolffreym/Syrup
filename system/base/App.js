@@ -332,7 +332,7 @@
 		_self.recipeCollection[moduleId].instance.model = {
 			object  : _model,
 			resource: function (_model) {
-				return _$ ('[sp-recipe="' + moduleId + '"] ' + (_model || '[sp-model]'));
+				return _$ ('[sp-recipe="' + moduleId + '"] ' + ('[sp-model="' + _model + '"]' || '[sp-model]'));
 			},
 			set     : function (obj, _res) {
 				//Resource model
@@ -377,7 +377,7 @@
 								)
 							});
 						}
-					}
+					};
 				}
 			}
 		}
