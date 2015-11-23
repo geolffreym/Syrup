@@ -382,6 +382,9 @@
 						}
 					};
 				}
+				//Not resource
+				//Do nothing!!
+				return { then: function () {} }
 			}
 		}
 	});
