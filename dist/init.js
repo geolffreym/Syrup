@@ -6119,7 +6119,7 @@ if ( !Object.observe ) {
 			},
 			set     : function (obj, _res) {
 				//Resource model
-				var _resource = this.resource (_res);
+				var _resource = _.is$(_res) && _res || this.resource (_res);
 
 				//Exist resource?
 				if ( _resource.exist )
@@ -6130,7 +6130,7 @@ if ( !Object.observe ) {
 			},
 			get     : function (item, _res) {
 				//Resource model
-				var _resource = this.resource (_res);
+				var _resource = _.is$(_res) && _res || this.resource (_res);
 
 				//Exist resource?
 				if ( _resource.exist ) {
