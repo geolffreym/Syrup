@@ -45,14 +45,14 @@ if ( typeof exports !== 'undefined' )
 				NOURL     : 'URL is needed.'
 			}
 		};
-	
+
 	/**Clone a object
 	 * @return object
 	 * */
 	nativeObject.clone = function () {
 		return _.extend ({}, this);
 	};
-	
+
 	/**Get a index
 	 * @param index
 	 * @return null|string|int
@@ -60,7 +60,7 @@ if ( typeof exports !== 'undefined' )
 	nativeObject.getIndex = function (index) {
 		return index in this ? this[index] : null;
 	};
-	
+
 	/** Extend a function
 	 *  @param child
 	 *  @return void
@@ -73,7 +73,7 @@ if ( typeof exports !== 'undefined' )
 		);
 		this.prototype[name] = child;
 	};
-	
+
 	/** Create a custom function
 	 *  @param name
 	 *  @return object
@@ -85,8 +85,8 @@ if ( typeof exports !== 'undefined' )
 			)
 		) ()
 	};
-	
-	
+
+
 	/**Add method to function
 	 * @param name
 	 * @param fn
@@ -94,15 +94,15 @@ if ( typeof exports !== 'undefined' )
 	nativeFunction.add = function (name, fn) {
 		this.prototype[name.trim ()] = fn;
 	};
-	
-	
+
+
 	/**Modelo Base
 	 * @constructor
 	 */
-	
+
 	function Syrup () {
 	}
-	
+
 	/**_$_
 	 * @constructor
 	 */
@@ -110,7 +110,7 @@ if ( typeof exports !== 'undefined' )
 		this.collection = null;
 		this.exist = null;
 	}
-	
+
 	/**Dom Traversing
 	 * @param dom
 	 * @returns {_$_}
@@ -118,33 +118,33 @@ if ( typeof exports !== 'undefined' )
 	_$_.add ('$', function (dom) {
 		var _tmp, _dom = dom,
 			_self = new _$_;
-		
+
 		if ( _.isFunction (dom) ) {
 			_$ (document).ready (dom);
 			return;
 		}
-		
+
 		if ( _.isHtml (dom) ) {
 			_tmp = document.createElement ('div');
 			_tmp.innerHTML = dom;
 			_self.collection = _tmp.children.length > 1
 				? _tmp.children
 				: _tmp.firstChild;
-			
+
 		} else {
 			_self.collection = !_.isObject (dom) && _.isString (dom)
 				? dom.indexOf ('+') > -1
 				? document.querySelectorAll (_.replace (dom, '+', _.emptyStr))
 				: document.querySelector (dom)
 				: dom;
-			
+
 		}
-		
+
 		_self.exist = _.isSet (_self.collection);
 		_self.name = _dom.nodeName && _dom.nodeName.toLowerCase () || _dom;
 		return _self;
 	});
-	
+
 	/***Event Handler
 	 * @param callback
 	 */
@@ -156,7 +156,7 @@ if ( typeof exports !== 'undefined' )
 			);
 		return this;
 	});
-	
+
 	/***Event Load
 	 * @param callback
 	 */
@@ -165,8 +165,8 @@ if ( typeof exports !== 'undefined' )
 			this.collection.onload = callback.bind (this);
 		}
 	});
-	
-	
+
+
 	/**Event Listener
 	 * @param {string} event
 	 * @param {string} delegate
@@ -177,13 +177,13 @@ if ( typeof exports !== 'undefined' )
 		if ( _.isFunction (delegate) ) {
 			callback = delegate;
 		}
-		
+
 		var _self = this,
 			_target = null,
 			_event = function (e) {
 				e = e || windowGlobal.event;
 				_target = event.srcElement || e.target;
-				
+
 				if ( _.isString (delegate) && !_.isFunction (delegate) ) {
 					if ( _$ (_target).is (delegate) ) {
 						_.callbackAudit (callback.bind (_target), e);
@@ -192,26 +192,26 @@ if ( typeof exports !== 'undefined' )
 					_.callbackAudit (callback.bind (_target), e);
 				}
 			};
-		
+
 		// For each element
 		_self.each (function (elem) {
-			
+
 			if ( elem.addEventListener ) {
 				elem.addEventListener (event, _event, true)
 			} else if ( elem.attachEvent ) {
 				elem.attachEvent ('on' + event, _event);
 			}
-			
+
 			if ( !_.isSet (elem['listListener']) ) {
 				elem['listListener'] = {}
 			}
-			
+
 			elem.listListener[event] = _event;
 		});
-		
+
 		return this;
 	});
-	
+
 	/**Remove Event Listener
 	 * @param {string} event
 	 * @return {object}
@@ -221,7 +221,7 @@ if ( typeof exports !== 'undefined' )
 			//Dynamic property listener
 			//Exist property?
 			if ( _.isSet (elem.listListener) ) {
-				
+
 				if ( event in elem.listListener ) {
 					if ( elem.removeEventListener ) {
 						elem.removeEventListener (event, elem.listListener[event], true);
@@ -232,9 +232,9 @@ if ( typeof exports !== 'undefined' )
 				}
 			}
 		})
-		
+
 	});
-	
+
 	/**Filter Pattern match
 	 *@param {string} filter
 	 *@param {function} callback
@@ -244,10 +244,10 @@ if ( typeof exports !== 'undefined' )
 		//Not string.. pass!!
 		if ( !_.isString (filter) )
 			return this;
-		
+
 		//Result return
 		var _result = [];
-		
+
 		//For Each element
 		this.each (function (elem) {
 			//The filtered element
@@ -257,30 +257,31 @@ if ( typeof exports !== 'undefined' )
 				// Push on list
 				if ( !_.isFunction (callback) )
 					_result.push (elem);
-				
+
 				//Callback if needed
 				_.callbackAudit (callback, elem);
-				
+
 			} else if ( _.isFunction (e_handler) ) {
 				//Throw error
 				_.callbackAudit (e_handler, elem);
 			}
 		});
-		
+
 		//Output
 		return _.isFunction (callback)
 			   && this || _.specArray (_result)
 	});
-	
+
 	/**Empty Dom
 	 * @return void
 	 * */
 	_$_.add ('empty', function () {
 		return this.each (function (v) {
-			v.innerHTML = _.emptyStr;
+			v.value && (v.value = _.emptyStr);
+			v.innerHTML && (v.innerHTML = _.emptyStr);
 		});
 	});
-	
+
 	/**Clone Objects
 	 * @param childs
 	 * @return array
@@ -293,8 +294,8 @@ if ( typeof exports !== 'undefined' )
 		//Speculate Array
 		return _.specArray (_clones);
 	});
-	
-	
+
+
 	/***Data set
 	 * @param {string} name
 	 * @param {string|number} value
@@ -304,37 +305,37 @@ if ( typeof exports !== 'undefined' )
 		var _self = this,
 			_data_set = null,
 			_values = [];
-		
+
 		//For each element!!
 		_self.each (function (dom, i) {
 			//Data set
 			_data_set = dom.dataset;
-			
+
 			//Value?
 			if ( _.isString (value) || _.isNumber (value) ) {
 				_data_set[name] = value;
 			} else if ( _.isSet (_data_set[name]) ) {
 				_values.push (_data_set[name])
 			}
-			
+
 		});
-		
+
 		return (_.isString (value)
 				&& _.isNumber (value)
 				&& this) || _.specArray (_values);
 	});
-	
-	
+
+
 	/***Assign Properties
 	 * @param {string|object} _prop
 	 * @return {array}
 	 */
 	_$_.add ('prop', function (_prop) {
 		var _props = [];
-		
+
 		//For each element
 		this.each (function (v) {
-			
+
 			//String?
 			if ( _.isString (_prop) ) {
 				_props.push (v[_prop]);
@@ -344,11 +345,11 @@ if ( typeof exports !== 'undefined' )
 				});
 			}
 		});
-		
+
 		return _.isString (_prop)
 			   && _.specArray (_props) || this;
 	});
-	
+
 	/***Assign Atributes
 	 * @param {string|object} _attr
 	 * @return {array}
@@ -356,11 +357,11 @@ if ( typeof exports !== 'undefined' )
 	_$_.add ('attr', function (attr) {
 		var _attr = [];
 		this.each (function (v) {
-			
+
 			//String?
 			if ( _.isString (attr) ) {
 				_attr.push (v.getAttribute (attr));
-				
+
 			} else if ( _.isObject (attr) ) {
 				//Object?
 				_.each (attr, function (value, index) {
@@ -368,12 +369,12 @@ if ( typeof exports !== 'undefined' )
 				});
 			}
 		});
-		
+
 		return _.isString (attr)
 			   && _.specArray (_attr) || this;
-		
+
 	});
-	
+
 	/***Remove Attributes
 	 * @param {string} _attr
 	 * @return {object}
@@ -387,7 +388,7 @@ if ( typeof exports !== 'undefined' )
 			}
 		});
 	});
-	
+
 	/**CSS
 	 * @param _css
 	 * @returns {_$_}
@@ -395,14 +396,14 @@ if ( typeof exports !== 'undefined' )
 	_$_.add ('css', function (css) {
 		var _css = [],
 			_self = this;
-		
+
 		_self.each (function (dom) {
-			
+
 			//String?
 			if ( _.isString (css) ) {
 				_css.push (windowGlobal.getComputedStyle (dom, null)
 							   .getPropertyValue (css));
-				
+
 			} else if ( _.isObject (dom) ) {
 				//Object?
 				_.each (css, function (value, index) {
@@ -410,11 +411,11 @@ if ( typeof exports !== 'undefined' )
 				});
 			}
 		});
-		
+
 		return _.isString (css)
 			   && _.specArray (_css) || this;
 	});
-	
+
 	/***Insert After
 	 * @param elem
 	 */
@@ -422,14 +423,14 @@ if ( typeof exports !== 'undefined' )
 		if ( _.isHtml (elem) || !_.is$ (elem) ) {
 			elem = _$ (elem);
 		}
-		
+
 		return this.each (function (obj) {
 			elem.each (function (v) {
 				obj.parentNode.insertBefore (v, obj.nextSibling)
 			})
 		});
 	});
-	
+
 	/***Insert Before
 	 * @param elem
 	 * @return object
@@ -438,14 +439,14 @@ if ( typeof exports !== 'undefined' )
 		if ( _.isHtml (elem) || !_.is$ (elem) ) {
 			elem = _$ (elem);
 		}
-		
+
 		return this.each (function (obj) {
 			elem.each (function (v) {
 				obj.parentNode.insertBefore (v, obj)
 			})
 		});
 	});
-	
+
 	/**Append Element or Html
 	 * @param childs
 	 * @return object
@@ -454,15 +455,15 @@ if ( typeof exports !== 'undefined' )
 		if ( _.isHtml (childs) || !_.is$ (childs) ) {
 			childs = _$ (childs);
 		}
-		
+
 		return this.each (function (p) {
 			childs.each (function (elm) {
 				p.appendChild (elm)
 			});
 		});
-		
+
 	});
-	
+
 	/**Prepend Element or Html
 	 * @param childs
 	 * @return object
@@ -471,54 +472,54 @@ if ( typeof exports !== 'undefined' )
 		if ( _.isHtml (childs) || !_.is$ (childs) ) {
 			childs = _$ (childs);
 		}
-		
+
 		return this.each (function (p) {
 			childs.each (function (elm) {
 				p.insertBefore (elm, p.firstChild)
 			});
 		});
-		
+
 	});
-	
+
 	/**Inner HTML
 	 * @param {string} html
 	 * @returns {object}
 	 */
 	_$_.add ('html', function (html) {
-		
+
 		//Is Html?
 		return ((_.isHtml (html) || _.isString (html))
 				&& this.prop ({ 'innerHTML': html })
 				&& this
 			   ) || this.prop ('innerHTML');
 	});
-	
+
 	/**Inner Text
 	 * @param {string} text
 	 * @returns {object}
 	 */
 	_$_.add ('text', function (text) {
-		
+
 		//Number or string?
 		return (_.isString (text)
 				&& this.prop ({ 'textContent': text })
 				&& this
 			   ) || this.prop ('textContent');
 	});
-	
+
 	/**Set value
 	 * @param {string} text
 	 * @returns {object}
 	 */
 	_$_.add ('val', function (text) {
-		
+
 		//Number or string?
 		return (_.isString (text)
 				&& this.prop ({ 'value': text })
 				&& this
 			   ) || this.prop ('value');
 	});
-	
+
 	/**Hide Element**/
 	_$_.add ('hide', function () {
 		return this.each (function (_elem) {
