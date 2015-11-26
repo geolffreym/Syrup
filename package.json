@@ -12,8 +12,10 @@
   ],
   "author": "Geolffrey Mena <gmjun2000@gmail.com>",
   "devDependencies": {
-    "b_combiner-js": "*",
-    "nodemon": "*",
+    "webpack": "^1.12.2",
+    "babel-core": "^6.0.14",
+    "babel-loader": "^6.0.0",
+    "babel-preset-es2015": "^6.0.15",
     "karma": "*",
     "karma-jasmine": "*",
     "jasmine-core": "*",
@@ -23,7 +25,8 @@
   "version": "0.1.1",
   "license": "GNU GPL",
   "scripts": {
-    "start": "node node_modules/b_combiner-js/index.js"
+    "build": "webpack -d -p",
+    "watch": "webpack -d --watch"
   },
   "repository": {
     "type": "git",
