@@ -58,10 +58,7 @@
 	 * Time: 12:22
 	 * To change this template use File | Settings | File Templates.
 	 */
-	'use strict'
-	//Polyfill
-
-	;
+	'use strict';
 
 	function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
 
