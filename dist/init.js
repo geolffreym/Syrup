@@ -7123,8 +7123,8 @@ if ( typeof exports !== 'undefined' )
 		window.addEventListener ('hashchange', function (e) {
 
 			//Clean # from hash
-			var _hash = _self._cleanHash (location.hash),
-				_params = _self._getParams (location.hash);
+			var _hash = _self.cleanHash (location.hash),
+				_params = _self.getParams (location.hash);
 
 			//Intercept pop state
 			_self._handleInterceptor ('change', _params);
@@ -7175,7 +7175,7 @@ if ( typeof exports !== 'undefined' )
 	 * @param {string} hash
 	 * @returns {string}
 	 */
-	Hash.add ('_cleanHash', function (hash) {
+	Hash.add ('cleanHash', function (hash) {
 		var _hash = _.replace (hash, '#', _.emptyStr),
 			_split = _hash.split ('/');
 
@@ -7186,7 +7186,7 @@ if ( typeof exports !== 'undefined' )
 	 * @param {string} hash
 	 * @returns {object}
 	 */
-	Hash.add ('_getParams', function (hash) {
+	Hash.add ('getParams', function (hash) {
 		var _split = hash.split ('/');
 		_split = (_split.length > 1 && _split || hash.split ('?')).splice (1);
 
