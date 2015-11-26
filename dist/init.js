@@ -2272,380 +2272,524 @@ if ( typeof exports !== 'undefined' )
 	window.MiddleWareClass = MiddleWare;
 
 }) (window);
-/*
- Tested against Chromium build with Object.observe and acts EXACTLY the same,
- though Chromium build is MUCH faster
- Trying to stay as close to the spec as possible,
- this is a work in progress, feel free to comment/update
- Specification:
- http://wiki.ecmascript.org/doku.php?id=harmony:observe
- Built using parts of:
- https://github.com/tvcutsem/harmony-reflect/blob/master/examples/observer.js
- Limits so far;
- Built using polling... Will update again with polling/getter&setters to make things better at some point
- TODO:
- Add support for Object.prototype.watch -> https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/watch
- */
-if ( !Object.observe ) {
-	(function (extend, global) {
-		"use strict";
-		var isCallable = (function (toString) {
-			var s = toString.call (toString),
-				u = typeof u;
-			return typeof global.alert === "object" ?
-				function isCallable (f) {
-					return s === toString.call (f) || (!!f && typeof f.toString == u && typeof f.valueOf == u && /^\s*\bfunction\b/.test ("" + f));
-				} :
-				function isCallable (f) {
-					return s === toString.call (f);
-				}
-				;
-		}) (extend.prototype.toString);
-		// isNode & isElement from
-		// http://stackoverflow.com/questions/384286/javascript-isdom-how-do-you-check-if-a-javascript-object-is-a-dom-object
-		// Returns true if it is a DOM node
-		var isNode = function isNode (o) {
-			return (
-				typeof Node === "object" ? o instanceof Node :
-				o && typeof o === "object" && typeof o.nodeType === "number" && typeof o.nodeName === "string"
-			);
+//    Copyright 2012 Kap IT (http://www.kapit.fr/)
+//
+//    Licensed under the Apache License, Version 2.0 (the 'License');
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an 'AS IS' BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
+//    Author : François de Campredon (http://francois.de-campredon.fr/),
+
+// Object.observe Shim
+// ===================
+
+// *See [The harmony proposal page](http://wiki.ecmascript.org/doku.php?id=harmony:observe)*
+
+(function (global) {
+	'use strict';
+	if (typeof Object.observe === 'function') {
+		return;
+	}
+
+	// Utilities
+	// ---------
+
+	// setImmediate shim used to deliver changes records asynchronously
+	// use setImmediate if available
+	var setImmediate = global.setImmediate || global.msSetImmediate,
+		clearImmediate = global.clearImmediate || global.msClearImmediate;
+	if (!setImmediate) {
+		// fallback on setTimeout if not
+		setImmediate = function (func, args) {
+			return setTimeout(func, 0, args);
 		};
-		//Returns true if it is a DOM element
-		var isElement = function isElement (o) {
-			return (
-				typeof HTMLElement === "object" ? o instanceof HTMLElement : //DOM2
-				o && typeof o === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName === "string"
-			);
+		clearImmediate = function (id) {
+			clearTimeout(id);
 		};
-		var _isImmediateSupported = (function () {
-			return !!global.setImmediate;
-		}) ();
-		var _doCheckCallback = (function () {
-			if ( _isImmediateSupported ) {
-				return function _doCheckCallback (f) {
-					return setImmediate (f);
-				};
-			} else {
-				return function _doCheckCallback (f) {
-					return setTimeout (f, 10);
-				};
-			}
-		}) ();
-		var _clearCheckCallback = (function () {
-			if ( _isImmediateSupported ) {
-				return function _clearCheckCallback (id) {
-					clearImmediate (id);
-				};
-			} else {
-				return function _clearCheckCallback (id) {
-					clearTimeout (id);
-				};
-			}
-		}) ();
-		var isNumeric = function isNumeric (n) {
-			return !isNaN (parseFloat (n)) && isFinite (n);
-		};
-		var sameValue = function sameValue (x, y) {
-			if ( x === y ) {
-				return x !== 0 || 1 / x === 1 / y;
-			}
-			return x !== x && y !== y;
-		};
-		var isAccessorDescriptor = function isAccessorDescriptor (desc) {
-			if ( typeof(desc) === 'undefined' ) {
-				return false;
-			}
-			return ('get' in desc || 'set' in desc);
-		};
-		var isDataDescriptor = function isDataDescriptor (desc) {
-			if ( typeof(desc) === 'undefined' ) {
-				return false;
-			}
-			return ('value' in desc || 'writable' in desc);
+	}
+
+
+	// WeakMap
+	// -------
+
+	var PrivateMap;
+	if (typeof WeakMap !== 'undefined')  {
+		//use weakmap if defined
+		PrivateMap = WeakMap;
+	} else {
+		//else use ses like shim of WeakMap
+		var HIDDEN_PREFIX = '__weakmap:' + (Math.random() * 1e9 >>> 0),
+			counter = new Date().getTime() % 1e9,
+			mascot = {};
+
+		PrivateMap = function () {
+			this.name = HIDDEN_PREFIX + (Math.random() * 1e9 >>> 0) + (counter++ + '__');
 		};
 
-		var validateArguments = function validateArguments (O, callback, accept) {
-			if ( typeof(O) !== 'object' ) {
-				// Throw Error
-				throw new TypeError ("Object.observeObject called on non-object");
-			}
-			if ( isCallable (callback) === false ) {
-				// Throw Error
-				throw new TypeError ("Object.observeObject: Expecting function");
-			}
-			if ( Object.isFrozen (callback) === true ) {
-				// Throw Error
-				throw new TypeError ("Object.observeObject: Expecting unfrozen function");
-			}
-			if ( accept !== undefined ) {
-				if ( !Array.isArray (accept) ) {
-					throw new TypeError ("Object.observeObject: Expecting acceptList in the form of an array");
-				}
-			}
-		};
+		PrivateMap.prototype = {
+			has: function (key) {
+				return key && key.hasOwnProperty(this.name);
+			},
 
-		var Observer = (function Observer () {
-			var wraped = [];
-			var Observer = function Observer (O, callback, accept) {
-				validateArguments (O, callback, accept);
-				if ( !accept ) {
-					accept = ["add", "update", "delete", "reconfigure", "setPrototype", "preventExtensions"];
-				}
-				Object.getNotifier (O).addListener (callback, accept);
-				if ( wraped.indexOf (O) === -1 ) {
-					wraped.push (O);
-				} else {
-					Object.getNotifier (O)._checkPropertyListing ();
-				}
-			};
+			get: function (key) {
+				var value = key && key[this.name];
+				return value === mascot ? undefined : value;
+			},
 
-			Observer.prototype.deliverChangeRecords = function Observer_deliverChangeRecords (O) {
-				Object.getNotifier (O).deliverChangeRecords ();
-			};
-
-			wraped.lastScanned = 0;
-			var f = (function f (wrapped) {
-				return function _f () {
-					var i = 0, l = wrapped.length, startTime = new Date (), takingTooLong = false;
-					for ( i = wrapped.lastScanned; (i < l) && (!takingTooLong); i++ ) {
-						if ( _indexes.indexOf (wrapped[i]) > -1 ) {
-							Object.getNotifier (wrapped[i])._checkPropertyListing ();
-							takingTooLong = ((new Date ()) - startTime) > 100; // make sure we don't take more than 100
-																			   // milliseconds to scan all objects
-						} else {
-							wrapped.splice (i, 1);
-							i--;
-							l--;
-						}
-					}
-					wrapped.lastScanned = i < l ? i : 0; // reset wrapped so we can make sure that we pick things back
-														 // up
-					_doCheckCallback (_f);
-				};
-			}) (wraped);
-			_doCheckCallback (f);
-			return Observer;
-		}) ();
-
-		var Notifier = function Notifier (watching) {
-			var _listeners = [], _acceptLists = [], _updates = [], _updater = false, properties = [], values = [];
-			var self = this;
-			Object.defineProperty (self, '_watching', {
-				enumerable: true,
-				get       : (function (watched) {
-					return function () {
-						return watched;
-					};
-				}) (watching)
-			});
-			var wrapProperty = function wrapProperty (object, prop) {
-				var propType = typeof(object[prop]), descriptor = Object.getOwnPropertyDescriptor (object, prop);
-				if ( (prop === 'getNotifier') || isAccessorDescriptor (descriptor) || (!descriptor.enumerable) ) {
-					return false;
-				}
-				if ( (object instanceof Array) && isNumeric (prop) ) {
-					var idx = properties.length;
-					properties[idx] = prop;
-					values[idx] = object[prop];
-					return true;
-				}
-				(function (idx, prop) {
-					properties[idx] = prop;
-					values[idx] = object[prop];
-					function getter () {
-						return values[getter.info.idx];
-					}
-
-					function setter (value) {
-						if ( !sameValue (values[setter.info.idx], value) ) {
-							Object.getNotifier (object).queueUpdate (object, prop, 'update', values[setter.info.idx]);
-							values[setter.info.idx] = value;
-						}
-					}
-
-					getter.info = setter.info = {
-						idx: idx
-					};
-					Object.defineProperty (object, prop, {
-						get: getter,
-						set: setter
-					});
-				}) (properties.length, prop);
-				return true;
-			};
-			self._checkPropertyListing = function _checkPropertyListing (dontQueueUpdates) {
-				var object = self._watching, keys = Object.keys (object), i = 0, l = keys.length;
-				var newKeys = [], oldKeys = properties.slice (0), updates = [];
-				var prop, queueUpdates = !dontQueueUpdates, propType, value, idx, aLength;
-
-				if ( object instanceof Array ) {
-					aLength = self._oldLength;//object.length;
-					//aLength = object.length;
-				}
-
-				for ( i = 0; i < l; i++ ) {
-					prop = keys[i];
-					value = object[prop];
-					propType = typeof(value);
-					if ( (idx = properties.indexOf (prop)) === -1 ) {
-						if ( wrapProperty (object, prop) && queueUpdates ) {
-							self.queueUpdate (object, prop, 'add', null, object[prop]);
-						}
-					} else {
-						if ( !(object instanceof Array) || (isNumeric (prop)) ) {
-							if ( values[idx] !== value ) {
-								if ( queueUpdates ) {
-									self.queueUpdate (object, prop, 'update', values[idx], value);
-								}
-								values[idx] = value;
-							}
-						}
-						oldKeys.splice (oldKeys.indexOf (prop), 1);
-					}
-				}
-
-				if ( object instanceof Array && object.length !== aLength ) {
-					if ( queueUpdates ) {
-						self.queueUpdate (object, 'length', 'update', aLength, object);
-					}
-					self._oldLength = object.length;
-				}
-
-				if ( queueUpdates ) {
-					l = oldKeys.length;
-					for ( i = 0; i < l; i++ ) {
-						idx = properties.indexOf (oldKeys[i]);
-						self.queueUpdate (object, oldKeys[i], 'delete', values[idx]);
-						properties.splice (idx, 1);
-						values.splice (idx, 1);
-						for ( var i = idx; i < properties.length; i++ ) {
-							if ( !(properties[i] in object) )
-								continue;
-							var getter = Object.getOwnPropertyDescriptor (object, properties[i]).get;
-							if ( !getter )
-								continue;
-							var info = getter.info;
-							info.idx = i;
-						}
-					}
-					;
-				}
-			};
-			self.addListener = function Notifier_addListener (callback, accept) {
-				var idx = _listeners.indexOf (callback);
-				if ( idx === -1 ) {
-					_listeners.push (callback);
-					_acceptLists.push (accept);
-				}
-				else {
-					_acceptLists[idx] = accept;
-				}
-			};
-			self.removeListener = function Notifier_removeListener (callback) {
-				var idx = _listeners.indexOf (callback);
-				if ( idx > -1 ) {
-					_listeners.splice (idx, 1);
-					_acceptLists.splice (idx, 1);
-				}
-			};
-			self.listeners = function Notifier_listeners () {
-				return _listeners;
-			};
-			self.queueUpdate = function Notifier_queueUpdate (what, prop, type, was) {
-				this.queueUpdates ([
-					{
-						type    : type,
-						object  : what,
-						name    : prop,
-						oldValue: was
-					}
-				]);
-			};
-			self.queueUpdates = function Notifier_queueUpdates (updates) {
-				var self = this, i = 0, l = updates.length || 0, update;
-				for ( i = 0; i < l; i++ ) {
-					update = updates[i];
-					_updates.push (update);
-				}
-				if ( _updater ) {
-					_clearCheckCallback (_updater);
-				}
-				_updater = _doCheckCallback (function () {
-					_updater = false;
-					self.deliverChangeRecords ();
+			set: function (key, value) {
+				Object.defineProperty(key, this.name, {
+					value : typeof value === 'undefined' ? mascot : value,
+					enumerable: false,
+					writable : true,
+					configurable: true
 				});
-			};
-			self.deliverChangeRecords = function Notifier_deliverChangeRecords () {
-				var i = 0, l = _listeners.length,
-				//keepRunning = true, removed as it seems the actual implementation doesn't do this
-				// In response to BUG #5
-					retval;
-				for ( i = 0; i < l; i++ ) {
-					if ( _listeners[i] ) {
-						var currentUpdates;
-						if ( _acceptLists[i] ) {
-							currentUpdates = [];
-							for ( var j = 0, updatesLength = _updates.length; j < updatesLength; j++ ) {
-								if ( _acceptLists[i].indexOf (_updates[j].type) !== -1 ) {
-									currentUpdates.push (_updates[j]);
-								}
-							}
-						}
-						else {
-							currentUpdates = _updates;
-						}
-						if ( currentUpdates.length ) {
-							if ( _listeners[i] === console.log ) {
-								console.log (currentUpdates);
-							} else {
-								_listeners[i] (currentUpdates);
-							}
-						}
-					}
-				}
-				_updates = [];
-			};
-			self.notify = function Notifier_notify (changeRecord) {
-				if ( typeof changeRecord !== "object" || typeof changeRecord.type !== "string" ) {
-					throw new TypeError ("Invalid changeRecord with non-string 'type' property");
-				}
-				changeRecord.object = watching;
-				self.queueUpdates ([changeRecord]);
-			};
-			self._checkPropertyListing (true);
+			},
+
+			'delete': function (key) {
+				return delete key[this.name];
+			}
 		};
 
-		var _notifiers = [], _indexes = [];
-		extend.getNotifier = function Object_getNotifier (O) {
-			var idx = _indexes.indexOf (O), notifier = idx > -1 ? _notifiers[idx] : false;
-			if ( !notifier ) {
-				idx = _indexes.length;
-				_indexes[idx] = O;
-				notifier = _notifiers[idx] = new Notifier (O);
+
+		var getOwnPropertyName = Object.getOwnPropertyNames;
+		Object.defineProperty(Object, 'getOwnPropertyNames', {
+			value: function fakeGetOwnPropertyNames(obj) {
+				return getOwnPropertyName(obj).filter(function (name) {
+					return name.substr(0, HIDDEN_PREFIX.length) !== HIDDEN_PREFIX;
+				});
+			},
+			writable: true,
+			enumerable: false,
+			configurable: true
+		});
+	}
+
+
+	// Internal Properties
+	// -------------------
+
+	// An ordered list used to provide a deterministic ordering in which callbacks are called.
+	// [Corresponding Section in ECMAScript wiki](http://wiki.ecmascript.org/doku.php?id=harmony:observe_internals#observercallbacks)
+	var observerCallbacks = [];
+
+	// This object is used as the prototype of all the notifiers that are returned by Object.getNotifier(O).
+	// [Corresponding Section in ECMAScript wiki](http://wiki.ecmascript.org/doku.php?id=harmony:observe_internals#notifierprototype)
+	var NotifierPrototype = Object.create(Object.prototype);
+
+	// Used to store immediate uid reference
+	var changeDeliveryImmediateUid;
+
+	// Used to schedule a call to _deliverAllChangeRecords
+	function setUpChangesDelivery() {
+		clearImmediate(changeDeliveryImmediateUid);
+		changeDeliveryImmediateUid = setImmediate(_deliverAllChangeRecords);
+	}
+
+	Object.defineProperty(NotifierPrototype, 'notify', {
+		value: function notify(changeRecord) {
+			var notifier = this;
+			if (Object(notifier) !== notifier) {
+				throw new TypeError('this must be an Object, given ' + notifier);
 			}
-			return notifier;
-		};
-		extend.observe = function Object_observe (O, callback, accept) {
-			// For Bug 4, can't observe DOM elements tested against canry implementation and matches
-			if ( !isElement (O) ) {
-				return new Observer (O, callback, accept);
-			}
-		};
-		extend.unobserve = function Object_unobserve (O, callback) {
-			validateArguments (O, callback);
-			var idx = _indexes.indexOf (O),
-				notifier = idx > -1 ? _notifiers[idx] : false;
-			if ( !notifier ) {
+			if (!notifier.__target) {
 				return;
 			}
-			notifier.removeListener (callback);
-			if ( notifier.listeners ().length === 0 ) {
-				_indexes.splice (idx, 1);
-				_notifiers.splice (idx, 1);
+			if (Object(changeRecord) !== changeRecord) {
+				throw new TypeError('changeRecord must be an Object, given ' + changeRecord);
 			}
-		};
-	}) (Object, this);
-}
+
+
+			var type = changeRecord.type;
+			if (typeof type !== 'string') {
+				throw new TypeError('changeRecord.type must be a string, given ' + type);
+			}
+
+			var changeObservers = changeObserversMap.get(notifier);
+			if (!changeObservers || changeObservers.length === 0) {
+				return;
+			}
+			var target = notifier.__target,
+				newRecord = Object.create(Object.prototype, {
+					'object': {
+						value: target,
+						writable : false,
+						enumerable : true,
+						configurable: false
+					}
+				});
+			for (var prop in changeRecord) {
+				if (prop !== 'object') {
+					var value = changeRecord[prop];
+					Object.defineProperty(newRecord, prop, {
+						value: value,
+						writable : false,
+						enumerable : true,
+						configurable: false
+					});
+				}
+			}
+			Object.preventExtensions(newRecord);
+			_enqueueChangeRecord(notifier.__target, newRecord);
+		},
+		writable: true,
+		enumerable: false,
+		configurable : true
+	});
+
+	Object.defineProperty(NotifierPrototype, 'performChange', {
+		value: function performChange(changeType, changeFn) {
+			var notifier = this;
+			if (Object(notifier) !== notifier) {
+				throw new TypeError('this must be an Object, given ' + notifier);
+			}
+			if (!notifier.__target) {
+				return;
+			}
+			if (typeof changeType !== 'string') {
+				throw new TypeError('changeType must be a string given ' + notifier);
+			}
+			if (typeof changeFn !== 'function') {
+				throw new TypeError('changeFn must be a function, given ' + changeFn);
+			}
+
+			_beginChange(notifier.__target, changeType);
+			var error, changeRecord;
+			try {
+				changeRecord = changeFn.call(undefined);
+			} catch (e) {
+				error = e;
+			}
+			_endChange(notifier.__target, changeType);
+			if (typeof error !== 'undefined') {
+				throw error;
+			}
+
+			var changeObservers = changeObserversMap.get(notifier);
+			if (changeObservers.length === 0) {
+				return;
+			}
+
+			var target = notifier.__target,
+				newRecord = Object.create(Object.prototype, {
+					'object': {
+						value: target,
+						writable : false,
+						enumerable : true,
+						configurable: false
+					},
+					'type': {
+						value: changeType,
+						writable : false,
+						enumerable : true,
+						configurable: false
+					}
+				});
+			if (typeof changeRecord !== 'undefined') {
+				for (var prop in changeRecord) {
+					if (prop !== 'object' && prop !== 'type') {
+						var value = changeRecord[prop];
+						Object.defineProperty(newRecord, prop, {
+							value: value,
+							writable : false,
+							enumerable : true,
+							configurable: false
+						});
+					}
+				}
+			}
+
+			Object.preventExtensions(newRecord);
+			_enqueueChangeRecord(notifier.__target, newRecord);
+
+		},
+		writable: true,
+		enumerable: false,
+		configurable : true
+	});
+
+	// Implementation of the internal algorithm 'BeginChange'
+	// described in the proposal.
+	// [Corresponding Section in ECMAScript wiki](http://wiki.ecmascript.org/doku.php?id=harmony:observe_internals#beginchange)
+	function _beginChange(object, changeType) {
+		var notifier = Object.getNotifier(object),
+			activeChanges = activeChangesMap.get(notifier),
+			changeCount = activeChangesMap.get(notifier)[changeType];
+		activeChanges[changeType] = typeof changeCount === 'undefined' ? 1 : changeCount + 1;
+	}
+
+	// Implementation of the internal algorithm 'EndChange'
+	// described in the proposal.
+	// [Corresponding Section in ECMAScript wiki](http://wiki.ecmascript.org/doku.php?id=harmony:observe_internals#endchange)
+	function _endChange(object, changeType) {
+		var notifier = Object.getNotifier(object),
+			activeChanges = activeChangesMap.get(notifier),
+			changeCount = activeChangesMap.get(notifier)[changeType];
+		activeChanges[changeType] = changeCount > 0 ? changeCount - 1 : 0;
+	}
+
+	// Implementation of the internal algorithm 'ShouldDeliverToObserver'
+	// described in the proposal.
+	// [Corresponding Section in ECMAScript wiki](http://wiki.ecmascript.org/doku.php?id=harmony:observe_internals#shoulddelivertoobserver)
+	function _shouldDeliverToObserver(activeChanges, acceptList, changeType) {
+		var doesAccept = false;
+		if (acceptList) {
+			for (var i = 0, l = acceptList.length; i < l; i++) {
+				var accept = acceptList[i];
+				if (activeChanges[accept] > 0) {
+					return false;
+				}
+				if (accept === changeType) {
+					doesAccept = true;
+				}
+			}
+		}
+		return doesAccept;
+	}
+
+
+	// Map used to store corresponding notifier to an object
+	var notifierMap = new PrivateMap(),
+		changeObserversMap = new PrivateMap(),
+		activeChangesMap = new PrivateMap();
+
+	// Implementation of the internal algorithm 'GetNotifier'
+	// described in the proposal.
+	// [Corresponding Section in ECMAScript wiki](http://wiki.ecmascript.org/doku.php?id=harmony:observe_internals#getnotifier)
+	function _getNotifier(target) {
+		if (!notifierMap.has(target)) {
+			var notifier = Object.create(NotifierPrototype);
+			// we does not really need to hide this, since anyway the host object is accessible from outside of the
+			// implementation. we just make it unwritable
+			Object.defineProperty(notifier, '__target', { value : target });
+			changeObserversMap.set(notifier, []);
+			activeChangesMap.set(notifier, {});
+			notifierMap.set(target, notifier);
+		}
+		return notifierMap.get(target);
+	}
+
+
+
+	// map used to store reference to a list of pending changeRecords
+	// in observer callback.
+	var pendingChangesMap = new PrivateMap();
+
+	// Implementation of the internal algorithm 'EnqueueChangeRecord'
+	// described in the proposal.
+	// [Corresponding Section in ECMAScript wiki](http://wiki.ecmascript.org/doku.php?id=harmony:observe_internals#enqueuechangerecord)
+	function _enqueueChangeRecord(object, changeRecord) {
+		var notifier = Object.getNotifier(object),
+			changeType = changeRecord.type,
+			activeChanges = activeChangesMap.get(notifier),
+			changeObservers = changeObserversMap.get(notifier);
+
+		for (var i = 0, l = changeObservers.length; i < l; i++) {
+			var observerRecord = changeObservers[i],
+				acceptList = observerRecord.accept;
+			if (_shouldDeliverToObserver(activeChanges, acceptList, changeType)) {
+				var observer = observerRecord.callback,
+					pendingChangeRecords = [];
+				if (!pendingChangesMap.has(observer))  {
+					pendingChangesMap.set(observer, pendingChangeRecords);
+				} else {
+					pendingChangeRecords = pendingChangesMap.get(observer);
+				}
+				pendingChangeRecords.push(changeRecord);
+			}
+		}
+		setUpChangesDelivery();
+	}
+
+	// map used to store a count of associated notifier to a function
+	var attachedNotifierCountMap = new PrivateMap();
+
+	// Remove reference all reference to an observer callback,
+	// if this one is not used anymore.
+	// In the proposal the ObserverCallBack has a weak reference over observers,
+	// Without this possibility we need to clean this list to avoid memory leak
+	function _cleanObserver(observer) {
+		if (!attachedNotifierCountMap.get(observer) && !pendingChangesMap.has(observer)) {
+			attachedNotifierCountMap.delete(observer);
+			var index = observerCallbacks.indexOf(observer);
+			if (index !== -1) {
+				observerCallbacks.splice(index, 1);
+			}
+		}
+	}
+
+	// Implementation of the internal algorithm 'DeliverChangeRecords'
+	// described in the proposal.
+	// [Corresponding Section in ECMAScript wiki](http://wiki.ecmascript.org/doku.php?id=harmony:observe_internals#deliverchangerecords)
+	function _deliverChangeRecords(observer) {
+		var pendingChangeRecords = pendingChangesMap.get(observer);
+		pendingChangesMap.delete(observer);
+		if (!pendingChangeRecords || pendingChangeRecords.length === 0) {
+			return false;
+		}
+		try {
+			observer.call(undefined, pendingChangeRecords);
+		}
+		catch (e) { }
+
+		_cleanObserver(observer);
+		return true;
+	}
+
+	// Implementation of the internal algorithm 'DeliverAllChangeRecords'
+	// described in the proposal.
+	// [Corresponding Section in ECMAScript wiki](http://wiki.ecmascript.org/doku.php?id=harmony:observe_internals#deliverallchangerecords)
+	function _deliverAllChangeRecords() {
+		var observers = observerCallbacks.slice();
+		var anyWorkDone = false;
+		for (var i = 0, l = observers.length; i < l; i++) {
+			var observer = observers[i];
+			if (_deliverChangeRecords(observer)) {
+				anyWorkDone = true;
+			}
+		}
+		return anyWorkDone;
+	}
+
+
+	Object.defineProperties(Object, {
+		// Implementation of the public api 'Object.observe'
+		// described in the proposal.
+		// [Corresponding Section in ECMAScript wiki](http://wiki.ecmascript.org/doku.php?id=harmony:observe_public_api#object.observe)
+		'observe': {
+			value: function observe(target, callback, accept) {
+				if (Object(target) !== target) {
+					throw new TypeError('target must be an Object, given ' + target);
+				}
+				if (typeof callback !== 'function') {
+					throw new TypeError('observer must be a function, given ' + callback);
+				}
+				if (Object.isFrozen(callback)) {
+					throw new TypeError('observer cannot be frozen');
+				}
+
+				var acceptList;
+				if (typeof accept === 'undefined') {
+					acceptList = ['add', 'update', 'delete', 'reconfigure', 'setPrototype', 'preventExtensions'];
+				} else {
+					if (Object(accept) !== accept) {
+						throw new TypeError('accept must be an object, given ' + accept);
+					}
+					var len = accept.length;
+					if (typeof len !== 'number' || len >>> 0 !== len || len < 1) {
+						throw new TypeError('the \'length\' property of accept must be a positive integer, given ' + len);
+					}
+
+					var nextIndex = 0;
+					acceptList = [];
+					while (nextIndex < len) {
+						var next = accept[nextIndex];
+						if (typeof next !== 'string') {
+							throw new TypeError('accept must contains only string, given' + next);
+						}
+						acceptList.push(next);
+						nextIndex++;
+					}
+				}
+
+
+				var notifier = _getNotifier(target),
+					changeObservers = changeObserversMap.get(notifier);
+
+				for (var i = 0, l = changeObservers.length; i < l; i++) {
+					if (changeObservers[i].callback === callback) {
+						changeObservers[i].accept = acceptList;
+						return target;
+					}
+				}
+
+				changeObservers.push({
+					callback: callback,
+					accept: acceptList
+				});
+
+				if (observerCallbacks.indexOf(callback) === -1)  {
+					observerCallbacks.push(callback);
+				}
+				if (!attachedNotifierCountMap.has(callback)) {
+					attachedNotifierCountMap.set(callback, 1);
+				} else {
+					attachedNotifierCountMap.set(callback, attachedNotifierCountMap.get(callback) + 1);
+				}
+				return target;
+			},
+			writable: true,
+			configurable: true
+		},
+
+		// Implementation of the public api 'Object.unobseve'
+		// described in the proposal.
+		// [Corresponding Section in ECMAScript wiki](http://wiki.ecmascript.org/doku.php?id=harmony:observe_public_api#object.unobseve)
+		'unobserve': {
+			value: function unobserve(target, callback) {
+				if (Object(target) !== target) {
+					throw new TypeError('target must be an Object, given ' + target);
+				}
+				if (typeof callback !== 'function') {
+					throw new TypeError('observer must be a function, given ' + callback);
+				}
+				var notifier = _getNotifier(target),
+					changeObservers = changeObserversMap.get(notifier);
+				for (var i = 0, l = changeObservers.length; i < l; i++) {
+					if (changeObservers[i].callback === callback) {
+						changeObservers.splice(i, 1);
+						attachedNotifierCountMap.set(callback, attachedNotifierCountMap.get(callback) - 1);
+						_cleanObserver(callback);
+						break;
+					}
+				}
+				return target;
+			},
+			writable: true,
+			configurable: true
+		},
+
+		// Implementation of the public api 'Object.deliverChangeRecords'
+		// described in the proposal.
+		// [Corresponding Section in ECMAScript wiki](http://wiki.ecmascript.org/doku.php?id=harmony:observe_public_api#object.deliverchangerecords)
+		'deliverChangeRecords': {
+			value: function deliverChangeRecords(observer) {
+				if (typeof observer !== 'function') {
+					throw new TypeError('callback must be a function, given ' + observer);
+				}
+				while (_deliverChangeRecords(observer)) {}
+			},
+			writable: true,
+			configurable: true
+		},
+
+		// Implementation of the public api 'Object.getNotifier'
+		// described in the proposal.
+		// [Corresponding Section in ECMAScript wiki](http://wiki.ecmascript.org/doku.php?id=harmony:observe_public_api#object.getnotifier)
+		'getNotifier': {
+			value: function getNotifier(target) {
+				if (Object(target) !== target) {
+					throw new TypeError('target must be an Object, given ' + target);
+				}
+				if (Object.isFrozen(target)) {
+					return null;
+				}
+				return _getNotifier(target);
+			},
+			writable: true,
+			configurable: true
+		}
+
+	});
+
+})(typeof global !== 'undefined' ? global : this);
+
 /** vim: et:ts=4:sw=4:sts=4
  * @license RequireJS 2.1.20 Copyright (c) 2010-2015, The Dojo Foundation All Rights Reserved.
  * Available via the MIT or new BSD license.
