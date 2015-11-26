@@ -2010,7 +2010,5 @@
 	_.nav.javascript = windowGlobal.navigator.javaEnabled ();
 	_.nav.online = windowGlobal.navigator.onLine;
 	_.nav.local = windowGlobal.navigator.userAgent.toLowerCase ();
-	
-	
-})
-(window);
+
+})(window);

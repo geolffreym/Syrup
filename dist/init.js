@@ -2028,10 +2028,8 @@ if ( typeof exports !== 'undefined' )
 	_.nav.javascript = windowGlobal.navigator.javaEnabled ();
 	_.nav.online = windowGlobal.navigator.onLine;
 	_.nav.local = windowGlobal.navigator.userAgent.toLowerCase ();
-	
-	
-})
-(window);
+
+})(window);
 /**
  * Created by gmena on 08-06-14.
  */
