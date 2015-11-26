@@ -5,8 +5,82 @@
  * Time: 12:22
  * To change this template use File | Settings | File Templates.
  */
-
 'use strict';
+//Polyfill
+
+(function (window) {
+
+	class Syrup {
+		constructor () {
+			var nativeFunction = Function.prototype,
+				nativeObject = Object.prototype,
+				regexConstructor = /(([^function])([a-zA-z])+(?=\())/,
+				regexMail = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+
+			/**Clone a object
+			 * @return object
+			 * */
+			nativeObject.clone = function () {
+				return _.extend ({}, this);
+			};
+
+			/**Get a index
+			 * @param index
+			 * @return null|string|int
+			 * */
+			nativeObject.getIndex = function (index) {
+				return index in this ? this[index] : null;
+			};
+
+			/** Extend a function
+			 *  @param child
+			 *  @return void
+			 * **/
+			nativeFunction.blend = function (child) {
+				var name = (
+					child.__proto__.constructor.name ||
+					child.prototype.constructor.name ||
+					( child.toString ().match (regexConstructor)[0]).trim ()
+				);
+				this.prototype[name] = child;
+			};
+
+			/** Create a custom function
+			 *  @param name
+			 *  @return object
+			 * **/
+			nativeFunction.factory = function (name) {
+				return (
+					new Function (
+						'return function ' + name + '(){}'
+					)
+				) ()
+			};
+
+
+			/**Add method to function
+			 * @param name
+			 * @param fn
+			 */
+			nativeFunction.add = function (name, fn) {
+				this.prototype[name.trim ()] = fn;
+			};
+
+
+		}
+
+	}
+
+	window._ = new Syrup;
+
+	//windowGlobal._$ = (function () {
+	//	return (
+	//		new _$_ ()
+	//	).$;
+	//}) ();
+	//
+}) (window);
+
 
 (function (windowGlobal) {
 	var
@@ -508,14 +582,14 @@
 			_elem.style.display = 'none';
 		});
 	});
-	
+
 	/**Show Element**/
 	_$_.add ('show', function () {
 		return this.each (function (_elem) {
 			_elem.style.display = 'block';
 		});
 	});
-	
+
 	/**Parent Node
 	 * @param callback
 	 */
@@ -523,7 +597,7 @@
 		//Result return
 		var _result = [],
 			_parent = null;
-		
+
 		this.each (function (_elem) {
 			if (
 				_elem.parentNode
@@ -531,24 +605,24 @@
 			) {
 				//The parent
 				_parent = _$ (_elem.parentNode);
-				
+
 				// Push on list
 				if ( !_.isFunction (callback) )
 					_result.push (_parent);
-				
+
 				//Callback if needed
 				_.isFunction (callback) && _.callbackAudit (
 					callback, _parent
 				)
 			}
-			
+
 		});
-		
+
 		//Output
 		return _.isFunction (callback)
 			   && this || _.specArray (_result)
 	});
-	
+
 	/**Childs Nodes
 	 * @param {function} callback
 	 * @return {object}
@@ -557,20 +631,20 @@
 		//Result return
 		var _result = [],
 			_child = null;
-		
+
 		//For each children
 		this.each (function (_elem) {
 			if ( _elem.children.length > 0 ) {
 				_.each (_elem.children, function (v, i) {
 					if ( _.isNumber (i) ) {
-						
+
 						//The child
 						_child = _$ (v);
-						
+
 						// Push on list
 						if ( !_.isFunction (callback) )
 							_result.push (_child);
-						
+
 						//Callback if needed
 						_.callbackAudit (
 							callback, _child
@@ -579,12 +653,12 @@
 				})
 			}
 		});
-		
+
 		//Output
 		return _.isFunction (callback)
 			   && this || _.specArray (_result)
 	});
-	
+
 	/**Next Node
 	 * @param callback
 	 */
@@ -592,36 +666,36 @@
 		//Result return
 		var _result = [],
 			_sibling = null;
-		
+
 		this.each (function (_elem) {
 			if ( _elem.nextElementSibling ) {
 				//The sibling
 				_sibling = _$ (_elem.nextElementSibling);
-				
+
 				// Push on list
 				if ( !_.isFunction (callback) )
 					_result.push (_sibling);
-				
+
 				//Callback if needed
 				_.callbackAudit (
 					callback, _sibling
 				);
 			}
 		});
-		
+
 		//Output
 		return _.isFunction (callback)
 			   && this || _.specArray (_result)
-		
+
 	});
-	
+
 	/**Nexts Node
 	 * @param callback
 	 */
 	_$_.add ('nexts', function (filter, callback) {
 		var _sibling = null, _result = [];
 		callback = _.isFunction (filter) && filter || callback;
-		
+
 		this.next (function (elem) {
 			_sibling = elem;
 			do {
@@ -630,7 +704,7 @@
 						// Push on list
 						if ( !_.isFunction (callback) )
 							_result.push (_sibling);
-						
+
 						//Callback if needed
 						_.callbackAudit (
 							callback, _sibling
@@ -640,7 +714,7 @@
 					// Push on list
 					if ( !_.isFunction (callback) )
 						_result.push (_sibling);
-					
+
 					//Callback if needed
 					_.callbackAudit (
 						callback, _sibling
@@ -649,12 +723,12 @@
 			} while ( _sibling.get (0).nextElementSibling
 					  && (_sibling = _$ (_sibling.get (0).nextElementSibling)).exist )
 		});
-		
+
 		//Output
 		return _.isFunction (callback)
 			   && this || _.specArray (_result)
 	});
-	
+
 	/**Trigger
 	 * @param event
 	 */
@@ -663,22 +737,22 @@
 			bubbles   : true,
 			cancelable: true
 		});
-		
+
 		if ( document.createEvent ) {
 			_event = document.createEvent ('Event');
 			_event.initEvent (event, true, false);
 			//_event.eventType = event;
 		}
-		
+
 		this.each (function (v) {
 			v.dispatchEvent (_event);
 		});
-		
+
 		_.callbackAudit (callback, _event);
-		
+
 		return this;
 	});
-	
+
 	/**Find Elements recursive
 	 * @param {string} filter
 	 * @param {function} callback
@@ -688,35 +762,35 @@
 		//Not string.. pass!!
 		if ( !_.isString (filter) )
 			return this;
-		
+
 		//Result return
 		var _result = find || [];
-		
+
 		//For each children
 		this.children (function (elem) {
 			if ( elem.is (filter) ) {
-				
+
 				// Push on list
 				if ( !_.isFunction (callback) )
 					_result.push (elem);
-				
+
 				//Callback if needed
 				_.isFunction (callback) && _.callbackAudit (
 					callback, elem, filter
 				);
-				
+
 			} else {
 				// Keep searching
 				elem.find (filter, callback, _result);
 			}
 		});
-		
+
 		//Output
 		return _.isFunction (callback)
 			   && this || _.specArray (_result)
-		
+
 	});
-	
+
 	/**Full Parent
 	 * @param {string} parent_class
 	 * @param {function} callback
@@ -726,55 +800,55 @@
 		//Not string.. pass!!
 		if ( !_.isString (parent_class) )
 			return this;
-		
+
 		//Result return
 		var _result = parents || [];
-		
+
 		//For each element
 		this.each (function (_elem) {
 			_$ (_elem).parent (function (_parent) {
 				if ( _parent.is (parent_class) ) {
-					
+
 					//Push on list
 					if ( !_.isFunction (callback) )
 						_result.push (_parent);
-					
+
 					//Callback if needed
 					_.isFunction (callback) && _.callbackAudit (
 						callback, _parent
 					);
-					
+
 				} else {
 					// Keep searching
 					_parent.parents (parent_class, callback, _result);
 				}
 			});
 		});
-		
+
 		//Output
 		return _.isFunction (callback)
 			   && this || _.specArray (_result)
-		
+
 	});
-	
+
 	/***Verify Class
 	 * @param {string} cls
 	 * @return {bool}
 	 */
 	_$_.add ('hasClass', function (cls) {
 		_.assert (cls, WARNING_SYRUP.ERROR.NOPARAM, '($ .hasClass)');
-		
+
 		//One at time!!
 		var elem = this.get (0);
-		
+
 		//ClassList and hasClass?
 		return elem.classList
 			   && Array.prototype.indexOf.call (
 				elem.classList, (cls || _.emptyStr)
 			) > -1;
-		
+
 	});
-	
+
 	/**AddClass Element
 	 * @param {string} cls
 	 * @return {object}
@@ -790,7 +864,7 @@
 			}
 		});
 	});
-	
+
 	/**ToggleClass Element
 	 * @param elem
 	 * @param cls
@@ -800,7 +874,7 @@
 			elem.classList.toggle (cls);
 		});
 	});
-	
+
 	/**Remove Class
 	 * @param cls
 	 */
@@ -817,7 +891,7 @@
 			}
 		});
 	});
-	
+
 	/**Fade Out
 	 * @param delay
 	 * @return object
@@ -830,10 +904,10 @@
 			delay   : 0,
 			duration: _.isNumber (delay) ? delay : 50
 		}, _.isFunction (delay) ? delay.bind (this) : callback.bind (this));
-		
+
 		return this;
 	});
-	
+
 	/**Fade In
 	 * @param delay
 	 * @return object
@@ -848,8 +922,8 @@
 		}, _.isFunction (delay) ? delay.bind (this) : callback.bind (this));
 		return this;
 	});
-	
-	
+
+
 	/**Return and set Heigth of DOM
 	 * @param height
 	 * @return object
@@ -861,7 +935,7 @@
 					? height + 'px' : height
 			});
 		}
-		
+
 		var _height = [];
 		this.each (function (elem) {
 			_height.push ((
@@ -870,47 +944,47 @@
 		});
 		return _.specArray (_height);
 	});
-	
+
 	/**Return and set width of DOM
 	 * @param width
 	 * @return object
 	 */
 	_$_.add ('width', function (width) {
-		
+
 		if ( _.isSet (width) ) {
 			return this.css ({
 				'width': _.isNumber (width)
 					? width + 'px' : width
 			});
 		}
-		
+
 		var _width = [];
 		this.each (function (elem) {
 			_width.push ((_.cartesianPlane (elem)).width);
 		});
-		
+
 		return _.specArray (_width);
 	});
-	
+
 	/**Validate is
 	 * @param context
 	 * @retur object
 	 * */
 	_$_.add ('is', function (context) {
 		_.assert (context, WARNING_SYRUP.ERROR.NOPARAM, '($ .is)');
-		
+
 		var _dom = this.get (0),
 			_match = (_dom.matchesSelector ||
 					  _dom.webkitMatchesSelector ||
 					  _dom.mozMatchesSelector ||
 					  _dom.oMatchesSelector ||
 					  _dom.msMatchesSelector);
-		
+
 		return (context in _dom || _dom['type'] === context)
 			   || _match.call (_dom, context);
-		
+
 	});
-	
+
 	/***Get Child Element
 	 * @param find
 	 * @return array
@@ -920,7 +994,7 @@
 			   && find in this.collection && this.collection[find]
 			   || this.collection;
 	});
-	
+
 	/***Remove Element*/
 	_$_.add ('remove', function () {
 		return this.each (function (v) {
@@ -931,16 +1005,16 @@
 			}
 		});
 	});
-	
+
 	/***Each Element
 	 * @param callback
 	 * @return object
 	 */
 	_$_.add ('each', function (callback) {
-		
+
 		//Nodes collection
 		var _element = this.collection;
-		
+
 		//Child nodes
 		//Global nodes?
 		if ( 'childNodes' in _element
@@ -954,10 +1028,10 @@
 				}
 			});
 		}
-		
+
 		return this;
 	});
-	
+
 	/**Return and set offset of DOM
 	 * @param {object} _object
 	 * @return {object}
@@ -965,37 +1039,37 @@
 	_$_.add ('offset', function (_object) {
 		var _offset = [],
 			_cartesian = null;
-		
+
 		//For each element
 		this.each (function (elem) {
-			
+
 			//To set?
 			if ( _.isObject (_object) ) {
-				
+
 				if ( _.isSet (_object.top) )
 					elem.style.top = _.isNumber (_object.top)
 						? _object.top + 'px' : _object.top;
-				
-				
+
+
 				if ( _.isSet (_object.left) )
 					elem.style.left = _.isNumber (_object.left)
 						? _object.left + 'px' : _object.left;
-				
-				
+
+
 				if ( _.isSet (_object.bottom) )
 					elem.style.bottom = _.isNumber (_object.bottom)
 						? _object.bottom + 'px' : _object.bottom;
-				
-				
+
+
 				if ( _.isSet (_object.right) )
 					elem.style.right = _.isNumber (_object.right)
 						? _object.right + 'px' : _object.right;
-				
+
 			} else {
 				// To get?
 				//Find position
 				_cartesian = _.cartesianPlane (elem);
-				
+
 				// Push positions!!
 				_offset.push ({
 					top   : _cartesian.top,
@@ -1005,13 +1079,13 @@
 				})
 			}
 		});
-		
+
 		//Result or reference
 		return _.isObject (_object) && this ||
 			   _.specArray (_offset);
 	});
-	
-	
+
+
 	/**Ordena Elementos
 	 * @param _prop
 	 * @param _desc
@@ -1023,20 +1097,20 @@
 			_desc = arguments[0];
 			_prop = false;
 		}
-		
+
 		_desc = !_desc ? 1 : -1;
 		_prop = _prop ? _prop : 'innerHTML';
-		
-		
+
+
 		return _.toArray (this.collection).sort (function (a, b) {
 			var _a = _$ (a).attr (_prop) || _$ (a).prop (_prop),
 				_b = _$ (b).attr (_prop) || _$ (b).prop (_prop);
-			
+
 			if ( _.isSet (_a) && _.isSet (_b) ) {
 				a = !isNaN (+_a) ? +_a : _a.toLowerCase ();
 				b = !isNaN (+_b) ? +_b : _b.toLowerCase ();
 			}
-			
+
 			return (
 				a > b
 			)
@@ -1044,39 +1118,39 @@
 				_desc * -1
 			);
 		});
-		
+
 	});
-	
-	
+
+
 	/**Animate element
 	 * @param prop
 	 * @param conf
 	 * @return Object
 	 */
 	_$_.add ('animate', function (prop, conf, callback) {
-		
+
 		return this.each (function (elem) {
 			if ( _.isSet (elem.animate) ) {
-				
+
 				if ( _.isFunction (conf) )
 					callback = conf;
-				
+
 				conf = (
 					(
 						!_.isObject (conf) && !_.isNumber (conf)
 					)
 				) ? {} : conf;
-				
-				
+
+
 				conf.iterations = _.isSet (conf.iterations)
 					? conf.iterations : 1;
-				
+
 				conf.duration = _.isSet (conf.duration)
 					? conf.duration : 1000;
-				
+
 				conf.delay = _.isSet (conf.delay)
 					? conf.delay : 300;
-				
+
 				var _animation = elem.animate (prop, conf);
 				_animation.addEventListener ('finish', function () {
 					_.callbackAudit (callback, _$ (elem));
@@ -1084,22 +1158,22 @@
 			}
 		});
 	});
-	
+
 	/**Return object
 	 * @returns {Object|Array}
 	 */
 	_$_.add ('object', function () {
 		return this.collection;
 	});
-	
+
 	/** No Conflict
 	 * @return _$ object
 	 * **/
 	Syrup.add ('noConflict', function () {
 		return _$;
 	});
-	
-	
+
+
 	/**Valida si esta seteado un elemento y envia un mensaje
 	 * @param obj
 	 * @param msg
@@ -1111,8 +1185,8 @@
 		}
 		return this;
 	});
-	
-	
+
+
 	/**Valida si un elemento es un arreglo
 	 * @param obj
 	 * @returns {boolean}
@@ -1120,7 +1194,7 @@
 	Syrup.add ('isArray', function (obj) {
 		return _.objectAsString (obj) === '[object Array]';
 	});
-	
+
 	/**Valida si un elemento es un object
 	 * @param obj
 	 * @returns {boolean}
@@ -1132,7 +1206,7 @@
 			)
 		);
 	});
-	
+
 	/**Valida si un elemento es un object
 	 * @param obj
 	 * @returns {boolean}
@@ -1154,7 +1228,7 @@
 			obj instanceof _$_
 		);
 	});
-	
+
 	/**Valida si es un FormData
 	 * @param obj
 	 * @returns {boolean}
@@ -1162,7 +1236,7 @@
 	Syrup.add ('isFormData', function (obj) {
 		return _.objectAsString (obj) === "[object FormData]";
 	});
-	
+
 	/**Valida si es un String
 	 * @param obj
 	 * @returns {boolean}
@@ -1170,7 +1244,7 @@
 	Syrup.add ('isString', function (obj) {
 		return _.objectAsString (obj) === '[object String]';
 	});
-	
+
 	/**Valida si un elemento es ua funcion
 	 * @param obj
 	 * @returns {boolean}
@@ -1178,7 +1252,7 @@
 	Syrup.add ('isFunction', function (obj) {
 		return _.objectAsString (obj) === '[object Function]';
 	});
-	
+
 	/**Comprueba si la estring es un html
 	 * @param html
 	 * @returns {boolean}
@@ -1186,7 +1260,7 @@
 	Syrup.add ('isHtml', function (html) {
 		return /(<([^>]+)>)/ig.test (html);
 	});
-	
+
 	/**Comprueba si es booleano
 	 * @param bool
 	 * @returns {boolean}
@@ -1194,7 +1268,7 @@
 	Syrup.add ('isBoolean', function (bool) {
 		return this.objectAsString (bool) === '[object Boolean]';
 	});
-	
+
 	/**Comprueba si es una expresion regular
 	 * @param regex
 	 * @returns {boolean}
@@ -1202,7 +1276,7 @@
 	Syrup.add ('isRegExp', function (regex) {
 		return this.objectAsString (regex) === '[object RegExp]';
 	});
-	
+
 	/**Verifica si un elemento esta seteado
 	 * @param elm
 	 * @return Boolean
@@ -1210,7 +1284,7 @@
 	Syrup.add ('isSet', function (elm) {
 		return typeof elm !== 'undefined' && elm !== null && !!elm;
 	});
-	
+
 	/**Valida Input
 	 * @param input
 	 * @returns {boolean}
@@ -1218,16 +1292,16 @@
 	Syrup.add ('isEmpty', function (input) {
 		if ( _.isObject (input) )
 			return _.getObjectSize (input) == 0;
-		
+
 		if ( _.isArray (input) )
 			return input.length === 0;
-		
-		
+
+
 		return (
 			!input || input === _.emptyStr || /^\s+$/.test (input)
 		)
 	});
-	
+
 	/**Validar Url
 	 * @param url
 	 * @returns {boolean}
@@ -1235,7 +1309,7 @@
 	Syrup.add ('isUrl', function (url) {
 		return regexUrl.test (url);
 	});
-	
+
 	/**Valida Correo
 	 * @param mail
 	 * @returns {boolean}
@@ -1243,7 +1317,7 @@
 	Syrup.add ('isMail', function (mail) {
 		return regexMail.test (mail);
 	});
-	
+
 	/**Valida JSON
 	 * @param str
 	 * @returns {boolean}
@@ -1257,7 +1331,7 @@
 		}
 		return true;
 	});
-	
+
 	/**Valida Numero
 	 * @param number
 	 * @returns {boolean}
@@ -1265,7 +1339,7 @@
 	Syrup.add ('isNumber', function (number) {
 		return !isNaN (number);
 	});
-	
+
 	/**Console Log con tiempo de ejecucion
 	 * @param msg
 	 */
@@ -1275,7 +1349,7 @@
 			(breakpoint ? ' | Method: ' + breakpoint : _.emptyStr)
 		);
 	});
-	
+
 	/**Console Log error con tiempo de ejecucion
 	 * @param msg
 	 */
@@ -1285,8 +1359,8 @@
 			(breakpoint ? ' | Method: ' + breakpoint : _.emptyStr)
 		);
 	});
-	
-	
+
+
 	/**Html entities
 	 * @param str
 	 * @returns {String}
@@ -1301,7 +1375,7 @@
 		};
 		return _.replace (str, /<|>|&|"|'/g, match);
 	});
-	
+
 	/**Truncate String
 	 * @param string
 	 * @param limit
@@ -1310,7 +1384,7 @@
 	Syrup.add ('truncateString', function (string, limit) {
 		return _.toObject (string).slice (0, limit);
 	});
-	
+
 	/**Replace String
 	 * @param _string
 	 * @param _find
@@ -1318,14 +1392,14 @@
 	 * @return String
 	 */
 	Syrup.add ('replace', function (_string, _find, _replace) {
-		
+
 		//Regexp result?
 		if ( _.isRegExp (_find) && _.isObject (_replace) ) {
 			return _string.replace (_find, function (found) {
 				if ( found in _replace ) {
 					return _replace[found];
 				}
-				
+
 				return found;
 			})
 		} else {
@@ -1335,8 +1409,8 @@
 			)
 		}
 	});
-	
-	
+
+
 	/**Retorna la fecha en un objeto
 	 * @param fecha
 	 * @returns {*}
@@ -1349,20 +1423,20 @@
 			hora_ = _fecha.getHours (),
 			segundos_ = _fecha.getSeconds (),
 			dia_ = _fecha.getDate ();
-		
+
 		_fecha = _.isSet (fecha)
 			? new Date (fecha) : _fecha;
-		
+
 		if ( _fecha === 'Invalid Date' ) {
 			_.error (_fecha);
 		}
-		
+
 		dia_ = dia_ < 0xA
 			? '0' + dia_ : dia_;
-		
+
 		meridiano_ = hora_ > 0xC
 			? 'PM' : 'AM';
-		
+
 		hora_ = hora_ > 0xC
 			? (
 				  hora_ - 0xC
@@ -1371,13 +1445,13 @@
 			hora_ - 0xC
 		) : hora_ < 0xA
 			? '0' + hora_ : hora_;
-		
+
 		minutos_ = minutos_ < 0xA
 			? '0' + minutos_ : minutos_;
-		
+
 		segundos_ = segundos_ < 0xA
 			? '0' + segundos_ : segundos_;
-		
+
 		return {
 			day     : dia_,
 			month   : mes_[_fecha.getMonth ()],
@@ -1388,7 +1462,7 @@
 			meridian: meridiano_
 		}
 	});
-	
+
 	/**Retorna informacion del navegador
 	 * @returns (Object|null)
 	 */
@@ -1396,14 +1470,14 @@
 		var _regex = /(?:trident\/(?=\w.+rv:)|(?:chrome\/|firefox\/|opera\/|msie\s|safari\/))[\w.]{1,4}/,
 			_matches = _.nav.local.match (_regex),
 			_split = _.isSet (_matches) ? _matches[0].split ('/') : false;
-		
+
 		return _split ? {
 			nav     : !!_split[0] ? _.replace (_split[0], 'trident', 'msie') : false,
 			version : !!_split[1] ? _split[1] : false,
 			platform: windowGlobal.navigator.platform.toLocaleLowerCase ()
 		} : false;
 	});
-	
+
 	/**Genera un id
 	 * @param longitud
 	 * @returns {string}
@@ -1412,13 +1486,13 @@
 		var _text = _.emptyStr,
 			_longitud = !!longitud ? longitud : 5,
 			_possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789=_";
-		
+
 		for ( var i = 0; i < _longitud; i++ )
 			_text += _possible.charAt (Math.floor (Math.random () * _possible.length));
-		
+
 		return _text;
 	});
-	
+
 	/**Devuelve las llaves de un objeto
 	 * @param obj
 	 * return {Boolean|Array}
@@ -1428,9 +1502,9 @@
 			return Object.keys (obj);
 		}
 		return [];
-		
+
 	});
-	
+
 	/**Devuelve el tamano de un objeto
 	 * @param obj
 	 * @returns (Number|null|Boolean)
@@ -1441,7 +1515,7 @@
 		}
 		return 0;
 	});
-	
+
 	/**Devuelve el los valores del objeto
 	 * @param obj
 	 * @returns (Number|null|Boolean)
@@ -1454,7 +1528,7 @@
 		}
 		return [];
 	});
-	
+
 	/**Retorna un objeto en String
 	 * @param obj
 	 * @returns {string}
@@ -1462,27 +1536,27 @@
 	Syrup.add ('objectAsString', function (obj) {
 		return nativeObject.toString.call (obj);
 	});
-	
+
 	/**Immutable Object
 	 * @param obj
 	 */
 	Syrup.add ('objectImmutable', function (obj) {
 		if ( _.isObject (obj) )
 			return Object.freeze (obj);
-		
+
 		return obj;
 	});
-	
+
 	/**Watch Object
 	 * @param obj
 	 */
 	Syrup.add ('objectWatch', function (obj, callback, conf) {
 		if ( _.isObject (obj) && _.isSet (callback) )
 			Object.observe (obj, callback, conf ? conf : []);
-		
+
 		return obj;
 	});
-	
+
 	/** Interval Manager
 	 * @param {function} callback
 	 * @param {object} conf -- delay:int, max:int, orientation:int
@@ -1490,7 +1564,7 @@
 	 */
 	Syrup.add ('interval', function (callback, conf) {
 		var _worker = new Workers;
-		
+
 		//Interceptor
 		_worker.intercept ({
 			'message': function (e) {
@@ -1500,10 +1574,10 @@
 			//Worker Running
 			_worker.toWork (conf);
 		});
-		
+
 		return _worker;
 	});
-	
+
 	/**Prepare animation
 	 * @param callback
 	 * @return function
@@ -1518,7 +1592,7 @@
 			}
 		) (callback);
 	});
-	
+
 	/**Devuelve la cookie segun el nombre
 	 * @param name
 	 * @returns {*}
@@ -1540,7 +1614,7 @@
 		}
 		return _cookie;
 	});
-	
+
 	/**Retorna un match asociado a grupos
 	 * @param {string} string
 	 * @param {string} regexp
@@ -1554,12 +1628,12 @@
 					if ( i > 0 ) {
 						v[groups[i - 1]] = m;
 					}
-					
+
 					return v;
 				}, {}) || null;
 		}
 	});
-	
+
 	/** Find the ocurrences count
 	 * @param {string} slashDir
 	 * @return {int}
@@ -1569,8 +1643,8 @@
 			return string.split (find).length - 1;
 		return 0;
 	});
-	
-	
+
+
 	/** Simple split directory from slash to dots
 	 * @param {string} slashDir
 	 * **/
@@ -1580,7 +1654,7 @@
 		}
 		return slashDir;
 	});
-	
+
 	/** Simple split directory from dots to slash
 	 * @param {string} dotDir
 	 * **/
@@ -1590,8 +1664,8 @@
 		}
 		return dotDir;
 	});
-	
-	
+
+
 	/**Pasa Json a format URL
 	 * @param _object
 	 * @returns {string}
@@ -1601,39 +1675,39 @@
 			_size = _.isObject (_object)
 				? _.getObjectSize (_object)
 				: 0;
-		
+
 		_.each (_object, function (value, key) {
 			_return += encodeURI (key + '=' + value);
 			if ( _size > 1 ) {
 				_return += '&';
 			}
 		});
-		
+
 		return _return.lastIndexOf ('&') > -1
 			? _return.slice (0, -1) : _return;
 	});
-	
+
 	/**Pasa Json a format URL
 	 * @param _object
 	 * @returns {string}
 	 */
 	Syrup.add ('queryStringToJson', function (_string) {
 		var _return = {};
-		
+
 		if ( _.isString (_string) ) {
 			//No '?' in query
 			_string = _.replace (_string, '?', _.emptyStr).split ('&');
-			
+
 			_.each (_string, function (value) {
 				value = value.split ('=');
 				if ( !_.isEmpty (value[0]) )
 					_return[value[0]] = value[1] || _.emptyStr;
 			});
 		}
-		
+
 		return _return;
 	});
-	
+
 	/**Get Script
 	 * @param url
 	 * @param callback
@@ -1645,7 +1719,7 @@
 				_$ (_script).remove ();
 				_.callbackAudit (callback);
 			};
-		
+
 		if ( _.isSet (_script.readyState) ) {
 			_script.addEventListener ('readystatechange', function () {
 				if ( _script.readyState == 'loaded'
@@ -1656,12 +1730,12 @@
 		} else {
 			_script.addEventListener ('load', _loaded, false);
 		}
-		
+
 		_script.src = url;
 		_script.async = true;
 		_body.appendChild (_script);
 	});
-	
+
 	/**Simple Each
 	 * @param _object
 	 * @param callback
@@ -1675,34 +1749,34 @@
 				break: false
 			}, _i = 0, _keys = null,
 			_max = _object.length || _.getObjectSize (_object);
-		
-		
+
+
 		//Is object? get the keys!!
 		if ( _.isObject (_object) )
 			_keys = _.getObjectKeys (_object);
-		
-		
+
+
 		//While object has elements!!
 		while ( (_i++) < _max ) {
 			_p.first = ((_i - 1) == 0);
 			_p.last = (_i == _max);
-			
+
 			//Filter function ?
 			_.callbackAudit (
 				callback.bind (_p),
 				_keys && _object[_keys[_i - 1]] || _object[_i - 1],
 				_keys && _keys[_i - 1] || _i - 1
 			);
-			
+
 			//If Break!!
 			if ( _p.break )
 				break;
-			
+
 		}
-		
+
 		return this;
 	});
-	
+
 	/**Retorna la posicion relativa a la pantalla,
 	 *  de un elemento y sus caracteristicas
 	 * @param {object} _dom
@@ -1710,7 +1784,7 @@
 	 */
 	Syrup.add ('cartesianPlane', function (_dom) {
 		_dom = !_.is$ (_dom) && _$ (_dom).get (0) || _dom;
-		
+
 		if ( _.isGlobal (_dom) ) {
 			return {
 				top   : _dom.pageYOffset,
@@ -1719,11 +1793,11 @@
 				height: _dom.outerHeight
 			}
 		}
-		
-		
+
+
 		return _dom.getBoundingClientRect ();
 	});
-	
+
 	/**Verifica el callback y sirve de auditor
 	 * @param callback
 	 * @returns {boolean}
@@ -1744,7 +1818,7 @@
 		}
 		return true;
 	});
-	
+
 	/**Limpia el arreglo de elementos null, empty,
 	 * @param arr
 	 */
@@ -1753,7 +1827,7 @@
 			return !!i ? i : false;
 		});
 	});
-	
+
 	/**Elimina elementos falsos de un Array
 	 * @param arr
 	 * @param callback
@@ -1762,17 +1836,17 @@
 		if ( !_.isArray (arr) ) {
 			_.error (WARNING_SYRUP.ERROR.NOARRAY, '(Syrup .specArray)');
 		}
-		
+
 		return arr.length > 1
 			? arr : 0 in arr
 			? arr[0] : null;
 	});
-	
-	
+
+
 	Syrup.add ('repeatString', function (str, times) {
 		return Array (times + 1).join (str);
 	});
-	
+
 	/**Filtra Arreglos
 	 * @param array
 	 * @param filter
@@ -1781,7 +1855,7 @@
 	Syrup.add ('filterArray', function (array, filter) {
 		return array.filter (filter);
 	});
-	
+
 	/**Busca un elemento en un arreglo
 	 * @param needle
 	 * @param haystack
@@ -1805,7 +1879,7 @@
 		return _exist === 0
 			? true : _exist;
 	});
-	
+
 	/**Busca un elemento en un arreglo por RegExp
 	 * @param {String} find
 	 * @param {Array} haystack
@@ -1818,25 +1892,25 @@
 		}
 		return false;
 	});
-	
+
 	/** Reemplaza elementos string en un arreglo por RegExp
 	 * @param {String} find
 	 * @param {Array} haystack
 	 * @returns {boolean}
 	 */
 	Syrup.add ('replaceInArray', function (find, replace, haystack) {
-		
+
 		if ( this.matchInArray (haystack, [find]) ) {
 			_.each (haystack, function (v, i) {
 				if ( _.isString (v) )
 					haystack[i] = _.replace (v, find, replace);
 			});
 		}
-		
+
 		return haystack;
 	});
-	
-	
+
+
 	/**Crea un arreglo unico de valores
 	 * @param {Object} array
 	 * @returns {Array}
@@ -1850,76 +1924,76 @@
 			}
 		});
 	});
-	
+
 	/**Parse to Array
 	 * @param {object} element
 	 * @returns {array}
 	 */
 	Syrup.add ('toArray', function (element) {
-		
+
 		//Object?
 		if ( _.isObject (element) ) {
 			return [].slice.apply (element);
 			//String?
 		}
-		
+
 		//To object!!
 		return _.toObject (element);
 	});
-	
-	
+
+
 	/** Parse to String
 	 * @param element object
 	 * @return string
 	 * */
-	
+
 	Syrup.add ('toString', function (element) {
 		return JSON.stringify (element);
 	});
-	
+
 	/** Parse to RegExp
 	 * @param element object
 	 * @return string
 	 * */
-	
+
 	Syrup.add ('toRegExp', function (element, det) {
 		if ( _.isString (element) )
 			return new RegExp (element, det || 'g');
 	});
-	
+
 	/**Parse to Object
 	 * @param element
 	 * @returns {Object}
 	 */
 	Syrup.add ('toObject', function (element, element2) {
-		
+
 		if ( _.isJson (element) )
 			return JSON.parse (element);
-		
+
 		if ( _.isString (element) || _.isNumber (element) )
 			return nativeObject.valueOf.call (element);
-		
+
 		if ( !_.isArray (element) )
 			_.error (WARNING_SYRUP.ERROR.NOARRAY, '(Syrup .toObject)');
-		
-		
+
+
 		return element.reduce (function (o, v, i) {
 			o[element2 && v || i] = element2 && element2[i] || v;
 			return o;
 		}, {});
-		
-		
+
+
 	});
-	
+
 	/**Distribute Array by index
 	 * @param obj
 	 * @param index
 	 * @return {Object}
 	 */
-	
+
 	Syrup.add ('objectDistribute', function (obj, index) {
 		var _new = {};
-		
+
 		if ( !_.isObject (obj[index]) ) {
 			_new[obj[index]] = obj;
 		} else {
@@ -1930,14 +2004,14 @@
 						_new[v][j].push (r[i]);
 					}
 				});
-				
+
 			});
 		}
-		
+
 		return _new;
 	});
-	
-	
+
+
 	/**Get Element Index
 	 * @param node
 	 * @returns {number}
@@ -1945,7 +2019,7 @@
 	Syrup.add ('getElementIndex', function (node) {
 		//Is syrup object?
 		node = _.is$ (node) && node.get (0) || node;
-		
+
 		var i = 1,
 			prop = document.body.previousElementSibling
 				? 'previousElementSibling' : 'previousSibling';
@@ -1954,7 +2028,7 @@
 		}
 		return i;
 	});
-	
+
 	/**Extend
 	 * @param target
 	 * @param source
@@ -1964,12 +2038,12 @@
 		if ( !_.isObject (target) || !source ) {
 			return target;
 		}
-		
+
 		if ( _.isFunction (source) ) {
 			source = new source;
 			target = target.__proto__
 		}
-		
+
 		_.each (source, function (v, i) {
 			if ( !target.hasOwnProperty (i)
 				 || _.isSet (overwrite) ) {
@@ -1984,19 +2058,19 @@
 	windowGlobal._ = (function () {
 		return new Syrup ();
 	}) ();
-	
+
 	windowGlobal._$ = (function () {
 		return (
 			new _$_ ()
 		).$;
 	}) ();
-	
+
 	_.VERSION = '1.1.6';
 	_.$fn = _$_;
 	_.emptyStr = '';
 	_.Syrup = Syrup;
 	_.WARNING_SYRUP = WARNING_SYRUP;
-	
+
 	_.nav = {};
 	_.nav.unsupported =
 		!windowGlobal.localStorage
@@ -2011,4 +2085,4 @@
 	_.nav.online = windowGlobal.navigator.onLine;
 	_.nav.local = windowGlobal.navigator.userAgent.toLowerCase ();
 
-})(window);
+}) (window);

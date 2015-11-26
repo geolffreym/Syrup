@@ -1,8 +1,15 @@
 var path = require ('path'),
-	env = require ('./app/config/init');
+	env = require ('./app/config/init'),
+	requires = require ('./app/config/' + env.setting.env + '/init');
 
+//Fix dirs!!
+for ( var x in requires.files.js.src ) {
+	requires.files.js.src[x] = path.join (__dirname, requires.files.js.src[x]);
+}
+
+//Build
 module.exports = {
-	entry  : path.join (__dirname, './app/config/' + env.setting.env + '/init.js'),
+	entry  : requires.files.js.src,
 	output : {
 		path      : path.join (__dirname, './dist'),
 		filename  : 'init.js', // or [name]
