@@ -8,6 +8,7 @@
 		this.root = null; // Root name
 		this.lib = null; // Lib handler
 		this.scope = null; // Global scope
+		this.$ = _$;
 
 		this.lazy = false; //Lazy execution?
 		this.interceptors = {}; //Interceptors
