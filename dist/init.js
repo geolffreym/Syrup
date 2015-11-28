@@ -6312,6 +6312,7 @@ if ( typeof exports !== 'undefined' )
 
 		//The view object
 		_self.recipeCollection[moduleId].instance.view = {
+			object: new View,
 			render: function (_view, _cache) {
 				//Rend
 				var _rend = _self._serve (
