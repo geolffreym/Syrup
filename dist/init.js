@@ -6823,6 +6823,15 @@ if ( typeof exports !== 'undefined' )
 
 	});
 
+	/**Live Redirect
+	 * @param {string} url
+	 * @return {object}
+	 * */
+	Router.add ('liveRedirect', function (url) {
+		location.href = url;
+		return this;
+	});
+
 	/**Redirect to route
 	 * @param {string} route_name
 	 * @return {object}
