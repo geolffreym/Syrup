@@ -31,7 +31,11 @@
 			this.moduleCollection[name].root = name; // Root name
 			this.moduleCollection[name].moduled = true; // Flag to handle module app
 			this.moduleCollection[name].lib = new LibClass;
-			this.moduleCollection[name].lib.blend (name, dependencies)
+			this.moduleCollection[name].lib.blend (name, dependencies);
+			//Provide lib with tools
+			this.moduleCollection[name].lib.provider ('$', function () {
+				return _$;
+			});
 		}
 
 		//Return the app
@@ -65,13 +69,6 @@
 
 		//Blend the libs
 		_self.lib.blend (name, dependencies);
-
-		//Provide lib with tools
-		_self.lib.provider (name, function () {
-			_self.$ = _$;
-			return _self;
-		});
-
 		return _self;
 	});
 
