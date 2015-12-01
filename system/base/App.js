@@ -69,6 +69,13 @@
 
 		//Blend the libs
 		_self.lib.blend (name, dependencies);
+
+		//Provide lib with tools
+		_self.lib.provider (name, function () {
+			_self.$ = _$;
+			return _self;
+		});
+
 		return _self;
 	});
 
