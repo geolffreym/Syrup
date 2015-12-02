@@ -5626,22 +5626,33 @@ if ( typeof exports !== 'undefined' )
 		return this;
 	});
 
-	///**Getting a array of values name="input[]"
-	// * @param {string} name
-	// * @return {array}
-	// */
-	//Model.add('multiple', function (name) {
-	//    var _return = [],
-	//        _model_obj = this.model.get(0);
-	//
-	//    if (name in _model_obj.elements) {
-	//        _.each(_model_obj.elements[name], function (v, i) {
-	//            _return.push(v.value);
-	//        });
-	//    }
-	//
-	//    return _return.length > 0 ? _return : false;
-	//});
+	/**Getting a array of values name="input[]"
+	 * @param {string} name
+	 * @return {array}
+	 */
+	Model.add ('multiple', function (name) {
+		var _return = [],
+			_model_obj = this.model.get (0);
+
+		if ( name in _model_obj.elements ) {
+			_.each (_model_obj.elements[name], function (v, i) {
+				if ( v && v.value ) {
+					if ( v.type === 'checkbox' || v.type === 'radio' ) {
+						if ( v.checked ) {
+							_return.push (v.value);
+						}
+					} else {
+						//else
+						_return.push (v.value);
+					}
+
+				}
+			});
+		}
+
+		return _return.length > 0
+			? _return : false;
+	});
 
 	/**Model fail what to do?
 	 * @param {object} field
@@ -5812,7 +5823,7 @@ if ( typeof exports !== 'undefined' )
 
 		var _self = this,
 			_modelData = new FormData,
-			_model_obj = _self.model.get (0),
+			_model_obj = _self.model.get (0), _field_array = null,
 			_fields = _model_obj.querySelectorAll ('input, textarea, select'),
 			x = _fields.length, _codes = null;
 
@@ -5830,13 +5841,6 @@ if ( typeof exports !== 'undefined' )
 				if ( _fields[x].type === 'file' ) {
 					_self.file (_fields[x]);
 					continue;
-				}
-
-				//Checked?
-				if ( _fields[x].type === 'checkbox' || _fields[x].type === 'radio' ) {
-					if ( !_fields[x].checked ) {
-						continue;
-					}
 				}
 
 				var field = _fields[x],
@@ -5881,8 +5885,8 @@ if ( typeof exports !== 'undefined' )
 				if ( _.isSet (field.name) ) {
 
 					//Has multiple?
-					//if (!!(_field_array = _self.multiple(field.name)))
-					//    fieldValue = _field_array;
+					if ( !!(_field_array = _self.multiple (field.name)) )
+						fieldValue = _field_array;
 
 					//Append Data
 					_modelData.append (field.name, fieldValue);
