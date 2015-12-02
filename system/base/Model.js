@@ -47,10 +47,7 @@
 		var _return = [], _self = this,
 			_model_obj = this.model.get (0);
 
-		if (
-			name in _model_obj.elements
-			&& _.objectAsString (_model_obj.elements[name]) !== '[object HTMLInputElement]'
-		) {
+		if ( name in _model_obj.elements ) {
 			_.each (_model_obj.elements[name], function (v, i) {
 				if ( v && v.value ) {
 					//Is check able?
@@ -314,9 +311,9 @@
 							continue
 					}
 
-					//Has multiple?
-					if ( (_field_array = _self.multiple (field.name)) )
-						fieldValue = _field_array;
+					////Has multiple?
+					//if ( (_field_array = _self.multiple (field.name)) )
+					//	fieldValue = _field_array;
 
 					//Append Data
 					_modelData.append (field.name, fieldValue);
