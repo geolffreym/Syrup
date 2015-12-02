@@ -44,21 +44,20 @@
 	 * @return {array}
 	 */
 	Model.add ('multiple', function (name) {
-		var _return = [],
+		var _return = [], _self = this,
 			_model_obj = this.model.get (0);
 
 		if ( name in _model_obj.elements ) {
 			_.each (_model_obj.elements[name], function (v, i) {
 				if ( v && v.value ) {
-					if ( v.type === 'checkbox' || v.type === 'radio' ) {
+					//Is check able?
+					if ( _self._check (v) ) {
 						if ( v.checked ) {
 							_return.push (v.value);
 						}
 					} else {
-						//else
 						_return.push (v.value);
 					}
-
 				}
 			});
 		}
@@ -80,6 +79,14 @@
 			error : error.error,
 			coords: _.cartesianPlane (field)
 		};
+	});
+
+	/**Is check o radio?
+	 * @param {object} field
+	 * @return {boolean}
+	 */
+	Model.add ('_check', function (e) {
+		return (e.type === 'checkbox' || e.type === 'radio');
 	});
 
 	//Return object
@@ -256,13 +263,6 @@
 					continue;
 				}
 
-				//Checked?
-				if ( _fields[x].type === 'checkbox' || _fields[x].type === 'radio' ) {
-					if ( !_fields[x].checked ) {
-						continue;
-					}
-				}
-
 				var field = _fields[x],
 					fieldValue = field.value;
 
@@ -307,6 +307,10 @@
 					//Has multiple?
 					if ( !!(_field_array = _self.multiple (field.name)) )
 						fieldValue = _field_array;
+
+					//Is check able and not checked?
+					if ( _self._check (field) && !field.checked )
+						continue;
 
 					//Append Data
 					_modelData.append (field.name, fieldValue);
