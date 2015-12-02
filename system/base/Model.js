@@ -256,6 +256,13 @@
 					continue;
 				}
 
+				//Checked?
+				if ( _fields[x].type === 'checkbox' || _fields[x].type === 'radio' ) {
+					if ( !_fields[x].checked ) {
+						continue;
+					}
+				}
+
 				var field = _fields[x],
 					fieldValue = field.value;
 
