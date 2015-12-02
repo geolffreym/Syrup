@@ -47,7 +47,10 @@
 		var _return = [], _self = this,
 			_model_obj = this.model.get (0);
 
-		if ( name in _model_obj.elements ) {
+		if (
+			name in _model_obj.elements
+			&& _.isArray (_model_obj.elements[name])
+		) {
 			_.each (_model_obj.elements[name], function (v, i) {
 				if ( v && v.value ) {
 					//Is check able?
@@ -304,13 +307,15 @@
 				//The field has name?
 				if ( _.isSet (field.name) ) {
 
-					//Has multiple?
-					if ( !!(_field_array = _self.multiple (field.name)) )
-						fieldValue = _field_array;
-
 					//Is check able and not checked?
-					if ( _self._check (field) && !field.checked )
-						continue;
+					if ( _self._check (field) ) {
+						if ( !field.checked )
+							continue
+					}
+
+					////Has multiple?
+					//if ( (_field_array = _self.multiple (field.name)) )
+					//	fieldValue = _field_array;
 
 					//Append Data
 					_modelData.append (field.name, fieldValue);
