@@ -251,6 +251,7 @@
 			x = _fields.length, _codes = null;
 
 		_self.failed = false;
+		_self.scope = {};
 
 		return (new Promise (function (resolve, reject) {
 			//Run over inputs
