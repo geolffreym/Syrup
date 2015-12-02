@@ -5636,7 +5636,7 @@ if ( typeof exports !== 'undefined' )
 
 		if (
 			name in _model_obj.elements
-			&& _.isArray (_model_obj.elements[name])
+			&& _.objectAsString (_model_obj.elements[name]) !== '[object HTMLInputElement]'
 		) {
 			_.each (_model_obj.elements[name], function (v, i) {
 				if ( v && v.value ) {
@@ -5900,9 +5900,9 @@ if ( typeof exports !== 'undefined' )
 							continue
 					}
 
-					////Has multiple?
-					//if ( (_field_array = _self.multiple (field.name)) )
-					//	fieldValue = _field_array;
+					//Has multiple?
+					if ( (_field_array = _self.multiple (field.name)) )
+						fieldValue = _field_array;
 
 					//Append Data
 					_modelData.append (field.name, fieldValue);
