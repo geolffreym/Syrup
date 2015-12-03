@@ -75,11 +75,11 @@
 			_xhr.timeout = _self.config.timeout;
 
 			//Setting Headers
-			if ( !_.isFormData (_data) ) {
-				_.each (_self.config.headers, function (value, header) {
-					_xhr.setRequestHeader (header, value);
-				});
-			}
+			//if ( !_.isFormData (_data) ) {
+			_.each (_self.config.headers, function (value, header) {
+				_xhr.setRequestHeader (header, value);
+			});
+			//}
 
 			//Cors?
 			_xhr.withCredentials = !!_self.config.cors;
