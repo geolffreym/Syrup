@@ -508,11 +508,11 @@
 
 				return _self.getRecipe (_moduleId);
 			},
-			drop: function (nModule) {
+			drop: function (nModule, cached) {
 				var _moduleId = _.isString (nModule)
 					? nModule : moduleId;
 
-				_self.drop (_moduleId);
+				_self.drop (_moduleId, cached);
 				return _self.recipeCollection[moduleId].instance;
 			}
 		};
@@ -704,7 +704,6 @@
 
 		//After execute clean all
 		MiddleWare.cleanInterceptor (_self, 'init');
-
 		return this;
 	});
 
@@ -752,12 +751,17 @@
 	 * @param moduleId
 	 * @return object
 	 * */
-	Apps.add ('drop', function (moduleId) {
+	Apps.add ('drop', function (moduleId, cached) {
 		if ( moduleId in this.recipeCollection ) {
 			if ( this.recipeCollection[moduleId].instance ) {
+
+				//Destroy in instance?
 				if ( 'destroy' in this.recipeCollection[moduleId].instance )
 					this.recipeCollection[moduleId].instance.destroy (this.lib.get (this.root));
-				this.recipeCollection[moduleId] = null;
+
+				//Save the module?
+				if ( !cached )
+					this.recipeCollection[moduleId] = null;
 			}
 		}
 		return this;
