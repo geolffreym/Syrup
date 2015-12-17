@@ -5297,6 +5297,7 @@ if ( typeof exports !== 'undefined' )
 	//Set registry to bucket
 	Repo.add ('set', function (key, data) {
 		localStorage.setItem (key, JSON.stringify (data));
+		return this;
 	});
 
 
