@@ -17,12 +17,14 @@
     "babel-plugin-object-assign": "^1.2.1",
     "babel-preset-es2015": "^6.0.15",
     "es7-object-observe": "^2.0.0",
+    "grunt-webpack": "^1.0.11",
     "install": "^0.3.0",
     "jasmine-core": "*",
     "karma": "*",
     "karma-chrome-launcher": "*",
     "karma-jasmine": "*",
-    "webpack": "^1.12.2"
+    "webpack": "^1.12.2",
+    "webpack-dev-server": "^1.14.0"
   },
   "main": "Syrup.js",
   "version": "0.1.1",
@@ -41,5 +43,8 @@
   "homepage": "https://github.com/geolffreym/Syrup",
   "directories": {
     "test": "test"
+  },
+  "dependencies": {
+    "underscore": "^1.8.3"
   }
 }

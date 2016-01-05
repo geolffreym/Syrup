@@ -39,7 +39,7 @@ _.$fn.add ( 'tooltip', function ( _conf ) {
 	} );
 
 
-	return this.each ( function ( elem ) {
+	return Syrup.each ( function ( elem ) {
 		var _domObject = _$ ( elem ),
 			_defaults = {
 				ajax       : false,

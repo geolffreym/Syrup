@@ -7,18 +7,16 @@
  */
 'use strict';
 
-import _ from '../third/underscore';
 
+module.exports = (
+	class Syrup {
 
-class Syrup extends _ {
-	constructor (obj) {
-		super (obj);
-
+		each (array, fn) {
+			array.forEach (fn)
+		}
 	}
+);
 
-}
 
-//Exports
-module.exports = Syrup;
 
 
