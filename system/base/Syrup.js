@@ -5,17 +5,21 @@
  * Time: 12:22
  * To change this template use File | Settings | File Templates.
  */
-'use strict';
 
+"use strict";
+
+var _underscore = require ('underscore');
 
 module.exports = (
 	class Syrup {
 
 		each (array, fn) {
-			array.forEach (fn)
+			array.forEach (fn);
 		}
+
 	}
 );
+
 
 
 
