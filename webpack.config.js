@@ -2,7 +2,9 @@ var path = require ('path');
 
 //Build
 module.exports = {
-	entry  : './system/include/init.js',
+	entry  : [
+		'./system/include/init.js'
+	],
 	output : {
 		path      : path.join (__dirname, './dist'),
 		filename  : 'init.js', // or [name]

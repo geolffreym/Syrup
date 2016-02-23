@@ -45,6 +45,8 @@
     "test": "test"
   },
   "dependencies": {
+    "is_js": "^0.8.0",
+    "jquery": "^2.2.1",
     "underscore": "^1.8.3"
   }
 }

@@ -1,6 +1,8 @@
 /**
  * Created by gmena on 01-05-16.
  */
+var path = require ('path');
+
 module.exports = function (grunt) {
 	// Load the plugin that provides the "uglify" task.
 	grunt.loadNpmTasks ('grunt-webpack');

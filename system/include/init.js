@@ -1,12 +1,17 @@
 /**
  * Created by gmena on 11-27-15.
  */
+"use strict";
+//Web parsing
+import Syrup from '../base/Syrup';
+
 (function (window) {
-	"use strict";
-	var syrup = require ('../base/Syrup');
 
 	//Global access
-	window._ = new syrup;
+	window.Syrup = new Syrup ();
+
 }) (window);
+
+
 
 

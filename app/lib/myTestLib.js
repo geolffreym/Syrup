@@ -6,7 +6,7 @@
 (function (libObj) {
 
 	//Return Lib reference
-	var myTestLib = libObj.blend ('myTestLib', []);
+	var myTestLi = libObj.blend ('myTestLib', []);
 
 	//Provide attributes
 	myTestLib.make ({ a: 0 });
