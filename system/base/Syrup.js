@@ -73,8 +73,9 @@ export default class Syrup {
 	assert (param, msg, breakpoint) {
 		//Is set. not null or undefined and not false?
 		if ( this.is.not.truthy (param) ) {
-			this.error (this.is.truthy (msg) ?
-							msg : 'Param needed', breakpoint
+			this.error (
+				this.is.truthy (msg)
+					? msg : 'Param needed', breakpoint
 			);
 		}
 		//Return self
