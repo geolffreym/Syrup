@@ -66,8 +66,9 @@
 
 	(function (window) {
 
-	  //Global access
-	  window.Syrup = new _Syrup2.default();
+		//Global access
+		window.Syrup = new _Syrup2.default();
+		window.SyrupClass = _Syrup2.default;
 	})(window);
 
 /***/ },
@@ -75,47 +76,40 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
-	 * Created with JetBrains PhpStorm.
-	 * User: Geolffrey
+	 * Created with JetBrains WebStorm.
+	 * User: Geolffrey Mena
 	 * Date: 25/11/13
 	 * Time: 12:22
-	 * To change this template use File | Settings | File Templates.
 	 */
 
 	"use strict"
 
-	//Handle dependencies
+	//Jquery Dom Traversing -> https://github.com/jquery/jquery
+	//Underscore util -> https://github.com/jashkenas/underscore
+	//Is validation tool -> https://github.com/arasatasaygin/is.js
+	//Date helper -> https://github.com/moment/moment/
+
+	//Handle dependencies using ECMA6 Module import
+	//import jquery from '../../node_modules/jquery';
+	//import underscore from '../../node_modules/underscore';
+	//import is_js from '../../node_modules/is_js';
+	//import moment_js from '../../node_modules/moment';
+
+	//Handle dependencies using CommonJs
 	;
 
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })(); //Jquery Dom Traversing -> https://github.com/jquery/jquery
-	//Underscore util -> https://github.com/jashkenas/underscore
-	//Is tool helper -> https://github.com/arasatasaygin/is.js
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
 
-	var _jquery = __webpack_require__(3);
-
-	var _jquery2 = _interopRequireDefault(_jquery);
-
-	var _underscore = __webpack_require__(4);
-
-	var _underscore2 = _interopRequireDefault(_underscore);
-
-	var _is_js = __webpack_require__(5);
-
-	var _is_js2 = _interopRequireDefault(_is_js);
-
-	var _moment = __webpack_require__(6);
-
-	var _moment2 = _interopRequireDefault(_moment);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	//Date helper -> https://github.com/moment/moment/
+	var jquery = __webpack_require__(3),
+	    underscore = __webpack_require__(4),
+	    is_js = __webpack_require__(5),
+	    moment_js = __webpack_require__(6);
 
 	//Syrup class
 
@@ -127,17 +121,13 @@
 			this.emptyStr = '';
 
 			//Dependencies
-			this.$ = _jquery2.default;
-			this.is = _is_js2.default;
-			this.date = _moment2.default;
-			this.u10s = _underscore2.default;
+			this.$ = jquery; //jquery.js
+			this.is = is_js; //is.js
+			this.date = moment_js; //moment.js
+			this.u10s = underscore; //underscore.js
 
-			//Native features
+			//Init features
 			this.i18n({});
-			this.native = {
-				'function': Function.prototype,
-				'object': Object.prototype
-			};
 		}
 
 		/**Set default locale i18n date format
@@ -148,10 +138,11 @@
 		_createClass(Syrup, [{
 			key: 'i18n',
 			value: function i18n(setting) {
-				var _setting = this.u10s.extend({ locale: 'es' }, setting);
+				var _setting = this.u10s.extend({ locale: 'en' }, setting);
 
 				//Set default locale setting
 				this.date.locale(_setting.locale);
+
 				//Return self
 				return this;
 			}

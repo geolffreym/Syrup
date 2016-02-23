@@ -9,6 +9,7 @@ import Syrup from '../base/Syrup';
 
 	//Global access
 	window.Syrup = new Syrup ();
+	window.SyrupClass = Syrup;
 
 }) (window);
 

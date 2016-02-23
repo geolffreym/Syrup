@@ -1,18 +1,28 @@
 /**
- * Created with JetBrains PhpStorm.
- * User: Geolffrey
+ * Created with JetBrains WebStorm.
+ * User: Geolffrey Mena
  * Date: 25/11/13
  * Time: 12:22
- * To change this template use File | Settings | File Templates.
  */
 
 "use strict";
 
-//Handle dependencies
-import jquery from '../../node_modules/jquery'; //Jquery Dom Traversing -> https://github.com/jquery/jquery
-import underscore from '../../node_modules/underscore'; //Underscore util -> https://github.com/jashkenas/underscore
-import is_js from '../../node_modules/is_js'; //Is tool helper -> https://github.com/arasatasaygin/is.js
-import moment_js from '../../node_modules/moment'; //Date helper -> https://github.com/moment/moment/
+//Jquery Dom Traversing -> https://github.com/jquery/jquery
+//Underscore util -> https://github.com/jashkenas/underscore
+//Is validation tool -> https://github.com/arasatasaygin/is.js
+//Date helper -> https://github.com/moment/moment/
+
+//Handle dependencies using ECMAScript 6 Module import
+//import jquery from '../../node_modules/jquery';
+//import underscore from '../../node_modules/underscore';
+//import is_js from '../../node_modules/is_js';
+//import moment_js from '../../node_modules/moment';
+
+//Handle dependencies using CommonJs
+var jquery = require ('jquery'),
+	underscore = require ('underscore'),
+	is_js = require ('is_js'),
+	moment_js = require ('moment');
 
 //Syrup class
 export default class Syrup {
@@ -26,12 +36,8 @@ export default class Syrup {
 		this.date = moment_js; //moment.js
 		this.u10s = underscore; //underscore.js
 
-		//Native features
+		//Init features
 		this.i18n ({});
-		this.native = {
-			'function': Function.prototype,
-			'object'  : Object.prototype
-		};
 	}
 
 	/**Set default locale i18n date format
