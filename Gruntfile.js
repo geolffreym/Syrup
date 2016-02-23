@@ -11,7 +11,7 @@ module.exports = function (grunt) {
 
 	// Project configuration.
 	grunt.initConfig ({
-		webpack       : {
+		webpack: {
 			syrup: {
 				entry : './system/include/init.js',
 				output: {
@@ -26,16 +26,17 @@ module.exports = function (grunt) {
 					reasons: true
 				},
 				// stats: false disables the stats output
-				watch : true, // use webpacks watcher
+
+				watch: true, // use webpacks watcher
 				// You need to keep the grunt process alive
 
-				keepalive  : true, // don't finish the grunt task
+				keepalive: true, // don't finish the grunt task
 				// Use this in combination with the watch option
-				inline     : true,  // embed the webpack-dev-server runtime into the bundle
-				// Defaults to false
+
 				failOnError: false, // don't report error to grunt if webpack find errors
 				// Use this if webpack errors are tolerable and grunt should continue
-				module     : {
+
+				module : {
 					loaders: [
 						{
 							test   : /\.js?$/,
@@ -49,7 +50,7 @@ module.exports = function (grunt) {
 						}
 					]
 				},
-				resolve    : {
+				resolve: {
 					modulesDirectories: [
 						'node_modules'
 					]
