@@ -8,25 +8,34 @@ module.exports = function (grunt) {
 	// Load the plugin that provides the "uglify" task.
 	grunt.loadNpmTasks ('grunt-webpack');
 
+
 	// Project configuration.
 	grunt.initConfig ({
-		webpack: {
+		webpack       : {
 			syrup: {
-				entry  : './system/include/init.js',
-				output : {
+				entry : './system/include/init.js',
+				output: {
 					path      : path.join (__dirname, './dist'),
 					filename  : 'init.js', // or [name]
 					publicPath: '/'
 				},
-				stats  : {
+				stats : {
 					// Configure the console output
-					colors : false,
+					colors : true,
 					modules: true,
 					reasons: true
 				},
-				watch  : true,
-				keepalive: true,
-				module : {
+				// stats: false disables the stats output
+				watch : true, // use webpacks watcher
+				// You need to keep the grunt process alive
+
+				keepalive  : true, // don't finish the grunt task
+				// Use this in combination with the watch option
+				inline     : true,  // embed the webpack-dev-server runtime into the bundle
+				// Defaults to false
+				failOnError: false, // don't report error to grunt if webpack find errors
+				// Use this if webpack errors are tolerable and grunt should continue
+				module     : {
 					loaders: [
 						{
 							test   : /\.js?$/,
@@ -40,7 +49,7 @@ module.exports = function (grunt) {
 						}
 					]
 				},
-				resolve: {
+				resolve    : {
 					modulesDirectories: [
 						'node_modules'
 					]
