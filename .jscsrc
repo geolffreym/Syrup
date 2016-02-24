@@ -16,7 +16,10 @@
   },
   "maximumLineLength": 120,
   "validateLineBreaks": "LF",
-  "validateIndentation": "\t",
+  "validateIndentation": {
+    "value": 4,
+    "includeEmptyLines": true
+  },
   "disallowTrailingComma": true,
   "disallowMultipleVarDecl": false,
   "requireCapitalizedComments": {
