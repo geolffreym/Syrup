@@ -21,6 +21,7 @@
     "grunt-webpack": "^1.0.11",
     "install": "^0.3.0",
     "jasmine-core": "*",
+    "jscs": "^2.10.1",
     "karma": "*",
     "karma-chrome-launcher": "*",
     "karma-jasmine": "*",

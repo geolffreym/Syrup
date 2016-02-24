@@ -75,7 +75,7 @@
 	 * Time: 12:22
 	 */
 
-	"use strict"
+	'use strict'
 
 	//Jquery Dom Traversing -> https://github.com/jquery/jquery
 	//Underscore util -> https://github.com/jashkenas/underscore
@@ -101,8 +101,8 @@
 
 	var jquery = __webpack_require__(2),
 	    underscore = __webpack_require__(3),
-	    is_js = __webpack_require__(4),
-	    moment_js = __webpack_require__(5);
+	    isJs = __webpack_require__(4),
+	    momentJs = __webpack_require__(5);
 
 	//Syrup class
 
@@ -115,8 +115,8 @@
 
 			//Dependencies
 			this.$ = jquery; //jquery.js
-			this.is = is_js; //is.js
-			this.date = moment_js; //moment.js
+			this.is = isJs; //is.js
+			this.date = momentJs; //moment.js
 			this.u10s = underscore; //underscore.js
 
 			//Init features
@@ -124,7 +124,7 @@
 		}
 
 		/**Set default locale i18n date format
-	  * @param {string} setting
+	  * @param {object} setting
 	  * @return {object}
 	  */
 

@@ -5,7 +5,7 @@
  * Time: 12:22
  */
 
-"use strict";
+'use strict';
 
 //Jquery Dom Traversing -> https://github.com/jquery/jquery
 //Underscore util -> https://github.com/jashkenas/underscore
@@ -21,8 +21,8 @@
 //Handle dependencies using CommonJs
 var jquery = require ('jquery'),
 	underscore = require ('underscore'),
-	is_js = require ('is_js'),
-	moment_js = require ('moment');
+	isJs = require ('is_js'),
+	momentJs = require ('moment');
 
 //Syrup class
 export default class Syrup {
@@ -32,8 +32,8 @@ export default class Syrup {
 
 		//Dependencies
 		this.$ = jquery; //jquery.js
-		this.is = is_js; //is.js
-		this.date = moment_js; //moment.js
+		this.is = isJs; //is.js
+		this.date = momentJs; //moment.js
 		this.u10s = underscore; //underscore.js
 
 		//Init features
@@ -41,7 +41,7 @@ export default class Syrup {
 	}
 
 	/**Set default locale i18n date format
-	 * @param {string} setting
+	 * @param {object} setting
 	 * @return {object}
 	 */
 	i18n (setting) {
@@ -56,7 +56,6 @@ export default class Syrup {
 		return this;
 	}
 
-
 	/**Throw error
 	 * @param {string} msg
 	 * @param {string} breakpoint
@@ -69,7 +68,6 @@ export default class Syrup {
 		));
 	}
 
-
 	/** Validate if param is set. If not, throw msg!
 	 * @param {object} param
 	 * @param {string} msg
@@ -80,8 +78,8 @@ export default class Syrup {
 		//Is set. not null or undefined and not false?
 		if ( this.is.not.truthy (param) ) {
 			this.error (
-				this.is.truthy (msg)
-					? msg : 'Param needed', breakpoint
+				this.is.truthy (msg) ?
+					msg : 'Param needed', breakpoint
 			);
 		}
 		//Return self
@@ -89,9 +87,4 @@ export default class Syrup {
 	}
 
 }
-
-
-
-
-
 

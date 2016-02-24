@@ -1,0 +1,41 @@
+{
+  "preset": "google",
+  "fileExtensions": [
+    ".js"
+  ],
+  "maxErrors": 100,
+  "requireSemicolons": true,
+  "requireParenthesesAroundIIFE": true,
+  "requireCamelCaseOrUpperCaseIdentifiers": {
+    "ignoreProperties": true,
+    "strict": true
+  },
+  "maximumLineLength": 120,
+  "validateLineBreaks": "LF",
+  "validateIndentation": "\t",
+  "disallowTrailingComma": true,
+  "disallowMultipleVarDecl": false,
+  "disallowSpacesInCallExpression": false,
+  "disallowSpacesInAnonymousFunctionExpression": false,
+  "disallowSpacesInFunctionExpression": false,
+  "disallowSpacesInsideParentheses": false,
+  "disallowSpacesInsideObjectBrackets": null,
+  "disallowTrailingWhitespace": "ignoreEmptyLines",
+  "disallowImplicitTypeConversion": [
+    "string"
+  ],
+  "safeContextKeyword": "_this",
+  "jsDoc": {
+    "checkAnnotations": "closurecompiler",
+    "checkParamNames": true,
+    "requireParamTypes": true,
+    "checkRedundantParams": true,
+    "checkReturnTypes": true,
+    "checkRedundantReturns": true,
+    "requireReturnTypes": true,
+    "checkTypes": "capitalizedNativeCase",
+    "checkRedundantAccess": true,
+    "requireNewlineAfterDescription": true
+  },
+  "excludeFiles": []
+}
