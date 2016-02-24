@@ -3,14 +3,12 @@
  * Interceptor: ['message']
  */
 
-
 'use strict';
 (function (window) {
-	function Workers () {
+	function Workers() {
 		this.Worker = null;
 		this.interceptors = {};
 	}
-
 
 	/** Run worker
 	 * @param {string} url
@@ -25,7 +23,7 @@
 				self._handleInterceptor ('message', e);
 			}, false);
 			resolve (self);
-		}))
+		}));
 	});
 
 	/**Get Worker
@@ -70,7 +68,6 @@
 		//Clean the interceptor
 		//MiddleWare.cleanInterceptor (this, type);
 	});
-
 
 	/**Send Message to Worker
 	 * @param {string} message

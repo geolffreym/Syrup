@@ -3,7 +3,6 @@
  * Interceptor: ['redirect']
  */
 
-
 (function (window) {
 
 	var WARNING_ROUTE = {
@@ -16,7 +15,7 @@
 	/**Router
 	 * @constructor
 	 */
-	function Router () {
+	function Router() {
 		this.routes = {};
 		this.history = window.history;
 		this.cleanParam = /([\w]+:)/g;
@@ -70,7 +69,7 @@
 		return (new Promise (function (resolve, reject) {
 			_self.routes = _.extend (_self.routes, routes);
 			resolve (_self);
-		}))
+		}));
 	});
 
 	/**Delegate routes
@@ -85,8 +84,8 @@
 
 		//No app. Nothing to do!!
 		if (
-			!(conf && 'app' in conf)
-			|| !(route_name in _self.routes)
+			!(conf && 'app' in conf) ||
+			!(route_name in _self.routes)
 		)
 			return _self;
 
@@ -100,17 +99,16 @@
 			_self._handleSkull (conf, function () {
 				//On main tpl is handled, what to do?
 
-
 				if ( conf.app in _self.module.appCollection ) {
 					//Intercept init
 					//Inject params
 					_self.module.appCollection[conf.app].intercept ({
 						'init': function (mod) {
 							mod.uri = {
-								params     : state,
+								params: state,
 								breadcrumbs: _self.breadcrumbs,
-								route      : _self.routes[route_name]
-							}
+								route: _self.routes[route_name]
+							};
 						}
 					});
 
@@ -118,15 +116,15 @@
 					_self.module.appCollection[conf.app].taste ();
 				}
 
-			}, [state, e])
+			}, [state, e]);
 
 		});
 
 		//First action
 		//Routing!!!
 		if (
-			_self.default
-			&& (_router = _self._route (route_name))
+			_self.default &&
+			(_router = _self._route (route_name))
 		) {
 			//No default
 			//No more routing after found!!!
@@ -169,13 +167,13 @@
 			_the_new_route = _the_route = _self.routes[route_name];
 
 			//Clean Uri? or Rewrite rules or the route
-			_the_new_route = 'uri' in _config && _config.uri
-							 || _self._rewriteRules (_the_new_route, _params)
-							 || _the_new_route;
+			_the_new_route = 'uri' in _config && _config.uri ||
+							 _self._rewriteRules (_the_new_route, _params) ||
+							 _the_new_route;
 
 			//Resolve params
-			_params = (_.getObjectSize (_params) > 0 && _params)
-					  || _self._reverseUriParams (
+			_params = (_.getObjectSize (_params) > 0 && _params) ||
+					  _self._reverseUriParams (
 					  _config.uri || _the_new_route,
 					  _the_route, 'route' in _config && _config.route
 				) || {};
@@ -198,9 +196,9 @@
 	 * */
 	Router.add ('otherwise', function (route_name, conf) {
 		if (
-			_.isString (route_name)
-			&& route_name in this.routes
-			&& this.default
+			_.isString (route_name) &&
+			route_name in this.routes &&
+			this.default
 		) {
 			this.when (route_name, conf);
 			this.redirect (route_name, {});
@@ -216,8 +214,8 @@
 	 * */
 	Router.add ('reverse', function (route_name, params) {
 		if ( route_name in this.routes )
-			return this._rewriteRules (this.routes[route_name], params || {})
-				   || this.routes[route_name];
+			return this._rewriteRules (this.routes[route_name], params || {}) ||
+				   this.routes[route_name];
 
 		return _.emptyStr;
 	});
@@ -268,7 +266,7 @@
 		}
 
 		return this._matchUri (_the_route, _uri_path) ? {
-			uri  : _uri_path,
+			uri: _uri_path,
 			route: _the_route,
 			query: _query_params,
 			match: true
@@ -323,7 +321,7 @@
 	 */
 	Router.add ('_matchUri', function (_the_route, _uri_path) {
 		//Clean param from route
-		return (_.toRegExp ('^' + _the_route + '$').test (_uri_path))
+		return (_.toRegExp ('^' + _the_route + '$').test (_uri_path));
 	});
 
 	/** Clean params from RegExp
@@ -349,7 +347,7 @@
 						_.toRegExp (_route)
 					)
 				)
-			) || {}
+			) || {};
 
 	});
 
@@ -381,9 +379,9 @@
 
 	//Go back
 	Router.add ('goBack', function () {
-		//pop last
-		this.breadcrumbs.pop (); //actual
-		var _previous = this.breadcrumbs.pop (); //previous
+		//Pop last
+		this.breadcrumbs.pop (); //Actual
+		var _previous = this.breadcrumbs.pop (); //Previous
 
 		//Set state in history
 		this._triggerPopState (
@@ -393,7 +391,6 @@
 			{ trigger: true }
 		);
 	});
-
 
 	/** Trigger the pop state
 	 * @param {object} _params
@@ -412,7 +409,6 @@
 			this.history.pushState (_params, route_name, _the_new_route);
 			this.history.back ();
 		}
-
 
 	});
 

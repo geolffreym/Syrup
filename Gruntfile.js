@@ -7,42 +7,42 @@ module.exports = function (grunt) {
 
 	// Load the plugin that provides the "uglify" task.
 	grunt.loadNpmTasks ('grunt-webpack');
-
+	grunt.loadNpmTasks ('grunt-jscs');
 
 	// Project configuration.
 	grunt.initConfig ({
 		webpack: {
 			syrup: {
-				entry : './system/include/init.js',
+				entry: './system/include/init.js',
 				output: {
-					path      : path.join (__dirname, './dist'),
-					filename  : 'init.js', // or [name]
+					path: path.join (__dirname, './dist'),
+					filename: 'init.js', // Or [name]
 					publicPath: '/'
 				},
-				stats : {
+				stats: {
 					// Configure the console output
-					colors : true,
+					colors: true,
 					modules: true,
 					reasons: true
 				},
-				// stats: false disables the stats output
+				// Stats: false disables the stats output
 
-				watch: true, // use webpacks watcher
+				watch: true, // Use webpacks watcher
 				// You need to keep the grunt process alive
 
-				keepalive: true, // don't finish the grunt task
+				keepalive: true, // Don't finish the grunt task
 				// Use this in combination with the watch option
 
-				failOnError: false, // don't report error to grunt if webpack find errors
+				failOnError: false, // Don't report error to grunt if webpack find errors
 				// Use this if webpack errors are tolerable and grunt should continue
 
-				module : {
+				module: {
 					loaders: [
 						{
-							test   : /\.js?$/,
+							test: /\.js?$/,
 							exclude: /node_modules/,
-							loader : 'babel-loader',
-							query  : {
+							loader: 'babel-loader',
+							query: {
 								presets: [
 									'es2015'
 								]
@@ -56,10 +56,21 @@ module.exports = function (grunt) {
 					]
 				}
 			}
+		},
+		jscs: {
+			src: './system/*/*.js',
+			options: {
+				config: '.jscsrc',
+				esnext: true, // If you use ES6 http://jscs.info/overview.html#esnext
+				verbose: true, // If you need output with rule names http://jscs.info/overview.html#verbose
+				fix: true // Autofix code style violations when possible.
+			}
 		}
 	});
 
 	// Default task(s).
-	grunt.registerTask ('default', ['webpack']);
+	grunt.registerTask ('default', [
+		'webpack'
+	]);
 
 };

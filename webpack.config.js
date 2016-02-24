@@ -2,21 +2,21 @@ var path = require ('path');
 
 //Build
 module.exports = {
-	entry  : [
+	entry: [
 		'./system/include/init.js'
 	],
-	output : {
-		path      : path.join (__dirname, './dist'),
-		filename  : 'init.js', // or [name]
+	output: {
+		path: path.join (__dirname, './dist'),
+		filename: 'init.js', // Or [name]
 		publicPath: '/'
 	},
-	module : {
+	module: {
 		loaders: [
 			{
-				test   : /\.js?$/,
+				test: /\.js?$/,
 				exclude: /node_modules/,
-				loader : 'babel-loader',
-				query  : {
+				loader: 'babel-loader',
+				query: {
 					presets: [
 						'es2015'
 					]

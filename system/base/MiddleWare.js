@@ -3,8 +3,8 @@
  */
 
 (function (window) {
-	"use strict";
-	function MiddleWare () {
+	'use strict';
+	function MiddleWare() {
 
 	}
 
@@ -34,8 +34,7 @@
 				resolve (intercepted);
 			}
 
-
-		})
+		});
 	});
 
 	/** Extend interceptors!!
@@ -52,7 +51,7 @@
 
 		//For each extension!!
 		_.each (extend, function (v) {
-			//v in intercepted?
+			//V in intercepted?
 			//v is not the same as target?
 			if ( v !== to && v in intercepted ) {
 				if ( 'interceptors' in intercepted[v] ) {
@@ -63,8 +62,8 @@
 						//Extend interceptors
 						intercepted[to].interceptors[i] = _.extend (
 							intercepted[to].interceptors[i], r
-						)
-					})
+						);
+					});
 				}
 			}
 		});
@@ -79,9 +78,9 @@
 	MiddleWare.add ('getInterceptors', function (intercepted, find) {
 		if ( intercepted && 'interceptors' in intercepted ) {
 			if (
-				find in intercepted.interceptors
-				&& _.isArray (intercepted.interceptors[find])
-				&& intercepted.interceptors[find].length > 0
+				find in intercepted.interceptors &&
+				_.isArray (intercepted.interceptors[find]) &&
+				intercepted.interceptors[find].length > 0
 			) {
 				return intercepted.interceptors[find];
 			}

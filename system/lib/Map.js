@@ -10,12 +10,12 @@
 	var GoogleMap,
 		WARNING_GOOGLE_MAP = {
 			ERROR: {
-				NOLOCATION : 'No coordinates seted.',
-				NOMAP      : 'No map seted.',
+				NOLOCATION: 'No coordinates seted.',
+				NOMAP: 'No map seted.',
 				NOCONTAINER: 'No map container seted.',
-				NOCONFIG   : 'The configuration object is necessary.',
-				NOROUTES   : 'No mapped routes',
-				NODISTANCE : 'You need the source and target to measure the distance.'
+				NOCONFIG: 'The configuration object is necessary.',
+				NOROUTES: 'No mapped routes',
+				NODISTANCE: 'You need the source and target to measure the distance.'
 
 			}
 		};
@@ -50,10 +50,10 @@
 			var self = this;
 			self.mapType = [
 							   {
-								   road     : self.mapObject.MapTypeId.ROADMAP,
+								   road: self.mapObject.MapTypeId.ROADMAP,
 								   satellite: self.mapObject.MapTypeId.SATELLITE,
-								   hybrid   : self.mapObject.MapTypeId.HYBRID,
-								   terrain  : self.mapObject.MapTypeId.TERRAIN
+								   hybrid: self.mapObject.MapTypeId.HYBRID,
+								   terrain: self.mapObject.MapTypeId.TERRAIN
 							   }[map]
 						   ].toString () || self.mapType;
 		};
@@ -78,9 +78,9 @@
 		_proto.parseLatLngEvent = function (e) {
 			if ( e.latLng ) {
 				return {
-					latitude : e.latLng.lat (),
+					latitude: e.latLng.lat (),
 					longitude: e.latLng.lng ()
-				}
+				};
 			}
 			return null;
 		};
@@ -137,12 +137,11 @@
 			lat = Math.atan2 (z, Math.sqrt (x * x + y * y));
 
 			return {
-				latitude : lat * 180 / Math.PI,
+				latitude: lat * 180 / Math.PI,
 				longitude: long * 180 / Math.PI
-			}
+			};
 
 		};
-
 
 		/**Append a coord to collection
 		 * @param ltnLgn LatLng Class
@@ -230,8 +229,8 @@
 			}
 
 			var mapOptionsDefault = {
-				zoom     : 10,
-				center   : self.position,
+				zoom: 10,
+				center: self.position,
 				mapTypeId: self.mapType
 			}, options;
 
@@ -245,7 +244,6 @@
 			self.mapa = new self.mapObject.Map (self.container, options);
 			_.callbackAudit (callback, self.mapa);
 		};
-
 
 		/**Markers Create
 		 * https://developers.google.com/maps/documentation/javascript/3.exp/reference?hl=es#Marker
@@ -280,7 +278,6 @@
 			return this.marker;
 		};
 
-
 		/** Set Marker ANimation Type
 		 *  @param animation string fall|infinitejump
 		 * */
@@ -288,7 +285,7 @@
 			var self = this;
 			self.animationType = [
 									 {
-										 fall        : self.mapObject.Animation.DROP,
+										 fall: self.mapObject.Animation.DROP,
 										 infinitejump: self.mapObject.Animation.BOUNCE
 									 }[animation]
 								 ].toString () || self.animationType;
@@ -354,12 +351,12 @@
 		_proto.clearInfoLabels = function () {
 			_.each (this.infoLabels, function (v) {
 				v.close ();
-			})
+			});
 		};
 
 		//Clear actual Info Label
 		_proto.clearInfoLabel = function () {
-			self.infoWindow.close ()
+			self.infoWindow.close ();
 		};
 
 		_proto.geoCodeRequest = function (object, callback) {
@@ -387,14 +384,14 @@
 			this.geoCodeRequest ({ 'latLng': self.position }, function (result, status) {
 				if ( status === self.mapObject.GeocoderStatus.OK ) {
 					_.callbackAudit (callback, {
-						street : _.isSet (result[0].address_components[0])
-							? result[0].address_components[0].long_name : null,
-						city   : _.isSet (result[0].address_components[1])
-							? result[0].address_components[1].long_name : null,
-						state  : _.isSet (result[0].address_components[2])
-							? result[0].address_components[2].long_name : null,
-						country: _.isSet (result[0].address_components[3])
-							? result[0].address_components[3].long_name : null
+						street: _.isSet (result[0].address_components[0]) ?
+							result[0].address_components[0].long_name : null,
+						city: _.isSet (result[0].address_components[1]) ?
+							result[0].address_components[1].long_name : null,
+						state: _.isSet (result[0].address_components[2]) ?
+							result[0].address_components[2].long_name : null,
+						country: _.isSet (result[0].address_components[3]) ?
+							result[0].address_components[3].long_name : null
 
 					});
 				}
@@ -411,9 +408,9 @@
 				if ( status == google.maps.GeocoderStatus.OK ) {
 					var data = results[0].geometry.location;
 					_.callbackAudit (callback, {
-						latitude : data.lat (),
+						latitude: data.lat (),
 						longitude: data.lng (),
-						altitude : 0
+						altitude: 0
 					});
 				}
 			});
@@ -431,11 +428,11 @@
 			}
 
 			var _Conf = _.extend ({
-				path         : self.coordsCollection,
-				geodesic     : true,
-				strokeColor  : '#FF0000',
+				path: self.coordsCollection,
+				geodesic: true,
+				strokeColor: '#FF0000',
 				strokeOpacity: 1.0,
-				strokeWeight : 2
+				strokeWeight: 2
 			}, config, true);
 
 			self.ruta = new self.mapObject.Polyline (_Conf);
@@ -472,9 +469,9 @@
 			self.travelType = [
 					{
 						'drive': self.mapObject.TravelMode.DRIVING,
-						'walk' : self.mapObject.TravelMode.WALKING,
-						'bike' : self.mapObject.TravelMode.BICYCLING,
-						'bus'  : self.mapObject.TravelMode.TRANSIT
+						'walk': self.mapObject.TravelMode.WALKING,
+						'bike': self.mapObject.TravelMode.BICYCLING,
+						'bus': self.mapObject.TravelMode.TRANSIT
 					}[type]
 				] || self.travelType;
 		};
@@ -494,7 +491,7 @@
 							self.distanceCollection[i][j]['from'] = _destination[i];
 							self.distanceCollection[i][j]['destiny'] = _origin[j];
 							self.distanceCollection[i][j]['distance'] = _distance[i].elements[j].distance.text;
-							self.distanceCollection[i][j]['time'] = _distance[i].elements[j].duration.text
+							self.distanceCollection[i][j]['time'] = _distance[i].elements[j].duration.text;
 						} else {
 							self.distanceCollection[i] = false;
 						}
@@ -520,9 +517,9 @@
 			}
 
 			var _Conf = _.extend ({
-				origins     : routes,
+				origins: routes,
 				destinations: routes,
-				travelMode  : self.travelType
+				travelMode: self.travelType
 			}, config), _Distances = false;
 
 			self.distance.getDistanceMatrix (_Conf, function (result, status) {
@@ -535,7 +532,7 @@
 				}
 			});
 
-		}
+		};
 
 	};
 

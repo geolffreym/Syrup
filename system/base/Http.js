@@ -10,7 +10,7 @@
  */
 (function (window) {
 
-	function Http () {
+	function Http() {
 		this.upload = null;
 		this.config = {};
 		this.interceptors = {
@@ -28,15 +28,15 @@
 			_query = _.emptyStr,
 			_data = data || null,
 		//New XHR Object
-			_xhr = new window.XMLHttpRequest
-				   || new window.ActiveXObject ("Microsoft.XMLHTTP");
+			_xhr = new window.XMLHttpRequest ||
+				   new window.ActiveXObject ('Microsoft.XMLHTTP');
 
 		//Make global conf
 		_self.config = _.extend ({
-			method : 'GET',
+			method: 'GET',
 			timeout: 0xFA0,
-			upload : false,
-			cors   : false,
+			upload: false,
+			cors: false,
 			headers: {
 				'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'
 			}
@@ -54,20 +54,19 @@
 
 			//If is Object and not formData
 			//parse Object to querystring
-			if ( !_.isFormData (_data)
-				 && _.isObject (_data)
-				 && _.getObjectSize (_data) > 0
+			if ( !_.isFormData (_data) &&
+				 _.isObject (_data) &&
+				 _.getObjectSize (_data) > 0
 			) {
 				_data = _.jsonToQueryString (_data);
 			}
 
 			//If method is GET and data exists
-			if ( _self.config.method === 'GET'
-				 && _.isString (_data)
+			if ( _self.config.method === 'GET' &&
+				 _.isString (_data)
 			) {
 				_query += '?' + _data;
 			}
-
 
 			//Process url
 			_query = url + (_query);
@@ -85,8 +84,8 @@
 			_xhr.withCredentials = !!_self.config.cors;
 
 			//If upload needed
-			if ( _.isSet (_self.config.upload)
-				 && _.isBoolean (_self.config.upload)
+			if ( _.isSet (_self.config.upload) &&
+				 _.isBoolean (_self.config.upload)
 			) {
 				_self.upload = _xhr.upload;
 				_xhr = _self.upload;
@@ -154,8 +153,8 @@
 
 			//Send
 			_xhr.send (
-				_self.config.method !== 'GET'
-					? _data : null
+				_self.config.method !== 'GET' ?
+					_data : null
 			);
 
 		}));
@@ -244,7 +243,6 @@
 		return this._rest (url, 'GET', data, naming);
 	});
 
-
 	/**Post request
 	 * @param {string} url
 	 * @param {object} data
@@ -254,7 +252,6 @@
 		return this._rest (url, 'POST', data, naming);
 	});
 
-
 	/**Put request
 	 * @param {string} url
 	 * @param {object} data
@@ -263,7 +260,6 @@
 	Http.add ('put', function (url, data, naming) {
 		return this._rest (url, 'PUT', data, naming);
 	});
-
 
 	/**Delete request
 	 * @param {string} url
@@ -301,9 +297,7 @@
 		return _.isJson (_response) && _.toObject (_response) || _response;
 	});
 
-
 	//Global access
 	window.Http = Http;
-
 
 }) (window);

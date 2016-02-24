@@ -47,11 +47,11 @@
 	/**
 	 * Created by gmena on 11-27-15.
 	 */
-	"use strict"
+	'use strict'
 	//Web parsing
 	;
 
-	var _Syrup = __webpack_require__(1);
+	var _Syrup = __webpack_require__(104);
 
 	var _Syrup2 = _interopRequireDefault(_Syrup);
 
@@ -65,118 +65,7 @@
 	})(window);
 
 /***/ },
-/* 1 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Created with JetBrains WebStorm.
-	 * User: Geolffrey Mena
-	 * Date: 25/11/13
-	 * Time: 12:22
-	 */
-
-	'use strict'
-
-	//Jquery Dom Traversing -> https://github.com/jquery/jquery
-	//Underscore util -> https://github.com/jashkenas/underscore
-	//Is validation tool -> https://github.com/arasatasaygin/is.js
-	//Date helper -> https://github.com/moment/moment/
-
-	//Handle dependencies using ECMAScript 6 Module import
-	//import jquery from '../../node_modules/jquery';
-	//import underscore from '../../node_modules/underscore';
-	//import is_js from '../../node_modules/is_js';
-	//import moment_js from '../../node_modules/moment';
-
-	//Handle dependencies using CommonJs
-	;
-
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	var jquery = __webpack_require__(2),
-	    underscore = __webpack_require__(3),
-	    isJs = __webpack_require__(4),
-	    momentJs = __webpack_require__(5);
-
-	//Syrup class
-
-	var Syrup = (function () {
-		function Syrup() {
-			_classCallCheck(this, Syrup);
-
-			//Basic attributes
-			this.emptyStr = '';
-
-			//Dependencies
-			this.$ = jquery; //jquery.js
-			this.is = isJs; //is.js
-			this.date = momentJs; //moment.js
-			this.u10s = underscore; //underscore.js
-
-			//Init features
-			this.i18n({});
-		}
-
-		/**Set default locale i18n date format
-	  * @param {object} setting
-	  * @return {object}
-	  */
-
-		_createClass(Syrup, [{
-			key: 'i18n',
-			value: function i18n(setting) {
-				var _setting = this.u10s.extend({ locale: 'en' }, setting);
-
-				//Set default locale setting
-				this.date.locale(_setting.locale);
-
-				//Return self
-				return this;
-			}
-
-			/**Throw error
-	   * @param {string} msg
-	   * @param {string} breakpoint
-	   * @return {void}
-	   */
-
-		}, {
-			key: 'error',
-			value: function error(msg, breakpoint) {
-				throw new Error(msg + (breakpoint ? ' | Method: ' + breakpoint : this.emptyStr) + ' ( ' + this.date().format('MMMM Do YYYY, h:mm:ss a') + ' )');
-			}
-
-			/** Validate if param is set. If not, throw msg!
-	   * @param {object} param
-	   * @param {string} msg
-	   * @param {string} breakpoint
-	   * @return {bool|object}
-	   */
-
-		}, {
-			key: 'assert',
-			value: function assert(param, msg, breakpoint) {
-				//Is set. not null or undefined and not false?
-				if (this.is.not.truthy(param)) {
-					this.error(this.is.truthy(msg) ? msg : 'Param needed', breakpoint);
-				}
-				//Return self
-				return this;
-			}
-		}]);
-
-		return Syrup;
-	})();
-
-	exports.default = Syrup;
-
-/***/ },
+/* 1 */,
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -25223,6 +25112,118 @@
 	    return zh_tw;
 
 	}));
+
+/***/ },
+/* 104 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Created with JetBrains WebStorm.
+	 * User: Geolffrey Mena
+	 * Date: 25/11/13
+	 * Time: 12:22
+	 */
+
+	'use strict'
+
+	//Jquery Dom Traversing -> https://github.com/jquery/jquery
+	//Underscore util -> https://github.com/jashkenas/underscore
+	//Is validation tool -> https://github.com/arasatasaygin/is.js
+	//Date helper -> https://github.com/moment/moment/
+
+	//Handle dependencies using ECMAScript 6 Module import
+	//import jquery from '../../node_modules/jquery';
+	//import underscore from '../../node_modules/underscore';
+	//import is_js from '../../node_modules/is_js';
+	//import moment_js from '../../node_modules/moment';
+
+	//Handle dependencies using CommonJs
+	;
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var jquery = __webpack_require__(2),
+	    underscore = __webpack_require__(3),
+	    isJs = __webpack_require__(4),
+	    momentJs = __webpack_require__(5);
+
+	//Syrup class
+
+	var Syrup = (function () {
+		function Syrup() {
+			_classCallCheck(this, Syrup);
+
+			//Basic attributes
+			this.emptyStr = '';
+
+			//Dependencies
+			this.$ = jquery; // Jquery jquery.js
+			this.is = isJs; // Is is.js
+			this.date = momentJs; // Moment moment.js
+			this.u10s = underscore; // Underscore underscore.js
+
+			//Init features
+			this.i18n({});
+		}
+
+		/**Set default locale i18n date format
+	  * @param {object} setting
+	  * @return {object}
+	  */
+
+		_createClass(Syrup, [{
+			key: 'i18n',
+			value: function i18n(setting) {
+				var _setting = this.u10s.extend({ locale: 'en' }, setting);
+
+				//Set default locale setting
+				this.date.locale(_setting.locale);
+
+				//Return self
+				return this;
+			}
+
+			/**Throw error
+	   * @param {string} msg
+	   * @param {string} breakpoint
+	   * @return {void}
+	   */
+
+		}, {
+			key: 'error',
+			value: function error(msg, breakpoint) {
+				throw new Error(msg + (breakpoint ? ' | Method: ' + breakpoint : this.emptyStr) + ' ( ' + this.date().format('MMMM Do YYYY, h:mm:ss a') + ' )');
+			}
+
+			/** Validate if param is set. If not, throw msg!
+	   * @param {object} param
+	   * @param {string} msg
+	   * @param {string} breakpoint
+	   * @return {bool|object}
+	   */
+
+		}, {
+			key: 'assert',
+			value: function assert(param, msg, breakpoint) {
+				//Is set. not null or undefined and not false?
+				if (this.is.not.truthy(param)) {
+					this.error(this.is.truthy(msg) ? msg : 'Param needed', breakpoint);
+				}
+				//Return self
+				return this;
+			}
+		}]);
+
+		return Syrup;
+	})();
+
+	exports.default = Syrup;
 
 /***/ }
 /******/ ]);

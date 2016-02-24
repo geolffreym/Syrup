@@ -5,15 +5,13 @@
 
 (function (window) {
 
-
 	'use strict';
 	/**Hash
 	 * @constructor
 	 */
-	function Hash () {
+	function Hash() {
 		this.interceptors = {};
 		this.onhashchange = {};
-
 
 		var _self = this;
 		//Set Hash Change
@@ -45,7 +43,6 @@
 		return this;
 	});
 
-
 	/**Delegate hash
 	 * @param {string} hash
 	 * @returns {object}
@@ -64,7 +61,7 @@
 				_self.onhashchange[hash].push (resolve);
 				return _self;
 			}
-		}
+		};
 
 	});
 
@@ -87,8 +84,8 @@
 		var _split = hash.split ('/');
 		_split = (_split.length > 1 && _split || hash.split ('?')).splice (1);
 
-		return _split.length > 0
-			   && _.queryStringToJson (_split[0]) || {};
+		return _split.length > 0 &&
+			   _.queryStringToJson (_split[0]) || {};
 	});
 
 	/** Interceptors
@@ -111,7 +108,6 @@
 		return this;
 	});
 
-
 	/** Handle the interceptors
 	 * @param {string} type
 	 * @param {object} param
@@ -130,6 +126,5 @@
 
 	//Global access
 	window.Hash = Hash;
-
 
 }) (window);

@@ -31,10 +31,10 @@ export default class Syrup {
 		this.emptyStr = '';
 
 		//Dependencies
-		this.$ = jquery; //jquery.js
-		this.is = isJs; //is.js
-		this.date = momentJs; //moment.js
-		this.u10s = underscore; //underscore.js
+		this.$ = jquery; // Jquery jquery.js
+		this.is = isJs; // Is is.js
+		this.date = momentJs; // Moment moment.js
+		this.u10s = underscore; // Underscore underscore.js
 
 		//Init features
 		this.i18n ({});

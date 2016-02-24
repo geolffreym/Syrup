@@ -11,20 +11,19 @@
 		ERROR: {
 			UNACTIVE: 'Your browser has disabled please select the location for the proper operation of the site.',
 			NOLOCATE: 'It is not currently possible to track its location. Please try again.',
-			NOWATCH : 'No watching location, can\'t stop it'
+			NOWATCH: 'No watching location, can\'t stop it'
 		}
 	};
 
-
-	function Geolocation () {
+	function Geolocation() {
 		this.location = null;
 		this.watch = false;
 		this.geolocation = window.navigator.geolocation;
 		this.conf = {
 			enableHighAccuracy: true,
-			timeout           : 0x3E8,
-			maximumAge        : 0xEA60
-		}
+			timeout: 0x3E8,
+			maximumAge: 0xEA60
+		};
 	}
 
 	/**Set the initial conf
@@ -45,8 +44,8 @@
 	 * */
 	Geolocation.add ('get', function (watch) {
 		var _self = this,
-			_whatToDo = watch && _self.geolocation.watchPosition
-						|| _self.geolocation.getCurrentPosition;
+			_whatToDo = watch && _self.geolocation.watchPosition ||
+						_self.geolocation.getCurrentPosition;
 
 		//Watching?
 		_self.watch = watch;
@@ -54,9 +53,9 @@
 		return (new Promise (function (resolve, reject) {
 			_whatToDo (function (u) {
 				_self.location = {
-					latitude : u.coords.latitude,
+					latitude: u.coords.latitude,
 					longitude: u.coords.longitude,
-					altitude : u.coords.altitude
+					altitude: u.coords.altitude
 				};
 
 				//Working, then resolve
@@ -71,7 +70,7 @@
 					)
 				};
 				//Error, then reject
-				reject (_error[e.code])
+				reject (_error[e.code]);
 			}, _self.conf);
 		}));
 

@@ -3,12 +3,12 @@
  * https://www.npmjs.com/package/b_wsserver
  */
 
-"use strict";
+'use strict';
 
 (function (window) {
 
 	//Constructor
-	function Socket () {
+	function Socket() {
 		this.socket = null;
 		this.open = null;
 		this.close = null;
@@ -30,32 +30,31 @@
 			port = config.port || 0x1F90,
 			query = _.emptyStr;
 
-
-		self.host = !!config.host
-			? config.host : self.host;
+		self.host = !!config.host ?
+			config.host : self.host;
 		self.user = user;
 
 		delete config['port'];
 		delete config['host'];
 
 		//Parse the config in url to Websocket
-		query = _.getObjectSize (config) > 0
-			? query + _.parseJsonUrl (config) : query;
+		query = _.getObjectSize (config) > 0 ?
+			query + _.parseJsonUrl (config) : query;
 
 		self.socket = new WebSocket ('ws://' + self.host + ':' + port + query);
 		self.socket.addEventListener ('open', function (e) {
 			if ( self.open ) {
-				self.open (e)
+				self.open (e);
 			}
 		});
 		self.socket.addEventListener ('error', function (e) {
 			if ( self.error ) {
-				self.error (e)
+				self.error (e);
 			}
 		});
 		self.socket.addEventListener ('close', function (e) {
 			if ( self.close ) {
-				self.close (e)
+				self.close (e);
 			}
 		});
 		self.socket.addEventListener ('message', function (e) {
@@ -74,19 +73,18 @@
 					message: function () {
 						self.message = callback;
 					},
-					open   : function () {
+					open: function () {
 						self.open = callback;
 					},
-					close  : function () {
+					close: function () {
 						self.close = callback;
 					},
-					error  : function () {
+					error: function () {
 						self.error = callback;
 					}
 				}[event] || function () {}
-			) ()
+			) ();
 	});
-
 
 	//Socket send message
 	Socket.add ('send', function (config) {
@@ -95,12 +93,10 @@
 		}
 	});
 
-
 	//Kill Socket
 	Socket.add ('clear', function () {
 		this.socket.close ();
 	});
-
 
 	//Global access
 	window.Socket = Socket;

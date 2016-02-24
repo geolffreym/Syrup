@@ -11,8 +11,8 @@
 //http://requirejs.org/docs/api.html
 //Fallback
 (function (window) {
-	"use strict";
-	function Required () {
+	'use strict';
+	function Required() {
 		var requirejs, require, define;
 		(function (global) {
 			var req, s, head, baseElement, dataMain, src,
@@ -42,11 +42,11 @@
 				globalDefQueue = [],
 				useInteractive = false;
 
-			function isFunction (it) {
+			function isFunction(it) {
 				return ostring.call (it) === '[object Function]';
 			}
 
-			function isArray (it) {
+			function isArray(it) {
 				return ostring.call (it) === '[object Array]';
 			}
 
@@ -54,7 +54,7 @@
 			 * Helper function for iterating over an array. If the func returns
 			 * a true value, it will break out of the loop.
 			 */
-			function each (ary, func) {
+			function each(ary, func) {
 				if ( ary ) {
 					var i;
 					for ( i = 0; i < ary.length; i += 1 ) {
@@ -69,7 +69,7 @@
 			 * Helper function for iterating over an array backwards. If the func
 			 * returns a true value, it will break out of the loop.
 			 */
-			function eachReverse (ary, func) {
+			function eachReverse(ary, func) {
 				if ( ary ) {
 					var i;
 					for ( i = ary.length - 1; i > -1; i -= 1 ) {
@@ -80,11 +80,11 @@
 				}
 			}
 
-			function hasProp (obj, prop) {
+			function hasProp(obj, prop) {
 				return hasOwn.call (obj, prop);
 			}
 
-			function getOwn (obj, prop) {
+			function getOwn(obj, prop) {
 				return hasProp (obj, prop) && obj[prop];
 			}
 
@@ -93,7 +93,7 @@
 			 * property value. If the function returns a truthy value, then the
 			 * iteration is stopped.
 			 */
-			function eachProp (obj, func) {
+			function eachProp(obj, func) {
 				var prop;
 				for ( prop in obj ) {
 					if ( hasProp (obj, prop) ) {
@@ -108,7 +108,7 @@
 			 * Simple function to mix in properties from source into target,
 			 * but only if target does not already have a property of the same name.
 			 */
-			function mixin (target, source, force, deepStringMixin) {
+			function mixin(target, source, force, deepStringMixin) {
 				if ( source ) {
 					eachProp (source, function (value, prop) {
 						if ( force || !hasProp (target, prop) ) {
@@ -129,23 +129,23 @@
 
 			//Similar to Function.prototype.bind, but the 'this' object is specified
 			//first, since it is easier to read/figure out what 'this' will be.
-			function bind (obj, fn) {
+			function bind(obj, fn) {
 				return function () {
 					return fn.apply (obj, arguments);
 				};
 			}
 
-			function scripts () {
+			function scripts() {
 				return document.getElementsByTagName ('script');
 			}
 
-			function defaultOnError (err) {
+			function defaultOnError(err) {
 				throw err;
 			}
 
 			//Allow getting a global that is expressed in
 			//dot notation, like 'a.b.c'.
-			function getGlobal (value) {
+			function getGlobal(value) {
 				if ( !value ) {
 					return value;
 				}
@@ -164,7 +164,7 @@
 			 *
 			 * @returns {Error}
 			 */
-			function makeError (id, msg, err, requireModules) {
+			function makeError(id, msg, err, requireModules) {
 				var e = new Error (msg + '\nhttp://requirejs.org/docs/errors.html#' + id);
 				e.requireType = id;
 				e.requireModules = requireModules;
@@ -191,12 +191,12 @@
 
 			//Allow for a require config object
 			if ( typeof require !== 'undefined' && !isFunction (require) ) {
-				//assume it is a config object.
+				//Assume it is a config object.
 				cfg = require;
 				require = undefined;
 			}
 
-			function newContext (contextName) {
+			function newContext(contextName) {
 				var inCheckLoaded, Module, context, handlers,
 					checkLoadedTimeoutId,
 					config = {
@@ -204,15 +204,15 @@
 						//config to speed up normalize(), which
 						//will run faster if there is no default.
 						waitSeconds: 7,
-						baseUrl    : './',
-						paths      : {},
-						bundles    : {},
-						pkgs       : {},
-						shim       : {},
-						config     : {}
+						baseUrl: './',
+						paths: {},
+						bundles: {},
+						pkgs: {},
+						shim: {},
+						config: {}
 					},
 					registry = {},
-				//registry of just enabled recipeCollection, to speed
+				//Registry of just enabled recipeCollection, to speed
 				//cycle breaking code when lots of recipeCollection
 				//are registered, but not activated.
 					enabledRegistry = {},
@@ -233,7 +233,7 @@
 				 * NOTE: this method MODIFIES the input array.
 				 * @param {Array} ary the array of path segments.
 				 */
-				function trimDots (ary) {
+				function trimDots(ary) {
 					var i, part;
 					for ( i = 0; i < ary.length; i++ ) {
 						part = ary[i];
@@ -266,7 +266,7 @@
 				 * only be done if this normalization is for a dependency ID.
 				 * @returns {String} normalized name
 				 */
-				function normalize (name, baseName, applyMap) {
+				function normalize(name, baseName, applyMap) {
 					var pkgMain, mapValue, nameParts, i, j, nameSegment, lastIndex,
 						foundMap, foundI, foundStarMap, starI, normalizedBaseParts,
 						baseParts = (baseName && baseName.split ('/')),
@@ -314,7 +314,7 @@
 								for ( j = baseParts.length; j > 0; j -= 1 ) {
 									mapValue = getOwn (map, baseParts.slice (0, j).join ('/'));
 
-									//baseName segment has config, find if it has one for
+									//BaseName segment has config, find if it has one for
 									//this name.
 									if ( mapValue ) {
 										mapValue = getOwn (mapValue, nameSegment);
@@ -355,7 +355,7 @@
 					return pkgMain ? pkgMain : name;
 				}
 
-				function removeScript (name) {
+				function removeScript(name) {
 					if ( isBrowser ) {
 						each (scripts (), function (scriptNode) {
 							if ( scriptNode.getAttribute ('data-requiremodule') === name &&
@@ -367,7 +367,7 @@
 					}
 				}
 
-				function hasPathFallback (id) {
+				function hasPathFallback(id) {
 					var pathConfig = getOwn (config.paths, id);
 					if ( pathConfig && isArray (pathConfig) && pathConfig.length > 1 ) {
 						//Pop off the first array value, since it failed, and
@@ -388,7 +388,7 @@
 				//Turns a plugin!resource to [plugin, resource]
 				//with the plugin being undefined if the name
 				//did not have a plugin prefix.
-				function splitPrefix (name) {
+				function splitPrefix(name) {
 					var prefix,
 						index = name ? name.indexOf ('!') : -1;
 					if ( index > -1 ) {
@@ -413,7 +413,7 @@
 				 *
 				 * @returns {Object}
 				 */
-				function makeModuleMap (name, parentModuleMap, isNormalized, applyMap) {
+				function makeModuleMap(name, parentModuleMap, isNormalized, applyMap) {
 					var url, pluginModule, suffix, nameParts,
 						prefix = null,
 						parentName = parentModuleMap ? parentModuleMap.name : null,
@@ -481,20 +481,20 @@
 						'';
 
 					return {
-						prefix      : prefix,
-						name        : normalizedName,
-						parentMap   : parentModuleMap,
+						prefix: prefix,
+						name: normalizedName,
+						parentMap: parentModuleMap,
 						unnormalized: !!suffix,
-						url         : url,
+						url: url,
 						originalName: originalName,
-						isDefine    : isDefine,
-						id          : (prefix ?
+						isDefine: isDefine,
+						id: (prefix ?
 									  prefix + '!' + normalizedName :
 							normalizedName) + suffix
 					};
 				}
 
-				function getModule (depMap) {
+				function getModule(depMap) {
 					var id = depMap.id,
 						mod = getOwn (registry, id);
 
@@ -505,7 +505,7 @@
 					return mod;
 				}
 
-				function on (depMap, name, fn) {
+				function on(depMap, name, fn) {
 					var id = depMap.id,
 						mod = getOwn (registry, id);
 
@@ -524,7 +524,7 @@
 					}
 				}
 
-				function onError (err, errback) {
+				function onError(err, errback) {
 					var ids = err.requireModules,
 						notified = false;
 
@@ -553,7 +553,7 @@
 				 * Internal method to transfer globalQueue items to this context's
 				 * defQueue.
 				 */
-				function takeGlobalQueue () {
+				function takeGlobalQueue() {
 					//Push all the globalDefQueue items into the context's defQueue
 					if ( globalDefQueue.length ) {
 						each (globalDefQueue, function (queueItem) {
@@ -585,14 +585,14 @@
 							}
 						}
 					},
-					'module' : function (mod) {
+					'module': function (mod) {
 						if ( mod.module ) {
 							return mod.module;
 						} else {
 							return (mod.module = {
-								id     : mod.map.id,
-								uri    : mod.map.url,
-								config : function () {
+								id: mod.map.id,
+								uri: mod.map.url,
+								config: function () {
 									return getOwn (config.config, mod.map.id) || {};
 								},
 								exports: mod.exports || (mod.exports = {})
@@ -601,13 +601,13 @@
 					}
 				};
 
-				function cleanRegistry (id) {
+				function cleanRegistry(id) {
 					//Clean up machinery used for waiting recipeCollection.
 					delete registry[id];
 					delete enabledRegistry[id];
 				}
 
-				function breakCycle (mod, traced, processed) {
+				function breakCycle(mod, traced, processed) {
 					var id = mod.map.id;
 
 					if ( mod.error ) {
@@ -625,7 +625,7 @@
 							if ( dep && !mod.depMatched[i] && !processed[depId] ) {
 								if ( getOwn (traced, depId) ) {
 									mod.defineDep (i, defined[depId]);
-									mod.check (); //pass false?
+									mod.check (); //Pass false?
 								} else {
 									breakCycle (dep, traced, processed);
 								}
@@ -635,7 +635,7 @@
 					}
 				}
 
-				function checkLoaded () {
+				function checkLoaded() {
 					var err, usingPathFallback,
 						waitInterval = config.waitSeconds * 1000,
 					//It is possible to disable the wait interval by using waitSeconds of 0.
@@ -732,7 +732,7 @@
 					this.pluginMaps = {};
 					this.depCount = 0;
 
-					/* this.exports this.factory
+					/* This.exports this.factory
 					 this.depMaps = [],
 					 this.enabled, this.fetched
 					 */
@@ -889,7 +889,7 @@
 										if ( cjsModule ) {
 											exports = cjsModule.exports;
 										} else if ( this.usingExports ) {
-											//exports already set the defined value.
+											//Exports already set the defined value.
 											exports = this.exports;
 										}
 									}
@@ -965,7 +965,7 @@
 										}) || '';
 								}
 
-								//prefix and name should already be normalized, no need
+								//Prefix and name should already be normalized, no need
 								//for applying map config again either.
 								normalizedMap = makeModuleMap (map.prefix + '!' + name,
 															   this.map.parentMap);
@@ -973,7 +973,7 @@
 									'defined', bind (this, function (value) {
 										this.init ([], function () { return value; }, null, {
 											enabled: true,
-											ignore : true
+											ignore: true
 										});
 									}));
 
@@ -1189,14 +1189,14 @@
 					}
 				};
 
-				function callGetModule (args) {
+				function callGetModule(args) {
 					//Skip recipeCollection already defined.
 					if ( !hasProp (defined, args[0]) ) {
 						getModule (makeModuleMap (args[0], null, true)).init (args[1], args[2]);
 					}
 				}
 
-				function removeListener (node, func, name, ieName) {
+				function removeListener(node, func, name, ieName) {
 					//Favor detachEvent because of IE9
 					//issue, see attachEvent/addEventListener comment elsewhere
 					//in this file.
@@ -1217,7 +1217,7 @@
 				 * @param {Event} evt
 				 * @returns {Object}
 				 */
-				function getScriptData (evt) {
+				function getScriptData(evt) {
 					//Using currentTarget instead of target for Firefox 2.0's sake. Not
 					//all old browsers will be supported, but this one was easy enough
 					//to support and still makes sense.
@@ -1229,11 +1229,11 @@
 
 					return {
 						node: node,
-						id  : node && node.getAttribute ('data-requiremodule')
+						id: node && node.getAttribute ('data-requiremodule')
 					};
 				}
 
-				function intakeDefines () {
+				function intakeDefines() {
 					var args;
 
 					//Any defined recipeCollection in the global queue, intake them now.
@@ -1246,7 +1246,7 @@
 							return onError (makeError ('mismatch', 'Mismatched anonymous define() module: ' +
 																   args[args.length - 1]));
 						} else {
-							//args are id, deps, factory. Should be normalized by the
+							//Args are id, deps, factory. Should be normalized by the
 							//define() function.
 							callGetModule (args);
 						}
@@ -1255,17 +1255,17 @@
 				}
 
 				context = {
-					config       : config,
-					contextName  : contextName,
-					registry     : registry,
-					defined      : defined,
-					urlFetched   : urlFetched,
-					defQueue     : defQueue,
-					defQueueMap  : {},
-					Module       : Module,
+					config: config,
+					contextName: contextName,
+					registry: registry,
+					defined: defined,
+					urlFetched: urlFetched,
+					defQueue: defQueue,
+					defQueueMap: {},
+					Module: Module,
 					makeModuleMap: makeModuleMap,
-					nextTick     : req.nextTick,
-					onError      : onError,
+					nextTick: req.nextTick,
+					onError: onError,
 
 					/**
 					 * Set a configuration for the context.
@@ -1283,10 +1283,10 @@
 						//they are additive.
 						var shim = config.shim,
 							objs = {
-								paths  : true,
+								paths: true,
 								bundles: true,
-								config : true,
-								map    : true
+								config: true,
+								map: true
 							};
 
 						eachProp (cfg, function (value, prop) {
@@ -1373,7 +1373,7 @@
 					},
 
 					makeShimExports: function (value) {
-						function fn () {
+						function fn() {
 							var ret;
 							if ( value.init ) {
 								ret = value.init.apply (global, arguments);
@@ -1387,7 +1387,7 @@
 					makeRequire: function (relMap, options) {
 						options = options || {};
 
-						function localRequire (deps, callback, errback) {
+						function localRequire(deps, callback, errback) {
 							var id, map, requireMod;
 
 							if ( options.enableBuildCallback && callback && isFunction (callback) ) {
@@ -1683,7 +1683,7 @@
 					},
 
 					/**
-					 * callback for script loads, used to check status of loading.
+					 * Callback for script loads, used to check status of loading.
 					 *
 					 * @param {Event} evt the event from the browser for the script
 					 * that was loaded.
@@ -1741,7 +1741,7 @@
 
 				// Determine if have config object in the call.
 				if ( !isArray (deps) && typeof deps !== 'string' ) {
-					// deps is a config object
+					// Deps is a config object
 					config = deps;
 					if ( isArray (callback) ) {
 						// Adjust args if there are dependencies
@@ -1800,7 +1800,7 @@
 			req.jsExtRegExp = /^\/|:|\?|\.js$/;
 			req.isBrowser = isBrowser;
 			s = req.s = {
-				contexts  : contexts,
+				contexts: contexts,
 				newContext: newContext
 			};
 
@@ -1952,7 +1952,7 @@
 				}
 			};
 
-			function getInteractiveScript () {
+			function getInteractiveScript() {
 				if ( interactiveScript && interactiveScript.readyState === 'interactive' ) {
 					return interactiveScript;
 				}
@@ -2115,10 +2115,10 @@
 	 * @return {void}
 	 * **/
 	Required.add ('setConf', function (conf) {
-		"use strict";
+		'use strict';
 		this.require.config (_.extend ({
 			baseUrl: setting.app_path,
-			paths  : {
+			paths: {
 				system: setting.system_path
 			}
 
@@ -2130,16 +2130,15 @@
 	 * **/
 
 	Required.add ('getRequire', function () {
-		"use strict";
+		'use strict';
 		return this.require;
 	});
-
 
 	/** Return define requirejs
 	 * @return {object}
 	 * **/
 	Required.add ('getDefine', function () {
-		"use strict";
+		'use strict';
 		return this.define;
 	});
 
@@ -2148,7 +2147,7 @@
 	 * @return {object}
 	 * **/
 	Required.add ('lookup', function (dependencies) {
-		"use strict";
+		'use strict';
 		var _self = this;
 		_self.dependencies = dependencies;
 		return (new Promise (function (resolve, reject) {
@@ -2163,7 +2162,7 @@
 	 * @return {object}
 	 * **/
 	Required.add ('getDependencies', function () {
-		return this.dependencies
+		return this.dependencies;
 	});
 
 	/** Return cleaned dependencies, only dependencies name

@@ -9,23 +9,22 @@
 /**Dependencies
  * Http Lib
  * */
-"use strict";
+'use strict';
 (function (window) {
 	var WARNING_MODEL = {
 		ERROR: {
-			NOPACK      : 'Error packing model',
+			NOPACK: 'Error packing model',
 			OBJECTNEEDED: 'Object need to set in model'
 		}
 	};
 
-	function Model () {
+	function Model() {
 		this.data = null;
 		this.blob = null;
 		this.scope = {};
 		this.model = null;
 		this.failed = null;
 	}
-
 
 	/**Attach additional data to request
 	 * @param {string} name
@@ -47,13 +46,13 @@
 	//    var _return = [],
 	//        _model_obj = this.model.get(0);
 	//
-	//    if (name in _model_obj.elements) {
+	//    If (name in _model_obj.elements) {
 	//        _.each(_model_obj.elements[name], function (v, i) {
 	//            _return.push(v.value);
 	//        });
 	//    }
 	//
-	//    return _return.length > 0 ? _return : false;
+	//    Return _return.length > 0 ? _return : false;
 	//});
 
 	/**Model fail what to do?
@@ -64,9 +63,9 @@
 	Model.add ('fail', function (field, error) {
 		this.failed = true;
 		return {
-			field : field,
-			code  : error.code,
-			error : error.error,
+			field: field,
+			code: error.code,
+			error: error.error,
 			coords: _.cartesianPlane (field)
 		};
 	});
@@ -86,7 +85,6 @@
 		return this.blob;
 	});
 
-
 	/**Pack the input files in ModelData
 	 * @param {object|string} input
 	 * @return {object}
@@ -102,8 +100,8 @@
 
 		return (new Promise (function (resolve, reject) {
 			if (
-				_field.type === "file"
-				&& _.isSet (_field.name)
+				_field.type === 'file' &&
+				_.isSet (_field.name)
 			) {
 				var _temp = _field.files,
 					x = _temp.length;
@@ -151,8 +149,8 @@
 			_.error (WARNING_MODEL.ERROR.OBJECTNEEDED, '(Model .set)');
 
 		var _self = this;
-		_self.model = !_.is$ (model)
-					  && _$ (model) || model;
+		_self.model = !_.is$ (model) &&
+					  _$ (model) || model;
 
 		//Not model.. pass!!
 		if ( !_self.model.exist )
@@ -196,7 +194,7 @@
 
 				} else {
 					//Work normally!!
-					e.val (_self.scope[_the_index])
+					e.val (_self.scope[_the_index]);
 				}
 			}
 		});
@@ -260,12 +258,12 @@
 
 					//Codes List
 					_codes = {
-						'valueMissing'   : '001',
-						'typeMismatch'   : '002',
-						'tooLong'        : '003',
-						'stepMismatch'   : '004',
-						'rangeUnderFlow' : '005',
-						'rangeOverFlow'  : '006',
+						'valueMissing': '001',
+						'typeMismatch': '002',
+						'tooLong': '003',
+						'stepMismatch': '004',
+						'rangeUnderFlow': '005',
+						'rangeOverFlow': '006',
 						'patternMismatch': '007'
 					};
 

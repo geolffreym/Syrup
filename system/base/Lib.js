@@ -2,9 +2,9 @@
  * Created by gmena on 08-06-14.
  */
 
-"use strict";
+'use strict';
 (function (window) {
-	function Libs () {
+	function Libs() {
 		this.breadcrumb = {};
 		this.object = null;
 		this.name = null;
@@ -51,12 +51,12 @@
 		var _self = this;
 		if ( _.isArray (dependencies) && _.isSet (_self.object) ) {
 			_.each (dependencies, function (v) {
-				_self.object.prototype[v] = !(v in _self.object)
-					? ( _[v] || (
-						_.isFunction (window[v]) && new window[v]
-						|| _.isFunction (window[v + 'Class']) && new window[v + 'Class']
+				_self.object.prototype[v] = !(v in _self.object) ?
+					( _[v] || (
+						_.isFunction (window[v]) && new window[v] ||
+						_.isFunction (window[v + 'Class']) && new window[v + 'Class']
 				)) : _self.object.prototype[v];
-			})
+			});
 		}
 	});
 
@@ -101,7 +101,6 @@
 
 		return this;
 	});
-
 
 	/**Append methods
 	 * @param {string} name

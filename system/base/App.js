@@ -2,9 +2,9 @@
  * Created by gmena on 07-31-14.
  * Interceptor : ['init', 'taste', 'after']
  */
-"use strict";
+'use strict';
 (function (window) {
-	function Apps () {
+	function Apps() {
 		this.root = null; // Root name
 		this.lib = null; // Lib handler
 		this.scope = null; // Global scope
@@ -31,7 +31,7 @@
 			this.moduleCollection[name].root = name; // Root name
 			this.moduleCollection[name].moduled = true; // Flag to handle module app
 			this.moduleCollection[name].lib = new LibClass;
-			this.moduleCollection[name].lib.blend (name, dependencies)
+			this.moduleCollection[name].lib.blend (name, dependencies);
 		}
 
 		//Return the app
@@ -87,7 +87,7 @@
 			if ( _.isSet (module) ) {
 				var _self = this;
 				_self.recipeCollection[moduleId] = {
-					creator : module,
+					creator: module,
 					instance: null
 				};
 
@@ -111,9 +111,9 @@
 		var _self = this;
 		Object.observe (_self.scope, function (change) {
 			_.each (change, function (v, i) {
-				if ( (v.name in _self.onchange)
-					 && _.getObjectSize (v.object) > 0
-					 && moduleId === v.name
+				if ( (v.name in _self.onchange) &&
+					 _.getObjectSize (v.object) > 0 &&
+					 moduleId === v.name
 				) {
 					//Break the loop
 					this.break = true;
@@ -122,9 +122,9 @@
 					_self.onchange[v.name].call (
 						_self.recipeCollection[moduleId].instance,
 						{
-							name  : v.name,
-							old   : v.oldValue,
-							type  : v.type,
+							name: v.name,
+							old: v.oldValue,
+							type: v.type,
 							object: v.object[v.name]
 						}
 					);
@@ -190,7 +190,7 @@
 		if ( _.isObject (name) ) {
 			_.each (name, function (v, i) {
 				_self.lib.provider (i, v);
-			})
+			});
 		}
 
 		//Cook service
@@ -200,7 +200,6 @@
 
 		return _self;
 	});
-
 
 	/** Append global service object
 	 * @param {string} name
@@ -216,12 +215,11 @@
 
 		//Cook service
 		if ( _.isString (name) && _.isFunction (callback) ) {
-			this.lib.cook (name, callback)
+			this.lib.cook (name, callback);
 		}
 
 		return this;
 	});
-
 
 	/**Return a recipe by name
 	 * @param {string} moduleId
@@ -275,7 +273,7 @@
 			}[event] || {
 				then: function () {
 				}
-			})
+			});
 	});
 
 	/**Bind Listeners
@@ -339,12 +337,12 @@
 
 		//The model Object?
 		_self.recipeCollection[moduleId].instance.model = {
-			object  : _model,
+			object: _model,
 			resource: function (_model) {
 				return _$ ('[sp-recipe="' + moduleId + '"] ' +
 						   ((_model && '[sp-model="' + _model + '"]') || '[sp-model]'));
 			},
-			set     : function (obj, _res) {
+			set: function (obj, _res) {
 				//Resource model
 				var _resource = _.is$ (_res) && _res || this.resource (_res);
 
@@ -355,7 +353,7 @@
 				//Return object reference
 				return _self.recipeCollection[moduleId].instance;
 			},
-			get     : function (item, _res) {
+			get: function (item, _res) {
 				//Resource model
 				var _resource = _.is$ (_res) && _res || this.resource (_res);
 
@@ -367,9 +365,9 @@
 						then: function (resolve) {
 							return _model.get (_resource).then (function (e) {
 								if (
-									_.isSet (item)
-									&& _.isArray (item)
-									&& !_.isEmpty (item)
+									_.isSet (item) &&
+									_.isArray (item) &&
+									!_.isEmpty (item)
 								) {
 									var _result = {};
 									_.each (item, function (v, i) {
@@ -384,16 +382,16 @@
 								// Call the resolve
 								resolve.call (
 									_self.recipeCollection[moduleId].instance, e
-								)
+								);
 							});
 						}
 					};
 				}
 				//Not resource
 				//Do nothing!!
-				return { then: function () {} }
+				return { then: function () {} };
 			}
-		}
+		};
 	});
 
 	/**Prepare Views
@@ -419,14 +417,13 @@
 							// Call the resolve
 							resolve.call (
 								_self.recipeCollection[moduleId].instance, m
-							)
-						})
+							);
+						});
 					}
-				}
+				};
 			}
-		}
+		};
 	});
-
 
 	/**Prepare Scopes
 	 * @param {string} moduleId
@@ -439,21 +436,21 @@
 		//The scope object
 		_self.recipeCollection[moduleId].instance.scope = {
 			global: _self.scope, object: _self.scope[moduleId],
-			set   : function (nModule, object) {
-				var _moduleId = !_.isObject (nModule)
-								&& _.isString (nModule) && nModule
-								|| moduleId,
-					_object = _.isObject (nModule) && nModule
-							  || object;
+			set: function (nModule, object) {
+				var _moduleId = !_.isObject (nModule) &&
+								_.isString (nModule) && nModule ||
+								moduleId,
+					_object = _.isObject (nModule) && nModule ||
+							  object;
 
 				if ( _.isObject (_object) ) {
 					_self.setScope (_moduleId, _object);
 					return _self.recipeCollection[moduleId].instance;
 				}
 			},
-			get   : function (nModule) {
-				var _moduleId = _.isString (nModule)
-					? nModule : moduleId;
+			get: function (nModule) {
+				var _moduleId = _.isString (nModule) ?
+					nModule : moduleId;
 
 				return _self.getScope (_moduleId);
 			}
@@ -471,16 +468,15 @@
 		//The app object
 		_self.recipeCollection[moduleId].instance.app = {
 			window: window, $: _$, object: _$ ('[sp-app]'),
-			title : function (title) {
+			title: function (title) {
 				var _title = _$ ('title');
 				if ( _title.exist ) {
-					_title.text (title)
+					_title.text (title);
 				}
 				return _self.recipeCollection[moduleId].instance;
 			}
 		};
 	});
-
 
 	/**Prepare Recipes
 	 * @param {string} moduleId
@@ -492,19 +488,19 @@
 
 		//The recipe object
 		_self.recipeCollection[moduleId].instance.recipe = {
-			$   : _$ ('[sp-recipe="' + moduleId + '"]'),
+			$: _$ ('[sp-recipe="' + moduleId + '"]'),
 			node: function (node) {
 				return _$ ('[sp-recipe="' + moduleId + '"] [sp-node=' + node + ']');
 			},
-			get : function (nModule) {
-				var _moduleId = _.isString (nModule)
-					? nModule : moduleId;
+			get: function (nModule) {
+				var _moduleId = _.isString (nModule) ?
+					nModule : moduleId;
 
 				return _self.getRecipe (_moduleId);
 			},
 			drop: function (nModule) {
-				var _moduleId = _.isString (nModule)
-					? nModule : moduleId;
+				var _moduleId = _.isString (nModule) ?
+					nModule : moduleId;
 
 				_self.drop (_moduleId);
 				return _self.recipeCollection[moduleId].instance;
@@ -552,8 +548,8 @@
 							view.render (_scope).then (function (res) {
 								_dom.html (res);
 								resolve (res);
-							})
-						})
+							});
+						});
 					} else {
 						//Handle view?
 						//Require the view if needed
@@ -561,8 +557,8 @@
 							if ( view_name in _view.__proto__ )
 								_view[view_name] (_, _scope, function (my_html) {
 									_dom.html (my_html);
-									resolve (my_html)
-								})
+									resolve (my_html);
+								});
 						});
 					}
 
@@ -570,7 +566,7 @@
 				} else if ( _dom_template.exist ) {
 					_view.render (_dom_template.html (), _scope).then (function (result) {
 						_dom.html (result);
-						resolve (result)
+						resolve (result);
 					});
 				}
 			}
@@ -590,8 +586,8 @@
 
 		//Module registered?
 		//Root exists?
-		if ( moduleId in _self.recipeCollection
-			 && _.isSet (_self.root)
+		if ( moduleId in _self.recipeCollection &&
+			 _.isSet (_self.root)
 		) {
 
 			// Initialize module in scope
@@ -632,8 +628,8 @@
 
 			// Init the module?
 			if (
-				'init' in _self.recipeCollection[moduleId].instance
-				&& _.isFunction (_self.recipeCollection[moduleId].instance.init)
+				'init' in _self.recipeCollection[moduleId].instance &&
+				_.isFunction (_self.recipeCollection[moduleId].instance.init)
 			) {
 
 				//Handle taste interceptor
@@ -643,8 +639,8 @@
 
 				//Require Libs?
 				if (
-					'require' in _self.recipeCollection[moduleId].instance
-					&& _.isArray (_self.recipeCollection[moduleId].instance.require)
+					'require' in _self.recipeCollection[moduleId].instance &&
+					_.isArray (_self.recipeCollection[moduleId].instance.require)
 				) {
 					//LookUp for libs!!
 					Require.lookup (_self.recipeCollection[moduleId].instance.require).then (function (e) {
@@ -683,8 +679,8 @@
 	 */
 	Apps.add ('taste', function (moduleId) {
 		var _self = this,
-			_moduleId = moduleId && [moduleId]
-						|| _.getObjectKeys (_self.recipeCollection);
+			_moduleId = moduleId && [moduleId] ||
+						_.getObjectKeys (_self.recipeCollection);
 
 		//Reset lazy exec
 		_self.lazy = false;
@@ -722,7 +718,6 @@
 		return this;
 	});
 
-
 	/** Handle the interceptors
 	 * @param {string} type
 	 * @param {object} param
@@ -741,7 +736,6 @@
 		//}
 	});
 
-
 	/**Drop a Module
 	 * @param moduleId
 	 * @return object
@@ -757,7 +751,6 @@
 		return this;
 	});
 
-
 	/**Drop all Modules
 	 * @return object
 	 * */
@@ -769,7 +762,7 @@
 		return this;
 	});
 
-//The global object App
+	//The global object App
 	window.App = new Apps;
 	window.AppClass = Apps;
 

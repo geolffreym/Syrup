@@ -2,7 +2,6 @@
  * @author Geolffrey Mena <gmjun2000@gmail.com>
  */
 
-
 (function (window) {
 	'use strict';
 
@@ -13,7 +12,7 @@
 	 *
 	 */
 
-	function View () {
+	function View() {
 		this.Repo = new Repo;
 		this.key = '___templates';
 		this.tpl = null;
@@ -61,7 +60,7 @@
 			//Is template in repo?
 			if ( template in _template ) {
 				_self.tpl = _template[template];
-				resolve (_self)
+				resolve (_self);
 
 			} else {
 				//Get the template
@@ -102,10 +101,10 @@
 		var old_templates = this.Repo.get (this.key);
 
 		if (
-			old_templates
-			&& template in old_templates
+			old_templates &&
+			template in old_templates
 		) {
-			delete old_templates[template]
+			delete old_templates[template];
 		}
 
 		//Update repo templates
@@ -136,7 +135,7 @@
 				//Worker running
 				worker.toWork ({
 					template: _template || _.emptyStr,
-					fields  : _fields || {}
+					fields: _fields || {}
 				});
 			});
 		}));

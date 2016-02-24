@@ -27,12 +27,12 @@
 	// Utilities
 	// ---------
 
-	// setImmediate shim used to deliver changes records asynchronously
+	// SetImmediate shim used to deliver changes records asynchronously
 	// use setImmediate if available
 	var setImmediate = global.setImmediate || global.msSetImmediate,
 		clearImmediate = global.clearImmediate || global.msClearImmediate;
 	if (!setImmediate) {
-		// fallback on setTimeout if not
+		// Fallback on setTimeout if not
 		setImmediate = function (func, args) {
 			return setTimeout(func, 0, args);
 		};
@@ -41,16 +41,15 @@
 		};
 	}
 
-
 	// WeakMap
 	// -------
 
 	var PrivateMap;
 	if (typeof WeakMap !== 'undefined')  {
-		//use weakmap if defined
+		//Use weakmap if defined
 		PrivateMap = WeakMap;
 	} else {
-		//else use ses like shim of WeakMap
+		//Else use ses like shim of WeakMap
 		var HIDDEN_PREFIX = '__weakmap:' + (Math.random() * 1e9 >>> 0),
 			counter = new Date().getTime() % 1e9,
 			mascot = {};
@@ -71,9 +70,9 @@
 
 			set: function (key, value) {
 				Object.defineProperty(key, this.name, {
-					value : typeof value === 'undefined' ? mascot : value,
+					value: typeof value === 'undefined' ? mascot : value,
 					enumerable: false,
-					writable : true,
+					writable: true,
 					configurable: true
 				});
 			},
@@ -82,7 +81,6 @@
 				return delete key[this.name];
 			}
 		};
-
 
 		var getOwnPropertyName = Object.getOwnPropertyNames;
 		Object.defineProperty(Object, 'getOwnPropertyNames', {
@@ -96,7 +94,6 @@
 			configurable: true
 		});
 	}
-
 
 	// Internal Properties
 	// -------------------
@@ -131,7 +128,6 @@
 				throw new TypeError('changeRecord must be an Object, given ' + changeRecord);
 			}
 
-
 			var type = changeRecord.type;
 			if (typeof type !== 'string') {
 				throw new TypeError('changeRecord.type must be a string, given ' + type);
@@ -145,8 +141,8 @@
 				newRecord = Object.create(Object.prototype, {
 					'object': {
 						value: target,
-						writable : false,
-						enumerable : true,
+						writable: false,
+						enumerable: true,
 						configurable: false
 					}
 				});
@@ -155,8 +151,8 @@
 					var value = changeRecord[prop];
 					Object.defineProperty(newRecord, prop, {
 						value: value,
-						writable : false,
-						enumerable : true,
+						writable: false,
+						enumerable: true,
 						configurable: false
 					});
 				}
@@ -166,7 +162,7 @@
 		},
 		writable: true,
 		enumerable: false,
-		configurable : true
+		configurable: true
 	});
 
 	Object.defineProperty(NotifierPrototype, 'performChange', {
@@ -206,14 +202,14 @@
 				newRecord = Object.create(Object.prototype, {
 					'object': {
 						value: target,
-						writable : false,
-						enumerable : true,
+						writable: false,
+						enumerable: true,
 						configurable: false
 					},
 					'type': {
 						value: changeType,
-						writable : false,
-						enumerable : true,
+						writable: false,
+						enumerable: true,
 						configurable: false
 					}
 				});
@@ -223,8 +219,8 @@
 						var value = changeRecord[prop];
 						Object.defineProperty(newRecord, prop, {
 							value: value,
-							writable : false,
-							enumerable : true,
+							writable: false,
+							enumerable: true,
 							configurable: false
 						});
 					}
@@ -237,7 +233,7 @@
 		},
 		writable: true,
 		enumerable: false,
-		configurable : true
+		configurable: true
 	});
 
 	// Implementation of the internal algorithm 'BeginChange'
@@ -279,7 +275,6 @@
 		return doesAccept;
 	}
 
-
 	// Map used to store corresponding notifier to an object
 	var notifierMap = new PrivateMap(),
 		changeObserversMap = new PrivateMap(),
@@ -291,9 +286,9 @@
 	function _getNotifier(target) {
 		if (!notifierMap.has(target)) {
 			var notifier = Object.create(NotifierPrototype);
-			// we does not really need to hide this, since anyway the host object is accessible from outside of the
+			// We does not really need to hide this, since anyway the host object is accessible from outside of the
 			// implementation. we just make it unwritable
-			Object.defineProperty(notifier, '__target', { value : target });
+			Object.defineProperty(notifier, '__target', { value: target });
 			changeObserversMap.set(notifier, []);
 			activeChangesMap.set(notifier, {});
 			notifierMap.set(target, notifier);
@@ -301,9 +296,7 @@
 		return notifierMap.get(target);
 	}
 
-
-
-	// map used to store reference to a list of pending changeRecords
+	// Map used to store reference to a list of pending changeRecords
 	// in observer callback.
 	var pendingChangesMap = new PrivateMap();
 
@@ -333,7 +326,7 @@
 		setUpChangesDelivery();
 	}
 
-	// map used to store a count of associated notifier to a function
+	// Map used to store a count of associated notifier to a function
 	var attachedNotifierCountMap = new PrivateMap();
 
 	// Remove reference all reference to an observer callback,
@@ -383,7 +376,6 @@
 		return anyWorkDone;
 	}
 
-
 	Object.defineProperties(Object, {
 		// Implementation of the public api 'Object.observe'
 		// described in the proposal.
@@ -423,7 +415,6 @@
 						nextIndex++;
 					}
 				}
-
 
 				var notifier = _getNotifier(target),
 					changeObservers = changeObserversMap.get(notifier);

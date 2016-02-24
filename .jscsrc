@@ -7,6 +7,10 @@
   "requireSemicolons": true,
   "requireParenthesesAroundIIFE": true,
   "requireCamelCaseOrUpperCaseIdentifiers": {
+    "allExcept": [
+      "Syrup",
+      "Error"
+    ],
     "ignoreProperties": true,
     "strict": true
   },
@@ -15,6 +19,9 @@
   "validateIndentation": "\t",
   "disallowTrailingComma": true,
   "disallowMultipleVarDecl": false,
+  "requireCapitalizedComments": {
+    "inlined": true
+  },
   "disallowSpacesInCallExpression": false,
   "disallowSpacesInAnonymousFunctionExpression": false,
   "disallowSpacesInFunctionExpression": false,
