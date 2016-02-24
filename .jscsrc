@@ -5,14 +5,16 @@
   ],
   "maxErrors": 100,
   "requireSemicolons": true,
+  "requireCurlyBraces": false,
   "requireParenthesesAroundIIFE": true,
   "requireCamelCaseOrUpperCaseIdentifiers": {
     "allExcept": [
       "Syrup",
-      "Error"
+      "Error",
+      "Object",
+      "Util"
     ],
-    "ignoreProperties": true,
-    "strict": true
+    "ignoreProperties": true
   },
   "maximumLineLength": 120,
   "validateLineBreaks": "LF",

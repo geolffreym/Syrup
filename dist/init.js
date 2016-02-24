@@ -59,9 +59,8 @@
 
 	(function (window) {
 
-		//Global access
-		window.Syrup = new _Syrup2.default();
-		window.SyrupClass = _Syrup2.default;
+	    //Global access
+	    window._ = new _Syrup2.default();
 	})(window);
 
 /***/ },
@@ -25117,14 +25116,36 @@
 /* 104 */
 /***/ function(module, exports, __webpack_require__) {
 
+	'use strict';
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _IsJsAdapter = __webpack_require__(111);
+
+	var _IsJsAdapter2 = _interopRequireDefault(_IsJsAdapter);
+
+	var _UnderscoreAdapter = __webpack_require__(112);
+
+	var _UnderscoreAdapter2 = _interopRequireDefault(_UnderscoreAdapter);
+
+	var _Exceptions = __webpack_require__(113);
+
+	var _Exceptions2 = _interopRequireDefault(_Exceptions);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 	/**
 	 * Created with JetBrains WebStorm.
 	 * User: Geolffrey Mena
 	 * Date: 25/11/13
 	 * Time: 12:22
 	 */
-
-	'use strict'
 
 	//Jquery Dom Traversing -> https://github.com/jquery/jquery
 	//Underscore util -> https://github.com/jashkenas/underscore
@@ -25134,46 +25155,43 @@
 	//Handle dependencies using ECMAScript 6 Module import
 	//import jquery from '../../node_modules/jquery';
 	//import underscore from '../../node_modules/underscore';
-	//import is_js from '../../node_modules/is_js';
 	//import moment_js from '../../node_modules/moment';
 
 	//Handle dependencies using CommonJs
-	;
-
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
 	var jquery = __webpack_require__(2),
-	    underscore = __webpack_require__(3),
-	    isJs = __webpack_require__(4),
-	    momentJs = __webpack_require__(5);
+	    momentjs = __webpack_require__(5);
 
-	//Syrup class
+	//Handle dependencies using ECMAScript 6 Module import
+
+	//Exceptions
 
 	var Syrup = (function () {
+	    /** Syrup class
+	      * @constructor
+	     */
+
 	    function Syrup() {
 	        _classCallCheck(this, Syrup);
 
 	        //Basic attributes
 	        this.emptyStr = '';
 
-	        //Dependencie injection
-	        this.$ = jquery; // Jquery jquery.js
-	        this.is = isJs; // Is is.js
-	        this.date = momentJs; // Moment moment.js
-	        this.u10s = underscore; // Underscore underscore.js
+	        //Dependencies injection
+	        this.$ = jquery; // Jquery.js
+	        this.is = _IsJsAdapter2.default; // Is.js
+	        this.date = momentjs; // Moment.js
+	        this.u10s = _UnderscoreAdapter2.default; // Underscore.js
 
 	        //Init features
 	        this.i18n({});
+	        this.native = {
+	            'function': Function.prototype,
+	            'object': Object.prototype
+	        };
 	    }
 
 	    /**Set default locale i18n date format
-	     * @param {object} setting
+	      * @param {object} setting
 	     * @return {object}
 	     */
 
@@ -25189,20 +25207,46 @@
 	            return this;
 	        }
 
-	        /**Throw error
-	         * @param {string} msg
-	         * @param {string} breakpoint
-	         * @return {void}
+	        /**Parse to Object
+	          * @param {object} element
+	         * @param {object} element2: optional
+	         * @return {object}
 	         */
 
 	    }, {
-	        key: 'error',
-	        value: function error(msg, breakpoint) {
-	            throw new Error(msg + (breakpoint ? ' | Method: ' + breakpoint : this.emptyStr) + ' ( ' + this.date().format('MMMM Do YYYY, h:mm:ss a') + ' )');
+	        key: 'toObject',
+	        value: function toObject(element) {
+	            var element2 = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
+	            try {
+	                //Is Json?
+	                if (this.is.json(element)) {
+	                    return JSON.parse(element);
+	                }
+
+	                //Is string or number?
+	                if (this.is.string(element) || this.is.number(element)) {
+	                    return this.native.object.valueOf.call(element);
+	                }
+
+	                //Is not array?
+	                if (!this.is.array(element)) {
+	                    throw new _Exceptions2.default('(Syrup .toObject)');
+	                }
+
+	                // Reduce object or mix it!!
+	                return element.reduce(function (o, v, i) {
+	                    o[element2 && v || i] = element2 && element2[i] || v;
+	                    return o;
+	                }, {});
+	            } catch (err) {
+	                //Log error
+	                err.log();
+	            }
 	        }
 
 	        /** Validate if param is set. If not, throw msg!
-	         * @param {object} param
+	          * @param {object} param
 	         * @param {string} msg
 	         * @param {string} breakpoint
 	         * @return {bool|object}
@@ -25224,6 +25268,191 @@
 	})();
 
 	exports.default = Syrup;
+
+/***/ },
+/* 105 */,
+/* 106 */,
+/* 107 */,
+/* 108 */,
+/* 109 */,
+/* 110 */,
+/* 111 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Created with JetBrains WebStorm.
+	 * User: Geolffrey Mena
+	 * Date: 25/11/13
+	 * Time: 12:22
+	 */
+
+	'use strict'
+	/**
+	 * IsJS adapter, to add additional features
+	 * */
+
+	//Is Js module
+	;
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var isJs = __webpack_require__(4);
+
+	//Enhanced Object Literals
+	exports.default = {
+	  __proto__: isJs,
+
+	  /**Is html?
+	   * @param {string} html
+	   * @return {boolean}
+	   */
+	  html: function html(_html) {
+	    return (/(<([^>]+)>)/ig.test(_html)
+	    );
+	  }
+	};
+
+/***/ },
+/* 112 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Created with JetBrains WebStorm.
+	 * User: Geolffrey Mena
+	 * Date: 25/11/13
+	 * Time: 12:22
+	 */
+
+	'use strict'
+	/**
+	 * IsJS adapter, to add additional features
+	 * */
+
+	//Is Js module
+	;
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var underscore = __webpack_require__(3);
+
+	//Enhanced Object Literals
+	exports.default = {
+	  __proto__: underscore
+
+	};
+
+/***/ },
+/* 113 */
+/***/ function(module, exports) {
+
+	/**
+	 * Created with JetBrains WebStorm.
+	 * User: Geolffrey Mena
+	 * Date: 25/11/13
+	 * Time: 12:22
+	 */
+
+	'use strict'
+	//Constants
+	;
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var ERROR = {
+	    INVALID_PARAM: 'Param needed',
+	    INVALID_NETWORK: 'Network Error',
+	    INVALID_OBJECT: 'A object is needed.',
+	    INVALID_ARRAY: 'An array is needed.',
+	    INVALID_STRING: 'A string is needed',
+	    INVALID_FUNCTION: 'A function is needed.',
+	    INVALID_DATE: 'Invalid Date',
+	    INVALID_URL: 'URL is needed.'
+	};
+
+	var CoreExceptions = (function () {
+	    /** Syrup core exceptions
+	      * @constructor
+	     */
+
+	    function CoreExceptions(message) {
+	        var breakpoint = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
+
+	        _classCallCheck(this, CoreExceptions);
+
+	        this.name = 'CoreExceptions';
+	        this.type = Error;
+	        this.message = message + (breakpoint && ' | Method: ' + breakpoint || '');
+	    }
+
+	    /**
+	     * Handle error by type
+	      * @returns {Error|*}
+	     * @private
+	     */
+
+	    _createClass(CoreExceptions, [{
+	        key: '_getError',
+	        value: function _getError() {
+	            return new this.type(this.message);
+	        }
+
+	        /**Throw error
+	          * @return {void}
+	         */
+
+	    }, {
+	        key: 'log',
+	        value: function log() {
+	            throw this._getError();
+	        }
+
+	        /**Show warning in console log
+	          * @return {string}
+	         */
+
+	    }, {
+	        key: 'toString',
+	        value: function toString() {
+	            return this.message;
+	        }
+	    }]);
+
+	    return CoreExceptions;
+	})();
+
+	var InvalidArray = (function (_CoreExceptions) {
+	    _inherits(InvalidArray, _CoreExceptions);
+
+	    /** Invalid Array exception
+	      * @constructor
+	     */
+
+	    function InvalidArray(breakpoint) {
+	        _classCallCheck(this, InvalidArray);
+
+	        //Overloading attributes
+
+	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(InvalidArray).call(this, ERROR.INVALID_ARRAY, breakpoint));
+
+	        _this.name = 'InvalidArray';
+	        _this.type = TypeError;
+	        return _this;
+	    }
+
+	    return InvalidArray;
+	})(CoreExceptions);
+
+	exports.default = InvalidArray;
 
 /***/ }
 /******/ ]);

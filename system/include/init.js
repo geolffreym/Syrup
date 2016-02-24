@@ -6,10 +6,9 @@
 import Syrup from '../core/Syrup';
 
 (function (window) {
-
-	//Global access
-	window.Syrup = new Syrup();
-	window.SyrupClass = Syrup;
-
+    
+    //Global access
+    window._ = new Syrup();
+    
 })(window);
 
