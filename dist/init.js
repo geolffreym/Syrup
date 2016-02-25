@@ -142,7 +142,7 @@
 	        //Dom traversing tool (jQuery) needed only for client side
 	        //Dom traversing not needed in server side
 	        if (this.isClient) {
-	            this.$ = this.isClient && jquery || null; // Jquery.js
+	            this.$ = jquery; // Jquery.js
 	        }
 
 	        //Init features
