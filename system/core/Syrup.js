@@ -101,15 +101,20 @@ export default class Syrup {
         
         //Match navigator information
         var _regex = /(?:trident\/(?=\w.+rv:)|(?:chrome\/|firefox\/|opera\/|msie\s|safari\/))[\w.]{1,4}/,
-            _matches = this.nav.local.match(_regex),
-            _split = this.is.truthy(_matches) ?
-                _matches[0].split('/') : null;
+            [_matches] = this.nav.local.match(_regex);
         
-        return _split ? {
-            nav: !!_split[0] ? _split[0].replace('trident', 'msie') : null,
-            version: !!_split[1] ? _split[1] : null,
-            platform: window.navigator.platform.toLocaleLowerCase()
-        } : null;
+        //Found match for navigator info
+        if (_matches) {
+            //Agent and version
+            [_agent, _version] = _matches.split('/');
+            
+            return {
+                nav: _agent.replace('trident', 'msie'),
+                version: _version,
+                platform: window.navigator.platform.toLocaleLowerCase()
+            };
+        }
+        
     }
 
     /** Validate if param is set. If not, throw msg!
