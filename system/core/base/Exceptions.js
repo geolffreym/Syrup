@@ -8,37 +8,28 @@
 'use strict';
 //Constants
 const ERROR = {
-    INVALID_PARAM: 'Param needed',
+    INVALID_PARAM: 'One or more parameters are invalid in function',
     INVALID_NETWORK: 'Network Error',
-    INVALID_OBJECT: 'A object is needed.',
-    INVALID_ARRAY: 'An array is needed.',
-    INVALID_STRING: 'A string is needed',
-    INVALID_FUNCTION: 'A function is needed.',
+    INVALID_OBJECT: 'An object is required as a parameter for the use of this function',
+    INVALID_ARRAY: 'An array is required as a parameter for the use of this function',
+    INVALID_STRING: 'An string is required as a parameter for the use of this function',
+    INVALID_FUNCTION: 'An function is required as a parameter for the use of this function',
     INVALID_DATE: 'Invalid Date',
     INVALID_URL: 'URL is needed.'
 };
 
-class CoreExceptions {
+export default class CoreExceptions {
     /** Syrup core exceptions
 
      * @constructor
      */
     constructor(message, breakpoint = null) {
-        this.name = 'CoreExceptions';
         this.type = Error;
-        this.message = (message) + (breakpoint && (' | Method: ' + breakpoint) || '');
-    }
-
-    /**
-     * Handle error by type
-
-     * @returns {Error|*}
-     * @private
-     */
-    _getError() {
-        return new this.type(
-            this.message
-        );
+        this.name = 'CoreExceptions';
+        this.message = (message
+            ) + (breakpoint && (' | Method: ' + breakpoint
+                ) || ''
+            );
     }
 
     /**Throw error
@@ -46,7 +37,10 @@ class CoreExceptions {
      * @return {void}
      */
     log() {
-        throw (this._getError());
+        throw (new this.type(
+                this.message
+            )
+        );
     }
 
     /**Show warning in console log
@@ -59,7 +53,7 @@ class CoreExceptions {
 
 }
 
-export default class InvalidArray extends CoreExceptions {
+export class InvalidArray extends CoreExceptions {
     /** Invalid Array exception
 
      * @constructor
@@ -67,7 +61,23 @@ export default class InvalidArray extends CoreExceptions {
     constructor(breakpoint) {
         super(ERROR.INVALID_ARRAY, breakpoint);
         //Overloading attributes
-        this.name = 'InvalidArray';
         this.type = TypeError;
+        this.name = 'InvalidArray';
+        
     }
 }
+
+export class InvalidParam extends CoreExceptions {
+    /** Invalid Array exception
+
+     * @constructor
+     */
+    constructor(breakpoint) {
+        super(ERROR.INVALID_PARAM, breakpoint);
+        //Overloading attributes
+        this.type = ReferenceError;
+        this.name = 'InvalidParam';
+        
+    }
+}
+

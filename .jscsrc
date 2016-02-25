@@ -11,8 +11,7 @@
     "allExcept": [
       "Syrup",
       "Error",
-      "Object",
-      "Util"
+      "Object"
     ],
     "ignoreProperties": true
   },
