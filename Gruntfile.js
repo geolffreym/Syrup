@@ -4,16 +4,16 @@
 var path = require('path');
 
 module.exports = function (grunt) {
-
+    
     // Load the plugin that provides the "uglify" task.
     grunt.loadNpmTasks('grunt-webpack');
     grunt.loadNpmTasks('grunt-jscs');
-
+    
     // Project configuration.
     grunt.initConfig({
         webpack: {
             syrup: {
-                entry: './system/include/init.js',
+                entry: './system/server/init.js',
                 output: {
                     path: path.join(__dirname, './dist'),
                     filename: 'init.js', // Or [name]
@@ -26,16 +26,16 @@ module.exports = function (grunt) {
                     reasons: true
                 },
                 // Stats: false disables the stats output
-
+                
                 watch: true, // Use webpacks watcher
                 // You need to keep the grunt process alive
-
+                
                 keepalive: true, // Don't finish the grunt task
                 // Use this in combination with the watch option
-
+                
                 failOnError: false, // Don't report error to grunt if webpack find errors
                 // Use this if webpack errors are tolerable and grunt should continue
-
+                
                 module: {
                     loaders: [
                         {
@@ -67,10 +67,10 @@ module.exports = function (grunt) {
             }
         }
     });
-
+    
     // Default task(s).
     grunt.registerTask('default', [
         'webpack'
     ]);
-
+    
 };

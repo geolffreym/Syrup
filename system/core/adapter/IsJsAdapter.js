@@ -13,6 +13,9 @@
 //Is Js module
 var isJs = require('is_js');
 
+//JQuery
+import jQuery  from './JQueryAdapter';
+
 //Enhanced Object Literals
 export default {
     __proto__: isJs,
@@ -23,6 +26,16 @@ export default {
      */
     html(html)    {
         return /(<([^>]+)>)/ig.test(html);
+    },
+    
+    /**Is Jquery Object?
+     * @param obj
+     * @returns {boolean}
+     */
+    $(obj) {
+        return (
+            obj instanceof jQuery.noConflict()
+        );
     }
 };
 

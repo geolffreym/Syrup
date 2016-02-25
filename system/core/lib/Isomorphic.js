@@ -31,10 +31,13 @@ export default class Isomorphic {
      * AMD with global, Node, or global
 
      * @param {string} name
-     * @param {object} factory
+     * @param {object} Factory
      * @return {void|object}
      */
-    static export(name, factory) {
+    static export(name, Factory) {
+        
+        Factory = typeof Factory === 'object' &&
+            Factory || new Factory();
         
         //Only for client
         if (this.client()) {
@@ -45,18 +48,22 @@ export default class Isomorphic {
                     // Also create a global in case some scripts
                     // that are loaded still are looking for
                     // a global even when an AMD loader is in use.
-                    return (window[name] = factory);
+                    return (
+                        window[name] = Factory
+                    );
                 });
             } else {
                 // Browser globals (root is window)
-                return (window[name] = factory);
+                return (
+                    window[name] = Factory
+                );
             }
             
         } else {
             // Node. Does not work with strict CommonJS, but
             // only CommonJS-like enviroments that support module.exports,
             // like Node.
-            module.exports = factory;
+            module.exports = Factory;
         }
     }
 

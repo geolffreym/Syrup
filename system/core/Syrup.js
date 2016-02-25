@@ -26,9 +26,8 @@ import isJs from './adapter/IsJsAdapter';
 import underscore from './adapter/UnderscoreAdapter';
 
 //Exceptions
-//Tools
-import {InvalidArray, InvalidParam} from './base/Exceptions';
 import Isomorphic from './lib/Isomorphic';
+import {InvalidParam} from './base/Exceptions';
 
 export default class Syrup {
     /** Syrup class
@@ -36,32 +35,22 @@ export default class Syrup {
      * @constructor
      */
     constructor() {
-
+        
         //Basic attributes
         this.emptyStr = '';
         this.isClient = Isomorphic.client();
         this.isServer = Isomorphic.server();
-
+        
         //Dependencies injection
         this.is = isJs; // Is.js
         this.date = momentjs; // Moment.js
         this.u10s = underscore; // Underscore.js
-
+        
+        //Client access only for nav
         //Dom traversing tool (jQuery) needed only for client side
         //Dom traversing not needed in server side
         if (this.isClient) {
             this.$ = jquery; // Jquery.js
-        }
-
-        //Init features
-        this.i18n({});
-        this.native = {
-            'function': Function.prototype,
-            'object': Object.prototype
-        };
-
-        //Client access only
-        if (this.isClient) {
             this.nav = {
                 online: window.navigator.onLine,
                 local: window.navigator.userAgent.toLowerCase(),
@@ -70,6 +59,16 @@ export default class Syrup {
                 unsupported: !window.localStorage
             };
         }
+        
+        //Version
+        this.VERSION = 'v1.0.0-alpha';
+        //Init features
+        this.i18n({});
+        //Native features
+        this.native = {
+            'function': Function.prototype,
+            'object': Object.prototype
+        };
     }
 
     /**Set default locale i18n date format
@@ -81,10 +80,10 @@ export default class Syrup {
         var _setting = this.u10s.extend(
             {locale: 'en'}, setting
         );
-
+        
         //Set default locale setting
         this.date.locale(_setting.locale);
-
+        
         //Return self
         return this;
     }
@@ -94,18 +93,18 @@ export default class Syrup {
      * @return (Object|null)
      */
     getNav() {
-
+        
         //Can't access if not client
         if (!this.isClient) {
             return null;
         }
-
+        
         //Match navigator information
         var _regex = /(?:trident\/(?=\w.+rv:)|(?:chrome\/|firefox\/|opera\/|msie\s|safari\/))[\w.]{1,4}/,
             _matches = this.nav.local.match(_regex),
             _split = this.is.truthy(_matches) ?
                 _matches[0].split('/') : null;
-
+        
         return _split ? {
             nav: !!_split[0] ? _split[0].replace('trident', 'msie') : null,
             version: !!_split[1] ? _split[1] : null,
@@ -126,7 +125,7 @@ export default class Syrup {
                 breakpoint
             );
         }
-
+        
         //Return self
         return this;
     }

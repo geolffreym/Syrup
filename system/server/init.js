@@ -4,11 +4,8 @@
 'use strict';
 //Web parsing
 import Syrup from '../core/Syrup';
+import Isomorphic from '../core/lib/Isomorphic';
 
-(function (window) {
-    
-    //Global access
-    window._ = new Syrup();
-    
-})(window);
+//Isomorphic
+Isomorphic.export('_', Syrup);
 
