@@ -15,14 +15,14 @@ var jQuery = require('jquery');
 
 //Enhanced Object Literals
 export default {
-    /**
-     * Proxy object for Jquery
+    __proto__: {},
+    
+    /**Proxy object for Jquery
 
      * @param {string} selector
      * @param {object} context
      * @return {object}
      */
-    
     $(selector, context) {
         //Dom traversing
         let jY = jQuery(selector, context);
@@ -32,8 +32,7 @@ export default {
         return jY;
     },
     
-    /**
-     * Default attr getter
+    /**Default attr getter
 
      * @return {object}
      */

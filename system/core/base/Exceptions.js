@@ -8,14 +8,14 @@
 'use strict';
 //Constants
 const ERROR = {
-    INVALID_PARAM: 'One or more parameters are invalid in function',
-    INVALID_NETWORK: 'Network Error',
-    INVALID_OBJECT: 'An object is required as a parameter for the use of this function',
-    INVALID_ARRAY: 'An array is required as a parameter for the use of this function',
-    INVALID_STRING: 'An string is required as a parameter for the use of this function',
-    INVALID_FUNCTION: 'An function is required as a parameter for the use of this function',
-    INVALID_DATE: 'Invalid Date',
-    INVALID_URL: 'URL is needed.'
+	INVALID_PARAM: 'One or more parameters are invalid in function',
+	INVALID_NETWORK: 'Network Error',
+	INVALID_OBJECT: 'An object is required as a parameter for the use of this function',
+	INVALID_ARRAY: 'An array is required as a parameter for the use of this function',
+	INVALID_STRING: 'An string is required as a parameter for the use of this function',
+	INVALID_FUNCTION: 'An function is required as a parameter for the use of this function',
+	INVALID_DATE: 'Invalid Date',
+	INVALID_URL: 'URL is needed.'
 };
 
 export default class CoreExceptions {
@@ -24,12 +24,12 @@ export default class CoreExceptions {
      * @constructor
      */
     constructor(message, breakpoint = null) {
-        this.type = Error;
-        this.name = 'CoreExceptions';
-        this.message = (message
-            ) + (breakpoint && (' | Method: ' + breakpoint
-                ) || ''
-            );
+	this.type = Error;
+	this.name = 'CoreExceptions';
+	this.message = (message
+	) + (breakpoint && (' | Method: ' + breakpoint
+	) || ''
+	);
     }
 
     /**Throw error
@@ -37,10 +37,10 @@ export default class CoreExceptions {
      * @return {void}
      */
     log() {
-        throw (new this.type(
-                this.message
-            )
-        );
+	throw (new this.type(
+	this.message
+	)
+	);
     }
 
     /**Show warning in console log
@@ -48,7 +48,7 @@ export default class CoreExceptions {
      * @return {string}
      */
     toString() {
-        return this.message;
+	return this.message;
     }
 
 }
@@ -59,12 +59,12 @@ export class InvalidArray extends CoreExceptions {
      * @constructor
      */
     constructor(breakpoint) {
-        super(ERROR.INVALID_ARRAY, breakpoint);
-        //Overloading attributes
-        this.type = TypeError;
-        this.name = 'InvalidArray';
-        
-    }
+	super(ERROR.INVALID_ARRAY, breakpoint);
+	//Overloading attributes
+	this.type = TypeError;
+	this.name = 'InvalidArray';
+	
+}
 }
 
 export class InvalidParam extends CoreExceptions {
@@ -73,11 +73,11 @@ export class InvalidParam extends CoreExceptions {
      * @constructor
      */
     constructor(breakpoint) {
-        super(ERROR.INVALID_PARAM, breakpoint);
-        //Overloading attributes
-        this.type = ReferenceError;
-        this.name = 'InvalidParam';
-        
-    }
+	super(ERROR.INVALID_PARAM, breakpoint);
+	//Overloading attributes
+	this.type = ReferenceError;
+	this.name = 'InvalidParam';
+	
+}
 }
 

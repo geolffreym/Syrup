@@ -24,7 +24,7 @@ export default class Isomorphic {
      */
     static server() {
         return typeof module === 'object' &&
-            typeof module.exports === 'object';
+        typeof module.exports === 'object';
     }
 
     /**
@@ -37,7 +37,7 @@ export default class Isomorphic {
     static export(name, Factory) {
         
         Factory = typeof Factory === 'object' &&
-            Factory || new Factory();
+        Factory || new Factory();
         
         //Only for client
         if (this.client()) {
@@ -49,13 +49,13 @@ export default class Isomorphic {
                     // that are loaded still are looking for
                     // a global even when an AMD loader is in use.
                     return (
-                        window[name] = Factory
+                    window[name] = Factory
                     );
                 });
             } else {
                 // Browser globals (root is window)
                 return (
-                    window[name] = Factory
+                window[name] = Factory
                 );
             }
             
@@ -68,9 +68,3 @@ export default class Isomorphic {
     }
 
 }
-
-////Isomorphic export
-//export default Isomorphic.export(
-//    'Isomorphic', Isomorphic
-//);
-

@@ -30,10 +30,13 @@
     "jscs": "^2.10.1",
     "karma": "*",
     "karma-chrome-launcher": "*",
+    "karma-firefox-launcher": "^0.1.7",
     "karma-jasmine": "*",
     "karma-junit-reporter": "^0.3.8",
+    "karma-phantomjs-launcher": "^1.0.0",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^1.7.0",
+    "phantomjs-prebuilt": "^2.1.4",
     "webpack": "^1.12.2",
     "webpack-dev-server": "^1.14.0"
   },

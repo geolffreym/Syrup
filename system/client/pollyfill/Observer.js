@@ -23,14 +23,14 @@
 	if (typeof Object.observe === 'function') {
 		return;
 	}
-
+	
 	// Utilities
 	// ---------
-
+	
 	// SetImmediate shim used to deliver changes records asynchronously
 	// use setImmediate if available
 	var setImmediate = global.setImmediate || global.msSetImmediate,
-		clearImmediate = global.clearImmediate || global.msClearImmediate;
+	clearImmediate = global.clearImmediate || global.msClearImmediate;
 	if (!setImmediate) {
 		// Fallback on setTimeout if not
 		setImmediate = function (func, args) {
@@ -40,10 +40,10 @@
 			clearTimeout(id);
 		};
 	}
-
+	
 	// WeakMap
 	// -------
-
+	
 	var PrivateMap;
 	if (typeof WeakMap !== 'undefined')  {
 		//Use weakmap if defined
@@ -51,23 +51,23 @@
 	} else {
 		//Else use ses like shim of WeakMap
 		var HIDDEN_PREFIX = '__weakmap:' + (Math.random() * 1e9 >>> 0),
-			counter = new Date().getTime() % 1e9,
-			mascot = {};
-
+		counter = new Date().getTime() % 1e9,
+		mascot = {};
+		
 		PrivateMap = function () {
 			this.name = HIDDEN_PREFIX + (Math.random() * 1e9 >>> 0) + (counter++ + '__');
 		};
-
+		
 		PrivateMap.prototype = {
 			has: function (key) {
 				return key && key.hasOwnProperty(this.name);
 			},
-
+			
 			get: function (key) {
 				var value = key && key[this.name];
 				return value === mascot ? undefined : value;
 			},
-
+			
 			set: function (key, value) {
 				Object.defineProperty(key, this.name, {
 					value: typeof value === 'undefined' ? mascot : value,
@@ -76,12 +76,12 @@
 					configurable: true
 				});
 			},
-
+			
 			'delete': function (key) {
 				return delete key[this.name];
 			}
 		};
-
+		
 		var getOwnPropertyName = Object.getOwnPropertyNames;
 		Object.defineProperty(Object, 'getOwnPropertyNames', {
 			value: function fakeGetOwnPropertyNames(obj) {
@@ -94,27 +94,27 @@
 			configurable: true
 		});
 	}
-
+	
 	// Internal Properties
 	// -------------------
-
+	
 	// An ordered list used to provide a deterministic ordering in which callbacks are called.
 	// [Corresponding Section in ECMAScript wiki](http://wiki.ecmascript.org/doku.php?id=harmony:observe_internals#observercallbacks)
 	var observerCallbacks = [];
-
+	
 	// This object is used as the prototype of all the notifiers that are returned by Object.getNotifier(O).
 	// [Corresponding Section in ECMAScript wiki](http://wiki.ecmascript.org/doku.php?id=harmony:observe_internals#notifierprototype)
 	var NotifierPrototype = Object.create(Object.prototype);
-
+	
 	// Used to store immediate uid reference
 	var changeDeliveryImmediateUid;
-
+	
 	// Used to schedule a call to _deliverAllChangeRecords
 	function setUpChangesDelivery() {
 		clearImmediate(changeDeliveryImmediateUid);
 		changeDeliveryImmediateUid = setImmediate(_deliverAllChangeRecords);
 	}
-
+	
 	Object.defineProperty(NotifierPrototype, 'notify', {
 		value: function notify(changeRecord) {
 			var notifier = this;
@@ -127,12 +127,12 @@
 			if (Object(changeRecord) !== changeRecord) {
 				throw new TypeError('changeRecord must be an Object, given ' + changeRecord);
 			}
-
+			
 			var type = changeRecord.type;
 			if (typeof type !== 'string') {
 				throw new TypeError('changeRecord.type must be a string, given ' + type);
 			}
-
+			
 			var changeObservers = changeObserversMap.get(notifier);
 			if (!changeObservers || changeObservers.length === 0) {
 				return;
@@ -164,7 +164,7 @@
 		enumerable: false,
 		configurable: true
 	});
-
+	
 	Object.defineProperty(NotifierPrototype, 'performChange', {
 		value: function performChange(changeType, changeFn) {
 			var notifier = this;
@@ -180,7 +180,7 @@
 			if (typeof changeFn !== 'function') {
 				throw new TypeError('changeFn must be a function, given ' + changeFn);
 			}
-
+			
 			_beginChange(notifier.__target, changeType);
 			var error, changeRecord;
 			try {
@@ -192,12 +192,12 @@
 			if (typeof error !== 'undefined') {
 				throw error;
 			}
-
+			
 			var changeObservers = changeObserversMap.get(notifier);
 			if (changeObservers.length === 0) {
 				return;
 			}
-
+			
 			var target = notifier.__target,
 				newRecord = Object.create(Object.prototype, {
 					'object': {
@@ -226,36 +226,36 @@
 					}
 				}
 			}
-
+			
 			Object.preventExtensions(newRecord);
 			_enqueueChangeRecord(notifier.__target, newRecord);
-
+			
 		},
 		writable: true,
 		enumerable: false,
 		configurable: true
 	});
-
+	
 	// Implementation of the internal algorithm 'BeginChange'
 	// described in the proposal.
 	// [Corresponding Section in ECMAScript wiki](http://wiki.ecmascript.org/doku.php?id=harmony:observe_internals#beginchange)
 	function _beginChange(object, changeType) {
 		var notifier = Object.getNotifier(object),
-			activeChanges = activeChangesMap.get(notifier),
-			changeCount = activeChangesMap.get(notifier)[changeType];
+		activeChanges = activeChangesMap.get(notifier),
+		changeCount = activeChangesMap.get(notifier)[changeType];
 		activeChanges[changeType] = typeof changeCount === 'undefined' ? 1 : changeCount + 1;
 	}
-
+	
 	// Implementation of the internal algorithm 'EndChange'
 	// described in the proposal.
 	// [Corresponding Section in ECMAScript wiki](http://wiki.ecmascript.org/doku.php?id=harmony:observe_internals#endchange)
 	function _endChange(object, changeType) {
 		var notifier = Object.getNotifier(object),
-			activeChanges = activeChangesMap.get(notifier),
-			changeCount = activeChangesMap.get(notifier)[changeType];
+		activeChanges = activeChangesMap.get(notifier),
+		changeCount = activeChangesMap.get(notifier)[changeType];
 		activeChanges[changeType] = changeCount > 0 ? changeCount - 1 : 0;
 	}
-
+	
 	// Implementation of the internal algorithm 'ShouldDeliverToObserver'
 	// described in the proposal.
 	// [Corresponding Section in ECMAScript wiki](http://wiki.ecmascript.org/doku.php?id=harmony:observe_internals#shoulddelivertoobserver)
@@ -274,12 +274,12 @@
 		}
 		return doesAccept;
 	}
-
+	
 	// Map used to store corresponding notifier to an object
 	var notifierMap = new PrivateMap(),
-		changeObserversMap = new PrivateMap(),
-		activeChangesMap = new PrivateMap();
-
+	changeObserversMap = new PrivateMap(),
+	activeChangesMap = new PrivateMap();
+	
 	// Implementation of the internal algorithm 'GetNotifier'
 	// described in the proposal.
 	// [Corresponding Section in ECMAScript wiki](http://wiki.ecmascript.org/doku.php?id=harmony:observe_internals#getnotifier)
@@ -295,26 +295,26 @@
 		}
 		return notifierMap.get(target);
 	}
-
+	
 	// Map used to store reference to a list of pending changeRecords
 	// in observer callback.
 	var pendingChangesMap = new PrivateMap();
-
+	
 	// Implementation of the internal algorithm 'EnqueueChangeRecord'
 	// described in the proposal.
 	// [Corresponding Section in ECMAScript wiki](http://wiki.ecmascript.org/doku.php?id=harmony:observe_internals#enqueuechangerecord)
 	function _enqueueChangeRecord(object, changeRecord) {
 		var notifier = Object.getNotifier(object),
-			changeType = changeRecord.type,
-			activeChanges = activeChangesMap.get(notifier),
-			changeObservers = changeObserversMap.get(notifier);
-
+		changeType = changeRecord.type,
+		activeChanges = activeChangesMap.get(notifier),
+		changeObservers = changeObserversMap.get(notifier);
+		
 		for (var i = 0, l = changeObservers.length; i < l; i++) {
 			var observerRecord = changeObservers[i],
-				acceptList = observerRecord.accept;
+			acceptList = observerRecord.accept;
 			if (_shouldDeliverToObserver(activeChanges, acceptList, changeType)) {
 				var observer = observerRecord.callback,
-					pendingChangeRecords = [];
+				pendingChangeRecords = [];
 				if (!pendingChangesMap.has(observer))  {
 					pendingChangesMap.set(observer, pendingChangeRecords);
 				} else {
@@ -325,10 +325,10 @@
 		}
 		setUpChangesDelivery();
 	}
-
+	
 	// Map used to store a count of associated notifier to a function
 	var attachedNotifierCountMap = new PrivateMap();
-
+	
 	// Remove reference all reference to an observer callback,
 	// if this one is not used anymore.
 	// In the proposal the ObserverCallBack has a weak reference over observers,
@@ -342,7 +342,7 @@
 			}
 		}
 	}
-
+	
 	// Implementation of the internal algorithm 'DeliverChangeRecords'
 	// described in the proposal.
 	// [Corresponding Section in ECMAScript wiki](http://wiki.ecmascript.org/doku.php?id=harmony:observe_internals#deliverchangerecords)
@@ -356,11 +356,11 @@
 			observer.call(undefined, pendingChangeRecords);
 		}
 		catch (e) { }
-
+		
 		_cleanObserver(observer);
 		return true;
 	}
-
+	
 	// Implementation of the internal algorithm 'DeliverAllChangeRecords'
 	// described in the proposal.
 	// [Corresponding Section in ECMAScript wiki](http://wiki.ecmascript.org/doku.php?id=harmony:observe_internals#deliverallchangerecords)
@@ -375,7 +375,7 @@
 		}
 		return anyWorkDone;
 	}
-
+	
 	Object.defineProperties(Object, {
 		// Implementation of the public api 'Object.observe'
 		// described in the proposal.
@@ -391,7 +391,7 @@
 				if (Object.isFrozen(callback)) {
 					throw new TypeError('observer cannot be frozen');
 				}
-
+				
 				var acceptList;
 				if (typeof accept === 'undefined') {
 					acceptList = ['add', 'update', 'delete', 'reconfigure', 'setPrototype', 'preventExtensions'];
@@ -403,7 +403,7 @@
 					if (typeof len !== 'number' || len >>> 0 !== len || len < 1) {
 						throw new TypeError('the \'length\' property of accept must be a positive integer, given ' + len);
 					}
-
+					
 					var nextIndex = 0;
 					acceptList = [];
 					while (nextIndex < len) {
@@ -415,22 +415,22 @@
 						nextIndex++;
 					}
 				}
-
+				
 				var notifier = _getNotifier(target),
-					changeObservers = changeObserversMap.get(notifier);
-
+				changeObservers = changeObserversMap.get(notifier);
+				
 				for (var i = 0, l = changeObservers.length; i < l; i++) {
 					if (changeObservers[i].callback === callback) {
 						changeObservers[i].accept = acceptList;
 						return target;
 					}
 				}
-
+				
 				changeObservers.push({
 					callback: callback,
 					accept: acceptList
 				});
-
+				
 				if (observerCallbacks.indexOf(callback) === -1)  {
 					observerCallbacks.push(callback);
 				}
@@ -444,7 +444,7 @@
 			writable: true,
 			configurable: true
 		},
-
+		
 		// Implementation of the public api 'Object.unobseve'
 		// described in the proposal.
 		// [Corresponding Section in ECMAScript wiki](http://wiki.ecmascript.org/doku.php?id=harmony:observe_public_api#object.unobseve)
@@ -457,7 +457,7 @@
 					throw new TypeError('observer must be a function, given ' + callback);
 				}
 				var notifier = _getNotifier(target),
-					changeObservers = changeObserversMap.get(notifier);
+				changeObservers = changeObserversMap.get(notifier);
 				for (var i = 0, l = changeObservers.length; i < l; i++) {
 					if (changeObservers[i].callback === callback) {
 						changeObservers.splice(i, 1);
@@ -471,7 +471,7 @@
 			writable: true,
 			configurable: true
 		},
-
+		
 		// Implementation of the public api 'Object.deliverChangeRecords'
 		// described in the proposal.
 		// [Corresponding Section in ECMAScript wiki](http://wiki.ecmascript.org/doku.php?id=harmony:observe_public_api#object.deliverchangerecords)
@@ -485,7 +485,7 @@
 			writable: true,
 			configurable: true
 		},
-
+		
 		// Implementation of the public api 'Object.getNotifier'
 		// described in the proposal.
 		// [Corresponding Section in ECMAScript wiki](http://wiki.ecmascript.org/doku.php?id=harmony:observe_public_api#object.getnotifier)
@@ -502,7 +502,7 @@
 			writable: true,
 			configurable: true
 		}
-
+		
 	});
-
+	
 })(typeof global !== 'undefined' ? global : this);

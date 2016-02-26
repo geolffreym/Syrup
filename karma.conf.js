@@ -59,35 +59,46 @@ var launchers = {
     // }
 };
 
-var browsers = [];
-
-if (process.env.TRAVIS) {
-    if (TRAVIS_WITHOUT_BS) {
-        browsers.push('Firefox');
-    } else {
-        browsers = Object.keys(launchers);
-    }
-} else {
-    browsers.push('Chrome');
-}
+var browsers = [
+    'PhantomJS',
+    'Chrome',
+    'Firefox'
+];
 
 module.exports = function (config) {
     config.set({
         // Base path, that will be used to resolve files and exclude
-        basePath: '../',
+        basePath: './test/',
         
         frameworks: ['jasmine'],
         
         // List of files / patterns to load in the browser
         files: [
-            'test/client/*.js'
+            'core/test_syrup_main.js'
         ],
         
         // List of files to exclude
         exclude: [],
         
         preprocessors: {
-            'test/client/*.js': ['webpack', 'sourcemap']
+            'core/*.js': ['webpack', 'sourcemap']
+        },
+        
+        webpack: {
+            module: {
+                loaders: [
+                    {
+                        test: /\.js?$/,
+                        exclude: /node_modules/,
+                        loader: 'babel-loader',
+                        query: {
+                            presets: [
+                                'es2015'
+                            ]
+                        }
+                    }
+                ]
+            }
         },
         
         // Use dots reporter, as travis terminal does not support escaping sequences
@@ -147,7 +158,9 @@ module.exports = function (config) {
             'karma-jasmine',
             'karma-webpack',
             'karma-sourcemap-loader',
-            'karma-junit-reporter'
+            'karma-junit-reporter',
+            'karma-phantomjs-launcher',
+            'karma-firefox-launcher'
         ],
         
         concurrency: 3,

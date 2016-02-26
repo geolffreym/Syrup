@@ -92,33 +92,28 @@ export default class Syrup {
 
     /**Return full navigator information
 
-     * @return (Object|null)
+     * @return (Object)
      */
     getNav() {
-        
-        //Can't access if not client
-        if (!this.isClient) {
-            return null;
-        }
         
         //Match navigator information
         let [_matches] = this.nav.local.match(
             /(?:trident\/(?=\w.+rv:)|(?:chrome\/|firefox\/|opera\/|msie\s|safari\/))[\w.]{1,4}/
         );
         
-        //Found match for navigator info
-        if (_matches) {
-            
-            //Agent and version
-            let [_agent, _version] = _matches.split('/');
-            
-            //Return the nav information
-            return {
-                nav: _agent.replace('trident', 'msie'),
-                version: _version,
-                platform: window.navigator.platform.toLocaleLowerCase()
-            };
-        }
+        //Can't access if not client
+        //Not found match for navigator info
+        if (!this.isClient || !_matches) return {};
+        
+        //Agent and version
+        let [_agent, _version] = _matches.split('/');
+        
+        //Return the nav information
+        return {
+            nav: _agent.replace('trident', 'msie'),
+            version: _version,
+            platform: window.navigator.platform.toLocaleLowerCase()
+        };
         
     }
 

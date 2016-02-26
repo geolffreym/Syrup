@@ -15,18 +15,18 @@ var momentJs = require('moment');
 
 //Enhanced Object Literals
 export default {
-    /**
-     * Proxy for locale conf
+    __proto__: {},
+    /**Proxy for locale conf
 
      * @param {string} conf
      * @return {void}
-     */
+     **/
+    
     locale(conf) {
         momentJs.locale(conf);
     },
     
-    /**
-     * Proxy for momentJs
+    /**Proxy for momentJs
 
      * @return {object}
      */

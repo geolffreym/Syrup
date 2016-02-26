@@ -14,7 +14,7 @@ export default class ObjectAdapter extends Object {
      * @param {object} param
      */
     constructor(param) {
-        super(param || {});
+	super(param || {});
     }
 
 }

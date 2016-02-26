@@ -9,11 +9,11 @@
 		this.Worker = null;
 		this.interceptors = {};
 	}
-
+	
 	/** Run worker
-	 * @param {string} url
-	 * @return {object}
-	 * **/
+	    	 * @param {string} url
+	    	 * @return {object}
+	    	 * **/
 	Workers.add ('run', function (url) {
 		var self = this;
 		return (new Promise (function (resolve, reject) {
@@ -25,72 +25,72 @@
 			resolve (self);
 		}));
 	});
-
+	
 	/**Get Worker
-	 * @return {object}
-	 * **/
+	    	 * @return {object}
+	    	 * **/
 	Workers.add ('get', function () {
 		return this.Worker;
 	});
-
+	
 	/** Interceptors
-	 * @param  {object} interceptors
-	 * @return {object}
-	 * */
+	    	 * @param  {object} interceptors
+	    	 * @return {object}
+	    	 * */
 	Workers.add ('intercept', function (interceptors) {
 		if ( _.isObject (interceptors) )
-			MiddleWare.intercept (this, interceptors);
+		MiddleWare.intercept (this, interceptors);
 		return this;
 	});
-
+	
 	/** Clean Interceptors
-	 * @param  {string} type
-	 * @return {object}
-	 * */
+	    	 * @param  {string} type
+	    	 * @return {object}
+	    	 * */
 	Workers.add ('interceptClean', function (type) {
 		//Clean the interceptor
 		MiddleWare.cleanInterceptor (this, type);
 		return this;
 	});
-
+	
 	/** Handle the interceptors
-	 * @param {string} type
-	 * @param {object} param
-	 * @return {void}
-	 * */
+	    	 * @param {string} type
+	    	 * @param {object} param
+	    	 * @return {void}
+	    	 * */
 	Workers.add ('_handleInterceptor', function (type, param) {
 		//Trigger Interceptors
 		MiddleWare.trigger (
-			MiddleWare.getInterceptors (this, type),
-			[param, this]
+		MiddleWare.getInterceptors (this, type),
+		[param, this]
 		);
-
+		
 		//Clean the interceptor
 		//MiddleWare.cleanInterceptor (this, type);
 	});
-
+	
 	/**Send Message to Worker
-	 * @param {string} message
-	 * @return {object}
-	 * **/
+	    	 * @param {string} message
+	    	 * @return {object}
+	    	 * **/
 	Workers.add ('toWork', function (message) {
 		this.Worker.postMessage (message || null);
 		return this;
 	});
-
+	
 	/**Kill Worker
-	 *@return {object}
-	 * **/
+	    	 *@return {object}
+	    	 * **/
 	Workers.add ('kill', function () {
 		if ( _.isSet (this.Worker) ) {
 			this.Worker.terminate ();
 			this.Worker = null;
 		}
-
+		
 		return this;
 	});
-
+	
 	//Global access
 	window.Workers = Workers;
-
+	
 }) (window);

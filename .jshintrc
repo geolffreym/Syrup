@@ -13,9 +13,9 @@
   "bitwise": true,
   // true: Prohibit bitwise operators (&, |, ^, etc.)
 
-  "curly": true,
+  "curly": false,
   // true: Require {} for every new block or scope
-
+  "jasmine": true,
   "eqeqeq": true,
   // true: Require triple equals (===) for comparison
 
@@ -123,7 +123,7 @@
   // Development/debugging (alert, confirm, etc)
   "dojo": false,
   // Dojo Toolkit
-  "jasmine": false,
+  "jasmine": true,
   // Jasmine
   "jquery": false,
   // jQuery
