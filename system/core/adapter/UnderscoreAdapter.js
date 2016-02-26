@@ -22,7 +22,7 @@ import {InvalidArray} from '../base/Exceptions';
 export default {
     __proto__: underscore,
     
-    /**Parse to Object
+    /** Parse to Object
 
      * @param {object} element
      * @param {object} element2: optional

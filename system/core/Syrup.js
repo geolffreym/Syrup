@@ -15,15 +15,13 @@
 //import underscore from '../../node_modules/underscore';
 //import moment_js from '../../node_modules/moment';
 
-//Handle dependencies using CommonJS
-var momentjs = require('moment');
-
 //Handle dependencies using ECMAScript 6 Module import
 //Adapter for is.js library
 //Adapter for underscore.js
 import isJs from './adapter/IsJsAdapter';
 import underscore from './adapter/UnderscoreAdapter';
-import JQuery from './adapter/JQueryAdapter';
+import jQuery from './adapter/JQueryAdapter';
+import momentJs from './adapter/MomentAdapter';
 
 //Exceptions
 import Isomorphic from './lib/Isomorphic';
@@ -43,7 +41,7 @@ export default class Syrup {
         
         //Dependencies injection
         this.is = isJs; // Is.js
-        this.date = momentjs; // Moment.js
+        this.m6s = momentJs; // Moment.js
         this.u10s = underscore; // Underscore.js
         
         //Client access only for nav
@@ -52,7 +50,7 @@ export default class Syrup {
         if (this.isClient) {
             // Jquery.js
             this.$ = ((q, c)=> {
-                return JQuery.$(q, c);
+                return jQuery.$(q, c);
             });
             //Navigator Info
             this.nav = {
@@ -86,7 +84,7 @@ export default class Syrup {
         );
         
         //Set default locale setting
-        this.date.locale(_setting.locale);
+        this.m6s.locale(_setting.locale);
         
         //Return self
         return this;

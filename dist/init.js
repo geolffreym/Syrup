@@ -72,7 +72,28 @@
 
 	var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; })();
 
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })(); /**
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * Created with JetBrains WebStorm.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * User: Geolffrey Mena
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * Date: 25/11/13
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * Time: 12:22
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        */
+	//ECMA6 Support -> node --harmony
+	//Jquery Dom Traversing -> https://github.com/jquery/jquery
+	//Underscore util -> https://github.com/jashkenas/underscore
+	//Is validation tool -> https://github.com/arasatasaygin/is.js
+	//Date helper -> https://github.com/moment/moment/
+
+	//Handle dependencies using ECMAScript 6 Module import
+	//import jquery from '../../node_modules/jquery';
+	//import underscore from '../../node_modules/underscore';
+	//import moment_js from '../../node_modules/moment';
+
+	//Handle dependencies using ECMAScript 6 Module import
+	//Adapter for is.js library
+	//Adapter for underscore.js
+
+	//Exceptions
 
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
@@ -90,6 +111,10 @@
 
 	var _JQueryAdapter2 = _interopRequireDefault(_JQueryAdapter);
 
+	var _MomentAdapter = __webpack_require__(109);
+
+	var _MomentAdapter2 = _interopRequireDefault(_MomentAdapter);
+
 	var _Isomorphic = __webpack_require__(9);
 
 	var _Isomorphic2 = _interopRequireDefault(_Isomorphic);
@@ -99,32 +124,6 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	/**
-	 * Created with JetBrains WebStorm.
-	 * User: Geolffrey Mena
-	 * Date: 25/11/13
-	 * Time: 12:22
-	 */
-	//ECMA6 Support -> node --harmony
-	//Jquery Dom Traversing -> https://github.com/jquery/jquery
-	//Underscore util -> https://github.com/jashkenas/underscore
-	//Is validation tool -> https://github.com/arasatasaygin/is.js
-	//Date helper -> https://github.com/moment/moment/
-
-	//Handle dependencies using ECMAScript 6 Module import
-	//import jquery from '../../node_modules/jquery';
-	//import underscore from '../../node_modules/underscore';
-	//import moment_js from '../../node_modules/moment';
-
-	//Handle dependencies using CommonJS
-	var momentjs = __webpack_require__(11);
-
-	//Handle dependencies using ECMAScript 6 Module import
-	//Adapter for is.js library
-	//Adapter for underscore.js
-
-	//Exceptions
 
 	var Syrup = (function () {
 	    /** Syrup class
@@ -141,7 +140,7 @@
 
 	        //Dependencies injection
 	        this.is = _IsJsAdapter2.default; // Is.js
-	        this.date = momentjs; // Moment.js
+	        this.m6s = _MomentAdapter2.default; // Moment.js
 	        this.u10s = _UnderscoreAdapter2.default; // Underscore.js
 
 	        //Client access only for nav
@@ -184,7 +183,7 @@
 	            var _setting = this.u10s.extend({ locale: 'en' }, setting);
 
 	            //Set default locale setting
-	            this.date.locale(_setting.locale);
+	            this.m6s.locale(_setting.locale);
 
 	            //Return self
 	            return this;
@@ -1200,7 +1199,7 @@
 	exports.default = {
 	    __proto__: underscore,
 
-	    /**Parse to Object
+	    /** Parse to Object
 	      * @param {object} element
 	     * @param {object} element2: optional
 	     * @return {object}
@@ -25708,6 +25707,63 @@
 	    return zh_tw;
 
 	}));
+
+/***/ },
+/* 109 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Created with JetBrains WebStorm.
+	 * User: Geolffrey Mena
+	 * Date: 25/11/13
+	 * Time: 12:22
+	 */
+
+	'use strict'
+	/**
+	 * IsJS adapter, to add additional features
+	 * */
+
+	//Is Js module
+	;
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var momentJs = __webpack_require__(11);
+
+	//Enhanced Object Literals
+	exports.default = {
+	  /**
+	   * Proxy for locale conf
+	    * @param {string} conf
+	   * @return {void}
+	   */
+
+	  locale: function locale(conf) {
+	    momentJs.locale(conf);
+	  },
+
+	  /**
+	   * Proxy for momentJs
+	    * @return {object}
+	   */
+
+	  get date() {
+	    return momentJs();
+	  },
+
+	  /**
+	   * Set date form for momentJs
+	    * @param {string} dA
+	   * @param {string} dB
+	   * @param {string} encode
+	   * @param {boolean} stric
+	   * @return {void}
+	   */
+	  moment: function moment(dA, dB, encode, stric) {
+	    return momentJs(dA, dB, encode, stric);
+	  }
+	};
 
 /***/ }
 /******/ ]);
