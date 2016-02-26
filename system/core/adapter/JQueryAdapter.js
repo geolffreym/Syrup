@@ -22,15 +22,19 @@ export default {
      * @param {object} context
      * @return {object}
      */
-
+    
     $(selector, context) {
         //Dom traversing
         let jY = jQuery(selector, context);
-
+        
         //Exist element?
         jY.exists = jY.length > 0;
         return jY;
+    },
+    
+    get type() {
+        return jQuery.fn.constructor;
     }
-
+    
 };
 

@@ -281,7 +281,16 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+
+	var _JQueryAdapter = __webpack_require__(7);
+
+	var _JQueryAdapter2 = _interopRequireDefault(_JQueryAdapter);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 	var isJs = __webpack_require__(3);
+
+	//JQuery
 
 	//Enhanced Object Literals
 	exports.default = {
@@ -294,6 +303,16 @@
 	  html: function html(_html) {
 	    return (/(<([^>]+)>)/ig.test(_html)
 	    );
+	  },
+
+	  /**Is Jquery Object?
+	   * @param obj
+	   * @returns {boolean}
+	   */
+	  $: function $() {
+	    var obj = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+	    return _JQueryAdapter2.default.type === obj.constructor;
 	  }
 	};
 
@@ -2919,7 +2938,12 @@
 	    //Exist element?
 	    jY.exists = jY.length > 0;
 	    return jY;
+	  },
+
+	  get type() {
+	    return jQuery.fn.constructor;
 	  }
+
 	};
 
 /***/ },
