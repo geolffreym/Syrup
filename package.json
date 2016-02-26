@@ -30,8 +30,14 @@
     "karma": "*",
     "karma-chrome-launcher": "*",
     "karma-jasmine": "*",
+    "karma-junit-reporter": "^0.3.8",
+    "karma-sourcemap-loader": "^0.3.7",
+    "karma-webpack": "^1.7.0",
     "webpack": "^1.12.2",
     "webpack-dev-server": "^1.14.0"
+  },
+  "scripts": {
+    "preinstall": "npm i -g karma-cli"
   },
   "main": "Syrup.js",
   "version": "0.1.1",
