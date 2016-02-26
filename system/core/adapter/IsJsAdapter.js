@@ -20,12 +20,18 @@ import jQuery  from './JQueryAdapter';
 export default {
     __proto__: isJs,
     
+    get not() {
+        this.is_not = true;
+        return this;
+    },
+    
     /**Is html?
      * @param {string} html
      * @return {boolean}
      */
     html(html)    {
-        return /(<([^>]+)>)/ig.test(html);
+        let result = /(<([^>]+)>)/ig.test(html);
+        return this.is_not ? !result : result;
     },
     
     /**Is Jquery Object?
@@ -33,9 +39,8 @@ export default {
      * @returns {boolean}
      */
     $(obj = {}) {
-        return (
-            jQuery.type === obj.constructor
-        );
+        let result = (jQuery.constructor === obj.constructor);
+        return this.is_not ? !result : result;
     }
 };
 

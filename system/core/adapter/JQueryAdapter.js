@@ -32,7 +32,12 @@ export default {
         return jY;
     },
     
-    get type() {
+    /**
+     * Default attr getter
+
+     * @return {object}
+     */
+    get constructor() {
         return jQuery.fn.constructor;
     }
     

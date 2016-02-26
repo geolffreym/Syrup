@@ -296,13 +296,18 @@
 	exports.default = {
 	  __proto__: isJs,
 
+	  get not() {
+	    this.is_not = true;
+	    return this;
+	  },
+
 	  /**Is html?
 	   * @param {string} html
 	   * @return {boolean}
 	   */
 	  html: function html(_html) {
-	    return (/(<([^>]+)>)/ig.test(_html)
-	    );
+	    var result = /(<([^>]+)>)/ig.test(_html);
+	    return this.is_not ? !result : result;
 	  },
 
 	  /**Is Jquery Object?
@@ -312,7 +317,8 @@
 	  $: function $() {
 	    var obj = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-	    return _JQueryAdapter2.default.type === obj.constructor;
+	    var result = _JQueryAdapter2.default.constructor === obj.constructor;
+	    return this.is_not ? !result : result;
 	  }
 	};
 
@@ -2940,7 +2946,11 @@
 	    return jY;
 	  },
 
-	  get type() {
+	  /**
+	   * Default attr getter
+	    * @return {object}
+	   */
+	  get constructor() {
 	    return jQuery.fn.constructor;
 	  }
 

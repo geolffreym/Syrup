@@ -35,17 +35,17 @@ export default class Syrup {
      * @constructor
      */
     constructor() {
-
+        
         //Basic attributes
         this.emptyStr = '';
         this.isClient = Isomorphic.client();
         this.isServer = Isomorphic.server();
-
+        
         //Dependencies injection
         this.is = isJs; // Is.js
         this.date = momentjs; // Moment.js
         this.u10s = underscore; // Underscore.js
-
+        
         //Client access only for nav
         //Dom traversing tool (jQuery) needed only for client side
         //Dom traversing not needed in server side
@@ -63,7 +63,7 @@ export default class Syrup {
                 unsupported: !window.localStorage
             };
         }
-
+        
         //Version
         this.VERSION = 'v1.0.0-alpha';
         //Init features
@@ -84,10 +84,10 @@ export default class Syrup {
         var _setting = this.u10s.extend(
             {locale: 'en'}, setting
         );
-
+        
         //Set default locale setting
         this.date.locale(_setting.locale);
-
+        
         //Return self
         return this;
     }
@@ -97,23 +97,23 @@ export default class Syrup {
      * @return (Object|null)
      */
     getNav() {
-
+        
         //Can't access if not client
         if (!this.isClient) {
             return null;
         }
-
+        
         //Match navigator information
         let [_matches] = this.nav.local.match(
             /(?:trident\/(?=\w.+rv:)|(?:chrome\/|firefox\/|opera\/|msie\s|safari\/))[\w.]{1,4}/
         );
-
+        
         //Found match for navigator info
         if (_matches) {
-
+            
             //Agent and version
             let [_agent, _version] = _matches.split('/');
-
+            
             //Return the nav information
             return {
                 nav: _agent.replace('trident', 'msie'),
@@ -121,7 +121,7 @@ export default class Syrup {
                 platform: window.navigator.platform.toLocaleLowerCase()
             };
         }
-
+        
     }
 
     /** Validate if param is set. If not, throw msg!
@@ -137,7 +137,7 @@ export default class Syrup {
                 breakpoint
             );
         }
-
+        
         //Return self
         return this;
     }
