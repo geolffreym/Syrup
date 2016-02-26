@@ -16,14 +16,14 @@
 //import moment_js from '../../node_modules/moment';
 
 //Handle dependencies using CommonJS
-var jquery = require('jquery'),
-    momentjs = require('moment');
+var momentjs = require('moment');
 
 //Handle dependencies using ECMAScript 6 Module import
 //Adapter for is.js library
 //Adapter for underscore.js
 import isJs from './adapter/IsJsAdapter';
 import underscore from './adapter/UnderscoreAdapter';
+import JQuery from './adapter/JQueryAdapter';
 
 //Exceptions
 import Isomorphic from './lib/Isomorphic';
@@ -35,22 +35,26 @@ export default class Syrup {
      * @constructor
      */
     constructor() {
-        
+
         //Basic attributes
         this.emptyStr = '';
         this.isClient = Isomorphic.client();
         this.isServer = Isomorphic.server();
-        
+
         //Dependencies injection
         this.is = isJs; // Is.js
         this.date = momentjs; // Moment.js
         this.u10s = underscore; // Underscore.js
-        
+
         //Client access only for nav
         //Dom traversing tool (jQuery) needed only for client side
         //Dom traversing not needed in server side
         if (this.isClient) {
-            this.$ = jquery; // Jquery.js
+            // Jquery.js
+            this.$ = ((q, c)=> {
+                return JQuery.$(q, c);
+            });
+            //Navigator Info
             this.nav = {
                 online: window.navigator.onLine,
                 local: window.navigator.userAgent.toLowerCase(),
@@ -59,7 +63,7 @@ export default class Syrup {
                 unsupported: !window.localStorage
             };
         }
-        
+
         //Version
         this.VERSION = 'v1.0.0-alpha';
         //Init features
@@ -80,10 +84,10 @@ export default class Syrup {
         var _setting = this.u10s.extend(
             {locale: 'en'}, setting
         );
-        
+
         //Set default locale setting
         this.date.locale(_setting.locale);
-        
+
         //Return self
         return this;
     }
@@ -93,28 +97,31 @@ export default class Syrup {
      * @return (Object|null)
      */
     getNav() {
-        
+
         //Can't access if not client
         if (!this.isClient) {
             return null;
         }
-        
+
         //Match navigator information
-        var _regex = /(?:trident\/(?=\w.+rv:)|(?:chrome\/|firefox\/|opera\/|msie\s|safari\/))[\w.]{1,4}/,
-            [_matches] = this.nav.local.match(_regex);
-        
+        let [_matches] = this.nav.local.match(
+            /(?:trident\/(?=\w.+rv:)|(?:chrome\/|firefox\/|opera\/|msie\s|safari\/))[\w.]{1,4}/
+        );
+
         //Found match for navigator info
         if (_matches) {
+
             //Agent and version
-            [_agent, _version] = _matches.split('/');
-            
+            let [_agent, _version] = _matches.split('/');
+
+            //Return the nav information
             return {
                 nav: _agent.replace('trident', 'msie'),
                 version: _version,
                 platform: window.navigator.platform.toLocaleLowerCase()
             };
         }
-        
+
     }
 
     /** Validate if param is set. If not, throw msg!
@@ -130,7 +137,7 @@ export default class Syrup {
                 breakpoint
             );
         }
-        
+
         //Return self
         return this;
     }

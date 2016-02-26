@@ -15,7 +15,22 @@ var jQuery = require('jquery');
 
 //Enhanced Object Literals
 export default {
-    __proto__: jQuery
-    
+    /**
+     * Proxy object for Jquery
+
+     * @param {string} selector
+     * @param {object} context
+     * @return {object}
+     */
+
+    $(selector, context) {
+        //Dom traversing
+        let jY = jQuery(selector, context);
+
+        //Exist element?
+        jY.exists = jY.length > 0;
+        return jY;
+    }
+
 };
 
