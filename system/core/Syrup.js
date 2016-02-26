@@ -29,7 +29,7 @@ import {InvalidParam} from './base/Exceptions';
 
 export default class Syrup {
     /** Syrup class
-
+     *
      * @constructor
      */
     constructor() {
@@ -73,10 +73,10 @@ export default class Syrup {
         };
     }
 
-    /**Set default locale i18n date format
-
-     * @param {object} setting
-     * @return {object}
+    /** Set default locale i18n date format
+     *
+     * @param {Object} setting
+     * @return {Object}
      */
     i18n(setting) {
         var _setting = this.u10s.extend(
@@ -90,8 +90,8 @@ export default class Syrup {
         return this;
     }
 
-    /**Return full navigator information
-
+    /** Return full navigator information
+     *
      * @return (Object)
      */
     getNav() {
@@ -118,10 +118,10 @@ export default class Syrup {
     }
 
     /** Validate if param is set. If not, throw msg!
-
-     * @param {object} param
-     * @param {string|null} breakpoint
-     * @return {object}
+     *
+     * @param {Object} param
+     * @param {String|null} breakpoint
+     * @return {Object}
      */
     assert(param, breakpoint = null) {
         //Is set. not null or undefined and not false?

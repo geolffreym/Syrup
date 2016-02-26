@@ -8,31 +8,28 @@
 'use strict';
 
 export default class Isomorphic {
-    /**
-     * Check if can access via global environment
-
-     * @return {boolean}
+    /** Check if can access via global environment
+     *
+     * @return {Boolean}
      */
     static client() {
         return typeof window === 'object';
     }
 
-    /**
-     * Check if can access via CommonJs environment
-
-     * @return {boolean}
+    /** Check if can access via CommonJs environment
+     *
+     * @return {Boolean}
      */
     static server() {
         return typeof module === 'object' &&
         typeof module.exports === 'object';
     }
 
-    /**
-     * AMD with global, Node, or global
-
-     * @param {string} name
-     * @param {object} Factory
-     * @return {void|object}
+    /** AMD with global, Node, or global
+     *
+     * @param {String} name
+     * @param {Object} Factory
+     * @return {void|Object}
      */
     static export(name, Factory) {
         

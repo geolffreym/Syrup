@@ -8,13 +8,12 @@
 'use strict';
 
 export default class ObjectAdapter extends Object {
-    /**
-     * Object adapter
-
-     * @param {object} param
+    /** Object adapter
+     *
+     * @param {Object} param
      */
     constructor(param) {
-	super(param || {});
+        super(param || {});
     }
 
 }

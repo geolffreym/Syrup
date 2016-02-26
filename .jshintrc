@@ -99,7 +99,7 @@
   // true: Tolerate generator functions with no yield statement in them.
   "notypeof": false,
   // true: Tolerate invalid typeof operator values
-  "proto": false,
+  "proto": true,
   // true: Tolerate using the `__proto__` property
   "scripturl": false,
   // true: Tolerate script-targeted URLs

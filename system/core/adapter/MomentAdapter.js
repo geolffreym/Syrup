@@ -16,9 +16,9 @@ var momentJs = require('moment');
 //Enhanced Object Literals
 export default {
     __proto__: {},
-    /**Proxy for locale conf
-
-     * @param {string} conf
+    /** Proxy for locale conf
+     *
+     * @param {String} conf
      * @return {void}
      **/
     
@@ -26,26 +26,25 @@ export default {
         momentJs.locale(conf);
     },
     
-    /**Proxy for momentJs
-
-     * @return {object}
+    /** Return momentJs object
+     *
+     * @return {Object}
      */
     
     get date() {
         return momentJs();
     },
     
-    /**
-     * Set date form for momentJs
-
-     * @param {string} dA
-     * @param {string} dB
-     * @param {string} encode
-     * @param {boolean} stric
+    /** Set date for momentJs
+     *
+     * @param {String} dA
+     * @param {String} dB
+     * @param {String} encode
+     * @param {Boolean} strict
      * @return {void}
      */
-    moment(dA, dB, encode, stric) {
-        return momentJs(dA, dB, encode, stric);
+    moment(dA, dB, encode, strict) {
+        return momentJs(dA, dB, encode, strict);
     }
     
 };

@@ -17,11 +17,11 @@ var jQuery = require('jquery');
 export default {
     __proto__: {},
     
-    /**Proxy object for Jquery
-
-     * @param {string} selector
-     * @param {object} context
-     * @return {object}
+    /** Proxy method for Jquery
+     *
+     * @param {String} selector
+     * @param {Object} context
+     * @return {Object}
      */
     $(selector, context) {
         //Dom traversing
@@ -32,9 +32,9 @@ export default {
         return jY;
     },
     
-    /**Default attr getter
-
-     * @return {object}
+    /** Default attr getter
+     *
+     * @return {Object}
      */
     get constructor() {
         return jQuery.fn.constructor;

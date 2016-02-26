@@ -127,7 +127,8 @@
 
 	var Syrup = (function () {
 	    /** Syrup class
-	      * @constructor
+	     *
+	     * @constructor
 	     */
 
 	    function Syrup() {
@@ -172,9 +173,10 @@
 	        };
 	    }
 
-	    /**Set default locale i18n date format
-	      * @param {object} setting
-	     * @return {object}
+	    /** Set default locale i18n date format
+	     *
+	     * @param {Object} setting
+	     * @return {Object}
 	     */
 
 	    _createClass(Syrup, [{
@@ -189,8 +191,9 @@
 	            return this;
 	        }
 
-	        /**Return full navigator information
-	          * @return (Object)
+	        /** Return full navigator information
+	         *
+	         * @return (Object)
 	         */
 
 	    }, {
@@ -229,9 +232,10 @@
 	        }
 
 	        /** Validate if param is set. If not, throw msg!
-	          * @param {object} param
-	         * @param {string|null} breakpoint
-	         * @return {object}
+	         *
+	         * @param {Object} param
+	         * @param {String|null} breakpoint
+	         * @return {Object}
 	         */
 
 	    }, {
@@ -273,7 +277,7 @@
 	//Is Js module
 	;
 	Object.defineProperty(exports, "__esModule", {
-		value: true
+	    value: true
 	});
 
 	var _JQueryAdapter = __webpack_require__(3);
@@ -288,32 +292,35 @@
 
 	//Enhanced Object Literals
 	exports.default = {
-		__proto__: isJs,
+	    __proto__: isJs,
 
-		get not() {
-			this.is_not = true;
-			return this;
-		},
+	    /** Not **/
+	    get not() {
+	        this.is_not = true;
+	        return this;
+	    },
 
-		/**Is html?
-	      * @param {string} html
-	      * @return {boolean}
-	      */
-		html: function html(_html) {
-			var result = /(<([^>]+)>)/ig.test(_html);
-			return this.is_not ? !result : result;
-		},
+	    /** Is html?
+	    *
+	    * @param {String} html
+	    * @return {Boolean}
+	    */
+	    html: function html(_html) {
+	        var result = /(<([^>]+)>)/ig.test(_html);
+	        return this.is_not ? !result : result;
+	    },
 
-		/**Is Jquery Object?
-	      * @param obj
-	      * @returns {boolean}
-	      */
-		$: function $() {
-			var obj = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	    /** Is Jquery Object?
+	    *
+	    * @param {Object} obj
+	    * @returns {Boolean}
+	    */
+	    $: function $() {
+	        var obj = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-			var result = _JQueryAdapter2.default.constructor === obj.constructor;
-			return this.is_not ? !result : result;
-		}
+	        var result = _JQueryAdapter2.default.constructor === obj.constructor;
+	        return this.is_not ? !result : result;
+	    }
 	};
 
 /***/ },
@@ -343,10 +350,11 @@
 	exports.default = {
 	  __proto__: {},
 
-	  /**Proxy object for Jquery
-	    * @param {string} selector
-	   * @param {object} context
-	   * @return {object}
+	  /** Proxy method for Jquery
+	   *
+	   * @param {String} selector
+	   * @param {Object} context
+	   * @return {Object}
 	   */
 	  $: function $(selector, context) {
 	    //Dom traversing
@@ -357,8 +365,9 @@
 	    return jY;
 	  },
 
-	  /**Default attr getter
-	    * @return {object}
+	  /** Default attr getter
+	   *
+	   * @return {Object}
 	   */
 	  get constructor() {
 	    return jQuery.fn.constructor;
@@ -11061,7 +11070,7 @@
 	//Is Js module
 	;
 	Object.defineProperty(exports, "__esModule", {
-		value: true
+	    value: true
 	});
 
 	var _IsJsAdapter = __webpack_require__(2);
@@ -11079,32 +11088,40 @@
 
 	//Enhanced Object Literals
 	exports.default = {
-		__proto__: underscore,
+	    __proto__: underscore,
 
-		/** Parse to Object
-	 	     * @param {object} element
-	      * @param {object} element2: optional
-	      * @return {object}
-	      */
-		toObject: function toObject(element) {
-			var element2 = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+	    /** Parse to Object
+	    *
+	    * @param {Object} element
+	    * @param {Object} element2: optional
+	    * @return {Object}
+	    */
 
-			//Is string or number?
-			if (_IsJsAdapter2.default.string(element) || _IsJsAdapter2.default.number(element)) {
-				return this.native.object.valueOf.call(element);
-			}
+	    toObject: function toObject(element) {
+	        var element2 = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
 
-			//Is not array?
-			if (!_IsJsAdapter2.default.array(element)) {
-				throw new _Exceptions.InvalidArray('(Underscore .toObject)');
-			}
+	        //Try convert JSON string
+	        try {
+	            return JSON.parse(element);
+	        } catch (err) {}
+	        //Pass
 
-			// Reduce object or mix it!!
-			return element.reduce(function (o, v, i) {
-				o[element2 && v || i] = element2 && element2[i] || v;
-				return o;
-			}, {});
-		}
+	        //Is string or number?
+	        if (_IsJsAdapter2.default.string(element) || _IsJsAdapter2.default.number(element)) {
+	            return Object.prototype.valueOf.call(element);
+	        }
+
+	        //Is not array?
+	        if (!_IsJsAdapter2.default.array(element)) {
+	            throw new _Exceptions.InvalidArray('(Underscore .toObject)');
+	        }
+
+	        // Reduce object or mix it!!
+	        return element.reduce(function (o, v, i) {
+	            o[element2 && v || i] = element2 && element2[i] || v;
+	            return o;
+	        }, {});
+	    }
 	};
 
 /***/ },
@@ -11147,7 +11164,8 @@
 
 	var CoreExceptions = (function () {
 		/** Syrup core exceptions
-	   * @constructor
+	  *
+	  * @constructor
 	  */
 
 		function CoreExceptions(message) {
@@ -11160,8 +11178,9 @@
 			this.message = message + (breakpoint && ' | Method: ' + breakpoint || '');
 		}
 
-		/**Throw error
-	   * @return {void}
+		/** Throw error
+	  *
+	  * @return {void}
 	  */
 
 		_createClass(CoreExceptions, [{
@@ -11170,8 +11189,8 @@
 				throw new this.type(this.message);
 			}
 
-			/**Show warning in console log
-	    * @return {string}
+			/** Show warning in console log
+	  	 * @return {String}
 	   */
 
 		}, {
@@ -11190,7 +11209,8 @@
 		_inherits(InvalidArray, _CoreExceptions);
 
 		/** Invalid Array exception
-	   * @constructor
+	  *
+	  * @constructor
 	  */
 
 		function InvalidArray(breakpoint) {
@@ -11212,8 +11232,9 @@
 	var InvalidParam = exports.InvalidParam = (function (_CoreExceptions2) {
 		_inherits(InvalidParam, _CoreExceptions2);
 
-		/** Invalid Array exception
-	   * @constructor
+		/**Invalid Array exception
+	  *
+	  * @constructor
 	  */
 
 		function InvalidParam(breakpoint) {
@@ -12812,8 +12833,9 @@
 	//Enhanced Object Literals
 	exports.default = {
 	  __proto__: {},
-	  /**Proxy for locale conf
-	    * @param {string} conf
+	  /** Proxy for locale conf
+	   *
+	   * @param {String} conf
 	   * @return {void}
 	   **/
 
@@ -12821,24 +12843,25 @@
 	    momentJs.locale(conf);
 	  },
 
-	  /**Proxy for momentJs
-	    * @return {object}
+	  /** Return momentJs object
+	   *
+	   * @return {Object}
 	   */
 
 	  get date() {
 	    return momentJs();
 	  },
 
-	  /**
-	   * Set date form for momentJs
-	    * @param {string} dA
-	   * @param {string} dB
-	   * @param {string} encode
-	   * @param {boolean} stric
+	  /** Set date for momentJs
+	   *
+	   * @param {String} dA
+	   * @param {String} dB
+	   * @param {String} encode
+	   * @param {Boolean} strict
 	   * @return {void}
 	   */
-	  moment: function moment(dA, dB, encode, stric) {
-	    return momentJs(dA, dB, encode, stric);
+	  moment: function moment(dA, dB, encode, strict) {
+	    return momentJs(dA, dB, encode, strict);
 	  }
 	};
 
@@ -25691,17 +25714,17 @@
 	    _createClass(Isomorphic, null, [{
 	        key: 'client',
 
-	        /**
-	         * Check if can access via global environment
-	          * @return {boolean}
+	        /** Check if can access via global environment
+	         *
+	         * @return {Boolean}
 	         */
 	        value: function client() {
 	            return (typeof window === 'undefined' ? 'undefined' : _typeof(window)) === 'object';
 	        }
 
-	        /**
-	         * Check if can access via CommonJs environment
-	          * @return {boolean}
+	        /** Check if can access via CommonJs environment
+	         *
+	         * @return {Boolean}
 	         */
 
 	    }, {
@@ -25710,11 +25733,11 @@
 	            return ( false ? 'undefined' : _typeof(module)) === 'object' && _typeof(module.exports) === 'object';
 	        }
 
-	        /**
-	         * AMD with global, Node, or global
-	          * @param {string} name
-	         * @param {object} Factory
-	         * @return {void|object}
+	        /** AMD with global, Node, or global
+	         *
+	         * @param {String} name
+	         * @param {Object} Factory
+	         * @return {void|Object}
 	         */
 
 	    }, {

@@ -19,65 +19,61 @@ const ERROR = {
 };
 
 export default class CoreExceptions {
-    /** Syrup core exceptions
+	/** Syrup core exceptions
+	 *
+	 * @constructor
+	 */
+	constructor(message, breakpoint = null) {
+		this.type = Error;
+		this.name = 'CoreExceptions';
+		this.message = (message) + (breakpoint && (' | Method: ' + breakpoint) || ''   );
+	}
 
-     * @constructor
-     */
-    constructor(message, breakpoint = null) {
-	this.type = Error;
-	this.name = 'CoreExceptions';
-	this.message = (message
-	) + (breakpoint && (' | Method: ' + breakpoint
-	) || ''
-	);
-    }
+	/** Throw error
+	 *
+	 * @return {void}
+	 */
+	log() {
+		throw (new this.type(
+			this.message
+		));
+	}
 
-    /**Throw error
+	/** Show warning in console log
 
-     * @return {void}
-     */
-    log() {
-	throw (new this.type(
-	this.message
-	)
-	);
-    }
-
-    /**Show warning in console log
-
-     * @return {string}
-     */
-    toString() {
-	return this.message;
-    }
+	 * @return {String}
+	 */
+	toString() {
+		return this.message;
+	}
 
 }
 
 export class InvalidArray extends CoreExceptions {
-    /** Invalid Array exception
+	/** Invalid Array exception
+	 *
+	 * @constructor
+	 */
+	constructor(breakpoint) {
+		super(ERROR.INVALID_ARRAY, breakpoint);
+		//Overloading attributes
+		this.type = TypeError;
+		this.name = 'InvalidArray';
 
-     * @constructor
-     */
-    constructor(breakpoint) {
-	super(ERROR.INVALID_ARRAY, breakpoint);
-	//Overloading attributes
-	this.type = TypeError;
-	this.name = 'InvalidArray';
-	
-}
+	}
 }
 
 export class InvalidParam extends CoreExceptions {
-    /** Invalid Array exception
+	/**Invalid Array exception
+	 *
+	 * @constructor
+	 */
+	constructor(breakpoint) {
+		super(ERROR.INVALID_PARAM, breakpoint);
+		//Overloading attributes
+		this.type = ReferenceError;
+		this.name = 'InvalidParam';
 
-     * @constructor
-     */
-    constructor(breakpoint) {
-	super(ERROR.INVALID_PARAM, breakpoint);
-	//Overloading attributes
-	this.type = ReferenceError;
-	this.name = 'InvalidParam';
-	
-}
+	}
 }
 
