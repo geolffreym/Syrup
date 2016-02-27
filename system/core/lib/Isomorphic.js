@@ -7,12 +7,12 @@
 
 'use strict';
 
-export default class Isomorphic {
+export class Isomorphic {
     /** Check if can access via global environment
      *
      * @return {Boolean}
      */
-    static client() {
+    static get client() {
         return typeof window === 'object';
     }
 
@@ -20,7 +20,7 @@ export default class Isomorphic {
      *
      * @return {Boolean}
      */
-    static server() {
+    static get server() {
         return typeof module === 'object' &&
         typeof module.exports === 'object';
     }
@@ -37,7 +37,7 @@ export default class Isomorphic {
         Factory || new Factory();
         
         //Only for client
-        if (this.client()) {
+        if (typeof window === 'object') {
             //Typeof window !== "undefined" ? window : this
             if (typeof define === 'function' && define.amd) {
                 // AMD. Register as an anonymous module.

@@ -59,12 +59,6 @@ var launchers = {
     // }
 };
 
-var browsers = [
-    'PhantomJS',
-    'Chrome',
-    'Firefox'
-];
-
 module.exports = function (config) {
     config.set({
         // Base path, that will be used to resolve files and exclude
@@ -74,7 +68,7 @@ module.exports = function (config) {
         
         // List of files / patterns to load in the browser
         files: [
-            'core/test_syrup_main.js'
+        'core/test_syrup_main.js'
         ],
         
         // List of files to exclude
@@ -87,17 +81,17 @@ module.exports = function (config) {
         webpack: {
             module: {
                 loaders: [
-                    {
-                        test: /\.js?$/,
-                        exclude: /node_modules/,
-                        loader: 'babel-loader',
-                        query: {
-                            presets: [
-                                'es2015'
-                            ]
-                        }
-                    }
-                ]
+						{
+    test: /\.js?$/,
+    exclude: /node_modules/,
+    loader: 'babel-loader',
+    query: {
+        presets: [
+        'es2015'
+        ]
+    }
+						}
+					]
             }
         },
         
@@ -137,7 +131,11 @@ module.exports = function (config) {
         // - PhantomJS
         // - IE (only Windows)
         // CLI --browsers Chrome,Firefox,Safari
-        browsers: browsers,
+        browsers: [
+        'PhantomJS',
+        'Chrome',
+        'Firefox'
+        ],
         
         customLaunchers: launchers,
         
@@ -154,13 +152,13 @@ module.exports = function (config) {
         reportSlowerThan: 500,
         
         plugins: [
-            'karma-chrome-launcher',
-            'karma-jasmine',
-            'karma-webpack',
-            'karma-sourcemap-loader',
-            'karma-junit-reporter',
-            'karma-phantomjs-launcher',
-            'karma-firefox-launcher'
+        'karma-chrome-launcher',
+        'karma-jasmine',
+        'karma-webpack',
+        'karma-sourcemap-loader',
+        'karma-junit-reporter',
+        'karma-phantomjs-launcher',
+        'karma-firefox-launcher'
         ],
         
         concurrency: 3,
@@ -170,5 +168,8 @@ module.exports = function (config) {
         browserStack: {
             project: 'Karma'
         }
-    });
-};
+    }
+    )
+    ;
+}
+;

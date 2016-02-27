@@ -53,33 +53,8 @@
 
 	'use strict';
 
-	var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; })();
-
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })(); /**
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * Created with JetBrains WebStorm.
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * User: Geolffrey Mena
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * Date: 25/11/13
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * Time: 12:22
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        */
-	//ECMA6 Support -> node --harmony
-	//Jquery Dom Traversing -> https://github.com/jquery/jquery
-	//Underscore util -> https://github.com/jashkenas/underscore
-	//Is validation tool -> https://github.com/arasatasaygin/is.js
-	//Date helper -> https://github.com/moment/moment/
-
-	//Handle dependencies using ECMAScript 6 Module import
-	//import jquery from '../../node_modules/jquery';
-	//import underscore from '../../node_modules/underscore';
-	//import moment_js from '../../node_modules/moment';
-
-	//Handle dependencies using ECMAScript 6 Module import
-	//Adapter for is.js library
-	//Adapter for underscore.js
-
-	//Exceptions
-
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+		value: true
 	});
 
 	var _IsJsAdapter = __webpack_require__(2);
@@ -98,146 +73,40 @@
 
 	var _MomentAdapter2 = _interopRequireDefault(_MomentAdapter);
 
-	var _Isomorphic = __webpack_require__(109);
+	var _SyrupCore2 = __webpack_require__(110);
 
-	var _Isomorphic2 = _interopRequireDefault(_Isomorphic);
-
-	var _Exceptions = __webpack_require__(7);
+	var _SyrupCore3 = _interopRequireDefault(_SyrupCore2);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var Syrup = (function () {
-	    /** Syrup class
-	     *
-	     * @constructor
-	     */
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-	    function Syrup() {
-	        _classCallCheck(this, Syrup);
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Created by gmena on 02-27-16.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
 
-	        //Basic attributes
-	        this.emptyStr = '';
-	        this.isClient = _Isomorphic2.default.client();
-	        this.isServer = _Isomorphic2.default.server();
+	//Handle dependencies using ECMAScript 6 Module import
+	//Adapter for is.js library
+	//Adapter for underscore.js
 
-	        //Dependencies injection
-	        this.is = _IsJsAdapter2.default; // Is.js
-	        this.m6s = _MomentAdapter2.default; // Moment.js
-	        this.u10s = _UnderscoreAdapter2.default; // Underscore.js
+	var Syrup = (function (_SyrupCore) {
+		_inherits(Syrup, _SyrupCore);
 
-	        //Client access only for nav
-	        //Dom traversing tool (jQuery) needed only for client side
-	        //Dom traversing not needed in server side
-	        if (this.isClient) {
-	            // Jquery.js
-	            this.$ = function (q, c) {
-	                return _JQueryAdapter2.default.$(q, c);
-	            };
-	            //Navigator Info
-	            this.nav = {
-	                online: window.navigator.onLine,
-	                local: window.navigator.userAgent.toLowerCase(),
-	                cookies: window.navigator.cookieEnabled,
-	                javascript: window.navigator.javaEnabled(),
-	                unsupported: !window.localStorage
-	            };
-	        }
+		/** Syrup class
+	  *
+	  * @constructor
+	  */
 
-	        //Version
-	        this.VERSION = 'v1.0.0-alpha';
-	        //Init features
-	        this.i18n({});
-	        //Native features
-	        this.native = {
-	            'function': Function.prototype,
-	            'object': Object.prototype
-	        };
-	    }
+		function Syrup() {
+			_classCallCheck(this, Syrup);
 
-	    /** Set default locale i18n date format
-	     *
-	     * @param {Object} setting
-	     * @return {Object}
-	     */
+			return _possibleConstructorReturn(this, Object.getPrototypeOf(Syrup).call(this, _JQueryAdapter2.default, _IsJsAdapter2.default, _MomentAdapter2.default, _UnderscoreAdapter2.default));
+		}
 
-	    _createClass(Syrup, [{
-	        key: 'i18n',
-	        value: function i18n(setting) {
-	            var _setting = this.u10s.extend({ locale: 'en' }, setting);
-
-	            //Set default locale setting
-	            this.m6s.locale(_setting.locale);
-
-	            //Return self
-	            return this;
-	        }
-
-	        /** Return full navigator information
-	         *
-	         * @return (Object)
-	         */
-
-	    }, {
-	        key: 'getNav',
-	        value: function getNav() {
-
-	            //Match navigator information
-
-	            var _nav$local$match = this.nav.local.match(/(?:trident\/(?=\w.+rv:)|(?:chrome\/|firefox\/|opera\/|msie\s|safari\/))[\w.]{1,4}/);
-
-	            var _nav$local$match2 = _slicedToArray(_nav$local$match, 1);
-
-	            var _matches = _nav$local$match2[0];
-
-	            //Can't access if not client
-	            //Not found match for navigator info
-
-	            if (!this.isClient || !_matches) return {};
-
-	            //Agent and version
-
-	            var _matches$split = _matches.split('/');
-
-	            var _matches$split2 = _slicedToArray(_matches$split, 2);
-
-	            var _agent = _matches$split2[0];
-	            var _version = _matches$split2[1];
-
-	            //Return the nav information
-
-	            return {
-	                nav: _agent.replace('trident', 'msie'),
-	                version: _version,
-	                platform: window.navigator.platform.toLocaleLowerCase()
-	            };
-	        }
-
-	        /** Validate if param is set. If not, throw msg!
-	         *
-	         * @param {Object} param
-	         * @param {String|null} breakpoint
-	         * @return {Object}
-	         */
-
-	    }, {
-	        key: 'assert',
-	        value: function assert(param) {
-	            var breakpoint = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
-
-	            //Is set. not null or undefined and not false?
-	            if (this.is.not.truthy(param)) {
-	                throw new _Exceptions.InvalidParam(breakpoint);
-	            }
-
-	            //Return self
-	            return this;
-	        }
-	    }]);
-
-	    return Syrup;
-	})();
+		return Syrup;
+	})(_SyrupCore3.default);
 
 	exports.default = Syrup;
 
@@ -25689,32 +25558,13 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var Isomorphic = (function () {
+	var Isomorphic = exports.Isomorphic = (function () {
 	    function Isomorphic() {
 	        _classCallCheck(this, Isomorphic);
 	    }
 
 	    _createClass(Isomorphic, null, [{
-	        key: 'client',
-
-	        /** Check if can access via global environment
-	         *
-	         * @return {Boolean}
-	         */
-	        value: function client() {
-	            return (typeof window === 'undefined' ? 'undefined' : _typeof(window)) === 'object';
-	        }
-
-	        /** Check if can access via CommonJs environment
-	         *
-	         * @return {Boolean}
-	         */
-
-	    }, {
-	        key: 'server',
-	        value: function server() {
-	            return ( false ? 'undefined' : _typeof(module)) === 'object' && _typeof(module.exports) === 'object';
-	        }
+	        key: 'export',
 
 	        /** AMD with global, Node, or global
 	         *
@@ -25722,15 +25572,12 @@
 	         * @param {Object} Factory
 	         * @return {void|Object}
 	         */
-
-	    }, {
-	        key: 'export',
 	        value: function _export(name, Factory) {
 
 	            Factory = (typeof Factory === 'undefined' ? 'undefined' : _typeof(Factory)) === 'object' && Factory || new Factory();
 
 	            //Only for client
-	            if (this.client()) {
+	            if ((typeof window === 'undefined' ? 'undefined' : _typeof(window)) === 'object') {
 	                //Typeof window !== "undefined" ? window : this
 	                if (true) {
 	                    // AMD. Register as an anonymous module.
@@ -25751,13 +25598,210 @@
 	                module.exports = Factory;
 	            }
 	        }
+	    }, {
+	        key: 'client',
+
+	        /** Check if can access via global environment
+	         *
+	         * @return {Boolean}
+	         */
+	        get: function get() {
+	            return (typeof window === 'undefined' ? 'undefined' : _typeof(window)) === 'object';
+	        }
+
+	        /** Check if can access via CommonJs environment
+	         *
+	         * @return {Boolean}
+	         */
+
+	    }, {
+	        key: 'server',
+	        get: function get() {
+	            return ( false ? 'undefined' : _typeof(module)) === 'object' && _typeof(module.exports) === 'object';
+	        }
 	    }]);
 
 	    return Isomorphic;
 	})();
-
-	exports.default = Isomorphic;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11)(module)))
+
+/***/ },
+/* 110 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; })();
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })(); /**
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * Created with JetBrains WebStorm.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * User: Geolffrey Mena
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * Date: 25/11/13
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * Time: 12:22
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        */
+	//ECMA6 Support -> node --harmony
+	//Jquery Dom Traversing -> https://github.com/jquery/jquery
+	//Underscore util -> https://github.com/jashkenas/underscore
+	//Is validation tool -> https://github.com/arasatasaygin/is.js
+	//Date helper -> https://github.com/moment/moment/
+
+	//Handle dependencies using ECMAScript 6 Module import
+	//import jquery from '../../node_modules/jquery';
+	//import underscore from '../../node_modules/underscore';
+	//import moment_js from '../../node_modules/moment';
+
+	//Exceptions
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _Isomorphic = __webpack_require__(109);
+
+	var _Exceptions = __webpack_require__(7);
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var SyrupCore = (function () {
+		/** Syrup Core class
+	  *
+	  * @constructor
+	  * @param {Function} jQuery Adapter
+	  * @param {Object} isJs Adapter
+	  * @param {Object} momentJs Adapter
+	  * @param {Object} underscore Adapter
+	  */
+
+		function SyrupCore(jQuery, isJs, momentJs, underscore) {
+			_classCallCheck(this, SyrupCore);
+
+			//Basic attributes
+			this.emptyStr = '';
+			this.isClient = _Isomorphic.Isomorphic.client;
+
+			//Dependencies injection
+			this.$ = null;
+			this.is = isJs; // Is.js
+			this.m6s = momentJs; // Moment.js
+			this.u10s = underscore; // Underscore.js
+
+			//Client access only for nav
+			//Dom traversing tool (jQuery) needed only for client side
+			//Dom traversing not needed in server side
+			if (this.isClient) {
+				// Jquery.js
+				this.$ = function (q, c) {
+					return jQuery.$(q, c);
+				};
+				//Navigator Info
+				this.nav = {
+					online: window.navigator.onLine,
+					local: window.navigator.userAgent.toLowerCase(),
+					cookies: window.navigator.cookieEnabled,
+					javascript: window.navigator.javaEnabled(),
+					unsupported: !window.localStorage
+				};
+			}
+
+			//Version
+			this.VERSION = 'v1.0.0-alpha';
+			//Init features
+			this.i18n({});
+		}
+
+		/** Set default locale i18n date format
+	  *
+	  * @param {Object} setting
+	  * @return {Object}
+	  */
+
+		_createClass(SyrupCore, [{
+			key: 'i18n',
+			value: function i18n(setting) {
+				var _setting = this.u10s.extend({ locale: 'en' }, setting);
+
+				//Set default locale setting
+				this.m6s.locale(_setting.locale);
+
+				//Return self
+				return this;
+			}
+
+			/** Return full navigator information
+	   *
+	   * @return (Object)
+	   */
+
+		}, {
+			key: 'getNav',
+			value: function getNav() {
+
+				//Basic object
+				var _nav = {
+					nav: null,
+					version: null,
+					platform: null
+				};
+
+				//Can't access if not client
+				if (!this.isClient) return _nav;
+
+				//Match navigator information
+
+				var _nav$local$match = this.nav.local.match(/(?:trident\/(?=\w.+rv:)|(?:chrome\/|firefox\/|opera\/|msie\s|safari\/))[\w.]{1,4}/);
+
+				var _nav$local$match2 = _slicedToArray(_nav$local$match, 1);
+
+				var _matches = _nav$local$match2[0];
+
+				//Can't access if not client
+				//Not found match for navigator info
+
+				if (!_matches) return _nav;
+
+				//Agent and version
+
+				var _matches$split = _matches.split('/');
+
+				var _matches$split2 = _slicedToArray(_matches$split, 2);
+
+				var _agent = _matches$split2[0];
+				var _version = _matches$split2[1];
+
+				_nav.nav = _agent.replace('trident', 'msie');
+				_nav.version = _version;
+				_nav.platform = window.navigator.platform.toLocaleLowerCase();
+
+				//Return the nav information
+				return _nav;
+			}
+
+			/** Validate if param is set. If not, throw msg!
+	   *
+	   * @param {Object} param
+	   * @param {String|null} breakpoint
+	   * @return {Object}
+	   */
+
+		}, {
+			key: 'assert',
+			value: function assert(param) {
+				var breakpoint = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
+
+				//Is set. not null or undefined and not false?
+				if (this.is.not.truthy(param)) {
+					throw new _Exceptions.InvalidParam(breakpoint);
+				}
+
+				//Return self
+				return this;
+			}
+		}]);
+
+		return SyrupCore;
+	})();
+
+	exports.default = SyrupCore;
 
 /***/ }
 /******/ ]);

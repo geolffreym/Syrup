@@ -17,10 +17,11 @@
   },
   "maximumLineLength": 120,
   "validateLineBreaks": "LF",
-  "validateIndentation": {
-    "value": 4,
-    "includeEmptyLines": true
-  },
+  "validateIndentation": false,
+  //  "validateIndentation": {
+  //    "value": "",
+  //    "includeEmptyLines": true
+  //  },
   "disallowTrailingComma": true,
   "disallowMultipleVarDecl": false,
   "requireCapitalizedComments": {
