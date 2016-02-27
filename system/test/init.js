@@ -3,7 +3,7 @@
  */
 'use strict';
 //Web parsing
-import Syrup from '../core/SyrupCore';
+import Syrup from '../core/Syrup';
 import {Isomorphic} from '../core/lib/Isomorphic';
 
 //Isomorphic

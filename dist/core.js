@@ -25639,6 +25639,7 @@
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * Date: 25/11/13
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * Time: 12:22
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        */
+
 	//ECMA6 Support -> node --harmony
 	//Jquery Dom Traversing -> https://github.com/jquery/jquery
 	//Underscore util -> https://github.com/jashkenas/underscore
@@ -25706,22 +25707,23 @@
 			//Version
 			this.VERSION = 'v1.0.0-alpha';
 			//Init features
-			this.i18n({});
+			this.i18n('es');
 		}
 
 		/** Set default locale i18n date format
 	  *
+	  * @param {String} locale
 	  * @param {Object} setting
 	  * @return {Object}
 	  */
 
 		_createClass(SyrupCore, [{
 			key: 'i18n',
-			value: function i18n(setting) {
-				var _setting = this.u10s.extend({ locale: 'en' }, setting);
+			value: function i18n(locale) {
+				var setting = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
 				//Set default locale setting
-				this.m6s.locale(_setting.locale);
+				this.m6s.locale(locale, setting);
 
 				//Return self
 				return this;

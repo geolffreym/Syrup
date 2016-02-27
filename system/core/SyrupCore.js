@@ -4,6 +4,7 @@
  * Date: 25/11/13
  * Time: 12:22
  */
+
 //ECMA6 Support -> node --harmony
 //Jquery Dom Traversing -> https://github.com/jquery/jquery
 //Underscore util -> https://github.com/jashkenas/underscore
@@ -61,21 +62,22 @@ export default class SyrupCore {
 		//Version
 		this.VERSION = 'v1.0.0-alpha';
 		//Init features
-		this.i18n({});
+		this.i18n('es');
 	}
 
 	/** Set default locale i18n date format
 	 *
+	 * @param {String} locale
 	 * @param {Object} setting
 	 * @return {Object}
 	 */
-	i18n(setting) {
-		var _setting = this.u10s.extend(
-			{locale: 'en'}, setting
-		);
+	i18n(locale, setting = {}) {
 
 		//Set default locale setting
-		this.m6s.locale(_setting.locale);
+		this.m6s.locale(
+			locale,
+			setting
+		);
 
 		//Return self
 		return this;
