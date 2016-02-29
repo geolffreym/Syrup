@@ -733,7 +733,7 @@
 
 		now: Date.now,
 
-		// jQuery.support is not used in Core but other projects attach their
+		// jQuery.support is not used in Syrup but other projects attach their
 		// properties to it so it needs to exist.
 		support: support
 	} );
@@ -25664,7 +25664,7 @@
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	var SyrupCore = (function () {
-		/** Syrup Core class
+		/** Syrup Syrup class
 	  *
 	  * @constructor
 	  * @param {Function} jQuery Adapter

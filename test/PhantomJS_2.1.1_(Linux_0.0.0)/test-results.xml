@@ -1,17 +1,14 @@
 <?xml version="1.0"?>
-<testsuite name="PhantomJS 2.1.1 (Linux 0.0.0)" package="" timestamp="2016-02-29T00:56:23" id="0" hostname="server.casa.com" tests="0" errors="1" failures="0" time="0">
+<testsuite name="PhantomJS 2.1.1 (Linux 0.0.0)" package="" timestamp="2016-02-29T03:14:24" id="0" hostname="server.casa.com" tests="0" errors="1" failures="0" time="0">
   <properties>
     <property name="browser.fullName" value="Mozilla/5.0 (Unknown; Linux x86_64) AppleWebKit/538.1 (KHTML, like Gecko) PhantomJS/2.1.1 Safari/538.1"/>
   </properties>
   <system-out>
-    <![CDATA[Firefox 40.0.0 (Linux 0.0.0) ERROR
+    <![CDATA[PhantomJS 2.1.1 (Linux 0.0.0) ERROR
   Error: Cannot find module "../../system/adapter/IsJsAdapter"
   at /home/gmena/Documentos/syrup/test/core/test_syrup_main.js:49
 ,Chrome 45.0.2454 (Linux 0.0.0) ERROR
   Uncaught Error: Cannot find module "../../system/adapter/IsJsAdapter"
-  at /home/gmena/Documentos/syrup/test/core/test_syrup_main.js:49
-,PhantomJS 2.1.1 (Linux 0.0.0) ERROR
-  Error: Cannot find module "../../system/adapter/IsJsAdapter"
   at /home/gmena/Documentos/syrup/test/core/test_syrup_main.js:49
 
 ]]>

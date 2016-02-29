@@ -4,7 +4,7 @@
 'use strict';
 //Web parsing
 import Syrup from '../core/Syrup';
-import {Isomorphic} from '../core/lib/Isomorphic';
+import {Isomorphic} from '../core/Isomorphic';
 
 //Isomorphic
 Isomorphic.export('_', Syrup);

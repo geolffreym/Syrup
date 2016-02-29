@@ -146,7 +146,7 @@ Open Closing
 
 **Attribute `.$fn` in Syrup**
 
-*You also have the option of creating plugins using the object context using Syrup Core.*
+*You also have the option of creating plugins using the object context using Syrup Syrup.*
 
 ```js
 

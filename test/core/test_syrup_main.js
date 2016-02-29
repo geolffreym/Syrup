@@ -5,7 +5,7 @@ import isJs from '../../system/adapter/IsJsAdapter';
 import underscore from '../../system/adapter/UnderscoreAdapter';
 import jQuery from '../../system/adapter/JQueryAdapter';
 import momentJs from '../../system/adapter/MomentAdapter';
-import SyrupCore from '../../system/core/SyrupCore';
+import SyrupCore from '../../system/core/Syrup';
 
 describe('Syrup.core', function () {
 	'use strict';

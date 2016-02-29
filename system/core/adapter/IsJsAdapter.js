@@ -18,32 +18,32 @@ import jQuery  from './JQueryAdapter';
 
 //Enhanced Object Literals
 export default {
-    __proto__: isJs,
-    
-    /** Not **/
-    get not() {
-        this.is_not = true;
-        return this;
-    },
-    
-    /** Is html?
+	__proto__: isJs,
+
+	/** Not **/
+	get not() {
+		this.is_not = true;
+		return this;
+	},
+
+	/** Is html?
 	 *
 	 * @param {String} html
 	 * @return {Boolean}
 	 */
-    html(html)    {
-        let result = /(<([^>]+)>)/ig.test(html);
-        return this.is_not ? !result : result;
-    },
-    
-    /** Is Jquery Object?
+		html(html)    {
+		let result = /(<([^>]+)>)/ig.test(html);
+		return this.is_not ? !result : result;
+	},
+
+	/** Is Jquery Object?
 	 *
 	 * @param {Object} obj
 	 * @returns {Boolean}
 	 */
-    $(obj = {}) {
-        let result = (jQuery.constructor === obj.constructor);
-        return this.is_not ? !result : result;
-    }
+		$(obj = {}) {
+		let result = (jQuery.constructor === obj.constructor);
+		return this.is_not ? !result : result;
+	}
 };
 

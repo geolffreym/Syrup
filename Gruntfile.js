@@ -15,8 +15,8 @@ module.exports = function (grunt) {
         webpack: {
             syrup: {
                 entry: {
-                    test: './system/test/init.js',
-                    core: ['./system/core/Syrup.js']
+                    //test: './system/test/init.js',
+                    //core: ['./system/core/Syrup.js']
                 },
                 output: {
                     path: path.join(__dirname, './dist'),

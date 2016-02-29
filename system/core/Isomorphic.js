@@ -12,7 +12,7 @@ export class Isomorphic {
      *
      * @return {Boolean}
      */
-    static get client() {
+    static isClient() {
         return typeof window === 'object';
     }
 
@@ -20,7 +20,7 @@ export class Isomorphic {
      *
      * @return {Boolean}
      */
-    static get server() {
+    static isServer() {
         return typeof module === 'object' &&
         typeof module.exports === 'object';
     }
