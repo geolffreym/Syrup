@@ -18,10 +18,7 @@ export default class Syrup extends SyrupCore {
 	 * @constructor
 	 */
 	constructor() {
-		super(
-			jQuery, isJs,
-			momentJs, underscore
-		);
+		super(jQuery, isJs, momentJs, underscore);
 	}
 
 }
