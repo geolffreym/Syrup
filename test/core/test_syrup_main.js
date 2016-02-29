@@ -20,7 +20,7 @@ describe('Syrup.core', function () {
 
 	//The Provider
 	var _syrupProvider = new CoreProvider();
-	_syrupProvider.setDom(_domAdapter);
+	_syrupProvider.add(_domAdapter);
 	_syrupProvider.setValidation(_validationAdapter);
 	_syrupProvider.setHelper(_underscoreAdapter);
 	_syrupProvider.setDate(_dateAdapter);
