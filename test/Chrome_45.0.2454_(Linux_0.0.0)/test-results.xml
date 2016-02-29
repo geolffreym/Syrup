@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<testsuite name="Chrome 45.0.2454 (Linux 0.0.0)" package="" timestamp="2016-02-27T20:12:08" id="0" hostname="server.casa.com" tests="16" errors="0" failures="0" time="0.007">
+  <properties>
+    <property name="browser.fullName" value="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.93 Safari/537.36"/>
+  </properties>
+  <testcase name="show version" time="0.001" classname="Chrome_45_0_2454_(Linux_0_0_0).Syrup.core"/>
+  <testcase name="has the attribute &quot;this.nav&quot; and is Object type" time="0" classname="Chrome_45_0_2454_(Linux_0_0_0).Syrup.core"/>
+  <testcase name="has the attribute &quot;this.is&quot; and is Object type" time="0" classname="Chrome_45_0_2454_(Linux_0_0_0).Syrup.core"/>
+  <testcase name="has the attribute &quot;this.m6s&quot; and is Object type" time="0" classname="Chrome_45_0_2454_(Linux_0_0_0).Syrup.core"/>
+  <testcase name="has the attribute &quot;this.u10s&quot; and is Object type" time="0" classname="Chrome_45_0_2454_(Linux_0_0_0).Syrup.core"/>
+  <testcase name="has the attribute &quot;this.$&quot; and is Function type" time="0" classname="Chrome_45_0_2454_(Linux_0_0_0).Syrup.core"/>
+  <testcase name="has the attribute &quot;this.isClient&quot; and is Boolean type" time="0.003" classname="Chrome_45_0_2454_(Linux_0_0_0).Syrup.core"/>
+  <testcase name="has the attribute &quot;this.emptyStr&quot; and is String type" time="0" classname="Chrome_45_0_2454_(Linux_0_0_0).Syrup.core"/>
+  <testcase name="is callable function" time="0" classname="Chrome_45_0_2454_(Linux_0_0_0).Syrup.core.getNav()"/>
+  <testcase name="can use (this.nav.local) Syrup attribute" time="0" classname="Chrome_45_0_2454_(Linux_0_0_0).Syrup.core.getNav()"/>
+  <testcase name="match type &quot;object&quot; in the return" time="0.001" classname="Chrome_45_0_2454_(Linux_0_0_0).Syrup.core.getNav()"/>
+  <testcase name="match {nav}, {version} and {platform}, in returned object keys" time="0" classname="Chrome_45_0_2454_(Linux_0_0_0).Syrup.core.getNav()"/>
+  <testcase name="is callable function" time="0.001" classname="Chrome_45_0_2454_(Linux_0_0_0).Syrup.core.i18n()"/>
+  <testcase name="can use &quot;locale&quot; (this.m6s.locale) method in m6s attribute to set &quot;zone&quot;" time="0" classname="Chrome_45_0_2454_(Linux_0_0_0).Syrup.core.i18n()"/>
+  <testcase name="call be called with invalid &quot;null&quot; or &quot;empty&quot; second param" time="0.001" classname="Chrome_45_0_2454_(Linux_0_0_0).Syrup.core.i18n()"/>
+  <testcase name="match type &quot;object&quot; in the return" time="0" classname="Chrome_45_0_2454_(Linux_0_0_0).Syrup.core.i18n()"/>
+  <system-out>
+    <![CDATA[
+]]>
+  </system-out>
+  <system-err/>
+</testsuite>

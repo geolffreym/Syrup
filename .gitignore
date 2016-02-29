@@ -6,7 +6,7 @@
 node_modules/*
 
 #Images
-test/*
+#test/*
 index.html
 
 app/modules/*
