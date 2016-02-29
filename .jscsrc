@@ -1,0 +1,53 @@
+{
+  "preset": "google",
+  "fileExtensions": [
+    ".js"
+  ],
+  "maxErrors": 100,
+  "requireSemicolons": true,
+  "requireCurlyBraces": false,
+  "requireParenthesesAroundIIFE": true,
+  "requireCamelCaseOrUpperCaseIdentifiers": {
+    "allExcept": [
+      "Syrup",
+      "Error",
+      "Object"
+    ],
+    "ignoreProperties": true
+  },
+  "maximumLineLength": 120,
+  "validateLineBreaks": "LF",
+  "validateIndentation": false,
+  //  "validateIndentation": {
+  //    "value": "",
+  //    "includeEmptyLines": true
+  //  },
+  "disallowTrailingComma": true,
+  "disallowMultipleVarDecl": false,
+  "requireCapitalizedComments": {
+    "inlined": true
+  },
+  "disallowSpacesInCallExpression": false,
+  "disallowSpacesInAnonymousFunctionExpression": false,
+  "disallowSpacesInFunctionExpression": false,
+  "disallowSpacesInsideParentheses": false,
+  "disallowSpacesInsideObjectBrackets": null,
+  "disallowTrailingWhitespace": "ignoreEmptyLines",
+  "disallowImplicitTypeConversion": [
+    "string"
+  ],
+  "safeContextKeyword": "_this",
+  "jsDoc": {
+    "checkAnnotations": "closurecompiler",
+    "checkParamNames": true,
+    "requireParamTypes": true,
+    "checkRedundantParams": true,
+    "checkReturnTypes": true,
+    "checkRedundantReturns": true,
+    "requireReturnTypes": true,
+    "checkTypes": "capitalizedNativeCase",
+    "checkRedundantAccess": true,
+    "requireNewlineAfterDescription": true
+  },
+  "excludeFiles": []
+}
