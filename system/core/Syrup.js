@@ -18,47 +18,35 @@ import {ReferenceErrorException} from './Exceptions';
 //Interface
 import Interface from './Interface';
 import iSyrupProvider from './interface/Interface_SyrupProvider';
-import iIsomorphic from './interface/Interface_Isomorphic';
 
 export default class Syrup {
 	/** Syrup Syrup class
 	 *
 	 * @constructor
 	 * @param {Object} sProvider
-	 * @param {Object} i8c
 	 */
-	constructor(sProvider, i8c) {
+	constructor(sProvider) {
 		//Check for interface implementation
 		Interface.implement(sProvider, iSyrupProvider);
-		Interface.implement(i8c, iIsomorphic);
-
-		//Basic attributes
-		//Is client or server?
-		this.isClient = i8c.isClient();
 
 		//Dependencies injection
-		this.$ = null;
 		this.is = sProvider.getIsJs(); // Is.js
 		this.m6s = sProvider.getM6s(); // Moment.js
 		this.u10s = sProvider.getU10s(); // Underscore.js
 
-		//Client access only for nav
-		//Dom traversing tool (jQuery) needed only for client side
-		//Dom traversing not needed in server side
-		if (this.isClient) {
-			// Jquery.js
-			this.$ = ((q, c)=> {
-				return sProvider.getJQuery().$(q, c);
-			});
-			//Navigator Info
-			this.nav = {
-				online: window.navigator.onLine,
-				local: window.navigator.userAgent.toLowerCase(),
-				cookies: window.navigator.cookieEnabled,
-				javascript: window.navigator.javaEnabled(),
-				unsupported: !window.localStorage
-			};
-		}
+		// Jquery.js
+		this.$ = ((q, c)=> {
+			return sProvider.getJQuery().$(q, c);
+		});
+
+		//Navigator Info
+		this.nav = {
+			online: window.navigator.onLine,
+			local: window.navigator.userAgent.toLowerCase(),
+			cookies: window.navigator.cookieEnabled,
+			javascript: window.navigator.javaEnabled(),
+			unsupported: !window.localStorage
+		};
 
 		//Version
 		this.VERSION = 'v1.0.0-alpha';
@@ -96,9 +84,6 @@ export default class Syrup {
 			version: null,
 			platform: null
 		};
-
-		//Can't access if not client
-		if (!this.isClient) return _nav;
 
 		//Match navigator information
 		let [_matches] = this.nav.local.match(
