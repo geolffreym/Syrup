@@ -1,21 +1,26 @@
 /**
  * Created by gmena on 02-26-16.
  */
-import isJs from '../../system/adapter/IsJsAdapter';
-import underscore from '../../system/adapter/UnderscoreAdapter';
-import jQuery from '../../system/adapter/JQueryAdapter';
-import momentJs from '../../system/adapter/MomentAdapter';
-import SyrupCore from '../../system/core/Syrup';
+import isJs from '../../system/core/adapter/IsJs_Adapter';
+import underscore from '../../system/core/adapter/Underscore_Adapter';
+import jQuery from '../../system/core/adapter/JQuery_Adapter';
+import momentJs from '../../system/core/adapter/Moment_Adapter';
+
+import Isomorphic from '../../system/core/Isomorphic';
+import SyrupProvider from '../../system/core/provider/SyrupProvider';
+import Syrup from '../../system/core/Syrup';
 
 describe('Syrup.core', function () {
 	'use strict';
+	var _ic8 = new Isomorphic();
+	var _syrupProvider = new SyrupProvider(jQuery, isJs, momentJs, underscore);
+	var _syrup = new Syrup(_syrupProvider, _ic8);
 
+	//TODO escribir pruebas para instancia del objeto Syrup
 	it('should be instantiable', function () {
-		expect(_syrup.VERSION).toBeDefined();
-		expect(_syrup.VERSION).toEqual(jasmine.any(String));
+		//expect(_syrup.VERSION).toBeDefined();
+		//expect(_syrup.VERSION).toEqual(jasmine.any(String));
 	});
-
-	let _syrup = new SyrupCore();
 
 	it('should show version', function () {
 		expect(_syrup.VERSION).toBeDefined();
@@ -53,18 +58,13 @@ describe('Syrup.core', function () {
 
 	});
 
-	it('should have the attribute "this.emptyStr" and is String type', function () {
-		expect(_syrup.emptyStr).toBeDefined();
-		expect(_syrup.emptyStr).toEqual(jasmine.any(String));
-
-	});
-
 });
 
 describe('Syrup.core.getNav()', function () {
 	'use strict';
-
-	let _syrup = new Syrup();
+	var _ic8 = new Isomorphic();
+	var _syrupProvider = new SyrupProvider(jQuery, isJs, momentJs, underscore);
+	var _syrup = new Syrup(_syrupProvider, _ic8);
 
 	it('should be callable function', function () {
 		spyOn(_syrup, 'getNav');
@@ -90,8 +90,9 @@ describe('Syrup.core.getNav()', function () {
 
 describe('Syrup.core.i18n()', function () {
 	'use strict';
-
-	let _syrup = new Syrup();
+	var _ic8 = new Isomorphic();
+	var _syrupProvider = new SyrupProvider(jQuery, isJs, momentJs, underscore);
+	var _syrup = new Syrup(_syrupProvider, _ic8);
 
 	it('should be callable function', function () {
 		spyOn(_syrup, 'i18n');

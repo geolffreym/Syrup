@@ -15,7 +15,7 @@ var underscore = require('underscore');
 
 //IsJs
 //Exceptions
-import is from './IsJsAdapter';
+import is from './IsJs_Adapter';
 import {TypeErrorException} from '../Exceptions';
 
 //Enhanced Object Literals

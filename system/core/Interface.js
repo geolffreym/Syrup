@@ -40,7 +40,7 @@ export default class Interface {
 	 *
 	 * @param {Object} object
 	 */
-	implement(object) {
+	static implement(object) {
 
 		if (arguments.length < 2) {
 			throw new TypeErrorException(
@@ -49,20 +49,22 @@ export default class Interface {
 			);
 		}
 
-		//Get first argument
+		//For each interfaces!!!!!!!!
 		for (let i = 1, len = arguments.length; i < len; i++) {
 
-			if (!( arguments[i] instanceof Interface)) {
+			//Check for valid interface!!
+			if (!(arguments[i] instanceof Interface)) {
 				throw new TypeErrorException(
 					'Expects arguments two and above to be instances of Interface.',
 					'(Interface .implement)'
 				);
 			}
 
-			for (let _method of  arguments[i].methods) {
-				if (!object[_method] || typeof object[_method] !== 'function') {
+			//Find method in object
+			for (let j = 0, methodsLen = arguments[i].methods.length; j < methodsLen; j++) {
+				if (typeof object[arguments[i].methods[j]] !== 'function') {
 					throw new Exception(
-						'Object does not implement the ' + arguments[i].name + ' interface. Method ' + _method + ' was not found.',
+						'Object does not implement the ' + arguments[i].name + ' interface. Method ' + arguments[i].methods[j] + ' was not found.',
 						'(Interface .implement)'
 					);
 				}

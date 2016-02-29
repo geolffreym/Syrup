@@ -16,10 +16,9 @@
 import {ReferenceErrorException} from './Exceptions';
 
 //Interface
-import SyrupProviderInterface from './interface/Interface_SyrupAdapter';
-import IsomorphicInterface from './interface/Interface_Isomorphic';
-import SyrupProvider from './provider/SyrupProvider';
-import Isomorphic from './Isomorphic';
+import Interface from './Interface';
+import iSyrupProvider from './interface/Interface_SyrupProvider';
+import iIsomorphic from './interface/Interface_Isomorphic';
 
 export default class Syrup {
 	/** Syrup Syrup class
@@ -30,8 +29,8 @@ export default class Syrup {
 	 */
 	constructor(sProvider, i8c) {
 		//Check for interface implementation
-		SyrupProviderInterface.implement(sProvider, SyrupProvider);
-		IsomorphicInterface.implement(i8c, Isomorphic);
+		Interface.implement(sProvider, iSyrupProvider);
+		Interface.implement(i8c, iIsomorphic);
 
 		//Basic attributes
 		//Is client or server?

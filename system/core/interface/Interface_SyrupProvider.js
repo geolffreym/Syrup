@@ -6,5 +6,5 @@ import Interface from '../Interface';
 
 //Default Syrup Provider Interface
 export default new Interface(
-	'SyrupAdapter', ['getJQuery', 'getIsJs', 'getM6s', 'getU10s']
+	'SyrupProvider', ['getJQuery', 'getIsJs', 'getM6s', 'getU10s']
 );

@@ -14,7 +14,7 @@
 var isJs = require('is_js');
 
 //JQuery
-import jQuery  from './JQueryAdapter';
+import jQuery  from './JQuery_Adapter';
 
 //Enhanced Object Literals
 export default {

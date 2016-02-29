@@ -5,7 +5,7 @@
 //Handle dependencies using ECMAScript 6 Module import
 export default class SyrupProvider {
 
-	/** Syrup class
+	/** Syrup class provider
 	 *
 	 * @constructor
 	 * @param {Function} jQuery Adapter
@@ -14,6 +14,7 @@ export default class SyrupProvider {
 	 * @param {Object} underscore Adapter
 	 */
 	constructor(jQuery, isJs, momentJs, underscore) {
+		//TODO verificar que cada parametro implemente una interfaz Adapter
 		this._jQuery = jQuery;
 		this._isJs = isJs;
 		this._momentJs = momentJs;
