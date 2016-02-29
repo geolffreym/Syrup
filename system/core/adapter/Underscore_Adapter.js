@@ -16,7 +16,7 @@ var underscore = require('underscore');
 //IsJs
 //Exceptions
 import is from './IsJs_Adapter';
-import {TypeErrorException} from '../Exceptions';
+import {TypeErrorException} from '../core/Exceptions';
 
 //Enhanced Object Literals
 export default {

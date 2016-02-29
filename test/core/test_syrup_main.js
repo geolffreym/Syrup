@@ -6,12 +6,26 @@ import underscore from '../../system/core/adapter/Underscore_Adapter';
 import jQuery from '../../system/core/adapter/JQuery_Adapter';
 import momentJs from '../../system/core/adapter/Moment_Adapter';
 
-import SyrupProvider from '../../system/core/provider/SyrupProvider';
-import Syrup from '../../system/core/Syrup';
+import Core from '../../system/core/core/Core';
+import CoreProvider from '../../system/core/provider/CoreProvider';
 
 describe('Syrup.core', function () {
 	'use strict';
-	var _syrupProvider = new SyrupProvider(jQuery, isJs, momentJs, underscore);
+	//The adapters
+	var _domAdapter = new Adapter(jQuery);
+	var _validationAdapter = new Adapter(isJs);
+	var _underscoreAdapter = new Adapter(underscore);
+	var _dateAdapter = new Adapter(momentJs);
+
+
+	//The Provider
+	var _syrupProvider = new CoreProvider();
+	_syrupProvider.setDom(_domAdapter);
+	_syrupProvider.setValidation(_validationAdapter);
+	_syrupProvider.setHelper(_underscoreAdapter);
+	_syrupProvider.setDate(_dateAdapter);
+
+	//The core
 	var _syrup = new Syrup(_syrupProvider);
 
 	//TODO escribir pruebas para instancia del objeto Syrup

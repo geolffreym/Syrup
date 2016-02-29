@@ -3,8 +3,8 @@
  */
 'use strict';
 //Web parsing
-import Syrup from '../core/Syrup';
-import {Isomorphic} from '../core/Isomorphic';
+import Syrup from '../core/core/Core';
+import {Isomorphic} from '../core/core/Isomorphic';
 
 //Isomorphic
 Isomorphic.export('_', Syrup);

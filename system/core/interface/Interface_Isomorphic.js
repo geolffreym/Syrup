@@ -2,10 +2,10 @@
  * Created by gmena on 02-28-16.
  */
 
-import Interface from '../Interface';
+import Interface from '../core/Interface';
 
 //Isomorphic Class Interface
 export default new Interface(
-	'Isomorphic', ['export','isClient','isServer']
+	'iIsomorphic', ['export','isClient','isServer']
 );
 
