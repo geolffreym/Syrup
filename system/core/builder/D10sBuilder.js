@@ -6,7 +6,7 @@
 import Builder from './../builder/Builder';
 import D10s from './../provider/D10s';
 
-export default class D10sBuilder extends Builder{
+export default class D10sBuilder extends Builder {
 
 	/** Syrup D10s "Build" class
 	 *
