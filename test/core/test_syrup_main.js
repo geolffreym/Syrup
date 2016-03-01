@@ -10,7 +10,7 @@ import M6s from '../../system/core/d10s/Moment';
 
 //Adapters
 import Adapter from '../../system/core/adapter/Adapter';
-import JAdapter from '../../system/core/adapter/jQueryAdapter';
+import JQueryAdapter from '../../system/core/adapter/jQueryAdapter';
 
 //Core
 import Builder from '../../system/core/builder/Builder';
@@ -23,10 +23,10 @@ describe('Syrup.core', function () {
 
 	'use strict';
 	//Adapters
-	var _jquery = new JAdapter(JQuery);
 	var _isJs = new Adapter(IsJs);
 	var _moment = new Adapter(M6s);
 	var _u10s = new Adapter(U10s);
+	var _jquery = new JQueryAdapter(JQuery);
 
 	//The Provider
 	var _d10sBuilder = new D10sBuilder();
@@ -96,10 +96,10 @@ describe('Syrup.core', function () {
 describe('Syrup.core.getNav()', function () {
 	'use strict';
 	//Adapters
-	var _jquery = new JAdapter(JQuery);
 	var _isJs = new Adapter(IsJs);
 	var _moment = new Adapter(M6s);
 	var _u10s = new Adapter(U10s);
+	var _jquery = new JQueryAdapter(JQuery);
 
 	//The Provider
 	var _d10sBuilder = new D10sBuilder();
@@ -154,10 +154,10 @@ describe('Syrup.core.getNav()', function () {
 describe('Syrup.core.i18n()', function () {
 	'use strict';
 	//Adapters
-	var _jquery = new JAdapter(JQuery);
 	var _isJs = new Adapter(IsJs);
 	var _moment = new Adapter(M6s);
 	var _u10s = new Adapter(U10s);
+	var _jquery = new JQueryAdapter(JQuery);
 
 	//The Provider
 	var _d10sBuilder = new D10sBuilder();
