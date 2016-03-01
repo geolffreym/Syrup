@@ -46,7 +46,7 @@ export default class D10s {
 
 		if (typeof  injectTo !== 'object') {
 			throw new TypeErrorException(
-				'Expects first arguments to be instances of Object.',
+				'Expects first arguments to be Object.',
 				'(D10s .inject)'
 			);
 		}
