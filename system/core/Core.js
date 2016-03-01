@@ -17,7 +17,7 @@ import {ReferenceErrorException} from './Exceptions';
 
 //Interface
 import Interface from './interface/Interface';
-import iCoreD10s from './interface/iCoreD10s';
+import iD10sList from './interface/iD10sList.js';
 
 export default class Core {
 	/** Syrup Core
@@ -40,12 +40,12 @@ export default class Core {
 
 	/** Set dependencies
 	 *
-	 * @param {iCoreD10s} sD10s
+	 * @param {iD10sList} sD10s
 	 * @return {void}
 	 */
 	setD10s(sD10s) {
 		//Check for interface implementation
-		Interface.implement(sD10s, iCoreD10s);
+		Interface.implement(sD10s, iD10sList);
 
 		//Dependencies injection
 		sD10s.inject(this, sD10s.getD10s());

@@ -15,9 +15,9 @@ import JAdapter from '../../system/core/adapter/jQueryAdapter';
 import MAdapter from '../../system/core/adapter/MomentAdapter';
 
 //Core
-import D from '../../system/core/factory/D10sFactory';
+import D10s from '../../system/core/factory/D10sFactory';
+import D10sList from '../../system/core/provider/D10sList';
 import Core from '../../system/core/Core';
-import CoreD10s from '../../system/core/provider/CoreD10s';
 
 describe('Syrup.core', function () {
 
@@ -27,14 +27,19 @@ describe('Syrup.core', function () {
 	var _isJs = new IsAdapter(JQuery);
 	var _moment = new MAdapter(M6s);
 	var _u10s = new UAdapter(U10s);
-	
-	////The Provider
-	var _coreDependencies = new CoreD10s();
-	_coreDependencies.addD10s('$', _jquery);
-	_coreDependencies.addD10s('is', _isJs);
-	_coreDependencies.addD10s('u10s', _u10s);
-	_coreDependencies.addD10s('m6s', _moment);
-	
+
+	var _jqueryD = D10s.create('$', _jquery.getAdapter());
+	var _isJsD = D10s.create('is', _isJs.getAdapter());
+	var _momentD = D10s.create('m6s', _moment.getAdapter());
+	var _u10sD = D10s.create('u10s', _u10s.getAdapter());
+
+	//The Provider
+	var _coreDependencies = new D10sList();
+	_coreDependencies.addD10s(_jqueryD);
+	_coreDependencies.addD10s(_isJsD);
+	_coreDependencies.addD10s(_u10sD);
+	_coreDependencies.addD10s(_momentD);
+
 	//The core
 	var _core = new Core();
 	_core.setD10s(_coreDependencies);
@@ -83,13 +88,18 @@ describe('Syrup.core.getNav()', function () {
 	var _isJs = new IsAdapter(JQuery);
 	var _moment = new MAdapter(M6s);
 	var _u10s = new UAdapter(U10s);
-	
-	////The Provider
-	var _coreDependencies = new CoreD10s();
-	_coreDependencies.addD10s('$', _jquery);
-	_coreDependencies.addD10s('is', _isJs);
-	_coreDependencies.addD10s('u10s', _u10s);
-	_coreDependencies.addD10s('m6s', _moment);
+
+	var _jqueryD = D10s.create('$', _jquery.getAdapter());
+	var _isJsD = D10s.create('is', _isJs.getAdapter());
+	var _momentD = D10s.create('m6s', _moment.getAdapter());
+	var _u10sD = D10s.create('u10s', _u10s.getAdapter());
+
+	//The Provider
+	var _coreDependencies = new D10sList();
+	_coreDependencies.addD10s(_jqueryD);
+	_coreDependencies.addD10s(_isJsD);
+	_coreDependencies.addD10s(_u10sD);
+	_coreDependencies.addD10s(_momentD);
 	
 	//The core
 	var _core = new Core();
@@ -125,12 +135,17 @@ describe('Syrup.core.i18n()', function () {
 	var _moment = new MAdapter(M6s);
 	var _u10s = new UAdapter(U10s);
 
-	////The Provider
-	var _coreDependencies = new CoreD10s();
-	_coreDependencies.addD10s('$', _jquery);
-	_coreDependencies.addD10s('is', _isJs);
-	_coreDependencies.addD10s('u10s', _u10s);
-	_coreDependencies.addD10s('m6s', _moment);
+	var _jqueryD = D10s.create('$', _jquery.getAdapter());
+	var _isJsD = D10s.create('is', _isJs.getAdapter());
+	var _momentD = D10s.create('m6s', _moment.getAdapter());
+	var _u10sD = D10s.create('u10s', _u10s.getAdapter());
+
+	//The Provider
+	var _coreDependencies = new D10sList();
+	_coreDependencies.addD10s(_jqueryD);
+	_coreDependencies.addD10s(_isJsD);
+	_coreDependencies.addD10s(_u10sD);
+	_coreDependencies.addD10s(_momentD);
 
 	//The core
 	var _core = new Core();

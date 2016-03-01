@@ -6,7 +6,7 @@ import {TypeErrorException} from './../Exceptions';
 //Handle dependencies using ECMAScript 6 Module import
 export default class Adapter {
 
-	/** Syrup adapter
+	/** Syrup "Adapter" class
 	 *
 	 * @constructor
 	 * @param {Object|Function} adapter

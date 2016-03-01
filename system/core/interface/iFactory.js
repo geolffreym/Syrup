@@ -6,6 +6,6 @@ import Interface from './Interface';
 
 //Isomorphic Class Interface
 export default new Interface(
-	'iFactory', ['create']
+	'iFactory', ['getAdapter']
 );
 

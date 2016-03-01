@@ -5,17 +5,25 @@
 //Handle dependencies using ECMAScript 6 Module import
 import D10s from './D10s';
 import Interface from './../interface/Interface';
-import iAdapter from './../interface/iAdapter';
+import iD10s from './../interface/iD10s';
 
-export default class CoreD10s extends D10s {
+export default class D10sList extends D10s {
 
 	/** Syrup "Composite" dependencies injector
 	 *
 	 * @constructor
 	 */
 	constructor() {
-		super('CoreD10s', {});
+		super('D10sList', {});
 		this.d10s = [];
+	}
+
+	/** Return the d10s list size
+	 *
+	 * @return {Number}
+	 */
+	get length() {
+		return this.d10s.length;
 	}
 
 	/** Return the d10s list
@@ -28,13 +36,12 @@ export default class CoreD10s extends D10s {
 
 	/** Append iD10s from iAdapter
 	 *
-	 * @param {String} name
-	 * @param {iAdapter} iAdapterIn
+	 * @param {iD10s} D10s
 	 */
-	addD10s(name, iAdapterIn) {
+	addD10s(D10s) {
 		//Check for interface implementation
-		Interface.implement(iAdapterIn, iAdapter);
-		this.d10s.push(new D10s(name, iAdapterIn.getAdapter()));
+		Interface.implement(D10s, iD10s);
+		this.d10s.push(D10s);
 	}
 
 }
