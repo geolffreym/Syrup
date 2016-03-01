@@ -1,23 +1,23 @@
 <?xml version="1.0"?>
-<testsuite name="PhantomJS 2.1.1 (Linux 0.0.0)" package="" timestamp="2016-03-01T19:33:16" id="0" hostname="server.casa.com" tests="15" errors="0" failures="0" time="0.007">
+<testsuite name="PhantomJS 2.1.1 (Linux 0.0.0)" package="" timestamp="2016-03-01T19:46:41" id="0" hostname="server.casa.com" tests="15" errors="0" failures="0" time="0.002">
   <properties>
     <property name="browser.fullName" value="Mozilla/5.0 (Unknown; Linux x86_64) AppleWebKit/538.1 (KHTML, like Gecko) PhantomJS/2.1.1 Safari/538.1"/>
   </properties>
   <testcase name="should be instantiable" time="0" classname="PhantomJS_2_1_1_(Linux_0_0_0).Syrup.core"/>
-  <testcase name="should show version" time="0.001" classname="PhantomJS_2_1_1_(Linux_0_0_0).Syrup.core"/>
-  <testcase name="should have the attribute &quot;this.nav&quot; and is Object type" time="0" classname="PhantomJS_2_1_1_(Linux_0_0_0).Syrup.core"/>
+  <testcase name="should show version" time="0" classname="PhantomJS_2_1_1_(Linux_0_0_0).Syrup.core"/>
+  <testcase name="should have the attribute &quot;this.nav&quot; and is Object type" time="0.001" classname="PhantomJS_2_1_1_(Linux_0_0_0).Syrup.core"/>
   <testcase name="should have the attribute &quot;this.is&quot; and is Object type" time="0" classname="PhantomJS_2_1_1_(Linux_0_0_0).Syrup.core"/>
-  <testcase name="should have the attribute &quot;this.m6s&quot; and is Object type" time="0.001" classname="PhantomJS_2_1_1_(Linux_0_0_0).Syrup.core"/>
+  <testcase name="should have the attribute &quot;this.m6s&quot; and is Object type" time="0" classname="PhantomJS_2_1_1_(Linux_0_0_0).Syrup.core"/>
   <testcase name="should have the attribute &quot;this.u10s&quot; and is Object type" time="0" classname="PhantomJS_2_1_1_(Linux_0_0_0).Syrup.core"/>
   <testcase name="should have the attribute &quot;this.$&quot; and is Function type" time="0" classname="PhantomJS_2_1_1_(Linux_0_0_0).Syrup.core"/>
   <testcase name="should be callable function" time="0" classname="PhantomJS_2_1_1_(Linux_0_0_0).Syrup.core.getNav()"/>
-  <testcase name="should call (this.nav.local)" time="0.001" classname="PhantomJS_2_1_1_(Linux_0_0_0).Syrup.core.getNav()"/>
+  <testcase name="should call (this.nav.local)" time="0" classname="PhantomJS_2_1_1_(Linux_0_0_0).Syrup.core.getNav()"/>
   <testcase name="match type &quot;object&quot; in the return" time="0" classname="PhantomJS_2_1_1_(Linux_0_0_0).Syrup.core.getNav()"/>
-  <testcase name="match {nav}, {version} and {platform}, in returned object keys" time="0.001" classname="PhantomJS_2_1_1_(Linux_0_0_0).Syrup.core.getNav()"/>
+  <testcase name="match {nav}, {version} and {platform}, in returned object keys" time="0" classname="PhantomJS_2_1_1_(Linux_0_0_0).Syrup.core.getNav()"/>
   <testcase name="should be callable function" time="0" classname="PhantomJS_2_1_1_(Linux_0_0_0).Syrup.core.i18n()"/>
   <testcase name="should can use (this.m6s.locale)" time="0.001" classname="PhantomJS_2_1_1_(Linux_0_0_0).Syrup.core.i18n()"/>
-  <testcase name="should be called, with invalid second param" time="0.001" classname="PhantomJS_2_1_1_(Linux_0_0_0).Syrup.core.i18n()"/>
-  <testcase name="match type &quot;object&quot; in the return" time="0.001" classname="PhantomJS_2_1_1_(Linux_0_0_0).Syrup.core.i18n()"/>
+  <testcase name="should be called, with invalid second param" time="0" classname="PhantomJS_2_1_1_(Linux_0_0_0).Syrup.core.i18n()"/>
+  <testcase name="match type &quot;object&quot; in the return" time="0" classname="PhantomJS_2_1_1_(Linux_0_0_0).Syrup.core.i18n()"/>
   <system-out>
     <![CDATA[
 ]]>

@@ -28,10 +28,8 @@ describe('Syrup.core', function () {
 	var _u10s = new Adapter(U10s);
 
 	//The Provider
-
 	var _d10sBuilder = new D10sBuilder();
 	var _coreDependencies = new D10sComposite();
-
 
 	//JQuery Builder
 	_d10sBuilder.setName('$');
