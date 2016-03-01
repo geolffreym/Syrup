@@ -14,6 +14,7 @@
 var jQuery = require('jquery');
 
 //Enhanced Object Literals
+//Decorators
 export default {
     __proto__: {},
     

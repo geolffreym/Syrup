@@ -19,6 +19,7 @@ import is from './../adapter/IsJsAdapter';
 import {TypeErrorException} from '../Exceptions';
 
 //Enhanced Object Literals
+//Decorators
 export default {
 	__proto__: underscore,
 

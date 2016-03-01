@@ -17,6 +17,7 @@ var isJs = require('is_js');
 import jQuery from './JQuery';
 
 //Enhanced Object Literals
+//Decorators
 export default {
 	__proto__: isJs,
 

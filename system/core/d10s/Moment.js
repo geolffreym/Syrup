@@ -14,6 +14,7 @@
 var momentJs = require('moment');
 
 //Enhanced Object Literals
+//Decorators
 export default {
     __proto__: {},
     /** Proxy for locale conf
