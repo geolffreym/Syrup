@@ -35,22 +35,30 @@ describe('Syrup.core', function () {
 	//JQuery Builder
 	_d10sBuilder.setName('$');
 	_d10sBuilder.setD10s(_jquery.object);
-	_coreDependencies.addD10s(_d10sBuilder.build());
+	_coreDependencies.addD10s(
+		_d10sBuilder.buildD10s()
+	);
 
 	//IsJs Builder
 	_d10sBuilder.setName('is');
 	_d10sBuilder.setD10s(_isJs.object);
-	_coreDependencies.addD10s(_d10sBuilder.build());
+	_coreDependencies.addD10s(
+		_d10sBuilder.buildD10s()
+	);
 
 	//Moment Builder
 	_d10sBuilder.setName('m6s');
 	_d10sBuilder.setD10s(_moment.object);
-	_coreDependencies.addD10s(_d10sBuilder.build());
+	_coreDependencies.addD10s(
+		_d10sBuilder.buildD10s()
+	);
 
 	//Moment Builder
 	_d10sBuilder.setName('u10s');
 	_d10sBuilder.setD10s(_u10s.object);
-	_coreDependencies.addD10s(_d10sBuilder.build());
+	_coreDependencies.addD10s(
+		_d10sBuilder.buildD10s()
+	);
 
 	//The core
 	var _core = new Core();
@@ -94,6 +102,7 @@ describe('Syrup.core', function () {
 });
 
 describe('Syrup.core.getNav()', function () {
+
 	'use strict';
 	//Adapters
 	var _isJs = new Adapter(IsJs);
@@ -108,22 +117,30 @@ describe('Syrup.core.getNav()', function () {
 	//JQuery Builder
 	_d10sBuilder.setName('$');
 	_d10sBuilder.setD10s(_jquery.object);
-	_coreDependencies.addD10s(_d10sBuilder.build());
+	_coreDependencies.addD10s(
+		_d10sBuilder.buildD10s()
+	);
 
 	//IsJs Builder
 	_d10sBuilder.setName('is');
 	_d10sBuilder.setD10s(_isJs.object);
-	_coreDependencies.addD10s(_d10sBuilder.build());
+	_coreDependencies.addD10s(
+		_d10sBuilder.buildD10s()
+	);
 
 	//Moment Builder
 	_d10sBuilder.setName('m6s');
 	_d10sBuilder.setD10s(_moment.object);
-	_coreDependencies.addD10s(_d10sBuilder.build());
+	_coreDependencies.addD10s(
+		_d10sBuilder.buildD10s()
+	);
 
 	//Moment Builder
 	_d10sBuilder.setName('u10s');
 	_d10sBuilder.setD10s(_u10s.object);
-	_coreDependencies.addD10s(_d10sBuilder.build());
+	_coreDependencies.addD10s(
+		_d10sBuilder.buildD10s()
+	);
 
 	//The core
 	var _core = new Core();
@@ -166,22 +183,30 @@ describe('Syrup.core.i18n()', function () {
 	//JQuery Builder
 	_d10sBuilder.setName('$');
 	_d10sBuilder.setD10s(_jquery.object);
-	_coreDependencies.addD10s(_d10sBuilder.build());
+	_coreDependencies.addD10s(
+		_d10sBuilder.buildD10s()
+	);
 
 	//IsJs Builder
 	_d10sBuilder.setName('is');
 	_d10sBuilder.setD10s(_isJs.object);
-	_coreDependencies.addD10s(_d10sBuilder.build());
+	_coreDependencies.addD10s(
+		_d10sBuilder.buildD10s()
+	);
 
 	//Moment Builder
 	_d10sBuilder.setName('m6s');
 	_d10sBuilder.setD10s(_moment.object);
-	_coreDependencies.addD10s(_d10sBuilder.build());
+	_coreDependencies.addD10s(
+		_d10sBuilder.buildD10s()
+	);
 
 	//Moment Builder
 	_d10sBuilder.setName('u10s');
 	_d10sBuilder.setD10s(_u10s.object);
-	_coreDependencies.addD10s(_d10sBuilder.build());
+	_coreDependencies.addD10s(
+		_d10sBuilder.buildD10s()
+	);
 
 	//The core
 	var _core = new Core();

@@ -22,8 +22,8 @@ export default class D10sBuilder extends Builder {
 		this.d10s = d10s;
 	}
 
-	build() {
-		return new this.type(
+	buildD10s() {
+		return this.build(
 			this.name, this.d10s
 		);
 	}
