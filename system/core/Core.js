@@ -16,29 +16,16 @@
 import {ReferenceErrorException} from './Exceptions';
 
 //Interface
-import Interface from './Interface';
-import iSyrupProvider from './../interface/Interface_SyrupProvider';
+import Interface from './interface/Interface';
+import iCoreD10s from './interface/iCoreD10s';
 
 export default class Core {
 	/** Syrup Core
 	 *
 	 * @constructor
-	 * @param {Object} sProvider
+	 * @param {Object} sD10s
 	 */
-	constructor(sProvider) {
-		//Check for interface implementation
-		Interface.implement(sProvider, iSyrupProvider);
-
-		//Dependencies injection
-		this.is = sProvider.getValidation(); // Is.js
-		this.m6s = sProvider.getDate(); // Moment.js
-		this.u10s = sProvider.getHelpers(); // Underscore.js
-
-		// Jquery.js
-		this.$ = ((q, c)=> {
-			return sProvider.getDom().$(q, c);
-		});
-
+	constructor() {
 		//Navigator Info
 		this.nav = {
 			online: window.navigator.onLine,
@@ -50,8 +37,20 @@ export default class Core {
 
 		//Version
 		this.VERSION = 'v1.0.0-alpha';
-		//Init features
-		this.i18n('es');
+	}
+
+	/** Set dependencies
+	 *
+	 * @param {Object} sD10s
+	 * @return {void}
+	 */
+	setD10s(sD10s) {
+		//Check for interface implementation
+		Interface.implement(sD10s, iCoreD10s);
+
+		//Dependencies injection
+		sD10s.inject(this, sD10s.getD10s());
+
 	}
 
 	/** Set default locale i18n date format

@@ -4,7 +4,7 @@
 'use strict';
 
 //Exceptions
-import Exception, {TypeErrorException} from './Exceptions';
+import Exception, {TypeErrorException} from './../Exceptions';
 
 export default class Interface {
 
@@ -43,7 +43,7 @@ export default class Interface {
 	static implement(object) {
 
 		if (arguments.length < 2) {
-			throw new TypeErrorException(
+			throw new Exception(
 				'Called with ' + arguments.length + 'arguments, but expected at least 2.',
 				'(Interface .implement)'
 			);
