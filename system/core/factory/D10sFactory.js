@@ -6,7 +6,7 @@ import D10s from './../provider/D10s';
 //Handle dependencies using ECMAScript 6 Module import
 export default class D10sFactory {
 
-	/** Syrup dependencies injector factory
+	/** Syrup dependencies injector "Factory"
 	 *
 	 * @constructor
 	 * @param {String} name

@@ -34,9 +34,7 @@ export default class CoreD10s extends D10s {
 	addD10s(name, iAdapterIn) {
 		//Check for interface implementation
 		Interface.implement(iAdapterIn, iAdapter);
-		this.d10s.push(
-			new D10s(name, iAdapterIn.getAdapter())
-		);
+		this.d10s.push(new D10s(name, iAdapterIn.getAdapter()));
 	}
 
 }

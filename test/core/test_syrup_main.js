@@ -20,8 +20,6 @@ import Core from '../../system/core/Core';
 import CoreD10s from '../../system/core/provider/CoreD10s';
 
 describe('Syrup.core', function () {
-	var a = D.create();
-	var l = [D.create('t', {'a': 3})];
 
 	'use strict';
 	//Adapters

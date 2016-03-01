@@ -15,7 +15,7 @@ export default class D10s {
 	 * @param {Object|Function} d10s
 	 * @return {void}
 	 */
-	constructor(name, d10s) {
+	constructor(name = 'D10s', d10s = {}) {
 
 		if (typeof name !== 'string') {
 			throw new TypeErrorException(
