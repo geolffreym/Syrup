@@ -14,14 +14,23 @@ export default class CoreD10s extends D10s {
 	 * @constructor
 	 */
 	constructor() {
-		super('Core', {});
+		super('CoreD10s', {});
 		this.d10s = [];
 	}
 
+	/** Return the d10s list
+	 *
+	 * @return {Object}
+	 */
 	getD10s() {
 		return this.d10s;
 	}
 
+	/** Append iD10s from iAdapter
+	 *
+	 * @param {String} name
+	 * @param {iAdapter} iAdapterIn
+	 */
 	addD10s(name, iAdapterIn) {
 		//Check for interface implementation
 		Interface.implement(iAdapterIn, iAdapter);

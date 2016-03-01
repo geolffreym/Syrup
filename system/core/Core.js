@@ -23,7 +23,6 @@ export default class Core {
 	/** Syrup Core
 	 *
 	 * @constructor
-	 * @param {Object} sD10s
 	 */
 	constructor() {
 		//Navigator Info
@@ -41,7 +40,7 @@ export default class Core {
 
 	/** Set dependencies
 	 *
-	 * @param {Object} sD10s
+	 * @param {iCoreD10s} sD10s
 	 * @return {void}
 	 */
 	setD10s(sD10s) {

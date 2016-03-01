@@ -15,10 +15,12 @@ import JAdapter from '../../system/core/adapter/jQueryAdapter';
 import MAdapter from '../../system/core/adapter/MomentAdapter';
 
 //Core
+import D from '../../system/core/factory/D10sFactory';
 import Core from '../../system/core/Core';
 import CoreD10s from '../../system/core/provider/CoreD10s';
 
 describe('Syrup.core', function () {
+
 	'use strict';
 	//Adapters
 	var _jquery = new JAdapter(IsJs);
