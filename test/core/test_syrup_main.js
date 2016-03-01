@@ -13,8 +13,8 @@ import Adapter from '../../system/core/adapter/Adapter';
 import JAdapter from '../../system/core/adapter/jQueryAdapter';
 
 //Core
-import D10sFactory from '../../system/core/factory/D10sFactory';
-import D10sList from '../../system/core/provider/D10sList';
+import D10sBuilder from '../../system/core/builder/D10sBuilder';
+import D10sComposite from '../../system/core/provider/D10sComposite';
 import Core from '../../system/core/Core';
 
 describe('Syrup.core', function () {
@@ -26,18 +26,29 @@ describe('Syrup.core', function () {
 	var _moment = new Adapter(M6s);
 	var _u10s = new Adapter(U10s);
 
-	//D10s factory
-	var _jqueryD = D10sFactory.create('$', _jquery);
-	var _isJsD = D10sFactory.create('is', _isJs);
-	var _momentD = D10sFactory.create('m6s', _moment);
-	var _u10sD = D10sFactory.create('u10s', _u10s);
-
 	//The Provider
-	var _coreDependencies = new D10sList();
-	_coreDependencies.addD10s(_jqueryD);
-	_coreDependencies.addD10s(_isJsD);
-	_coreDependencies.addD10s(_u10sD);
-	_coreDependencies.addD10s(_momentD);
+	var _d10sBuilder = new D10sBuilder();
+	var _coreDependencies = new D10sComposite();
+
+	//JQuery Builder
+	_d10sBuilder.setD10sName('$');
+	_d10sBuilder.setD10s(_jquery.object);
+	_coreDependencies.addD10s(_d10sBuilder.build());
+
+	//IsJs Builder
+	_d10sBuilder.setD10s(_isJs.object);
+	_d10sBuilder.setD10sName('is');
+	_coreDependencies.addD10s(_d10sBuilder.build());
+
+	//Moment Builder
+	_d10sBuilder.setD10s(_moment.object);
+	_d10sBuilder.setD10sName('m6s');
+	_coreDependencies.addD10s(_d10sBuilder.build());
+
+	//Moment Builder
+	_d10sBuilder.setD10s(_u10s.object);
+	_d10sBuilder.setD10sName('u10s');
+	_coreDependencies.addD10s(_d10sBuilder.build());
 
 	//The core
 	var _core = new Core();
@@ -83,27 +94,38 @@ describe('Syrup.core', function () {
 describe('Syrup.core.getNav()', function () {
 	'use strict';
 	//Adapters
-	var _jquery = new JAdapter(IsJs);
-	var _isJs = new Adapter(JQuery);
+	var _jquery = new JAdapter(JQuery);
+	var _isJs = new Adapter(IsJs);
 	var _moment = new Adapter(M6s);
 	var _u10s = new Adapter(U10s);
 
-	var _jqueryD = D10sFactory.create('$', _jquery);
-	var _isJsD = D10sFactory.create('is', _isJs);
-	var _momentD = D10sFactory.create('m6s', _moment);
-	var _u10sD = D10sFactory.create('u10s', _u10s);
-
 	//The Provider
-	var _coreDependencies = new D10sList();
-	_coreDependencies.addD10s(_jqueryD);
-	_coreDependencies.addD10s(_isJsD);
-	_coreDependencies.addD10s(_u10sD);
-	_coreDependencies.addD10s(_momentD);
+	var _d10sBuilder = new D10sBuilder();
+	var _coreDependencies = new D10sComposite();
+
+	//JQuery Builder
+	_d10sBuilder.setD10sName('$');
+	_d10sBuilder.setD10s(_jquery.object);
+	_coreDependencies.addD10s(_d10sBuilder.build());
+
+	//IsJs Builder
+	_d10sBuilder.setD10s(_isJs.object);
+	_d10sBuilder.setD10sName('is');
+	_coreDependencies.addD10s(_d10sBuilder.build());
+
+	//Moment Builder
+	_d10sBuilder.setD10s(_moment.object);
+	_d10sBuilder.setD10sName('m6s');
+	_coreDependencies.addD10s(_d10sBuilder.build());
+
+	//Moment Builder
+	_d10sBuilder.setD10s(_u10s.object);
+	_d10sBuilder.setD10sName('u10s');
+	_coreDependencies.addD10s(_d10sBuilder.build());
 
 	//The core
 	var _core = new Core();
 	_core.setD10s(_coreDependencies);
-
 
 	it('should be callable function', function () {
 		spyOn(_core, 'getNav');
@@ -130,27 +152,38 @@ describe('Syrup.core.getNav()', function () {
 describe('Syrup.core.i18n()', function () {
 	'use strict';
 	//Adapters
-	var _jquery = new JAdapter(IsJs);
-	var _isJs = new Adapter(JQuery);
+	var _jquery = new JAdapter(JQuery);
+	var _isJs = new Adapter(IsJs);
 	var _moment = new Adapter(M6s);
 	var _u10s = new Adapter(U10s);
 
-	var _jqueryD = D10sFactory.create('$', _jquery);
-	var _isJsD = D10sFactory.create('is', _isJs);
-	var _momentD = D10sFactory.create('m6s', _moment);
-	var _u10sD = D10sFactory.create('u10s', _u10s);
-
 	//The Provider
-	var _coreDependencies = new D10sList();
-	_coreDependencies.addD10s(_jqueryD);
-	_coreDependencies.addD10s(_isJsD);
-	_coreDependencies.addD10s(_u10sD);
-	_coreDependencies.addD10s(_momentD);
+	var _d10sBuilder = new D10sBuilder();
+	var _coreDependencies = new D10sComposite();
+
+	//JQuery Builder
+	_d10sBuilder.setD10sName('$');
+	_d10sBuilder.setD10s(_jquery.object);
+	_coreDependencies.addD10s(_d10sBuilder.build());
+
+	//IsJs Builder
+	_d10sBuilder.setD10s(_isJs.object);
+	_d10sBuilder.setD10sName('is');
+	_coreDependencies.addD10s(_d10sBuilder.build());
+
+	//Moment Builder
+	_d10sBuilder.setD10s(_moment.object);
+	_d10sBuilder.setD10sName('m6s');
+	_coreDependencies.addD10s(_d10sBuilder.build());
+
+	//Moment Builder
+	_d10sBuilder.setD10s(_u10s.object);
+	_d10sBuilder.setD10sName('u10s');
+	_coreDependencies.addD10s(_d10sBuilder.build());
 
 	//The core
 	var _core = new Core();
 	_core.setD10s(_coreDependencies);
-
 
 	it('should be callable function', function () {
 		spyOn(_core, 'i18n');

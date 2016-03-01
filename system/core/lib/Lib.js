@@ -2,6 +2,10 @@
  * Created by gmena on 08-06-14.
  */
 
+export default class Lib{
+
+}
+
 'use strict';
 (function (window) {
 	function Libs() {

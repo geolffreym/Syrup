@@ -7,14 +7,14 @@ import D10s from './D10s';
 import Interface from './../interface/Interface';
 import iD10s from './../interface/iD10s';
 
-export default class D10sList extends D10s {
+export default class D10sComposite extends D10s {
 
 	/** Syrup "Composite" dependencies injector
 	 *
 	 * @constructor
 	 */
 	constructor() {
-		super('D10sList', {});
+		super('D10sComposite', {});
 		this.d10s = [];
 	}
 

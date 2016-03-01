@@ -15,15 +15,6 @@ export default class D10sFactory {
 	 * @return {Object}
 	 */
 	static create(name = 'D10s', d10s = {}) {
-
-		//Switch type
-		switch (true) {
-			//Is Adapter?
-			case d10s instanceof  Adapter:
-				d10s = d10s.getObject();
-				break;
-		}
-
 		//Return new object
 		return new D10s(
 			name, d10s

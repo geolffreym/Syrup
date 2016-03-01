@@ -12,6 +12,7 @@ export default class Adapter {
 	 * @param {Object|Function} adapter
 	 */
 	constructor(adapter) {
+		//Validate type
 		if (typeof  adapter !== 'object' && typeof adapter !== 'function') {
 			throw new TypeErrorException(
 				'Expects first arguments to be instances of Object or Function.',
@@ -27,7 +28,7 @@ export default class Adapter {
 	 * @constructor
 	 * @return {Object|Function}
 	 */
-	getObject() {
+	get object() {
 		return this.adapter;
 	}
 }
