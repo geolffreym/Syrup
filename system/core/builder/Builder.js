@@ -28,7 +28,7 @@ export default class Builder {
 	 * @return {Object}
 	 */
 	build() {
-		////Return instance
+		//Build instance
 		return new this.type(
 			...arguments
 		);
