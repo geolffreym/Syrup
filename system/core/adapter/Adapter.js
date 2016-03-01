@@ -27,7 +27,7 @@ export default class Adapter {
 	 * @constructor
 	 * @return {Object|Function}
 	 */
-	getAdapter() {
+	getObject() {
 		return this.adapter;
 	}
 }

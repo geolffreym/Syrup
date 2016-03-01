@@ -9,13 +9,11 @@ import JQuery from '../../system/core/d10s/JQuery';
 import M6s from '../../system/core/d10s/Moment';
 
 //Adapters
-import IsAdapter from '../../system/core/adapter/IsJsAdapter';
-import UAdapter from '../../system/core/adapter/UnderscoreAdapter';
+import Adapter from '../../system/core/adapter/Adapter';
 import JAdapter from '../../system/core/adapter/jQueryAdapter';
-import MAdapter from '../../system/core/adapter/MomentAdapter';
 
 //Core
-import D10s from '../../system/core/factory/D10sFactory';
+import D10sFactory from '../../system/core/factory/D10sFactory';
 import D10sList from '../../system/core/provider/D10sList';
 import Core from '../../system/core/Core';
 
@@ -23,15 +21,16 @@ describe('Syrup.core', function () {
 
 	'use strict';
 	//Adapters
-	var _jquery = new JAdapter(IsJs);
-	var _isJs = new IsAdapter(JQuery);
-	var _moment = new MAdapter(M6s);
-	var _u10s = new UAdapter(U10s);
+	var _jquery = new JAdapter(JQuery);
+	var _isJs = new Adapter(IsJs);
+	var _moment = new Adapter(M6s);
+	var _u10s = new Adapter(U10s);
 
-	var _jqueryD = D10s.create('$', _jquery.getAdapter());
-	var _isJsD = D10s.create('is', _isJs.getAdapter());
-	var _momentD = D10s.create('m6s', _moment.getAdapter());
-	var _u10sD = D10s.create('u10s', _u10s.getAdapter());
+	//D10s factory
+	var _jqueryD = D10sFactory.create('$', _jquery);
+	var _isJsD = D10sFactory.create('is', _isJs);
+	var _momentD = D10sFactory.create('m6s', _moment);
+	var _u10sD = D10sFactory.create('u10s', _u10s);
 
 	//The Provider
 	var _coreDependencies = new D10sList();
@@ -85,14 +84,14 @@ describe('Syrup.core.getNav()', function () {
 	'use strict';
 	//Adapters
 	var _jquery = new JAdapter(IsJs);
-	var _isJs = new IsAdapter(JQuery);
-	var _moment = new MAdapter(M6s);
-	var _u10s = new UAdapter(U10s);
+	var _isJs = new Adapter(JQuery);
+	var _moment = new Adapter(M6s);
+	var _u10s = new Adapter(U10s);
 
-	var _jqueryD = D10s.create('$', _jquery.getAdapter());
-	var _isJsD = D10s.create('is', _isJs.getAdapter());
-	var _momentD = D10s.create('m6s', _moment.getAdapter());
-	var _u10sD = D10s.create('u10s', _u10s.getAdapter());
+	var _jqueryD = D10sFactory.create('$', _jquery);
+	var _isJsD = D10sFactory.create('is', _isJs);
+	var _momentD = D10sFactory.create('m6s', _moment);
+	var _u10sD = D10sFactory.create('u10s', _u10s);
 
 	//The Provider
 	var _coreDependencies = new D10sList();
@@ -100,11 +99,12 @@ describe('Syrup.core.getNav()', function () {
 	_coreDependencies.addD10s(_isJsD);
 	_coreDependencies.addD10s(_u10sD);
 	_coreDependencies.addD10s(_momentD);
-	
+
 	//The core
 	var _core = new Core();
 	_core.setD10s(_coreDependencies);
-	
+
+
 	it('should be callable function', function () {
 		spyOn(_core, 'getNav');
 		//Call getNav
@@ -131,14 +131,14 @@ describe('Syrup.core.i18n()', function () {
 	'use strict';
 	//Adapters
 	var _jquery = new JAdapter(IsJs);
-	var _isJs = new IsAdapter(JQuery);
-	var _moment = new MAdapter(M6s);
-	var _u10s = new UAdapter(U10s);
+	var _isJs = new Adapter(JQuery);
+	var _moment = new Adapter(M6s);
+	var _u10s = new Adapter(U10s);
 
-	var _jqueryD = D10s.create('$', _jquery.getAdapter());
-	var _isJsD = D10s.create('is', _isJs.getAdapter());
-	var _momentD = D10s.create('m6s', _moment.getAdapter());
-	var _u10sD = D10s.create('u10s', _u10s.getAdapter());
+	var _jqueryD = D10sFactory.create('$', _jquery);
+	var _isJsD = D10sFactory.create('is', _isJs);
+	var _momentD = D10sFactory.create('m6s', _moment);
+	var _u10sD = D10sFactory.create('u10s', _u10s);
 
 	//The Provider
 	var _coreDependencies = new D10sList();
@@ -150,6 +150,7 @@ describe('Syrup.core.i18n()', function () {
 	//The core
 	var _core = new Core();
 	_core.setD10s(_coreDependencies);
+
 
 	it('should be callable function', function () {
 		spyOn(_core, 'i18n');
