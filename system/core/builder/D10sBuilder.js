@@ -3,9 +3,10 @@
  */
 
 //Handle dependencies using ECMAScript 6 Module import
+import Builder from './../builder/Builder';
 import D10s from './../provider/D10s';
 
-export default class D10sBuilder {
+export default class D10sBuilder extends Builder{
 
 	/** Syrup D10s "Build" class
 	 *
@@ -13,12 +14,8 @@ export default class D10sBuilder {
 	 */
 	constructor() {
 		//Handle adapter
-		this.name = 'D10sBuild';
+		super(D10s);
 		this.d10s = {};
-	}
-
-	setD10sName(name) {
-		this.name = name;
 	}
 
 	setD10s(d10s) {
@@ -26,7 +23,7 @@ export default class D10sBuilder {
 	}
 
 	build() {
-		return new D10s(
+		return new this.type(
 			this.name, this.d10s
 		);
 	}
