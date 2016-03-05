@@ -4,10 +4,7 @@
 
 import Interface from './Interface';
 
-/**
- *
- * @interface
- */
+//TODO agregar documentacion http://usejsdoc.org/tags-interface.html
 export default new Interface(
 	'iBuilder', ['setName', 'build']
 );
