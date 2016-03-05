@@ -4,7 +4,7 @@
 
 import Interface from './Interface';
 
-//Default Syrup Provider Interface
+//TODO agregar documentacion http://usejsdoc.org/tags-interface.html
 export default new Interface(
 	'iD10sComposite', ['inject', 'getD10s', 'addD10s']
 );

@@ -4,7 +4,7 @@
 
 import Interface from './Interface';
 
-//Isomorphic Class Interface
+//TODO agregar documentacion http://usejsdoc.org/tags-interface.html
 export default new Interface(
 	'iFactory', ['getAdapter']
 );
