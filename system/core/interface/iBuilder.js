@@ -4,7 +4,10 @@
 
 import Interface from './Interface';
 
-//Isomorphic Class Interface
+/**
+ *
+ * @interface
+ */
 export default new Interface(
 	'iBuilder', ['setName', 'build']
 );

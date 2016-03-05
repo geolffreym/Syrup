@@ -4,7 +4,10 @@
 
 import Interface from './Interface';
 
-//Default Syrup Provider Interface
+/** Dependencies iD10s interface
+ *
+ * @interface
+ */
 export default new Interface(
 	'iD10s', ['inject']
 );
