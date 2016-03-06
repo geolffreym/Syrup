@@ -13,8 +13,9 @@
 //Is Js module
 var momentJs = require('moment');
 
-//Enhanced Object Literals
-//Decorators
+/**Enhanced Object Literals
+ * @mixes momentJs
+ */
 export default {
     __proto__: {},
     /** Proxy for locale conf

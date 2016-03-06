@@ -7,7 +7,8 @@ import Adapter from './../adapter/Adapter';
 //Handle dependencies using ECMAScript 6 Module import
 export default class D10sFactory {
 
-	/** Syrup "Factory" dependencies injector
+	/**
+	 * D10s "Factory" dependencies injector
 	 *
 	 * @constructor
 	 * @param {String} name

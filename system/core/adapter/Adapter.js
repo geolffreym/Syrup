@@ -3,10 +3,16 @@
  */
 import {TypeErrorException} from './../Exceptions';
 
-//Handle dependencies using ECMAScript 6 Module import
+/**
+ * Class for adapter.
+ *
+ * @class
+ * @implements {iAdapter}
+ */
 export default class Adapter {
 
-	/** Syrup "Adapter" class
+	/**
+	 * Syrup "Adapter" class
 	 *
 	 * @constructor
 	 * @param {Object|Function} adapter
@@ -23,7 +29,8 @@ export default class Adapter {
 		this.adapter = adapter;
 	}
 
-	/** Return the adapter
+	/**
+	 * Return the adapter
 	 *
 	 * @constructor
 	 * @return {Object|Function}

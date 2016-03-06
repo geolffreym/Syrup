@@ -1,15 +1,10 @@
 /**
- * Created with JetBrains WebStorm.
  * User: Geolffrey Mena
  * Date: 25/11/13
  * Time: 12:22
+ *
+ * @license GNU/GPL-3.0
  */
-
-//ECMA Script 6 Support -> node --harmony
-//Jquery Dom Traversing -> https://github.com/jquery/jquery
-//Underscore util -> https://github.com/jashkenas/underscore
-//Is validation tool -> https://github.com/arasatasaygin/is.js
-//Date helper -> https://github.com/moment/moment/
 
 //Handle dependencies using ECMAScript 6 Module import
 //Exceptions
@@ -19,13 +14,24 @@ import {ReferenceErrorException} from './Exceptions';
 import Interface from './interface/Interface';
 import iD10sComposite from './interface/iD10sComposite';
 
+/**
+ * Core class for internal handling
+ * @class
+ * @version 1.0.0-alpha
+ */
 export default class Core {
-	/** Syrup Core
+	/**
+	 * Syrup Core
 	 *
 	 * @constructor
+	 * @property {Object} nav
+	 * @property {String} VERSION
 	 */
 	constructor() {
-		//Navigator Info
+		/**
+		 * Navigator Info
+		 * @public
+		 * **/
 		this.nav = {
 			online: window.navigator.onLine,
 			local: window.navigator.userAgent.toLowerCase(),
@@ -34,14 +40,19 @@ export default class Core {
 			unsupported: !window.localStorage
 		};
 
-		//Version
+		/**
+		 * Version
+		 * @public
+		 * **/
 		this.VERSION = 'v1.0.0-alpha';
 	}
 
-	/** Set dependencies
+	/**
+	 * Set dependencies
 	 *
-	 * @param {iD10sComposite} sD10s
-	 * @return {void}
+	 * @this Core
+	 * @param {Object} sD10s
+	 * @borrows sD10s as D10sComposite
 	 */
 	setD10s(sD10s) {
 		//Check for interface implementation
@@ -52,11 +63,13 @@ export default class Core {
 
 	}
 
-	/** Set default locale i18n date format
+	/**
+	 * Set default locale i18n date format
 	 *
+	 * @this Core
 	 * @param {String} locale
 	 * @param {Object} setting
-	 * @return {Object}
+	 * @returns {Object}
 	 */
 	i18n(locale, setting = {}) {
 
@@ -70,9 +83,11 @@ export default class Core {
 		return this;
 	}
 
-	/** Return full navigator information
+	/**
+	 * Return full navigator information
 	 *
-	 * @return (Object)
+	 * @this Core
+	 * @returns {Object}
 	 */
 	getNav() {
 
@@ -104,13 +119,14 @@ export default class Core {
 
 	}
 
-	/** Validate if param is set. If not, throw msg!
+	/**
+	 * Validate if param is set. If not, throw msg!
 	 *
 	 * @param {Object} param
 	 * @param {String|null} msg
 	 * @param {String|null} breakpoint
 	 * @throws {ReferenceErrorException}
-	 * @return {Object}
+	 * @returns {Object}
 	 */
 	assert(param, msg, breakpoint = null) {
 		//Is set. not null or undefined and not false?

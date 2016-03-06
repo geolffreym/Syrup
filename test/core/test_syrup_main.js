@@ -63,6 +63,7 @@ describe('Syrup.core', function () {
 	//The core
 	var _core = new Core();
 	_core.setD10s(_coreDependencies);
+
 	
 	//TODO escribir pruebas para confirmar que Core es instanciable
 	//TODO escribir pruebas para confirmas que Core exige como parametro un tipo iCoreD10s /home/gmena/Documentos/syrup/system/core/interface/iD10s.js

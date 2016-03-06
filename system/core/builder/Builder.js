@@ -3,7 +3,8 @@
  */
 
 export default class Builder {
-	/** Syrup D10s "Build" class
+	/**
+	 * Syrup D10s "Build" class
 	 *
 	 * @constructor
 	 */
@@ -23,7 +24,8 @@ export default class Builder {
 		this.name = name;
 	}
 
-	/** Build type
+	/**
+	 * Build type
 	 *
 	 * @return {Object}
 	 */

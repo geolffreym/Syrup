@@ -7,18 +7,26 @@ import D10s from './D10s';
 import Interface from './../interface/Interface';
 import iD10s from './../interface/iD10s';
 
+
+/**
+ * D10s composite class for multiple dependencies handling
+ * @class
+ */
 export default class D10sComposite extends D10s {
 
-	/** Syrup "Composite" dependencies injector
+	/**
+	 * D10s "Composite" dependencies injector
 	 *
 	 * @constructor
+	 * @augments D10s
 	 */
 	constructor() {
 		super('D10sComposite', {});
 		this.d10s = [];
 	}
 
-	/** Return the d10s list size
+	/**
+	 * Return the d10s list size
 	 *
 	 * @return {Number}
 	 */
@@ -26,7 +34,8 @@ export default class D10sComposite extends D10s {
 		return this.d10s.length;
 	}
 
-	/** Return the d10s list
+	/**
+	 * Return the d10s list
 	 *
 	 * @return {Object}
 	 */
@@ -34,7 +43,8 @@ export default class D10sComposite extends D10s {
 		return this.d10s;
 	}
 
-	/** Append iD10s from iAdapter
+	/**
+	 * Append iD10s from iAdapter
 	 *
 	 * @param {iD10s} D10s
 	 */

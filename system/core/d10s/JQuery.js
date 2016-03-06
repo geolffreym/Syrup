@@ -13,8 +13,9 @@
 //Is Js module
 var jQuery = require('jquery');
 
-//Enhanced Object Literals
-//Decorators
+/**Enhanced Object Literals
+ * @mixes jQuery
+ */
 export default {
     __proto__: {},
     

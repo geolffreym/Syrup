@@ -8,12 +8,12 @@ import iD10s from './../interface/iD10s';
 //Handle dependencies using ECMAScript 6 Module import
 export default class D10s {
 
-	/** Syrup dependencies injector
+	/**
+	 * Syrup dependencies injector
 	 *
 	 * @constructor
 	 * @param {String} name
 	 * @param {Object|Function} d10s
-	 * @return {void}
 	 */
 	constructor(name = 'D10s', d10s = {}) {
 
@@ -35,12 +35,12 @@ export default class D10s {
 		this.d10s = d10s;
 	}
 
-	/** Inject dependencies
+	/**
+	 * Inject dependencies
 	 *
 	 * @constructor
 	 * @param {Object} injectTo
 	 * @param {Array} dependencies
-	 * @return {void}
 	 */
 	inject(injectTo, dependencies = []) {
 

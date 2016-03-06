@@ -18,8 +18,9 @@ var underscore = require('underscore');
 import is from './IsJs';
 import {TypeErrorException} from '../Exceptions';
 
-//Enhanced Object Literals
-//Decorators
+/**Enhanced Object Literals
+ * @mixes underscore
+ */
 export default {
 	__proto__: underscore,
 
