@@ -4,6 +4,7 @@
  * Time: 12:22
  *
  * @license GNU/GPL-3.0
+ * {@link https://github.com/geolffreym/Syrup GitHub}
  */
 
 //Handle dependencies using ECMAScript 6 Module import
@@ -17,15 +18,20 @@ import iD10sComposite from './interface/iD10sComposite';
 /**
  * Core class for internal handling
  * @class
+ * @namespace
  * @version 1.0.0-alpha
+ * @implements {iD10sInjectable}
+ *
+ * This class requires implement iD10Composite to setD10s
+ * @requires module:D10sComposite
  */
 export default class Core {
 	/**
 	 * Syrup Core
 	 *
 	 * @constructor
-	 * @property {Object} nav
-	 * @property {String} VERSION
+	 * @property {Object} Core.nav
+	 * @property {String} Core.VERSION
 	 */
 	constructor() {
 		/**
@@ -52,7 +58,7 @@ export default class Core {
 	 *
 	 * @this Core
 	 * @param {Object} sD10s
-	 * @borrows sD10s as D10sComposite
+	 * @borrows iD10sComposite as sD10s
 	 */
 	setD10s(sD10s) {
 		//Check for interface implementation
@@ -63,6 +69,16 @@ export default class Core {
 
 	}
 
+	/**
+	 * Return dependencies
+	 *
+	 * @this Core
+	 * @returns {Array<String>}
+	 */
+	getD10s() {
+		return this.dependencies;
+	}
+	
 	/**
 	 * Set default locale i18n date format
 	 *
@@ -121,7 +137,7 @@ export default class Core {
 
 	/**
 	 * Validate if param is set. If not, throw msg!
-	 *
+	 * @this Core
 	 * @param {Object} param
 	 * @param {String|null} msg
 	 * @param {String|null} breakpoint

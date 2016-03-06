@@ -3,7 +3,7 @@
  */
 import Exception,{TypeErrorException} from './../Exceptions';
 import Interface from './../interface/Interface';
-import iD10s from './../interface/iD10s';
+import iD10sInjectable from './../interface/iD10sInjectable';
 
 //Handle dependencies using ECMAScript 6 Module import
 export default class D10s {
@@ -44,14 +44,16 @@ export default class D10s {
 	 */
 	inject(injectTo, dependencies = []) {
 
-		if (typeof  injectTo !== 'object') {
-			throw new TypeErrorException(
-				'Expects first arguments to be Object.',
-				'(D10s .inject)'
-			);
-		}
+		//Expects first arguments to be iD10sInjectable
+		Interface.implement(injectTo, iD10sInjectable);
 
-		//For each dependencie
+		/**
+		 * Assign dependencies attribute
+		 * @property {Array} iInjectable.dependencies
+		 * **/
+		injectTo.dependencies = [];
+
+		//For each dependencies
 		for (var at in dependencies) {
 
 			//Check for valid interface!!
@@ -64,6 +66,8 @@ export default class D10s {
 
 			//Inject dependencies
 			injectTo[dependencies[at].name] = dependencies[at].d10s;
+			injectTo.dependencies.push(dependencies[at].name);
+
 		}
 	}
 
