@@ -30,41 +30,40 @@ describe('Syrup.core', function () {
 
 	//The Provider
 	var _d10sBuilder = new D10sBuilder();
-	var _coreDependencies = new D10sComposite();
+	var _d10sCore = new D10sComposite();
 
 	//JQuery Builder
 	_d10sBuilder.setName('$');
-	_d10sBuilder.setD10s(
-		_jquery.object
-	);
-	_coreDependencies.addD10s(
+	_d10sBuilder.setD10s(_jquery);
+
+	_d10sCore.addD10s(
 		_d10sBuilder.buildD10s()
 	);
 
 	//IsJs Builder
 	_d10sBuilder.setName('is');
-	_d10sBuilder.setD10s(_isJs.object);
-	_coreDependencies.addD10s(
+	_d10sBuilder.setD10s(_isJs);
+	_d10sCore.addD10s(
 		_d10sBuilder.buildD10s()
 	);
 
 	//Moment Builder
 	_d10sBuilder.setName('m6s');
-	_d10sBuilder.setD10s(_moment.object);
-	_coreDependencies.addD10s(
+	_d10sBuilder.setD10s(_moment);
+	_d10sCore.addD10s(
 		_d10sBuilder.buildD10s()
 	);
 
 	//Moment Builder
 	_d10sBuilder.setName('u10s');
-	_d10sBuilder.setD10s(_u10s.object);
-	_coreDependencies.addD10s(
+	_d10sBuilder.setD10s(_u10s);
+	_d10sCore.addD10s(
 		_d10sBuilder.buildD10s()
 	);
 
 	//The core
 	var _core = new Core();
-	_core.setD10s(_coreDependencies);
+	_core.setD10s(_d10sCore);
 
 	//TODO escribir pruebas para confirmar que Core es instanciable
 	//TODO escribir pruebas para confirmas que Core exige como parametro un tipo iCoreD10s /home/gmena/Documentos/syrup/system/core/interface/iD10s.js

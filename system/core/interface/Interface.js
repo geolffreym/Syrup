@@ -14,7 +14,7 @@ export default class Interface {
 	 * @param {String} name
 	 * @param {Array} methods
 	 * @throws {TypeErrorException}
-	 * @return {void}
+	 * @returns {void}
 	 */
 	constructor(name, methods = []) {
 
@@ -38,10 +38,13 @@ export default class Interface {
 
 	/** Extend methods.
 	 *
-	 * @param {Object} from
+	 * @param {Object} append
+	 * @returns {Array}
 	 */
-	static extend(news){
-		return 
+	extend(append) {
+		return this.methods.concat(
+			append
+		);
 	}
 
 	/** Ensure implement interface declaration.

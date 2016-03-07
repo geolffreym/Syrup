@@ -1,7 +1,8 @@
 /**
- * Created by gmena on 03-01-16.
+ * Builder abstract
+ * @class
+ * @implements {iBuilder}
  */
-
 export default class Builder {
 	/**
 	 * Syrup D10s "Build" class

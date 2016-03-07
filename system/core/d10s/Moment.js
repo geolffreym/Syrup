@@ -33,7 +33,7 @@ const m6s = {
 	 * Return momentJs object
 	 *
 	 * @return {Object}
-	 */
+	 * */
 
 	get date() {
 		return momentJs();
@@ -46,10 +46,10 @@ const m6s = {
 	 * @param {String} dB
 	 * @param {String} encode
 	 * @param {Boolean} strict
-	 * @return {void}
-	 */
+	 * @return {Object}
+	 **/
 
-		moment(dA, dB, encode, strict) {
+	moment(dA, dB, encode, strict) {
 		return momentJs(dA, dB, encode, strict);
 	}
 

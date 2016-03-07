@@ -8,16 +8,30 @@
 'use strict';
 
 //JQuery.js
+import Interface from './../interface/Interface';
+import iAdapter from './../interface/iAdapter';
 import Adapter from './../adapter/Adapter';
 
-export default class D10sAdapter extends Adapter {
+/**
+ * D10s composite adapters
+ * @class
+ * @implements {iD10sAdapterComposite}
+ *
+ * This class requires implement Adapter to addD10sAdapter
+ * @requires module:Adapter
+ */
+export default class D10sAdapterComposite extends Adapter {
 	constructor(adapter) {
 		super(adapter);
+		/**
+		 * Adapted lists
+		 * @protected
+		 * **/
 		this._adaptedList = [];
 	}
 
 	/**
-	 * Return the d10s list
+	 * Return the d10s adapted list
 	 *
 	 * @return {Object}
 	 */
@@ -32,7 +46,7 @@ export default class D10sAdapter extends Adapter {
 	 */
 	addD10sAdapter(Adapter) {
 		//Check for interface implementation
-		Interface.implement(Adapter, iD10s);
-		this.d10s.push(D10s);
+		Interface.implement(Adapter, iAdapter);
+		this._adaptedList.push(Adapter.getAdapted());
 	}
 }

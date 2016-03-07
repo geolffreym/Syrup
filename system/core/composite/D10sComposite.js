@@ -21,7 +21,11 @@ export default class D10sComposite extends D10s {
 	 */
 	constructor() {
 		super('D10sComposite', {});
-		this.d10s = [];
+		/**
+		 * Dependencies lists
+		 * @protected
+		 * **/
+		this._d10s = [];
 	}
 
 	/**
@@ -30,7 +34,7 @@ export default class D10sComposite extends D10s {
 	 * @return {Number}
 	 */
 	get length() {
-		return this.d10s.length;
+		return this._d10s.length;
 	}
 
 	/**
@@ -39,7 +43,7 @@ export default class D10sComposite extends D10s {
 	 * @return {Object}
 	 */
 	getD10s() {
-		return this.d10s;
+		return this._d10s;
 	}
 
 	/**
@@ -50,7 +54,7 @@ export default class D10sComposite extends D10s {
 	addD10s(D10s) {
 		//Check for interface implementation
 		Interface.implement(D10s, iD10s);
-		this.d10s.push(D10s);
+		this._d10s.push(D10s);
 	}
 
 }
