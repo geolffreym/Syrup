@@ -4,8 +4,14 @@
 
 import Interface from './Interface';
 
-//TODO agregar documentacion http://usejsdoc.org/tags-interface.html
-//TODO similar a /home/gmena/Documentos/syrup/system/core/interface/iD10s.js
+/**
+ * IAdapter (Dependencies) class specification
+ * The class specification supports a specific protocol of methods that have
+ * special meaning (e.g. getAdapted). See `iAdapter` for
+ * more the comprehensive protocol. Any other properties and methods in the
+ * class specification will available on the prototype.
+ * @interface
+ */
 export default new Interface(
 	'iAdapter', ['getAdapted']
 );

@@ -35,7 +35,6 @@ describe('Syrup.core', function () {
 	//JQuery Builder
 	_d10sBuilder.setName('$');
 	_d10sBuilder.setD10s(_jquery);
-
 	_d10sCore.addD10s(
 		_d10sBuilder.buildD10s()
 	);
@@ -54,7 +53,7 @@ describe('Syrup.core', function () {
 		_d10sBuilder.buildD10s()
 	);
 
-	//Moment Builder
+	//Underscore Builder
 	_d10sBuilder.setName('u10s');
 	_d10sBuilder.setD10s(_u10s);
 	_d10sCore.addD10s(
@@ -65,14 +64,36 @@ describe('Syrup.core', function () {
 	var _core = new Core();
 	_core.setD10s(_d10sCore);
 
+	//Custom matchers
+	beforeEach(function () {
+		jasmine.addMatchers({
+			toBeInstantiable: function (util, customEqualityTesters) {
+				return {
+					compare: function (Actual, expected) {
+						var result = {};
+						try {
+							new Actual;
+							result.pass = true;
+							return result;
+
+						} catch (e) {
+							result.message = 'Expected ' + expected + ' be an instantiable type';
+							return result;
+						}
+					}
+				};
+			}
+		});
+	});
+
 	//TODO escribir pruebas para confirmar que Core es instanciable
 	//TODO escribir pruebas para confirmas que Core exige como parametro un tipo iCoreD10s /home/gmena/Documentos/syrup/system/core/interface/iD10s.js
 	it('should be instantiable', function () {
-
+		expect(Core).toBeInstantiable('CoreClass');
 	});
-
+	
 	//TODO escribir pruebas para confirmar que Core es injectable
-	it('should be D10s injectable', function () {
+	it('should be iD10sInjectable', function () {
 
 	});
 	
@@ -119,39 +140,47 @@ describe('Syrup.core.getNav()', function () {
 
 	//The Provider
 	var _d10sBuilder = new D10sBuilder();
-	var _coreDependencies = new D10sComposite();
+	var _d10sCore = new D10sComposite();
 
 	//JQuery Builder
 	_d10sBuilder.setName('$');
-	_d10sBuilder.setD10s(_jquery.object);
-	_coreDependencies.addD10s(
+	_d10sBuilder.setD10s(_jquery);
+	_d10sCore.addD10s(
 		_d10sBuilder.buildD10s()
 	);
 
 	//IsJs Builder
 	_d10sBuilder.setName('is');
-	_d10sBuilder.setD10s(_isJs.object);
-	_coreDependencies.addD10s(
+	_d10sBuilder.setD10s(_isJs);
+	_d10sCore.addD10s(
 		_d10sBuilder.buildD10s()
 	);
 
 	//Moment Builder
 	_d10sBuilder.setName('m6s');
-	_d10sBuilder.setD10s(_moment.object);
-	_coreDependencies.addD10s(
+	_d10sBuilder.setD10s(_moment);
+	_d10sCore.addD10s(
 		_d10sBuilder.buildD10s()
 	);
 
-	//Moment Builder
+	//Underscore Builder
 	_d10sBuilder.setName('u10s');
-	_d10sBuilder.setD10s(_u10s.object);
-	_coreDependencies.addD10s(
+	_d10sBuilder.setD10s(_u10s);
+	_d10sCore.addD10s(
 		_d10sBuilder.buildD10s()
 	);
 
 	//The core
 	var _core = new Core();
-	_core.setD10s(_coreDependencies);
+	_core.setD10s(_d10sCore);
+
+	it('should be callable function', function () {
+		spyOn(_core, 'i18n');
+		//Call i18n
+		_core.i18n('es');
+		expect(_core.i18n).toHaveBeenCalled();
+		expect(_core.i18n).toHaveBeenCalledWith('es');
+	});
 
 	it('should be callable function', function () {
 		spyOn(_core, 'getNav');
@@ -176,6 +205,7 @@ describe('Syrup.core.getNav()', function () {
 });
 
 describe('Syrup.core.i18n()', function () {
+
 	'use strict';
 	//Adapters
 	var _isJs = new Adapter(IsJs);
@@ -185,39 +215,39 @@ describe('Syrup.core.i18n()', function () {
 
 	//The Provider
 	var _d10sBuilder = new D10sBuilder();
-	var _coreDependencies = new D10sComposite();
+	var _d10sCore = new D10sComposite();
 
 	//JQuery Builder
 	_d10sBuilder.setName('$');
-	_d10sBuilder.setD10s(_jquery.object);
-	_coreDependencies.addD10s(
+	_d10sBuilder.setD10s(_jquery);
+	_d10sCore.addD10s(
 		_d10sBuilder.buildD10s()
 	);
 
 	//IsJs Builder
 	_d10sBuilder.setName('is');
-	_d10sBuilder.setD10s(_isJs.object);
-	_coreDependencies.addD10s(
+	_d10sBuilder.setD10s(_isJs);
+	_d10sCore.addD10s(
 		_d10sBuilder.buildD10s()
 	);
 
 	//Moment Builder
 	_d10sBuilder.setName('m6s');
-	_d10sBuilder.setD10s(_moment.object);
-	_coreDependencies.addD10s(
+	_d10sBuilder.setD10s(_moment);
+	_d10sCore.addD10s(
 		_d10sBuilder.buildD10s()
 	);
 
-	//Moment Builder
+	//Underscore Builder
 	_d10sBuilder.setName('u10s');
-	_d10sBuilder.setD10s(_u10s.object);
-	_coreDependencies.addD10s(
+	_d10sBuilder.setD10s(_u10s);
+	_d10sCore.addD10s(
 		_d10sBuilder.buildD10s()
 	);
 
 	//The core
 	var _core = new Core();
-	_core.setD10s(_coreDependencies);
+	_core.setD10s(_d10sCore);
 
 	it('should be callable function', function () {
 		spyOn(_core, 'i18n');

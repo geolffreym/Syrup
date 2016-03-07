@@ -12,13 +12,17 @@ export default class Builder {
 	constructor(type) {
 		//Handle adapter
 		this.name = 'Builder';
-		this.type = type;
+
+		/**
+		 * Type to build
+		 * @protected
+		 * **/
+		this._type = type;
 	}
 
 	/** Set build name
 	 *
-	 * @param {string} name
-	 * @return {void}
+	 * @param {String} name
 	 */
 
 	setName(name) {
@@ -28,11 +32,11 @@ export default class Builder {
 	/**
 	 * Build type
 	 *
-	 * @return {Object}
+	 * @returns {Object}
 	 */
 	build() {
 		//Build instance
-		return new this.type(
+		return new this._type(
 			...arguments
 		);
 	}

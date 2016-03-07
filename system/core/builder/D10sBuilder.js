@@ -30,11 +30,21 @@ export default class D10sBuilder extends Builder {
 		this.d10s = {};
 	}
 
+	/** Set d10s adapter
+	 *
+	 * @param {Object} Adapter
+	 */
+
 	setD10s(Adapter) {
 		Interface.implement(Adapter, iAdapter);
 		this.d10s = Adapter.getAdapted();
 	}
 
+	/**
+	 * Build type
+	 *
+	 * @returns {Object}
+	 */
 	buildD10s() {
 		return this.build(
 			this.name, this.d10s

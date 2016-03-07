@@ -12,7 +12,12 @@
 
 //JQuery.js
 import Adapter from './Adapter';
-
+/**
+ * Class Jquery Adapter.
+ *
+ * @class
+ * @implements {iAdapter}
+ */
 export default class JQueryAdapter extends Adapter {
 	constructor(adapter) {
 		super((q, c)=> adapter.$(q, c));
