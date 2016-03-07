@@ -388,7 +388,7 @@ describe('Syrup.core.i18n()', function () {
 		expect(_core.m6s.locale).toHaveBeenCalledWith('en');
 	});
 
-	it('should be called, with invalid second param', function () {
+	it('should can be called, with invalid second param', function () {
 		spyOn(_core, 'i18n');
 		//Call i18n
 		_core.i18n('es', {});
