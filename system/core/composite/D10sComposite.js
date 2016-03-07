@@ -3,10 +3,9 @@
  */
 
 //Handle dependencies using ECMAScript 6 Module import
-import D10s from './D10s';
-import Interface from './../interface/Interface';
+import D10s from './../provider/D10s';
 import iD10s from './../interface/iD10s';
-
+import Interface from './../interface/Interface';
 
 /**
  * D10s composite class for multiple dependencies handling
@@ -46,7 +45,7 @@ export default class D10sComposite extends D10s {
 	/**
 	 * Append iD10s from iAdapter
 	 *
-	 * @param {iD10s} D10s
+	 * @param {Object} D10s
 	 */
 	addD10s(D10s) {
 		//Check for interface implementation

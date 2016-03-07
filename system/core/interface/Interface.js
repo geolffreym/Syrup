@@ -36,6 +36,14 @@ export default class Interface {
 
 	}
 
+	/** Extend methods.
+	 *
+	 * @param {Object} from
+	 */
+	static extend(news){
+		return 
+	}
+
 	/** Ensure implement interface declaration.
 	 *
 	 * @param {Object} object

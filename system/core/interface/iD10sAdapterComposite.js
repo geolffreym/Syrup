@@ -6,6 +6,5 @@ import Interface from './Interface';
 
 //TODO agregar documentacion http://usejsdoc.org/tags-interface.html
 export default new Interface(
-	'iFactory', ['create']
+	'iD10sAdapterComposite', ['getD10sAdapted', 'addD10sAdapter']
 );
-

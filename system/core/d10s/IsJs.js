@@ -19,7 +19,7 @@ import jQuery from './JQuery';
 /**Enhanced Object Literals
  * @mixes isJs
  */
-export default {
+const IsJs = {
 	__proto__: isJs,
 
 	/** Not **/
@@ -28,7 +28,8 @@ export default {
 		return this;
 	},
 
-	/** Is html?
+	/**
+	 * Is html?
 	 *
 	 * @param {String} html
 	 * @return {Boolean}
@@ -38,7 +39,8 @@ export default {
 		return this.is_not ? !result : result;
 	},
 
-	/** Is Jquery Object?
+	/**
+	 * Is Jquery Object?
 	 *
 	 * @param {Object} obj
 	 * @returns {Boolean}
@@ -49,3 +51,5 @@ export default {
 	}
 };
 
+//Export
+export default IsJs;

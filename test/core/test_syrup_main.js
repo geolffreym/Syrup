@@ -16,7 +16,7 @@ import JQueryAdapter from '../../system/core/adapter/jQueryAdapter';
 import Builder from '../../system/core/builder/Builder';
 import D10s from '../../system/core/provider/D10s';
 import D10sBuilder from '../../system/core/builder/D10sBuilder';
-import D10sComposite from '../../system/core/provider/D10sComposite';
+import D10sComposite from '../../system/core/composite/D10sComposite';
 import Core from '../../system/core/Core';
 
 describe('Syrup.core', function () {
@@ -34,7 +34,9 @@ describe('Syrup.core', function () {
 
 	//JQuery Builder
 	_d10sBuilder.setName('$');
-	_d10sBuilder.setD10s(_jquery.object);
+	_d10sBuilder.setD10s(
+		_jquery.object
+	);
 	_coreDependencies.addD10s(
 		_d10sBuilder.buildD10s()
 	);

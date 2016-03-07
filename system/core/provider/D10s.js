@@ -51,7 +51,7 @@ export default class D10s {
 		 * Assign dependencies attribute
 		 * @property {Array} iInjectable.dependencies
 		 * **/
-		injectTo.dependencies = [];
+		injectTo._dependencies = [];
 
 		//For each dependencies
 		for (var at in dependencies) {
@@ -66,7 +66,7 @@ export default class D10s {
 
 			//Inject dependencies
 			injectTo[dependencies[at].name] = dependencies[at].d10s;
-			injectTo.dependencies.push(dependencies[at].name);
+			injectTo._dependencies.push(dependencies[at].name);
 
 		}
 	}

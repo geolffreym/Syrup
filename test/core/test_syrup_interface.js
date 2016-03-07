@@ -16,7 +16,7 @@ import JQueryAdapter from '../../system/core/adapter/jQueryAdapter';
 import Builder from '../../system/core/builder/Builder';
 import D10s from '../../system/core/provider/D10s';
 import D10sBuilder from '../../system/core/builder/D10sBuilder';
-import D10sComposite from '../../system/core/provider/D10sComposite';
+import D10sComposite from '../../system/core/composite/D10sComposite';
 import Core from '../../system/core/Core';
 
 describe('Syrup.interface', function () {

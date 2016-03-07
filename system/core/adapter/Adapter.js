@@ -32,10 +32,9 @@ export default class Adapter {
 	/**
 	 * Return the adapter
 	 *
-	 * @constructor
 	 * @return {Object|Function}
 	 */
-	get object() {
+	getAdapted() {
 		return this.adapter;
 	}
 }

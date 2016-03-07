@@ -12,8 +12,8 @@
 import {ReferenceErrorException} from './Exceptions';
 
 //Interface
-import Interface from './interface/Interface';
 import iD10sComposite from './interface/iD10sComposite';
+import Interface from './interface/Interface';
 
 /**
  * Core class for internal handling
@@ -76,7 +76,11 @@ export default class Core {
 	 * @returns {Array<String>}
 	 */
 	getD10s() {
-		return this.dependencies;
+		/**
+		 * Dependencies lists
+		 * @protected
+		 * **/
+		return this._dependencies;
 	}
 	
 	/**

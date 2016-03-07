@@ -16,31 +16,36 @@ var jQuery = require('jquery');
 /**Enhanced Object Literals
  * @mixes jQuery
  */
-export default {
-    __proto__: {},
-    
-    /** Proxy method for Jquery
-     *
-     * @param {String} selector
-     * @param {Object} context
-     * @return {Object}
-     */
-    $(selector, context) {
-        //Dom traversing
-        let jY = jQuery(selector, context);
-        
-        //Exist element?
-        jY.exists = jY.length > 0;
-        return jY;
-    },
-    
-    /** Default attr getter
-     *
-     * @return {Object}
-     */
-    get constructor() {
-        return jQuery.fn.constructor;
-    }
-    
+const $ = {
+	__proto__: {},
+
+	/**
+	 * Proxy method for Jquery
+	 *
+	 * @param {String} selector
+	 * @param {Object} context
+	 * @return {Object}
+	 */
+		$(selector, context) {
+		//Dom traversing
+		let jY = jQuery(selector, context);
+
+		//Exist element?
+		jY.exists = jY.length > 0;
+		return jY;
+	},
+
+	/**
+	 * Default attr getter
+	 *
+	 * @return {Object}
+	 */
+	get constructor() {
+		return jQuery.fn.constructor;
+	}
+
 };
+
+//Export
+export default $;
 

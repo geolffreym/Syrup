@@ -21,7 +21,7 @@ import {TypeErrorException} from '../Exceptions';
 /**Enhanced Object Literals
  * @mixes underscore
  */
-export default {
+const u10s = {
 	__proto__: underscore,
 
 	/** Parse to Object
@@ -70,4 +70,7 @@ export default {
 	}
 
 };
+
+//Export
+export default u10s;
 
