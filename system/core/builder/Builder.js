@@ -8,6 +8,7 @@ export default class Builder {
 	 * Syrup D10s "Build" class
 	 *
 	 * @constructor
+	 * @this Builder
 	 */
 	constructor(type) {
 		//Handle adapter
@@ -15,6 +16,7 @@ export default class Builder {
 
 		/**
 		 * Type to build
+		 * @type {Array}
 		 * @protected
 		 * **/
 		this._type = type;
@@ -22,6 +24,7 @@ export default class Builder {
 
 	/** Set build name
 	 *
+	 * @this Builder
 	 * @param {String} name
 	 */
 
@@ -32,6 +35,7 @@ export default class Builder {
 	/**
 	 * Build type
 	 *
+	 * @this Builder
 	 * @returns {Object}
 	 */
 	build() {

@@ -10,6 +10,7 @@ import Interface from './../interface/Interface';
 /**
  * D10s composite class for multiple dependencies handling
  * @class
+ * @implements {iD10s}
  */
 export default class D10sComposite extends D10s {
 
@@ -23,6 +24,7 @@ export default class D10sComposite extends D10s {
 		super('D10sComposite', {});
 		/**
 		 * Dependencies lists
+		 * @type {Array}
 		 * @protected
 		 * **/
 		this._d10s = [];

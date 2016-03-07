@@ -77,7 +77,8 @@ export default class Core {
 	 */
 	getD10s() {
 		/**
-		 * Dependencies lists
+		 * Dynamic property dependencies lists
+		 * @type {Array}
 		 * @protected
 		 * **/
 		return this._dependencies;

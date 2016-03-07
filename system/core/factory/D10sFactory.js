@@ -4,7 +4,11 @@
 import D10s from './../provider/D10s';
 import Adapter from './../adapter/Adapter';
 
-//Handle dependencies using ECMAScript 6 Module import
+/**
+ * Factory D10s
+ * @class
+ * @implements {iFactory}
+ */
 export default class D10sFactory {
 
 	/**

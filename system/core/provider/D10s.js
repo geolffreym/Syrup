@@ -12,6 +12,7 @@ export default class D10s {
 	 * Syrup dependencies injector
 	 *
 	 * @constructor
+	 * @this D10s
 	 * @param {String} name
 	 * @param {Object|Function} d10s
 	 */
@@ -38,7 +39,7 @@ export default class D10s {
 	/**
 	 * Inject dependencies
 	 *
-	 * @constructor
+	 * @this D10s
 	 * @param {Object} injectTo
 	 * @param {Array} dependencies
 	 */
