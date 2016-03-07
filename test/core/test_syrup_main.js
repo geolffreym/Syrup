@@ -19,7 +19,6 @@ import D10sBuilder from '../../system/core/builder/D10sBuilder';
 import D10sComposite from '../../system/core/composite/D10sComposite';
 import Core from '../../system/core/Core';
 
-
 //Interface
 import Interface from '../../system/core/interface/Interface';
 import iD10sInjectable from '../../system/core/interface/iD10sInjectable';
@@ -66,7 +65,7 @@ describe('Syrup.core', function () {
 	);
 
 	//The core
-	var _core = new Core();
+	var _core;
 
 	//Custom matcher
 	beforeEach(function () {
@@ -88,14 +87,13 @@ describe('Syrup.core', function () {
 		});
 	});
 
-	//TODO escribir pruebas para confirmas que Core exige como parametro un tipo iCoreD10s /home/gmena/Documentos/syrup/system/core/interface/iD10s.js
 	it('should be instantiable', function () {
 		expect(Core).toBeInstantiable('CoreClass');
 		_core = new Core();
 	});
 
 	it('should be iD10sInjectable', function () {
-		var _implement = function(){
+		var _implement = function () {
 			Interface.implement(_core, iD10sInjectable);
 		};
 
@@ -132,6 +130,123 @@ describe('Syrup.core', function () {
 	it('should have the attribute "this.$" and is Function type', function () {
 		expect(_core.$).toBeDefined();
 		expect(_core.$).toEqual(jasmine.any(Function));
+	});
+
+});
+
+describe('Syrup.core.setD10s()', function () {
+	'use strict';
+	//Adapters
+	var _isJs = new Adapter(IsJs);
+	var _moment = new Adapter(M6s);
+	var _u10s = new Adapter(U10s);
+	var _jquery = new JQueryAdapter(JQuery);
+
+	//The Provider
+	var _d10sBuilder = new D10sBuilder();
+	var _d10sCore = new D10sComposite();
+
+	//JQuery Builder
+	_d10sBuilder.setName('$');
+	_d10sBuilder.setD10s(_jquery);
+	_d10sCore.addD10s(
+		_d10sBuilder.buildD10s()
+	);
+
+	//IsJs Builder
+	_d10sBuilder.setName('is');
+	_d10sBuilder.setD10s(_isJs);
+	_d10sCore.addD10s(
+		_d10sBuilder.buildD10s()
+	);
+
+	//Moment Builder
+	_d10sBuilder.setName('m6s');
+	_d10sBuilder.setD10s(_moment);
+	_d10sCore.addD10s(
+		_d10sBuilder.buildD10s()
+	);
+
+	//Underscore Builder
+	_d10sBuilder.setName('u10s');
+	_d10sBuilder.setD10s(_u10s);
+	_d10sCore.addD10s(
+		_d10sBuilder.buildD10s()
+	);
+
+	//The core
+	var _core = new Core();
+
+	it('should be called with iD10sComposite type', function () {
+		spyOn(_core, 'setD10s');
+		//Call i18n
+		_core.setD10s(_d10sCore);
+		expect(_core.setD10s).toHaveBeenCalled();
+		expect(_core.setD10s).toHaveBeenCalledWith(_d10sCore);
+	});
+
+	it('should throw error if is called without iD10Composite type', function () {
+		//Call i18n
+		var _throwTo = function() {
+			_core.setD10s({});
+		};
+
+		expect(_throwTo).toThrow();
+	});
+
+});
+
+describe('Syrup.core.getD10s()', function () {
+	'use strict';
+	//Adapters
+	var _isJs = new Adapter(IsJs);
+	var _moment = new Adapter(M6s);
+	var _u10s = new Adapter(U10s);
+	var _jquery = new JQueryAdapter(JQuery);
+
+	//The Provider
+	var _d10sBuilder = new D10sBuilder();
+	var _d10sCore = new D10sComposite();
+
+	//JQuery Builder
+	_d10sBuilder.setName('$');
+	_d10sBuilder.setD10s(_jquery);
+	_d10sCore.addD10s(
+		_d10sBuilder.buildD10s()
+	);
+
+	//IsJs Builder
+	_d10sBuilder.setName('is');
+	_d10sBuilder.setD10s(_isJs);
+	_d10sCore.addD10s(
+		_d10sBuilder.buildD10s()
+	);
+
+	//Moment Builder
+	_d10sBuilder.setName('m6s');
+	_d10sBuilder.setD10s(_moment);
+	_d10sCore.addD10s(
+		_d10sBuilder.buildD10s()
+	);
+
+	//Underscore Builder
+	_d10sBuilder.setName('u10s');
+	_d10sBuilder.setD10s(_u10s);
+	_d10sCore.addD10s(
+		_d10sBuilder.buildD10s()
+	);
+
+	//The core
+	var _core = new Core();
+	_core.setD10s(_d10sCore);
+
+	it('should have access to the attribute Core._dependencies', function () {
+		expect(_core._dependencies).toBeDefined();
+		expect(_core._dependencies).toEqual(jasmine.any(Array));
+	});
+
+	it('match type "array" in the return', function () {
+		expect(_core.getD10s()).toEqual(jasmine.any(Array));
 	});
 
 });
