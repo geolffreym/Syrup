@@ -1234,7 +1234,7 @@ if ( typeof exports !== 'undefined' )
 	Syrup.add('isEmpty', function (input) {
 
 		if (_.is$(input))
-			return false;
+			return true;
 
 		if (_.isObject(input))
 			return _.getObjectSize(input) == 0;
