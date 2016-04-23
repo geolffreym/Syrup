@@ -5079,7 +5079,7 @@ if ( typeof exports !== 'undefined' )
 			//Event Listeners
 			//Success
 			_xhr.addEventListener ('load', function (e) {
-				if ( this.status >= 0xC8 && this.status < 0x190 || this.status == 0 ) {
+				if ((this.status == 200 || this.status == 0 ) && this.readyState == 4) {
 					//The response
 					this.responseClean = _self._response (this);
 
