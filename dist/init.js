@@ -5114,7 +5114,7 @@ if ( typeof exports !== 'undefined' )
 			});
 
 			//Complete
-			_xhr.addEventListener('loadend', function (e) {
+			_xhr.addEventListener('load', function (e) {
 				//The response
 				this.responseClean = _self._response(this);
 
