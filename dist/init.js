@@ -5077,15 +5077,22 @@ if ( typeof exports !== 'undefined' )
             }
 
             ////Event Listeners
-            //_xhr.addEventListener('readystatechange', function (e) {
-            //
-            //});
+            _xhr.addEventListener('load', function (e) {
+                // Success
+                if ((this.status == 200 || this.status == 0 ) && this.readyState == 4) {
+                    //The response
+                    this.responseClean = _self._response(this);
+                    //Find a interceptor for success
+                    _self._handleInterceptor('success', _xhr, naming);
+                    //Resolve
+                    resolve(this.responseClean);
+                }
+            });
 
             //Progress
             _xhr.addEventListener('progress', function (e) {
                 //Find a interceptor for progress
                 _self._handleInterceptor('progress', e, naming);
-
             });
 
             //State
@@ -5093,16 +5100,6 @@ if ( typeof exports !== 'undefined' )
                 if (this.readyState) {
                     //Find a interceptor for state
                     _self._handleInterceptor('state', _xhr, naming);
-
-                    // Success
-                    if (this.status == 200 && this.readyState == 4) {
-                        //The response
-                        this.responseClean = _self._response(this);
-                        //Find a interceptor for success
-                        _self._handleInterceptor('success', _xhr, naming);
-                        //Resolve
-                        resolve(this.responseClean);
-                    }
                 }
             });
 
@@ -5114,7 +5111,7 @@ if ( typeof exports !== 'undefined' )
             });
 
             //Complete
-            _xhr.addEventListener('load', function (e) {
+            _xhr.addEventListener('loadend', function (e) {
                 //The response
                 this.responseClean = _self._response(this);
 
