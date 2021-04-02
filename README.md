@@ -1,4 +1,4 @@
-Syrup ([v1.0.0-alpha](https://en.wiktionary.org/wiki/alpha_version))
+Syrup ([v0.1.0-alpha](https://en.wiktionary.org/wiki/alpha_version))
 =======
 App with sweet flavor
 
