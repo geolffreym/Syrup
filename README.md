@@ -2,9 +2,6 @@ Syrup ([v0.1.0-alpha](https://en.wiktionary.org/wiki/alpha_version))
 =======
 App with sweet flavor
 
-
-[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/geolffreym/Syrup?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
 Content
 =======
 
